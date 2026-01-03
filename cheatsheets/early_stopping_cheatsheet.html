@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Ранняя остановка и кривые обучения Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⏱️ Ранняя остановка и кривые обучения Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть Early Stopping</h2>
+    <ul>
+      <li><strong>Цель</strong>: остановить обучение до переобучения</li>
+      <li><strong>Метод</strong>: мониторинг метрики на валидации</li>
+      <li><strong>Критерий</strong>: метрика перестаёт улучшаться</li>
+      <li><strong>Эффект</strong>: регуляризация модели</li>
+    </ul>
+    <blockquote>
+      Ранняя остановка — это как знать, когда остановиться на тренировке: слишком мало — не получите результат, слишком много — перетренируетесь.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Принцип работы</h2>
+    <ol>
+      <li>Разделить данные на train/validation/test</li>
+      <li>Начать обучение модели</li>
+      <li>После каждой эпохи оценивать на validation</li>
+      <li>Сохранять лучшую модель</li>
+      <li>Если метрика не улучшается N эпох подряд — остановиться</li>
+      <li>Вернуться к лучшей сохранённой модели</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовая реализация</h2>
+    <pre><code>from sklearn.model_selection import train_test_split
+
+# Разделение данных
+X_train, X_temp, y_train, y_temp = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+X_val, X_test, y_val, y_test = train_test_split(
+    X_temp, y_temp, test_size=0.5, random_state=42
+)
+
+# Early stopping
+best_val_loss = float('inf')
+patience = 10  # сколько эпох ждать
+patience_counter = 0
+best_model = None
+
+for epoch in range(max_epochs):
+    # Обучение
+    model.fit(X_train, y_train)
+    
+    # Оценка на валидации
+    val_loss = model.evaluate(X_val, y_val)
+    
+    # Проверка улучшения
+    if val_loss < best_val_loss:
+        best_val_loss = val_loss
+        best_model = copy.deepcopy(model)
+        patience_counter = 0
+    else:
+        patience_counter += 1
+    
+    # Ранняя остановка
+    if patience_counter >= patience:
+        print(f"Early stopping at epoch {epoch}")
+        break
+
+# Использовать лучшую модель
+model = best_model</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Keras/TensorFlow</h2>
+    <pre><code>from tensorflow.keras.callbacks import EarlyStopping
+
+# Создание callback
+early_stop = EarlyStopping(
+    monitor='val_loss',      # метрика для мониторинга
+    patience=10,             # количество эпох без улучшения
+    restore_best_weights=True,  # вернуть лучшие веса
+    verbose=1,               # вывод информации
+    mode='min'               # min для loss, max для accuracy
+)
+
+# Обучение с early stopping
+history = model.fit(
+    X_train, y_train,
+    validation_data=(X_val, y_val),
+    epochs=1000,
+    callbacks=[early_stop],
+    batch_size=32
+)
+
+# Проверка на каких эпохах остановились
+stopped_epoch = early_stop.stopped_epoch
+print(f"Training stopped at epoch: {stopped_epoch}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. PyTorch</h2>
+    <pre><code>import torch
+import copy
+
+class EarlyStopping:
+    def __init__(self, patience=10, delta=0, verbose=False):
+        self.patience = patience
+        self.delta = delta
+        self.verbose = verbose
+        self.counter = 0
+        self.best_loss = None
+        self.early_stop = False
+        self.best_model = None
+    
+    def __call__(self, val_loss, model):
+        if self.best_loss is None:
+            self.best_loss = val_loss
+            self.save_checkpoint(model)
+        elif val_loss > self.best_loss - self.delta:
+            self.counter += 1
+            if self.verbose:
+                print(f'EarlyStopping counter: {self.counter}/{self.patience}')
+            if self.counter >= self.patience:
+                self.early_stop = True
+        else:
+            self.best_loss = val_loss
+            self.save_checkpoint(model)
+            self.counter = 0
+    
+    def save_checkpoint(self, model):
+        if self.verbose:
+            print(f'Validation loss decreased, saving model...')
+        self.best_model = copy.deepcopy(model.state_dict())
+
+# Использование
+early_stopping = EarlyStopping(patience=10, verbose=True)
+
+for epoch in range(max_epochs):
+    # Train
+    model.train()
+    train_loss = train_epoch(model, train_loader, optimizer)
+    
+    # Validate
+    model.eval()
+    val_loss = validate_epoch(model, val_loader)
+    
+    # Early stopping
+    early_stopping(val_loss, model)
+    
+    if early_stopping.early_stop:
+        print(f"Early stopping at epoch {epoch}")
+        break
+
+# Загрузить лучшую модель
+model.load_state_dict(early_stopping.best_model)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Параметры Early Stopping</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>patience</code></td><td>Эпох без улучшения</td><td>5-20 (больше для больших моделей)</td></tr>
+      <tr><td><code>min_delta</code></td><td>Минимальное изменение</td><td>0.0001-0.001</td></tr>
+      <tr><td><code>monitor</code></td><td>Какую метрику отслеживать</td><td>val_loss, val_accuracy</td></tr>
+      <tr><td><code>mode</code></td><td>min или max</td><td>min для loss, max для accuracy</td></tr>
+      <tr><td><code>restore_best</code></td><td>Вернуть лучшие веса</td><td>True (рекомендуется)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Кривые обучения</h2>
+    <p><strong>Learning Curves показывают:</strong></p>
+    <ul>
+      <li>Динамику обучения во времени</li>
+      <li>Наличие переобучения/недообучения</li>
+      <li>Когда применить early stopping</li>
+      <li>Нужно ли больше данных</li>
+    </ul>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Построение кривых
+plt.figure(figsize=(12, 5))
+
+# Loss
+plt.subplot(1, 2, 1)
+plt.plot(history.history['loss'], label='Train Loss')
+plt.plot(history.history['val_loss'], label='Val Loss')
+plt.xlabel('Эпоха')
+plt.ylabel('Loss')
+plt.legend()
+plt.title('Кривые потерь')
+plt.grid(True)
+
+# Accuracy
+plt.subplot(1, 2, 2)
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Val Accuracy')
+plt.xlabel('Эпоха')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.title('Кривые точности')
+plt.grid(True)
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Интерпретация кривых</h2>
+    <table>
+      <tr><th>Паттерн</th><th>Train</th><th>Val</th><th>Диагноз</th><th>Решение</th></tr>
+      <tr><td>Хорошая модель</td><td>↓</td><td>↓</td><td>Сходится</td><td>✅ Всё ок</td></tr>
+      <tr><td>Переобучение</td><td>↓↓</td><td>↑</td><td>Overfitting</td><td>Регуляризация, Early stopping</td></tr>
+      <tr><td>Недообучение</td><td>высокий</td><td>высокий</td><td>Underfitting</td><td>Сложнее модель, больше эпох</td></tr>
+      <tr><td>Разрыв</td><td>низкий</td><td>высокий</td><td>High variance</td><td>Больше данных</td></tr>
+      <tr><td>Plateau</td><td>→</td><td>→</td><td>Застряли</td><td>Изменить LR, архитектуру</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Визуальная диагностика</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошая сходимость</h3>
+        <ul>
+          <li>Train и val loss снижаются вместе</li>
+          <li>Небольшой разрыв между ними</li>
+          <li>Плавные кривые без скачков</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Переобучение</h3>
+        <ul>
+          <li>Train loss продолжает падать</li>
+          <li>Val loss растёт или plateau</li>
+          <li>Большой разрыв между train и val</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Кривые размера обучающей выборки</h2>
+    <pre><code>from sklearn.model_selection import learning_curve
+import numpy as np
+
+# Построение кривых
+train_sizes, train_scores, val_scores = learning_curve(
+    model, X, y,
+    train_sizes=np.linspace(0.1, 1.0, 10),
+    cv=5,
+    scoring='neg_mean_squared_error',
+    n_jobs=-1
+)
+
+# Средние значения
+train_mean = -np.mean(train_scores, axis=1)
+train_std = np.std(train_scores, axis=1)
+val_mean = -np.mean(val_scores, axis=1)
+val_std = np.std(val_scores, axis=1)
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(train_sizes, train_mean, label='Train', marker='o')
+plt.plot(train_sizes, val_mean, label='Validation', marker='o')
+plt.fill_between(train_sizes, 
+                 train_mean - train_std, 
+                 train_mean + train_std, 
+                 alpha=0.15)
+plt.fill_between(train_sizes, 
+                 val_mean - val_std, 
+                 val_mean + val_std, 
+                 alpha=0.15)
+plt.xlabel('Размер обучающей выборки')
+plt.ylabel('MSE')
+plt.title('Learning Curves: размер выборки')
+plt.legend()
+plt.grid(True)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. ModelCheckpoint (сохранение)</h2>
+    <pre><code>from tensorflow.keras.callbacks import ModelCheckpoint
+
+# Сохранение лучшей модели
+checkpoint = ModelCheckpoint(
+    'best_model.h5',
+    monitor='val_loss',
+    save_best_only=True,
+    mode='min',
+    verbose=1
+)
+
+# Обучение
+history = model.fit(
+    X_train, y_train,
+    validation_data=(X_val, y_val),
+    epochs=100,
+    callbacks=[early_stop, checkpoint]
+)
+
+# Загрузка лучшей модели
+from tensorflow.keras.models import load_model
+best_model = load_model('best_model.h5')
+
+# PyTorch
+torch.save(model.state_dict(), 'best_model.pt')
+model.load_state_dict(torch.load('best_model.pt'))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Комбинация с другими callbacks</h2>
+    <pre><code>from tensorflow.keras.callbacks import (
+    EarlyStopping, 
+    ModelCheckpoint,
+    ReduceLROnPlateau,
+    TensorBoard
+)
+
+# Early stopping
+early_stop = EarlyStopping(
+    monitor='val_loss',
+    patience=15,
+    restore_best_weights=True
+)
+
+# Model checkpoint
+checkpoint = ModelCheckpoint(
+    'model_epoch_{epoch:02d}.h5',
+    save_best_only=True
+)
+
+# Reduce learning rate
+reduce_lr = ReduceLROnPlateau(
+    monitor='val_loss',
+    factor=0.5,
+    patience=5,
+    min_lr=1e-7,
+    verbose=1
+)
+
+# TensorBoard
+tensorboard = TensorBoard(log_dir='./logs')
+
+# Все вместе
+callbacks = [early_stop, checkpoint, reduce_lr, tensorboard]
+
+history = model.fit(
+    X_train, y_train,
+    validation_data=(X_val, y_val),
+    epochs=1000,
+    callbacks=callbacks
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Анализ кривых</h2>
+    <pre><code>def analyze_learning_curves(history):
+    """Автоматический анализ кривых обучения"""
+    train_loss = history.history['loss']
+    val_loss = history.history['val_loss']
+    
+    # Проверка переобучения
+    last_train = np.mean(train_loss[-5:])
+    last_val = np.mean(val_loss[-5:])
+    
+    if last_val > last_train * 1.2:
+        print("⚠️ Переобучение обнаружено")
+        print("Рекомендации:")
+        print("- Использовать регуляризацию (L1/L2, Dropout)")
+        print("- Уменьшить сложность модели")
+        print("- Добавить больше данных")
+        print("- Применить data augmentation")
+    
+    # Проверка недообучения
+    if last_train > 0.5 and last_val > 0.5:  # пороги зависят от задачи
+        print("⚠️ Недообучение обнаружено")
+        print("Рекомендации:")
+        print("- Увеличить сложность модели")
+        print("- Увеличить количество эпох")
+        print("- Уменьшить регуляризацию")
+    
+    # Проверка сходимости
+    recent_change = abs(np.mean(val_loss[-5:]) - np.mean(val_loss[-10:-5]))
+    if recent_change < 0.001:
+        print("✅ Модель сошлась")
+    else:
+        print("⚠️ Модель ещё может улучшаться")
+    
+    return {
+        'train_loss': last_train,
+        'val_loss': last_val,
+        'gap': last_val - last_train
+    }
+
+# Использование
+analysis = analyze_learning_curves(history)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Разделить данные на train/val/test</li>
+      <li>[ ] Настроить early stopping (patience=10-20)</li>
+      <li>[ ] Сохранять лучшую модель (restore_best_weights)</li>
+      <li>[ ] Визуализировать кривые обучения</li>
+      <li>[ ] Мониторить и train, и validation метрики</li>
+      <li>[ ] Проверить на переобучение</li>
+      <li>[ ] Комбинировать с ReduceLROnPlateau</li>
+      <li>[ ] Использовать TensorBoard для мониторинга</li>
+      <li>[ ] Сохранить финальную модель</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Early stopping — это как остановиться на репетициях перед выступлением в нужный момент: слишком мало — не будете готовы, слишком много — перегорите и выступите хуже».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Практические советы</h2>
+    <ul>
+      <li><strong>Patience</strong>: 5-10 для малых моделей, 20-50 для больших</li>
+      <li><strong>Валидация</strong>: 15-20% от обучающих данных</li>
+      <li><strong>Мониторинг</strong>: всегда val_loss, не train_loss</li>
+      <li><strong>Min_delta</strong>: 0 по умолчанию, увеличьте для стабильности</li>
+      <li><strong>Restore_best</strong>: всегда True</li>
+      <li><strong>Логирование</strong>: используйте wandb или tensorboard</li>
+    </ul>
+    <pre><code># Пример полного пайплайна
+from sklearn.model_selection import train_test_split
+
+# Разделение
+X_train, X_temp, y_train, y_temp = train_test_split(
+    X, y, test_size=0.3, random_state=42
+)
+X_val, X_test, y_val, y_test = train_test_split(
+    X_temp, y_temp, test_size=0.5, random_state=42
+)
+
+# Callbacks
+callbacks = [
+    EarlyStopping(patience=20, restore_best_weights=True),
+    ModelCheckpoint('best_model.h5', save_best_only=True),
+    ReduceLROnPlateau(patience=5, factor=0.5)
+]
+
+# Обучение
+history = model.fit(
+    X_train, y_train,
+    validation_data=(X_val, y_val),
+    epochs=1000,
+    callbacks=callbacks,
+    verbose=1
+)
+
+# Оценка на test
+test_loss = model.evaluate(X_test, y_test)</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>

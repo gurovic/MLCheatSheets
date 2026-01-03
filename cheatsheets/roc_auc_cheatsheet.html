@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>ROC и AUC Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}
+    @media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}
+    .container{column-count:3;column-gap:20px;max-width:100%}
+    .block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+    h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}
+    .subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}
+    h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}
+    p,ul,ol{font-size:0.92em;margin:0.6em 0}
+    ul,ol{padding-left:18px}
+    li{margin-bottom:4px}
+    code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}
+    pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}
+    pre code{padding:0;background:none;white-space:pre-wrap}
+    table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}
+    th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}
+    td{padding:4px 6px;border-bottom:1px solid #f0f4ff}
+    tr:nth-child(even){background-color:#f8fbff}
+    .good-vs-bad{display:flex;flex-direction:column;gap:8px}
+    .good-vs-bad div{flex:1;padding:6px 8px;border-radius:4px}
+    .good{background-color:#f0f9f4;border-left:3px solid #2e8b57}
+    .bad{background-color:#fdf0f2;border-left:3px solid #d32f2f}
+    .good h3,.bad h3{margin:0 0 4px;font-size:1em;font-weight:700}
+    .good ul,.bad ul{padding-left:20px;margin:0}
+    .good li::before{content:"✅ ";font-weight:bold}
+    .bad li::before{content:"❌ ";font-weight:bold}
+    blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}
+    @media print{.container{column-gap:12px}.block{box-shadow:none}code,pre,table{font-size:0.78em}h1{font-size:1.4em}h2{font-size:1em}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📈 ROC и AUC Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>ROC</strong>: Receiver Operating Characteristic curve</li>
+      <li><strong>AUC</strong>: Area Under the ROC Curve</li>
+      <li><strong>Цель</strong>: оценка качества бинарной классификации</li>
+      <li><strong>Применение</strong>: выбор оптимального порога</li>
+    </ul>
+    <blockquote>ROC-кривая показывает компромисс между True Positive Rate и False Positive Rate при разных порогах классификации.</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные метрики</h2>
+    <table>
+      <tr><th>Метрика</th><th>Формула</th><th>Описание</th></tr>
+      <tr><td><strong>TPR (Recall)</strong></td><td>TP/(TP+FN)</td><td>Доля правильных положительных</td></tr>
+      <tr><td><strong>FPR</strong></td><td>FP/(FP+TN)</td><td>Доля ложных положительных</td></tr>
+      <tr><td><strong>TNR (Specificity)</strong></td><td>TN/(TN+FP)</td><td>Доля правильных отрицательных</td></tr>
+      <tr><td><strong>AUC</strong></td><td>[0, 1]</td><td>Площадь под ROC-кривой</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Построение ROC</h2>
+    <pre><code>from sklearn.metrics import roc_curve, roc_auc_score
+import matplotlib.pyplot as plt
+
+# Получить вероятности
+y_proba = model.predict_proba(X_test)[:, 1]
+
+# ROC curve
+fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+
+# AUC score
+auc = roc_auc_score(y_test, y_proba)
+
+# Визуализация
+plt.figure(figsize=(10, 8))
+plt.plot(fpr, tpr, label=f'ROC (AUC = {auc:.3f})')
+plt.plot([0, 1], [0, 1], 'k--', label='Random')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.legend()
+plt.grid(True)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Интерпретация AUC</h2>
+    <table>
+      <tr><th>AUC</th><th>Качество</th><th>Интерпретация</th></tr>
+      <tr><td>0.9-1.0</td><td>Отлично</td><td>Модель отлично разделяет классы</td></tr>
+      <tr><td>0.8-0.9</td><td>Хорошо</td><td>Модель хорошо работает</td></tr>
+      <tr><td>0.7-0.8</td><td>Приемлемо</td><td>Есть потенциал для улучшения</td></tr>
+      <tr><td>0.6-0.7</td><td>Плохо</td><td>Слабая способность к классификации</td></tr>
+      <tr><td>0.5-0.6</td><td>Очень плохо</td><td>Чуть лучше случайного</td></tr>
+      <tr><td>0.5</td><td>Случайность</td><td>Модель не лучше подбрасывания монеты</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Выбор порога</h2>
+    <pre><code># Найти оптимальный порог
+from sklearn.metrics import f1_score
+
+thresholds_to_test = thresholds[::10]  # каждый 10-й
+f1_scores = []
+
+for threshold in thresholds_to_test:
+    y_pred = (y_proba >= threshold).astype(int)
+    f1 = f1_score(y_test, y_pred)
+    f1_scores.append(f1)
+
+optimal_idx = np.argmax(f1_scores)
+optimal_threshold = thresholds_to_test[optimal_idx]
+print(f"Optimal threshold: {optimal_threshold:.3f}")
+
+# Или по Youden's J statistic
+J = tpr - fpr
+optimal_idx = np.argmax(J)
+optimal_threshold = thresholds[optimal_idx]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Мультиклассовая ROC</h2>
+    <pre><code>from sklearn.preprocessing import label_binarize
+from sklearn.metrics import roc_curve, auc
+
+# Binarize labels
+y_test_bin = label_binarize(y_test, classes=[0, 1, 2])
+n_classes = y_test_bin.shape[1]
+
+# Get probabilities
+y_score = model.predict_proba(X_test)
+
+# ROC для каждого класса
+plt.figure(figsize=(10, 8))
+for i in range(n_classes):
+    fpr, tpr, _ = roc_curve(y_test_bin[:, i], y_score[:, i])
+    roc_auc = auc(fpr, tpr)
+    plt.plot(fpr, tpr, label=f'Class {i} (AUC={roc_auc:.2f})')
+
+plt.plot([0,1], [0,1], 'k--')
+plt.xlabel('FPR')
+plt.ylabel('TPR')
+plt.title('Multiclass ROC')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сравнение моделей</h2>
+    <pre><code># Сравнение нескольких моделей
+models = [model1, model2, model3]
+names = ['Logistic', 'Random Forest', 'XGBoost']
+
+plt.figure(figsize=(10, 8))
+for model, name in zip(models, names):
+    y_proba = model.predict_proba(X_test)[:, 1]
+    fpr, tpr, _ = roc_curve(y_test, y_proba)
+    auc_score = roc_auc_score(y_test, y_proba)
+    plt.plot(fpr, tpr, label=f'{name} (AUC={auc_score:.3f})')
+
+plt.plot([0,1], [0,1], 'k--', label='Random')
+plt.xlabel('FPR')
+plt.ylabel('TPR')
+plt.title('ROC Comparison')
+plt.legend()
+plt.grid(True)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Чек-лист</h2>
+    <ul>
+      <li>[ ] Построить ROC-кривую</li>
+      <li>[ ] Вычислить AUC score</li>
+      <li>[ ] Сравнить с baseline (AUC=0.5)</li>
+      <li>[ ] Найти оптимальный порог</li>
+      <li>[ ] Сравнить несколько моделей</li>
+      <li>[ ] Проверить для всех классов (мультикласс)</li>
+    </ul>
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>«AUC показывает, насколько хорошо модель может отличить положительные примеры от отрицательных: значение 0.9 означает, что в 90% случаев модель правильно ранжирует случайный положительный пример выше случайного отрицательного».</blockquote>
+  </div>
+</div>
+</body>
+</html>

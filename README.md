@@ -55,6 +55,8 @@
 
 ### **6. Оценка моделей и валидация**
 1. [Метрики классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/classification_metrics_cheatsheet.html)
+1. [Матрица ошибок (Confusion Matrix)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/confusion_matrix_cheatsheet.html)
+1. [ROC и AUC](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/roc_auc_cheatsheet.html)
 1. [Метрики регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/regression_metrics_cheatsheet.html)
 1. [Кросс-валидация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cross_validation_cheatsheet.html)
 1. Кривые обучения
@@ -143,7 +145,9 @@
 
 ### **19. Основы теории**
 1. [Смещение-дисперсия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bias_variance_cheatsheet.html)
-1. Переобучение/недообучение
+1. [Переобучение и недообучение (Overfitting/Underfitting)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/overfitting_underfitting_cheatsheet.html)
+1. [Градиентный спуск (Gradient Descent)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gradient_descent_cheatsheet.html)
+1. [Теория вероятностей для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/probability_theory_cheatsheet.html)
 1. Регуляризация
 1. Байесовский подход
 1. Теория информации в ML
@@ -169,14 +173,15 @@
 1. [Архитектура MLP (многослойный перцептрон)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mlp_cheatsheet.html)
 1. [Функции активации (ReLU, Sigmoid, Tanh, Softmax)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/activation_functions_cheatsheet.html)
 1. [Функции потерь для классификации и регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/loss_functions_cheatsheet.html)
-1. Алгоритм обратного распространения ошибки
+1. [Обратное распространение ошибки (Backpropagation)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/backpropagation_cheatsheet.html)
 1. [Оптимизаторы (SGD, Momentum, Adam, RMSProp)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/optimizers_cheatsheet.html)
-1. Инициализация весов
+1. [Инициализация весов (Weight Initialization)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/weight_initialization_cheatsheet.html)
+1. [Ранняя остановка и кривые обучения (Early Stopping)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/early_stopping_cheatsheet.html)
 1. [Регуляризация нейронных сетей (Dropout и др.)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dropout_regularization_cheatsheet.html)
 
 ### **2. Сверточные нейронные сети (CNN)**
 1. [Основы свертки](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_basics_cheatsheet.html)
-1. Пулинг-слои (Max, Average, Global)
+1. [Пулинг-слои (Max, Average, Global Pooling)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pooling_layers_cheatsheet.html)
 1. Архитектуры CNN (LeNet, AlexNet, VGG)
 1. Современные архитектуры ([ResNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/resnet_cheatsheet.html), Inception, EfficientNet)
 1. Transfer learning для CNN
@@ -192,7 +197,7 @@
 1. [GRU (Gated Recurrent Units)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gru_cheatsheet.html)
 1. Двунаправленные RNN
 1. Рекуррентная регуляризация
-1. Архитектуры encoder-decoder
+1. [Архитектура Encoder-Decoder](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/encoder_decoder_cheatsheet.html)
 
 ### **4. Трансформеры и механизмы внимания**
 1. [Механизм внимания (attention)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/attention_mechanism_cheatsheet.html)

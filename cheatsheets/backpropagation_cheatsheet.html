@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Обратное распространение ошибки Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔄 Обратное распространение ошибки Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: эффективно вычислить градиенты в нейросети</li>
+      <li><strong>Метод</strong>: распространение ошибки от выхода к входу</li>
+      <li><strong>Основа</strong>: правило дифференцирования сложных функций (chain rule)</li>
+      <li><strong>Применение</strong>: обучение всех нейронных сетей</li>
+    </ul>
+    <blockquote>
+      Backpropagation — это способ узнать, насколько каждый нейрон виноват в ошибке, чтобы его исправить.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Два этапа обучения</h2>
+    <ol>
+      <li><strong>Forward pass (прямой проход)</strong>:
+        <ul>
+          <li>Данные идут от входа к выходу</li>
+          <li>Вычисляются активации всех слоёв</li>
+          <li>Получается предсказание</li>
+          <li>Вычисляется функция потерь</li>
+        </ul>
+      </li>
+      <li><strong>Backward pass (обратный проход)</strong>:
+        <ul>
+          <li>Ошибка идёт от выхода к входу</li>
+          <li>Вычисляются градиенты для каждого веса</li>
+          <li>Веса обновляются градиентным спуском</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Chain Rule (правило цепочки)</h2>
+    <p><strong>Математическая основа backpropagation:</strong></p>
+    <pre><code>Если z = f(y) и y = g(x), то:
+
+∂z/∂x = (∂z/∂y) * (∂y/∂x)
+
+Для нейросети:
+
+∂Loss/∂w₁ = (∂Loss/∂output) * (∂output/∂h) * (∂h/∂w₁)
+
+где h — скрытый слой</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Простой пример: 1 слой</h2>
+    <pre><code>import numpy as np
+
+# Forward pass
+x = np.array([1.0, 2.0, 3.0])  # вход
+w = np.array([0.5, -0.2, 0.1])  # веса
+b = 0.1  # bias
+
+# Линейная комбинация
+z = np.dot(x, w) + b  # z = 1.2
+
+# Активация (sigmoid)
+a = 1 / (1 + np.exp(-z))  # a ≈ 0.77
+
+# Функция потерь (MSE)
+y_true = 1.0
+loss = (a - y_true)**2  # loss ≈ 0.053
+
+# Backward pass
+# Градиент loss по a
+dL_da = 2 * (a - y_true)  # ≈ -0.46
+
+# Градиент a по z (производная sigmoid)
+da_dz = a * (1 - a)  # ≈ 0.177
+
+# Градиент loss по z (chain rule)
+dL_dz = dL_da * da_dz  # ≈ -0.081
+
+# Градиенты по весам
+dL_dw = dL_dz * x  # [-0.081, -0.163, -0.244]
+dL_db = dL_dz  # -0.081
+
+# Обновление весов
+learning_rate = 0.1
+w = w - learning_rate * dL_dw
+b = b - learning_rate * dL_db</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Многослойная сеть</h2>
+    <pre><code>class NeuralNetwork:
+    def __init__(self, input_size, hidden_size, output_size):
+        # Инициализация весов
+        self.W1 = np.random.randn(input_size, hidden_size) * 0.01
+        self.b1 = np.zeros((1, hidden_size))
+        self.W2 = np.random.randn(hidden_size, output_size) * 0.01
+        self.b2 = np.zeros((1, output_size))
+    
+    def sigmoid(self, z):
+        return 1 / (1 + np.exp(-z))
+    
+    def sigmoid_derivative(self, a):
+        return a * (1 - a)
+    
+    def forward(self, X):
+        # Слой 1
+        self.z1 = X.dot(self.W1) + self.b1
+        self.a1 = self.sigmoid(self.z1)
+        
+        # Слой 2
+        self.z2 = self.a1.dot(self.W2) + self.b2
+        self.a2 = self.sigmoid(self.z2)
+        
+        return self.a2
+    
+    def backward(self, X, y, output):
+        m = X.shape[0]
+        
+        # Градиенты слоя 2
+        dL_da2 = output - y  # для MSE loss
+        da2_dz2 = self.sigmoid_derivative(self.a2)
+        dL_dz2 = dL_da2 * da2_dz2
+        
+        dL_dW2 = (1/m) * self.a1.T.dot(dL_dz2)
+        dL_db2 = (1/m) * np.sum(dL_dz2, axis=0, keepdims=True)
+        
+        # Градиенты слоя 1
+        dL_da1 = dL_dz2.dot(self.W2.T)
+        da1_dz1 = self.sigmoid_derivative(self.a1)
+        dL_dz1 = dL_da1 * da1_dz1
+        
+        dL_dW1 = (1/m) * X.T.dot(dL_dz1)
+        dL_db1 = (1/m) * np.sum(dL_dz1, axis=0, keepdims=True)
+        
+        return dL_dW1, dL_db1, dL_dW2, dL_db2
+    
+    def train(self, X, y, epochs=1000, lr=0.1):
+        for epoch in range(epochs):
+            # Forward
+            output = self.forward(X)
+            
+            # Backward
+            dW1, db1, dW2, db2 = self.backward(X, y, output)
+            
+            # Обновление весов
+            self.W1 -= lr * dW1
+            self.b1 -= lr * db1
+            self.W2 -= lr * dW2
+            self.b2 -= lr * db2
+            
+            if epoch % 100 == 0:
+                loss = np.mean((output - y)**2)
+                print(f"Epoch {epoch}, Loss: {loss:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Производные активаций</h2>
+    <table>
+      <tr><th>Активация</th><th>Функция</th><th>Производная</th></tr>
+      <tr><td><strong>Sigmoid</strong></td><td>σ(x) = 1/(1+e⁻ˣ)</td><td>σ(x)(1-σ(x))</td></tr>
+      <tr><td><strong>Tanh</strong></td><td>tanh(x)</td><td>1 - tanh²(x)</td></tr>
+      <tr><td><strong>ReLU</strong></td><td>max(0, x)</td><td>1 if x>0, else 0</td></tr>
+      <tr><td><strong>Leaky ReLU</strong></td><td>max(αx, x)</td><td>1 if x>0, else α</td></tr>
+      <tr><td><strong>Softmax</strong></td><td>eˣⁱ/Σeˣʲ</td><td>σᵢ(1-σⱼ)</td></tr>
+    </table>
+    <pre><code>def relu_derivative(z):
+    return (z > 0).astype(float)
+
+def tanh_derivative(a):
+    return 1 - np.tanh(a)**2
+
+def leaky_relu_derivative(z, alpha=0.01):
+    dz = np.ones_like(z)
+    dz[z < 0] = alpha
+    return dz</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Производные функций потерь</h2>
+    <table>
+      <tr><th>Loss</th><th>Формула</th><th>Производная ∂L/∂ŷ</th></tr>
+      <tr><td><strong>MSE</strong></td><td>(y - ŷ)²</td><td>2(ŷ - y)</td></tr>
+      <tr><td><strong>MAE</strong></td><td>|y - ŷ|</td><td>sign(ŷ - y)</td></tr>
+      <tr><td><strong>BCE</strong></td><td>-y log(ŷ) - (1-y)log(1-ŷ)</td><td>(ŷ - y)/(ŷ(1-ŷ))</td></tr>
+      <tr><td><strong>CCE</strong></td><td>-Σyᵢlog(ŷᵢ)</td><td>-y/ŷ</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Computational Graph</h2>
+    <p><strong>Визуализация вычислений:</strong></p>
+    <pre><code>Пример: z = (x + y) * w
+
+Forward:
+x=2, y=3 → a=5 (сложение)
+a=5, w=4 → z=20 (умножение)
+
+Backward:
+∂z/∂z = 1
+∂z/∂a = w = 4
+∂z/∂w = a = 5
+∂z/∂x = ∂z/∂a * ∂a/∂x = 4 * 1 = 4
+∂z/∂y = ∂z/∂a * ∂a/∂y = 4 * 1 = 4</code></pre>
+    <p>Каждая операция хранит:</p>
+    <ul>
+      <li>Входы (для backward pass)</li>
+      <li>Выход (для forward pass)</li>
+      <li>Локальные градиенты</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Автоматическое дифференцирование</h2>
+    <p><strong>Современные фреймворки делают это автоматически:</strong></p>
+    <pre><code># PyTorch
+import torch
+
+x = torch.tensor([1.0, 2.0, 3.0], requires_grad=True)
+w = torch.tensor([0.5, -0.2, 0.1], requires_grad=True)
+b = torch.tensor(0.1, requires_grad=True)
+
+# Forward
+z = torch.dot(x, w) + b
+a = torch.sigmoid(z)
+y_true = torch.tensor(1.0)
+loss = (a - y_true)**2
+
+# Backward (автоматически!)
+loss.backward()
+
+print(f"Градиент w: {w.grad}")
+print(f"Градиент b: {b.grad}")
+
+# TensorFlow
+import tensorflow as tf
+
+x = tf.constant([1.0, 2.0, 3.0])
+w = tf.Variable([0.5, -0.2, 0.1])
+b = tf.Variable(0.1)
+
+with tf.GradientTape() as tape:
+    z = tf.reduce_sum(x * w) + b
+    a = tf.sigmoid(z)
+    loss = (a - 1.0)**2
+
+# Градиенты автоматически
+gradients = tape.gradient(loss, [w, b])
+print(f"Градиенты: {gradients}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Проблемы backpropagation</h2>
+    <table>
+      <tr><th>Проблема</th><th>Причина</th><th>Решение</th></tr>
+      <tr><td><strong>Vanishing gradient</strong></td><td>Производные близки к 0</td><td>ReLU, Batch Norm, ResNet</td></tr>
+      <tr><td><strong>Exploding gradient</strong></td><td>Производные слишком большие</td><td>Gradient clipping, Normalization</td></tr>
+      <tr><td><strong>Dead ReLU</strong></td><td>Нейроны всегда выдают 0</td><td>Leaky ReLU, правильная инициализация</td></tr>
+      <tr><td><strong>Медленная сходимость</strong></td><td>Плохая инициализация</td><td>Xavier, He initialization</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Vanishing Gradient</h2>
+    <p><strong>Проблема глубоких сетей:</strong></p>
+    <ul>
+      <li>Градиенты умножаются на каждом слое</li>
+      <li>Если производная < 1, градиент уменьшается</li>
+      <li>В глубоких сетях градиенты → 0</li>
+      <li>Ранние слои почти не обучаются</li>
+    </ul>
+    <pre><code># Пример: sigmoid имеет max производную 0.25
+# В 10-слойной сети: (0.25)^10 ≈ 0.000001
+
+# Решения:
+# 1. ReLU вместо sigmoid
+def relu(x):
+    return np.maximum(0, x)
+
+# 2. Batch Normalization
+from tensorflow.keras.layers import BatchNormalization
+
+# 3. Residual connections (ResNet)
+output = input + F(input)  # skip connection
+
+# 4. LSTM/GRU для RNN</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Exploding Gradient</h2>
+    <p><strong>Противоположная проблема:</strong></p>
+    <ul>
+      <li>Градиенты становятся очень большими</li>
+      <li>Веса обновляются слишком сильно</li>
+      <li>Модель расходится</li>
+    </ul>
+    <pre><code># Решения:
+
+# 1. Gradient Clipping
+import torch.nn as nn
+
+max_grad_norm = 1.0
+torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
+
+# 2. Правильная инициализация
+# Xavier/Glorot для sigmoid/tanh
+w = np.random.randn(n_in, n_out) * np.sqrt(1.0/n_in)
+
+# He initialization для ReLU
+w = np.random.randn(n_in, n_out) * np.sqrt(2.0/n_in)
+
+# 3. Меньший learning rate
+optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
+
+# 4. Batch Normalization
+# Нормализует активации, стабилизирует градиенты</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Проверка градиентов</h2>
+    <pre><code>def gradient_check(f, x, analytic_grad, epsilon=1e-5):
+    """
+    Проверяет правильность аналитических градиентов
+    численным методом
+    """
+    numeric_grad = np.zeros_like(x)
+    
+    for i in range(x.size):
+        x_plus = x.copy()
+        x_minus = x.copy()
+        
+        x_plus.flat[i] += epsilon
+        x_minus.flat[i] -= epsilon
+        
+        # Численная производная
+        numeric_grad.flat[i] = (f(x_plus) - f(x_minus)) / (2*epsilon)
+    
+    # Относительная ошибка
+    numerator = np.linalg.norm(numeric_grad - analytic_grad)
+    denominator = np.linalg.norm(numeric_grad) + np.linalg.norm(analytic_grad)
+    relative_error = numerator / denominator
+    
+    if relative_error < 1e-7:
+        print("✅ Градиенты корректны")
+    else:
+        print(f"❌ Ошибка: {relative_error}")
+        print(f"Численный: {numeric_grad}")
+        print(f"Аналитический: {analytic_grad}")
+    
+    return relative_error</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Правильная инициализация весов (Xavier/He)</li>
+      <li>[ ] Выбор подходящей активации (ReLU для глубоких сетей)</li>
+      <li>[ ] Мониторинг градиентов (tensorboard, wandb)</li>
+      <li>[ ] Gradient clipping для RNN</li>
+      <li>[ ] Batch Normalization для глубоких сетей</li>
+      <li>[ ] Проверка градиентов при разработке</li>
+      <li>[ ] Использование автоматического дифференцирования</li>
+      <li>[ ] Регулярная проверка на vanishing/exploding</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Backpropagation — это способ, которым нейросеть понимает, какие её части работают хорошо, а какие плохо, чтобы улучшить каждую часть в правильном направлении».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Оптимизация производительности</h2>
+    <ul>
+      <li><strong>Vectorization</strong>: избегайте циклов, используйте матричные операции</li>
+      <li><strong>GPU acceleration</strong>: используйте PyTorch/TensorFlow с CUDA</li>
+      <li><strong>Mixed precision</strong>: FP16 для ускорения</li>
+      <li><strong>Gradient accumulation</strong>: для больших батчей</li>
+      <li><strong>Checkpointing</strong>: сохраняйте промежуточные активации</li>
+    </ul>
+    <pre><code># PyTorch automatic mixed precision
+from torch.cuda.amp import autocast, GradScaler
+
+scaler = GradScaler()
+
+for data, target in dataloader:
+    optimizer.zero_grad()
+    
+    with autocast():
+        output = model(data)
+        loss = criterion(output, target)
+    
+    scaler.scale(loss).backward()
+    scaler.step(optimizer)
+    scaler.update()</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>

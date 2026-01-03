@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Инициализация весов Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎲 Инициализация весов Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Почему это важно</h2>
+    <ul>
+      <li><strong>Проблема</strong>: неправильная инициализация → плохая сходимость</li>
+      <li><strong>Vanishing gradients</strong>: слишком малые веса</li>
+      <li><strong>Exploding gradients</strong>: слишком большие веса</li>
+      <li><strong>Симметрия</strong>: одинаковые веса → нейроны учатся одинаково</li>
+    </ul>
+    <blockquote>
+      Правильная инициализация весов — это как правильный старт в беге: плохой старт может сделать невозможным победу.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Плохие методы</h2>
+    <div class="good-vs-bad">
+      <div class="bad">
+        <h3>❌ Нулевая инициализация</h3>
+        <ul>
+          <li>Все веса = 0</li>
+          <li>Все нейроны учатся одинаково</li>
+          <li>Нет обучения, симметрия</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Слишком большие значения</h3>
+        <ul>
+          <li>w = np.random.randn(n) * 10</li>
+          <li>Exploding gradients</li>
+          <li>Расхождение модели</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Слишком малые значения</h3>
+        <ul>
+          <li>w = np.random.randn(n) * 0.0001</li>
+          <li>Vanishing gradients</li>
+          <li>Медленное обучение</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Xavier/Glorot Initialization</h2>
+    <p><strong>Для sigmoid и tanh активаций:</strong></p>
+    <pre><code>import numpy as np
+
+# Xavier Uniform
+def xavier_uniform(n_in, n_out):
+    limit = np.sqrt(6.0 / (n_in + n_out))
+    return np.random.uniform(-limit, limit, (n_in, n_out))
+
+# Xavier Normal
+def xavier_normal(n_in, n_out):
+    std = np.sqrt(2.0 / (n_in + n_out))
+    return np.random.randn(n_in, n_out) * std
+
+# Keras/TensorFlow
+from tensorflow.keras import initializers
+
+model.add(Dense(
+    64,
+    kernel_initializer='glorot_uniform',  # по умолчанию
+    bias_initializer='zeros'
+))
+
+# PyTorch
+import torch.nn as nn
+
+nn.Linear(in_features, out_features)  # Xavier по умолчанию
+# или явно:
+nn.init.xavier_uniform_(layer.weight)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. He Initialization</h2>
+    <p><strong>Для ReLU и его вариаций:</strong></p>
+    <pre><code># He Uniform
+def he_uniform(n_in, n_out):
+    limit = np.sqrt(6.0 / n_in)
+    return np.random.uniform(-limit, limit, (n_in, n_out))
+
+# He Normal (рекомендуется)
+def he_normal(n_in, n_out):
+    std = np.sqrt(2.0 / n_in)
+    return np.random.randn(n_in, n_out) * std
+
+# Keras/TensorFlow
+model.add(Dense(
+    64,
+    activation='relu',
+    kernel_initializer='he_normal'
+))
+
+# PyTorch
+nn.init.kaiming_normal_(layer.weight, mode='fan_in', nonlinearity='relu')
+# или
+nn.init.kaiming_uniform_(layer.weight)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Формула</th><th>Активация</th><th>Когда использовать</th></tr>
+      <tr><td><strong>Xavier Uniform</strong></td><td>U(-√(6/(n_in+n_out)), √(6/(n_in+n_out)))</td><td>sigmoid, tanh</td><td>Мелкие сети</td></tr>
+      <tr><td><strong>Xavier Normal</strong></td><td>N(0, √(2/(n_in+n_out)))</td><td>sigmoid, tanh</td><td>Любые сети</td></tr>
+      <tr><td><strong>He Uniform</strong></td><td>U(-√(6/n_in), √(6/n_in))</td><td>ReLU, Leaky ReLU</td><td>CNN</td></tr>
+      <tr><td><strong>He Normal</strong></td><td>N(0, √(2/n_in))</td><td>ReLU, Leaky ReLU</td><td>Глубокие сети (рекомендуется)</td></tr>
+      <tr><td><strong>LeCun</strong></td><td>N(0, √(1/n_in))</td><td>SELU</td><td>Self-normalizing NN</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Инициализация bias</h2>
+    <pre><code># Обычно bias = 0
+bias = np.zeros(n_out)
+
+# Keras
+model.add(Dense(64, bias_initializer='zeros'))
+
+# Иногда небольшое положительное значение для ReLU
+bias = np.ones(n_out) * 0.01
+
+# Для LSTM forget gate — инициализируем единицами
+model.add(LSTM(64, recurrent_initializer='glorot_uniform'))
+
+# PyTorch
+nn.init.zeros_(layer.bias)
+# или
+nn.init.constant_(layer.bias, 0.01)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Полный пример на Keras</h2>
+    <pre><code>from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Activation
+
+model = Sequential()
+
+# Первый слой с ReLU
+model.add(Dense(
+    128,
+    input_dim=784,
+    kernel_initializer='he_normal',
+    bias_initializer='zeros',
+    activation='relu'
+))
+
+# Второй слой с ReLU
+model.add(Dense(
+    64,
+    kernel_initializer='he_normal',
+    bias_initializer='zeros',
+    activation='relu'
+))
+
+# Выходной слой с sigmoid
+model.add(Dense(
+    10,
+    kernel_initializer='glorot_uniform',
+    bias_initializer='zeros',
+    activation='softmax'
+))
+
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Полный пример на PyTorch</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.fc1 = nn.Linear(784, 128)
+        self.fc2 = nn.Linear(128, 64)
+        self.fc3 = nn.Linear(64, 10)
+        
+        # Инициализация весов
+        self._initialize_weights()
+    
+    def _initialize_weights(self):
+        for m in self.modules():
+            if isinstance(m, nn.Linear):
+                # He initialization для ReLU
+                nn.init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')
+                if m.bias is not None:
+                    nn.init.zeros_(m.bias)
+    
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = torch.softmax(self.fc3(x), dim=1)
+        return x
+
+model = Net()
+
+# Или вручную для каждого слоя
+nn.init.kaiming_normal_(model.fc1.weight)
+nn.init.zeros_(model.fc1.bias)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Специальные случаи</h2>
+    <table>
+      <tr><th>Случай</th><th>Метод</th><th>Код</th></tr>
+      <tr><td><strong>LSTM/GRU</strong></td><td>Xavier</td><td>glorot_uniform</td></tr>
+      <tr><td><strong>CNN фильтры</strong></td><td>He</td><td>he_normal</td></tr>
+      <tr><td><strong>BatchNorm после</strong></td><td>Любой</td><td>BN компенсирует</td></tr>
+      <tr><td><strong>Residual connections</strong></td><td>He</td><td>he_normal</td></tr>
+      <tr><td><strong>Embedding слои</strong></td><td>Uniform</td><td>[-0.05, 0.05]</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Проверка инициализации</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Проверка распределения весов
+def check_weight_distribution(model):
+    for layer in model.layers:
+        if hasattr(layer, 'kernel'):
+            weights = layer.get_weights()[0]
+            
+            plt.figure(figsize=(12, 4))
+            
+            plt.subplot(1, 2, 1)
+            plt.hist(weights.flatten(), bins=50)
+            plt.title(f'{layer.name} - Histogram')
+            plt.xlabel('Weight value')
+            
+            plt.subplot(1, 2, 2)
+            plt.hist(weights.flatten(), bins=50, cumulative=True, density=True)
+            plt.title(f'{layer.name} - CDF')
+            
+            print(f"{layer.name}:")
+            print(f"  Mean: {weights.mean():.6f}")
+            print(f"  Std: {weights.std():.6f}")
+            print(f"  Min: {weights.min():.6f}")
+            print(f"  Max: {weights.max():.6f}")
+            
+            plt.tight_layout()
+            plt.show()
+
+check_weight_distribution(model)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Мониторинг активаций</h2>
+    <pre><code># Проверка активаций после инициализации
+def check_activations(model, X_sample):
+    from tensorflow.keras.models import Model
+    
+    layer_outputs = [layer.output for layer in model.layers]
+    activation_model = Model(inputs=model.input, outputs=layer_outputs)
+    
+    activations = activation_model.predict(X_sample[:1])
+    
+    for i, activation in enumerate(activations):
+        print(f"\nLayer {i}: {model.layers[i].name}")
+        print(f"  Shape: {activation.shape}")
+        print(f"  Mean: {activation.mean():.6f}")
+        print(f"  Std: {activation.std():.6f}")
+        print(f"  % zeros: {(activation == 0).mean() * 100:.2f}%")
+        
+        # Визуализация
+        plt.figure(figsize=(10, 3))
+        plt.hist(activation.flatten(), bins=50)
+        plt.title(f'Layer {i} - Activations')
+        plt.show()
+
+check_activations(model, X_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Transfer Learning</h2>
+    <pre><code># При transfer learning часто используют:
+# 1. Предобученные веса для base модели
+# 2. Случайную инициализацию для новых слоёв
+
+from tensorflow.keras.applications import VGG16
+
+# Загрузка предобученной модели
+base_model = VGG16(
+    weights='imagenet',
+    include_top=False,
+    input_shape=(224, 224, 3)
+)
+
+# Заморозка весов
+base_model.trainable = False
+
+# Добавление новых слоёв с правильной инициализацией
+model = Sequential([
+    base_model,
+    Flatten(),
+    Dense(256, kernel_initializer='he_normal', activation='relu'),
+    Dropout(0.5),
+    Dense(10, kernel_initializer='glorot_uniform', activation='softmax')
+])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Custom инициализация</h2>
+    <pre><code># Keras - custom initializer
+from tensorflow.keras.initializers import Initializer
+
+class MyInitializer(Initializer):
+    def __call__(self, shape, dtype=None):
+        # Своя логика инициализации
+        return np.random.normal(0, 0.01, shape)
+
+model.add(Dense(64, kernel_initializer=MyInitializer()))
+
+# PyTorch - custom
+def custom_init(m):
+    if isinstance(m, nn.Linear):
+        # Своя логика
+        nn.init.normal_(m.weight, mean=0, std=0.01)
+        if m.bias is not None:
+            nn.init.constant_(m.bias, 0)
+
+model.apply(custom_init)
+
+# Или функциональный подход
+def my_init(tensor):
+    with torch.no_grad():
+        tensor.uniform_(-0.1, 0.1)
+    return tensor
+
+weight = my_init(torch.empty(3, 5))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Используйте He для ReLU/Leaky ReLU</li>
+      <li>[ ] Используйте Xavier для sigmoid/tanh</li>
+      <li>[ ] Bias инициализируйте нулями</li>
+      <li>[ ] Проверьте распределение весов после инициализации</li>
+      <li>[ ] Мониторьте активации первых батчей</li>
+      <li>[ ] Избегайте нулевой инициализации</li>
+      <li>[ ] Для CNN используйте He Normal</li>
+      <li>[ ] Для LSTM используйте Xavier</li>
+      <li>[ ] Проверьте на vanishing/exploding gradients</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Инициализация весов — это как правильная настройка музыкального инструмента перед концертом: неправильная настройка сделает невозможным хорошее исполнение, даже если музыкант талантлив».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Практические рекомендации</h2>
+    <table>
+      <tr><th>Архитектура</th><th>Инициализация</th></tr>
+      <tr><td>Простой MLP с ReLU</td><td>He Normal</td></tr>
+      <tr><td>MLP с sigmoid/tanh</td><td>Xavier Normal</td></tr>
+      <tr><td>CNN</td><td>He Normal</td></tr>
+      <tr><td>ResNet</td><td>He Normal</td></tr>
+      <tr><td>LSTM/GRU</td><td>Xavier Uniform</td></tr>
+      <tr><td>Transformer</td><td>Xavier Uniform</td></tr>
+      <tr><td>GAN Generator</td><td>Normal(0, 0.02)</td></tr>
+      <tr><td>GAN Discriminator</td><td>He Normal</td></tr>
+    </table>
+    <pre><code># Быстрый рецепт для большинства случаев:
+# 1. ReLU → He Normal
+# 2. Sigmoid/Tanh → Xavier Normal
+# 3. Bias → Zeros
+# 4. Мониторить первые эпохи</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>
