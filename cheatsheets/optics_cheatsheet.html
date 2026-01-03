@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>OPTICS кластеризация Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 OPTICS кластеризация Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Полное название</strong>: Ordering Points To Identify Clustering Structure</li>
+      <li><strong>Тип</strong>: плотностная кластеризация</li>
+      <li><strong>Улучшение DBSCAN</strong>: не требует выбора epsilon</li>
+      <li><strong>Результат</strong>: упорядоченный список точек + reachability distance</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Преимущества перед DBSCAN</h2>
+    <ul>
+      <li>Не нужно выбирать epsilon (eps)</li>
+      <li>Находит кластеры разной плотности</li>
+      <li>Создает иерархическую структуру</li>
+      <li>Можно анализировать reachability plot</li>
+      <li>Более стабильные результаты</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код</h2>
+    <pre><code>from sklearn.cluster import OPTICS
+from sklearn.preprocessing import StandardScaler
+
+# Масштабирование важно!
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# OPTICS
+optics = OPTICS(
+    min_samples=5,
+    max_eps=np.inf,  # без ограничений
+    metric='euclidean',
+    cluster_method='xi'
+)
+
+# Обучение
+labels = optics.fit_predict(X_scaled)
+
+# Reachability distances
+reachability = optics.reachability_
+ordering = optics.ordering_
+
+print(f"Кластеров найдено: {len(set(labels)) - (1 if -1 in labels else 0)}")
+print(f"Выбросов: {list(labels).count(-1)}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>min_samples</code></td><td>Минимум точек в окрестности</td><td>5-20 для начала</td></tr>
+      <tr><td><code>max_eps</code></td><td>Максимальное расстояние</td><td>np.inf (без ограничений)</td></tr>
+      <tr><td><code>metric</code></td><td>Метрика расстояния</td><td>'euclidean', 'manhattan'</td></tr>
+      <tr><td><code>cluster_method</code></td><td>Метод извлечения кластеров</td><td>'xi' или 'dbscan'</td></tr>
+      <tr><td><code>xi</code></td><td>Крутизна для 'xi' метода</td><td>0.01-0.1</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Reachability Plot</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Получаем данные
+reachability = optics.reachability_[optics.ordering_]
+labels_ordered = labels[optics.ordering_]
+
+# График
+plt.figure(figsize=(12, 5))
+
+# Цветовая кодировка кластеров
+colors = plt.cm.Spectral(labels_ordered / max(labels_ordered))
+colors[labels_ordered == -1] = [0, 0, 0, 1]  # черный для шума
+
+plt.bar(range(len(reachability)), reachability, 
+        color=colors, width=1.0)
+
+plt.xlabel('Порядок точек')
+plt.ylabel('Reachability Distance')
+plt.title('OPTICS Reachability Plot')
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# Впадины = кластеры, пики = границы кластеров</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Метод извлечения 'xi'</h2>
+    <p>Автоматическое определение кластеров</p>
+    <pre><code># xi метод (рекомендуется)
+optics_xi = OPTICS(
+    min_samples=5,
+    cluster_method='xi',
+    xi=0.05  # чувствительность (0.01-0.1)
+)
+
+labels_xi = optics_xi.fit_predict(X_scaled)
+
+# xi=0.01: больше кластеров (чувствительнее)
+# xi=0.1: меньше кластеров (грубее)
+
+# Визуализация
+plt.scatter(X_scaled[:, 0], X_scaled[:, 1], 
+            c=labels_xi, cmap='viridis')
+plt.title(f'OPTICS (xi={0.05}): {len(set(labels_xi))} кластеров')
+plt.colorbar()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Метод извлечения 'dbscan'</h2>
+    <p>Извлечение как в DBSCAN</p>
+    <pre><code># dbscan метод
+optics_db = OPTICS(
+    min_samples=5,
+    max_eps=0.5,  # аналог eps в DBSCAN
+    cluster_method='dbscan'
+)
+
+labels_db = optics_db.fit_predict(X_scaled)
+
+# Можно менять eps после обучения
+from sklearn.cluster import cluster_optics_dbscan
+
+new_labels = cluster_optics_dbscan(
+    reachability=optics_db.reachability_,
+    core_distances=optics_db.core_distances_,
+    ordering=optics_db.ordering_,
+    eps=0.3  # новое значение
+)
+
+# Экспериментируйте с eps без переобучения!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сравнение с DBSCAN</h2>
+    <pre><code>from sklearn.cluster import DBSCAN
+
+# DBSCAN
+dbscan = DBSCAN(eps=0.5, min_samples=5)
+labels_dbscan = dbscan.fit_predict(X_scaled)
+
+# OPTICS
+optics = OPTICS(min_samples=5, cluster_method='xi')
+labels_optics = optics.fit_predict(X_scaled)
+
+# Визуализация
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+ax1.scatter(X_scaled[:, 0], X_scaled[:, 1], 
+            c=labels_dbscan, cmap='viridis')
+ax1.set_title('DBSCAN')
+
+ax2.scatter(X_scaled[:, 0], X_scaled[:, 1],
+            c=labels_optics, cmap='viridis')
+ax2.set_title('OPTICS')
+
+plt.tight_layout()
+plt.show()
+
+# OPTICS часто находит больше структуры</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Кластеры разной плотности</h2>
+    <pre><code># OPTICS отлично работает с разными плотностями
+from sklearn.datasets import make_blobs
+
+# Создаем данные с разной плотностью
+X1, _ = make_blobs(n_samples=300, centers=1, 
+                   cluster_std=0.5, random_state=1)
+X2, _ = make_blobs(n_samples=100, centers=1,
+                   cluster_std=0.1, random_state=2)
+X2 += 3
+
+X = np.vstack([X1, X2])
+
+# OPTICS
+optics = OPTICS(min_samples=10, cluster_method='xi', xi=0.05)
+labels = optics.fit_predict(X)
+
+plt.scatter(X[:, 0], X[:, 1], c=labels, cmap='viridis')
+plt.title('OPTICS: кластеры разной плотности')
+plt.show()
+
+# DBSCAN бы тут не справился с одним eps!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Подбор min_samples</h2>
+    <pre><code># Экспериментируйте с min_samples
+min_samples_range = [3, 5, 10, 20, 50]
+
+fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+axes = axes.ravel()
+
+for i, min_samp in enumerate(min_samples_range):
+    optics = OPTICS(
+        min_samples=min_samp,
+        cluster_method='xi'
+    )
+    labels = optics.fit_predict(X_scaled)
+    
+    n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+    n_noise = list(labels).count(-1)
+    
+    axes[i].scatter(X_scaled[:, 0], X_scaled[:, 1],
+                   c=labels, cmap='viridis', s=5)
+    axes[i].set_title(
+        f'min_samples={min_samp}\n'
+        f'{n_clusters} кластеров, {n_noise} шума'
+    )
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Core distances</h2>
+    <pre><code># Core distance = расстояние до min_samples-го соседа
+core_distances = optics.core_distances_
+
+# Статистика
+print(f"Средняя core distance: {np.mean(core_distances[core_distances != np.inf]):.3f}")
+print(f"Медианная: {np.median(core_distances[core_distances != np.inf]):.3f}")
+
+# Визуализация
+plt.figure(figsize=(10, 5))
+plt.hist(core_distances[core_distances != np.inf], 
+         bins=50, edgecolor='black')
+plt.xlabel('Core Distance')
+plt.ylabel('Частота')
+plt.title('Распределение Core Distances')
+plt.grid(True)
+plt.show()
+
+# Помогает понять плотность данных</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Иерархическая структура</h2>
+    <pre><code># OPTICS создает иерархию кластеров
+# Можно извлечь разные уровни
+
+# Грубое разбиение
+optics_coarse = OPTICS(min_samples=20, xi=0.1)
+labels_coarse = optics_coarse.fit_predict(X_scaled)
+
+# Детальное разбиение
+optics_fine = OPTICS(min_samples=5, xi=0.01)
+labels_fine = optics_fine.fit_predict(X_scaled)
+
+# Визуализация
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+ax1.scatter(X_scaled[:, 0], X_scaled[:, 1],
+            c=labels_coarse, cmap='viridis')
+ax1.set_title('Грубые кластеры')
+
+ax2.scatter(X_scaled[:, 0], X_scaled[:, 1],
+            c=labels_fine, cmap='viridis')
+ax2.set_title('Детальные кластеры')
+
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Оценка качества</h2>
+    <pre><code>from sklearn.metrics import (
+    silhouette_score,
+    davies_bouldin_score,
+    calinski_harabasz_score
+)
+
+# Только не-шумовые точки
+mask = labels != -1
+X_filtered = X_scaled[mask]
+labels_filtered = labels[mask]
+
+if len(set(labels_filtered)) > 1:
+    # Silhouette Score
+    sil = silhouette_score(X_filtered, labels_filtered)
+    print(f"Silhouette: {sil:.3f}")
+    
+    # Davies-Bouldin Index (чем меньше, тем лучше)
+    db = davies_bouldin_score(X_filtered, labels_filtered)
+    print(f"Davies-Bouldin: {db:.3f}")
+    
+    # Calinski-Harabasz Index (чем больше, тем лучше)
+    ch = calinski_harabasz_score(X_filtered, labels_filtered)
+    print(f"Calinski-Harabasz: {ch:.1f}")
+else:
+    print("Недостаточно кластеров для оценки")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Визуализация полная</h2>
+    <pre><code>def visualize_optics(X, optics, labels):
+    """Полная визуализация OPTICS"""
+    
+    fig = plt.figure(figsize=(16, 5))
+    
+    # 1. Данные с кластерами
+    ax1 = fig.add_subplot(131)
+    ax1.scatter(X[:, 0], X[:, 1], c=labels, 
+                cmap='viridis', s=10)
+    ax1.set_title('Кластеры')
+    
+    # 2. Reachability plot
+    ax2 = fig.add_subplot(132)
+    reachability = optics.reachability_[optics.ordering_]
+    colors = labels[optics.ordering_]
+    
+    for i, (r, c) in enumerate(zip(reachability, colors)):
+        color = 'black' if c == -1 else plt.cm.viridis(c / max(colors))
+        ax2.bar(i, r, color=color, width=1)
+    
+    ax2.set_xlabel('Порядок точек')
+    ax2.set_ylabel('Reachability')
+    ax2.set_title('Reachability Plot')
+    
+    # 3. Core distances
+    ax3 = fig.add_subplot(133)
+    core_dist = optics.core_distances_
+    valid = core_dist != np.inf
+    ax3.hist(core_dist[valid], bins=50, edgecolor='black')
+    ax3.set_xlabel('Core Distance')
+    ax3.set_ylabel('Частота')
+    ax3.set_title('Core Distances')
+    
+    plt.tight_layout()
+    plt.show()
+
+# Использование
+visualize_optics(X_scaled, optics, labels)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Когда использовать OPTICS</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ OPTICS хорош когда:</h3>
+        <ul>
+          <li>Кластеры имеют разную плотность</li>
+          <li>Не знаете параметр eps</li>
+          <li>Нужна иерархическая структура</li>
+          <li>Много выбросов</li>
+          <li>Сложная форма кластеров</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не используйте когда:</h3>
+        <ul>
+          <li>Очень большие данные (> 100K точек)</li>
+          <li>Высокая размерность (> 50D)</li>
+          <li>Нужны строго сферические кластеры</li>
+          <li>Важна скорость</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Лучшие практики</h2>
+    <ul>
+      <li><strong>Масштабирование</strong>: всегда StandardScaler</li>
+      <li><strong>min_samples</strong>: начните с 5-10</li>
+      <li><strong>xi метод</strong>: предпочтительнее dbscan</li>
+      <li><strong>Reachability plot</strong>: всегда анализируйте</li>
+      <li><strong>Эксперименты</strong>: пробуйте разные параметры</li>
+      <li><strong>Валидация</strong>: проверяйте на разных данных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Частые ошибки</h2>
+    <ul>
+      <li>❌ Не масштабировать данные</li>
+      <li>❌ Слишком большой min_samples</li>
+      <li>❌ Использовать на высокоразмерных данных без PCA</li>
+      <li>❌ Не анализировать reachability plot</li>
+      <li>❌ Игнорировать выбросы (шум)</li>
+      <li>❌ Не валидировать результаты</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Ускорение для больших данных</h2>
+    <pre><code># Sampling для больших данных
+from sklearn.utils import resample
+
+if len(X) > 10000:
+    # Sample для обучения OPTICS
+    X_sample, idx = resample(
+        X_scaled, range(len(X_scaled)),
+        n_samples=10000,
+        random_state=42
+    )
+    
+    # Обучение на sample
+    optics = OPTICS(min_samples=10, cluster_method='xi')
+    labels_sample = optics.fit_predict(X_sample)
+    
+    # Предсказание для остальных
+    # (OPTICS не имеет predict, используйте KNN)
+    from sklearn.neighbors import KNeighborsClassifier
+    
+    mask = labels_sample != -1
+    knn = KNeighborsClassifier(n_neighbors=5)
+    knn.fit(X_sample[mask], labels_sample[mask])
+    
+    labels_all = knn.predict(X_scaled)
+else:
+    optics = OPTICS(min_samples=10)
+    labels_all = optics.fit_predict(X_scaled)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Скорость</th><th>Разные плотности</th><th>Любая форма</th><th>Выбросы</th></tr>
+      <tr><td>K-means</td><td>+++</td><td>-</td><td>-</td><td>-</td></tr>
+      <tr><td>DBSCAN</td><td>++</td><td>-</td><td>+</td><td>+</td></tr>
+      <tr><td>OPTICS</td><td>+</td><td>++</td><td>+</td><td>++</td></tr>
+      <tr><td>Hierarchical</td><td>-</td><td>+</td><td>+</td><td>-</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Пример workflow</h2>
+    <pre><code># Полный пайплайн
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import OPTICS
+
+# 1. Подготовка
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 2. Обучение
+optics = OPTICS(
+    min_samples=10,
+    cluster_method='xi',
+    xi=0.05
+)
+labels = optics.fit_predict(X_scaled)
+
+# 3. Анализ
+n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+n_noise = list(labels).count(-1)
+
+print(f"Кластеров: {n_clusters}")
+print(f"Шума: {n_noise} ({100*n_noise/len(labels):.1f}%)")
+
+# 4. Визуализация
+visualize_optics(X_scaled, optics, labels)
+
+# 5. Оценка
+if n_clusters > 1:
+    mask = labels != -1
+    score = silhouette_score(X_scaled[mask], labels[mask])
+    print(f"Silhouette: {score:.3f}")
+
+# 6. Экспорт результатов
+import pandas as pd
+df = pd.DataFrame({
+    'cluster': labels,
+    'reachability': optics.reachability_,
+    'core_distance': optics.core_distances_
+})
+df.to_csv('optics_results.csv', index=False)</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>
