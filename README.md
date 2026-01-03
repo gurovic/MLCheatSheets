@@ -41,7 +41,7 @@
 1. [Иерархическая кластеризация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hierarchical_clustering_cheatsheet.html)
 1. [DBSCAN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dbscan_cheatsheet.html)
 1. OPTICS
-1. Gaussian Mixture Models
+1. [Gaussian Mixture Models (GMM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gmm_cheatsheet.html)
 1. Метрики оценки кластеризации
 1. Выбор числа кластеров
 
@@ -166,21 +166,21 @@
 ### **1. Основы нейронных сетей**
 1. [Искусственный нейрон (перцептрон)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/perceptron_cheatsheet.html)
 1. Архитектура MLP (многослойный перцептрон)
-1. Функции активации (ReLU, Sigmoid, Tanh, Softmax)
+1. [Функции активации (ReLU, Sigmoid, Tanh, Softmax)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/activation_functions_cheatsheet.html)
 1. Функции потерь для классификации и регрессии
 1. Алгоритм обратного распространения ошибки
-1. Оптимизаторы (SGD, Momentum, Adam, RMSProp)
+1. [Оптимизаторы (SGD, Momentum, Adam, RMSProp)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/optimizers_cheatsheet.html)
 1. Инициализация весов
-1. Регуляризация нейронных сетей (Dropout и др.)
+1. [Регуляризация нейронных сетей (Dropout и др.)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dropout_regularization_cheatsheet.html)
 
 ### **2. Сверточные нейронные сети (CNN)**
 1. [Основы свертки](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_basics_cheatsheet.html)
 1. Пулинг-слои (Max, Average, Global)
 1. Архитектуры CNN (LeNet, AlexNet, VGG)
-1. Современные архитектуры (ResNet, Inception, EfficientNet)
+1. Современные архитектуры ([ResNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/resnet_cheatsheet.html), Inception, EfficientNet)
 1. Transfer learning для CNN
-1. Data augmentation для изображений
-1. Batch Normalization
+1. [Data augmentation для изображений](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/data_augmentation_cheatsheet.html)
+1. [Batch Normalization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/batch_normalization_cheatsheet.html)
 1. Визуализация CNN
 1. 1D-CNN и 3D-CNN
 
@@ -194,7 +194,7 @@
 1. Архитектуры encoder-decoder
 
 ### **4. Трансформеры и механизмы внимания**
-1. Механизм внимания (attention)
+1. [Механизм внимания (attention)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/attention_mechanism_cheatsheet.html)
 1. Self-attention
 1. Multi-head attention
 1. [Архитектура Transformer](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transformers_cheatsheet.html)
@@ -205,8 +205,8 @@
 
 ### **5. Генеративные модели**
 1. [Автоэнкодеры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/autoencoders_cheatsheet.html)
-1. Вариационные автоэнкодеры (VAE)
-1. Генеративно-состязательные сети (GAN)
+1. [Вариационные автоэнкодеры (VAE)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/vae_cheatsheet.html)
+1. [Генеративно-состязательные сети (GAN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gan_cheatsheet.html)
 1. DCGAN, Conditional GAN
 1. StyleGAN
 1. Diffusion модели
