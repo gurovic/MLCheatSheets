@@ -2,7 +2,7 @@
 * [Глубокое обучение](https://github.com/gurovic/MLCheatSheets/blob/main/README.md#%D0%B3%D0%BB%D1%83%D0%B1%D0%BE%D0%BA%D0%BE%D0%B5-%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5)
 * [Разные темы машинного обучения](https://github.com/gurovic/MLCheatSheets/blob/main/README.md#%D0%B4%D1%80%D1%83%D0%B3%D0%B8%D0%B5-%D1%82%D0%B5%D0%BC%D1%8B-%D0%BC%D0%B0%D1%88%D0%B8%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F)
 
-## Классическое машинное обучение
+## I Классическое машинное обучение
 
 ### **1. Подготовка данных**
 1. [Предобработка данных (Preprocessing)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/preprocessing_cheatsheet.html)
@@ -162,7 +162,7 @@
 1. Multi-output модели
 1. Квантильная регрессия
 
-## Глубокое обучение
+## II Глубокое обучение
 
 ### **1. Основы нейронных сетей**
 1. [Искусственный нейрон (перцептрон)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/perceptron_cheatsheet.html)
@@ -366,7 +366,7 @@
 21. Современные тенденции
 21. Будущее глубокого обучения
 
-## Разные темы машинного обучения
+## III Разные темы машинного обучения
 
 ### **1. Обучение с подкреплением (Reinforcement Learning)**
 1. Классическое RL (табличное, без нейросетей)
