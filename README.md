@@ -1,6 +1,6 @@
 * [Классическое машинное обучение](https://github.com/gurovic/MLCheatSheets/blob/main/README.md#%D0%BA%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5-%D0%BC%D0%B0%D1%88%D0%B8%D0%BD%D0%BD%D0%BE%D0%B5-%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5)
 * [Глубокое обучение](https://github.com/gurovic/MLCheatSheets/blob/main/README.md#%D0%B3%D0%BB%D1%83%D0%B1%D0%BE%D0%BA%D0%BE%D0%B5-%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5)
-* [Разные темы машинного обучения]()
+* [Разные темы машинного обучения](https://github.com/gurovic/MLCheatSheets/blob/main/README.md#%D0%B4%D1%80%D1%83%D0%B3%D0%B8%D0%B5-%D1%82%D0%B5%D0%BC%D1%8B-%D0%BC%D0%B0%D1%88%D0%B8%D0%BD%D0%BD%D0%BE%D0%B3%D0%BE-%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F)
 
 ## Классическое машинное обучение
 
@@ -366,3 +366,268 @@
 21. Современные тенденции
 21. Будущее глубокого обучения
 
+## Другие темы машинного обучения
+
+### **1. Обучение с подкреплением (Reinforcement Learning)**
+1. Классическое RL (табличное, без нейросетей)
+1. Многорукие бандиты (Multi-armed bandits)
+1. Марковские процессы принятия решений
+1. Динамическое программирование
+1. Монте-Карло методы
+1. Временная разница (TD-learning)
+1. Q-learning и SARSA
+1. Функции приближения (линейные, ядерные)
+1. Иерархическое RL
+1.10. Многозадачное RL
+1.11. Инверсное RL
+
+### **2. Байесовские методы и вероятностное ML**
+1. Байесовский вывод
+1. Скрытые марковские модели (HMM)
+1. Гауссовские процессы
+1. Вариационный вывод
+1. Марковские цепи Монте-Карло (MCMC)
+1. Expectation-Maximization (EM)
+1. Графические модели
+1. Наивный Байес (как байесовский метод)
+1. Байесовская оптимизация
+2.10. Байесовские нейронные сети (отдельно от DL)
+
+### **3. Ансамбли методов**
+1. Бэггинг (Bagging)
+1. Бустинг (Boosting) - классические версии (AdaBoost)
+1. Стекинг (Stacking)
+1. Блендинг (Blending)
+1. Voting классификаторы
+1. Ансамбли деревьев (не только случайный лес)
+1. Ансамбли линейных моделей
+1. Диверсификация ансамблей
+
+### **4. Снижение размерности (нелинейное)**
+1. Manifold learning
+1. Isomap
+1. LLE (Locally Linear Embedding)
+1. MDS (Multidimensional Scaling)
+1. Spectral embedding
+1. Kernel PCA
+1. Autoencoders (линейные и неглубокие)
+
+### **5. Кластеризация (продвинутые методы)**
+1. Spectral clustering
+1. Mean shift
+1. Affinity propagation
+1. BIRCH
+1. CURE
+1. CLARANS
+1. Методы на основе плотности (DBSCAN, OPTICS, HDBSCAN)
+1. Subspace clustering
+
+### **6. Графовые алгоритмы и методы**
+1. Алгоритмы на графах (кластеризация, поиск путей)
+1. Социальный сетевой анализ
+1. Графовые эмбеддинги (Node2Vec, DeepWalk)
+1. Community detection
+1. Графовые ядра (Graph kernels)
+1. Influence maximization
+
+### **7. Матричная факторизация и рекомендательные системы**
+1. Коллаборативная фильтрация (user-based, item-based)
+1. Матричная факторизация (SVD, NMF)
+1. ALS (Alternating Least Squares)
+1. Контентная фильтрация
+1. Гибридные системы
+1. Context-aware рекомендации
+1. Sequence-aware рекомендации
+
+### **8. Обработка временных рядов (классические методы)**
+1. ARIMA/SARIMA
+1. Экспоненциальное сглаживание
+1. Prophet
+1. State space models
+1. Kalman filters
+1. Сезонная декомпозиция
+1. Теория временных рядов Box-Jenkins
+
+### **9. Методы обработки текста (традиционные NLP)**
+1. Тематическое моделирование (LDA, NMF)
+1. TF-IDF и векторное пространство
+1. Латентно-семантический анализ (LSA)
+1. Стемминг, лемматизация
+1. Правила и паттерны (regex, finite-state)
+1. CRF (Conditional Random Fields) для NER
+1. Синтаксический разбор (constituency, dependency)
+
+### **10. Feature engineering и selection**
+11. Доменный feature engineering
+11. Автоматический feature engineering (Featuretools)
+11. Методы отбора признаков (фильтры, обертки, встроенные)
+11. Feature interaction и polynomial features
+11. Binning и discretization
+11. Target encoding (без нейросетей)
+
+### **11. Обнаружение аномалий (классические методы)**
+11. Статистические методы (z-score, IQR)
+11. One-class SVM
+11. Isolation Forest
+11. Local Outlier Factor
+11. Elliptic Envelope
+11. Clustering-based аномалии
+11. Autoencoder-based (неглубокие)
+
+### **12. Полуавтоматическое обучение (Semi-supervised)**
+11. Self-training
+11. Co-training
+11. Label propagation
+11. Graph-based SSL
+11. Pseudo-labeling
+11. Generative models (без глубоких)
+
+### **13. Активное обучение (Active Learning)**
+11. Стратегии запросов (uncertainty, diversity)
+11. Query-by-committee
+11. Expected model change
+11. Pool-based sampling
+11. Stream-based sampling
+11. Cost-sensitive active learning
+
+### **14. Трансферное обучение (без нейросетей)**
+11. Instance transfer
+11. Feature representation transfer
+11. Parameter transfer
+11. Relational knowledge transfer
+11. Domain adaptation (традиционные методы)
+
+### **15. Мета-обучение (Meta-learning)**
+11. Model-agnostic meta-learning (MAML)
+11. Metric-based (Siamese networks, Matching networks)
+11. Optimization-based meta-learning
+11. Few-shot learning (традиционные подходы)
+11. Meta-features и meta-learning
+
+### **16. Онлайн обучение и streaming ML**
+11. Online algorithms (SGD, Perceptron)
+11. Concept drift detection
+11. Adaptive windowing
+11. Ensemble methods для streaming
+11. Reservoir sampling
+11. Hoeffding trees
+
+### **17. Обучение на несбалансированных данных**
+11. Sampling методы (undersampling, oversampling)
+11. SMOTE и его варианты
+11. Cost-sensitive learning
+11. Threshold moving
+11. Метрики для несбалансированных данных
+
+### **18. Выбор и сравнение моделей**
+11. Статистические тесты (t-test, McNemar)
+11. Кривые обучения и валидации
+11. Bias-variance decomposition
+11. Неметрические критерии (интерпретируемость, скорость)
+
+### **19. Автоматическое ML (AutoML)**
+11. Hyperparameter optimization (Grid, Random, Bayesian)
+11. Neural Architecture Search (классические подходы)
+11. Automated feature engineering
+11. Automated pipeline construction
+11. Meta-learning для AutoML
+
+### **20. Интерпретируемость и Explainable AI**
+21. LIME и SHAP (для любых моделей)
+21. Partial dependence plots
+21. Individual conditional expectation
+21. Rule extraction
+21. Counterfactual explanations
+21. Feature importance (разные методы)
+
+### **21. Многозадачное обучение (Multi-task)**
+21. Shared representation learning
+21. Task clustering
+21. Multi-output models
+21. Hierarchical multi-task
+
+### **22. Мультимодальное обучение (классическое)**
+21. Early fusion и late fusion
+21. Canonical correlation analysis (CCA)
+21. Kernel CCA
+21. Multi-view learning
+21. Co-training
+
+### **23. Обучение с ограничениями**
+21. Constrained optimization в ML
+21. Fairness constraints
+21. Monotonic constraints
+21. Shape constraints
+
+### **24. Непараметрическая статистика и ML**
+21. Kernel methods (SVM, kernel PCA)
+21. k-NN и его варианты
+21. Local regression (LOESS)
+21. Splines и smoothing
+
+### **25. Комбинаторная оптимизация и ML**
+21. Генетические алгоритмы
+21. Эволюционные стратегии
+21. Swarm intelligence (PSO, ant colony)
+21. Simulated annealing
+21. Tabu search
+
+### **26. Математические основы ML**
+21. Теория вероятностей для ML
+21. Линейная алгебра и оптимизация
+21. Информационная теория в ML
+21. Теория графов для ML
+21. Теория решений
+
+### **27. Промышленное ML и MLOps**
+21. Мониторинг моделей
+21. Концептуальный дрейф
+21. A/B тестирование ML моделей
+21. Модельные реестры
+21. Feature stores
+21. CI/CD для ML
+
+### **28. Специализированные прикладные области**
+21. Биоинформатика и computational biology
+21. Computational chemistry
+21. Астрофизика и космология
+21. Геоинформационные системы
+21. Цифровая гуманитаристика
+21. Computational social science
+
+### **29. Этика, безопасность и приватность**
+21. Fairness в ML
+21. Adversarial robustness (классические атаки)
+21. Differential privacy
+21. Federated learning (алгоритмические аспекты)
+21. Explainability и accountability
+
+### **30. Квантовое машинное обучение**
+31. Квантовые алгоритмы для ML
+31. Квантовые нейронные сети
+31. Квантовое усиление классических алгоритмов
+
+### **31. Нейро-символьное ИИ**
+31. Гибридные нейро-символьные системы
+31. Rule-based системы с ML
+31. Логический вывод с обучением
+
+### **32. Композиционное и структурное обучение**
+31. Grammatical inference
+31. Inductive logic programming
+31. Program synthesis
+
+### **33. Материаловедение и ML**
+31. Материальные информатики
+31. Свойства материалов и ML
+31. Дизайн материалов
+
+### **34. Компьютерная безопасность и ML**
+31. Обнаружение вторжений
+31. Malware detection
+31. Fraud detection
+
+### **35. Финансовое ML**
+31. Алгоритмический трейдинг
+31. Кредитный скоринг
+31. Risk management
