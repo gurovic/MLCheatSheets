@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Поиск гиперпараметров (Hyperparameter Tuning) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Поиск гиперпараметров Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Гиперпараметры</strong> — параметры, которые задаются до обучения</li>
+      <li><strong>Цель</strong> — найти оптимальные значения</li>
+      <li><strong>Методы</strong>: Grid Search, Random Search, Bayesian Optimization</li>
+      <li><strong>Оценка</strong>: кросс-валидация</li>
+      <li><strong>Результат</strong>: лучшая модель</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Grid Search</h2>
+    <p>Перебор всех комбинаций параметров</p>
+    <pre><code>from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+
+# Определить сетку параметров
+param_grid = {
+    'n_estimators': [100, 200, 300],
+    'max_depth': [5, 10, 15, None],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4]
+}
+
+# Модель
+model = RandomForestClassifier(random_state=42)
+
+# Grid Search
+grid_search = GridSearchCV(
+    estimator=model,
+    param_grid=param_grid,
+    cv=5,                    # кросс-валидация
+    scoring='accuracy',
+    n_jobs=-1,              # все ядра
+    verbose=2
+)
+
+# Обучение
+grid_search.fit(X_train, y_train)
+
+# Лучшие параметры
+print("Best params:", grid_search.best_params_)
+print("Best score:", grid_search.best_score_)
+
+# Лучшая модель
+best_model = grid_search.best_estimator_</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Random Search</h2>
+    <p>Случайный выбор комбинаций</p>
+    <pre><code>from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import randint, uniform
+
+# Распределения параметров
+param_distributions = {
+    'n_estimators': randint(100, 500),
+    'max_depth': randint(5, 20),
+    'min_samples_split': randint(2, 11),
+    'min_samples_leaf': randint(1, 5),
+    'max_features': uniform(0.1, 0.9)
+}
+
+# Random Search
+random_search = RandomizedSearchCV(
+    estimator=model,
+    param_distributions=param_distributions,
+    n_iter=50,              # количество комбинаций
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1,
+    random_state=42,
+    verbose=2
+)
+
+random_search.fit(X_train, y_train)
+
+print("Best params:", random_search.best_params_)
+print("Best score:", random_search.best_score_)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Скорость</th><th>Точность</th><th>Когда использовать</th></tr>
+      <tr><td><strong>Grid Search</strong></td><td>Медленно</td><td>Гарантированный оптимум</td><td>Мало параметров</td></tr>
+      <tr><td><strong>Random Search</strong></td><td>Быстрее</td><td>Близко к оптимуму</td><td>Много параметров</td></tr>
+      <tr><td><strong>Bayesian</strong></td><td>Средне</td><td>Лучший баланс</td><td>Дорогое обучение</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Bayesian Optimization (Optuna)</h2>
+    <pre><code>import optuna
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
+
+def objective(trial):
+    # Определить пространство поиска
+    params = {
+        'n_estimators': trial.suggest_int('n_estimators', 100, 500),
+        'max_depth': trial.suggest_int('max_depth', 5, 20),
+        'min_samples_split': trial.suggest_int('min_samples_split', 2, 10),
+        'min_samples_leaf': trial.suggest_int('min_samples_leaf', 1, 4)
+    }
+    
+    # Модель
+    model = RandomForestClassifier(**params, random_state=42)
+    
+    # Оценка
+    score = cross_val_score(model, X_train, y_train, 
+                           cv=5, scoring='accuracy').mean()
+    
+    return score
+
+# Создать study
+study = optuna.create_study(direction='maximize')
+
+# Оптимизация
+study.optimize(objective, n_trials=50)
+
+# Лучшие параметры
+print("Best params:", study.best_params)
+print("Best value:", study.best_value)
+
+# Обучить с лучшими параметрами
+best_model = RandomForestClassifier(**study.best_params, random_state=42)
+best_model.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Визуализация результатов (Optuna)</h2>
+    <pre><code>import optuna.visualization as vis
+
+# История оптимизации
+vis.plot_optimization_history(study).show()
+
+# Важность параметров
+vis.plot_param_importances(study).show()
+
+# Slice plot
+vis.plot_slice(study).show()
+
+# Contour plot
+vis.plot_contour(study, params=['max_depth', 'n_estimators']).show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Hyperopt (альтернатива Optuna)</h2>
+    <pre><code>from hyperopt import hp, fmin, tpe, Trials, STATUS_OK
+from sklearn.model_selection import cross_val_score
+
+# Пространство поиска
+space = {
+    'n_estimators': hp.choice('n_estimators', [100, 200, 300]),
+    'max_depth': hp.choice('max_depth', [5, 10, 15, 20]),
+    'min_samples_split': hp.uniform('min_samples_split', 2, 10),
+    'min_samples_leaf': hp.choice('min_samples_leaf', [1, 2, 4])
+}
+
+def objective(params):
+    # Преобразовать параметры
+    params['min_samples_split'] = int(params['min_samples_split'])
+    
+    model = RandomForestClassifier(**params, random_state=42)
+    score = cross_val_score(model, X_train, y_train, 
+                           cv=5, scoring='accuracy').mean()
+    
+    return {'loss': -score, 'status': STATUS_OK}
+
+# Оптимизация
+trials = Trials()
+best = fmin(
+    fn=objective,
+    space=space,
+    algo=tpe.suggest,
+    max_evals=50,
+    trials=trials
+)
+
+print("Best params:", best)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Множественные метрики</h2>
+    <pre><code>from sklearn.metrics import make_scorer, f1_score
+
+# Определить метрики
+scoring = {
+    'accuracy': 'accuracy',
+    'precision': 'precision',
+    'recall': 'recall',
+    'f1': make_scorer(f1_score)
+}
+
+# Grid Search с несколькими метриками
+grid_search = GridSearchCV(
+    model,
+    param_grid,
+    cv=5,
+    scoring=scoring,
+    refit='f1',  # какую метрику использовать для выбора
+    n_jobs=-1
+)
+
+grid_search.fit(X_train, y_train)
+
+# Результаты
+results = grid_search.cv_results_
+for metric in scoring.keys():
+    print(f"{metric}: {results[f'mean_test_{metric}'].max():.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Анализ результатов Grid Search</h2>
+    <pre><code>import pandas as pd
+import matplotlib.pyplot as plt
+
+# Результаты в DataFrame
+results = pd.DataFrame(grid_search.cv_results_)
+
+# Топ-10 комбинаций
+top_results = results.sort_values('mean_test_score', 
+                                 ascending=False).head(10)
+print(top_results[['params', 'mean_test_score', 'std_test_score']])
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(results['mean_test_score'])
+plt.xlabel('Комбинация параметров')
+plt.ylabel('Mean CV Score')
+plt.title('Grid Search Results')
+plt.show()
+
+# Heatmap для 2 параметров
+pivot = results.pivot_table(
+    values='mean_test_score',
+    index='param_max_depth',
+    columns='param_n_estimators'
+)
+
+import seaborn as sns
+plt.figure(figsize=(10, 6))
+sns.heatmap(pivot, annot=True, fmt='.3f', cmap='viridis')
+plt.title('Grid Search Heatmap')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Последовательный поиск</h2>
+    <p>Сначала грубый поиск, потом точный</p>
+    <pre><code># Шаг 1: Грубый поиск
+coarse_grid = {
+    'n_estimators': [100, 500, 1000],
+    'max_depth': [5, 15, None]
+}
+
+coarse_search = GridSearchCV(model, coarse_grid, cv=5)
+coarse_search.fit(X_train, y_train)
+
+print("Coarse best:", coarse_search.best_params_)
+
+# Шаг 2: Точный поиск вокруг лучших значений
+best_n = coarse_search.best_params_['n_estimators']
+best_d = coarse_search.best_params_['max_depth']
+
+fine_grid = {
+    'n_estimators': [best_n-100, best_n, best_n+100],
+    'max_depth': [best_d-2, best_d, best_d+2] if best_d else [10, 15, 20]
+}
+
+fine_search = GridSearchCV(model, fine_grid, cv=5)
+fine_search.fit(X_train, y_train)
+
+print("Fine best:", fine_search.best_params_)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Early Stopping в Grid Search</h2>
+    <pre><code># Для моделей с early stopping
+param_grid = {
+    'n_estimators': [1000],  # большое значение
+    'max_depth': [3, 5, 7],
+    'learning_rate': [0.01, 0.1, 0.3]
+}
+
+# Использовать fit_params
+fit_params = {
+    'early_stopping_rounds': 10,
+    'eval_set': [(X_val, y_val)],
+    'verbose': False
+}
+
+grid_search = GridSearchCV(
+    xgb.XGBClassifier(),
+    param_grid,
+    cv=5
+)
+
+# Передать fit_params через fit
+grid_search.fit(X_train, y_train, **fit_params)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Pipelines с Grid Search</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+
+# Pipeline
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('svm', SVC())
+])
+
+# Параметры с префиксом шага
+param_grid = {
+    'svm__C': [0.1, 1, 10],
+    'svm__kernel': ['linear', 'rbf'],
+    'svm__gamma': ['scale', 'auto']
+}
+
+grid_search = GridSearchCV(pipeline, param_grid, cv=5)
+grid_search.fit(X_train, y_train)
+
+print("Best params:", grid_search.best_params_)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Когда использовать каждый метод</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Grid Search</h3>
+        <ul>
+          <li>Мало параметров (≤ 3)</li>
+          <li>Дискретные значения</li>
+          <li>Нужен гарантированный оптимум</li>
+          <li>Быстрое обучение модели</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>✅ Random Search</h3>
+        <ul>
+          <li>Много параметров (> 3)</li>
+          <li>Непрерывные значения</li>
+          <li>Ограниченное время</li>
+          <li>Первый поиск</li>
+        </ul>
+      </div>
+    </div>
+    <div class="good">
+      <h3>✅ Bayesian Optimization</h3>
+      <ul>
+        <li>Дорогое обучение</li>
+        <li>Мало итераций доступно</li>
+        <li>Сложное пространство</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Параллелизация</h2>
+    <pre><code># n_jobs=-1 использует все ядра
+grid_search = GridSearchCV(
+    model,
+    param_grid,
+    cv=5,
+    n_jobs=-1  # все доступные ядра
+)
+
+# Для Optuna - параллельные trials
+import optuna
+from joblib import Parallel, delayed
+
+def optimize_parallel(n_trials=10):
+    study = optuna.create_study(
+        direction='maximize',
+        storage='sqlite:///optuna.db',  # общее хранилище
+        study_name='parallel_study',
+        load_if_exists=True
+    )
+    
+    study.optimize(objective, n_trials=n_trials)
+    return study
+
+# Запустить параллельно
+Parallel(n_jobs=4)(
+    delayed(optimize_parallel)(10) for _ in range(4)
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Типичные ошибки</h2>
+    <ul>
+      <li><strong>Слишком большая сетка</strong> — начать с грубого поиска</li>
+      <li><strong>Не использовать CV</strong> — переобучение на train</li>
+      <li><strong>Игнорировать время</strong> — Random Search для начала</li>
+      <li><strong>Забыть scaling</strong> — использовать Pipeline</li>
+      <li><strong>Data leakage</strong> — fitting в GridSearchCV делается правильно</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить важные гиперпараметры</li>
+      <li>[ ] Начать с Random Search (быстрый обзор)</li>
+      <li>[ ] Grid Search вокруг лучших значений</li>
+      <li>[ ] Использовать CV (минимум 5 фолдов)</li>
+      <li>[ ] Параллелизация (n_jobs=-1)</li>
+      <li>[ ] Анализировать результаты (не только best)</li>
+      <li>[ ] Для дорогих моделей: Bayesian Optimization</li>
+      <li>[ ] Pipeline для предотвращения leakage</li>
+      <li>[ ] Сохранить лучшую модель</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Поиск гиперпараметров — это как настройка радио для лучшего звука. Мы перебираем разные комбинации настроек (параметров) модели, чтобы найти ту, которая даёт наилучший результат на наших данных».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

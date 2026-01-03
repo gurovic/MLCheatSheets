@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>XGBoost Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 XGBoost Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>XGBoost</strong> = eXtreme Gradient Boosting</li>
+      <li><strong>Идея</strong>: последовательное построение деревьев, каждое исправляет ошибки предыдущих</li>
+      <li><strong>Оптимизация</strong>: использует градиентный спуск второго порядка</li>
+      <li><strong>Скорость</strong>: параллельное построение, кэширование</li>
+      <li><strong>Регуляризация</strong>: встроенная L1/L2</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Установка</h2>
+    <pre><code># pip
+pip install xgboost
+
+# conda
+conda install -c conda-forge xgboost
+
+# Проверка установки
+import xgboost as xgb
+print(xgb.__version__)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый пример (Классификация)</h2>
+    <pre><code>import xgboost as xgb
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Разделение данных
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Модель
+model = xgb.XGBClassifier(
+    n_estimators=100,
+    max_depth=6,
+    learning_rate=0.1,
+    random_state=42
+)
+
+# Обучение
+model.fit(X_train, y_train)
+
+# Предсказание
+y_pred = model.predict(X_test)
+y_proba = model.predict_proba(X_test)
+
+# Оценка
+acc = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {acc:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Базовый пример (Регрессия)</h2>
+    <pre><code>from sklearn.metrics import mean_squared_error
+import numpy as np
+
+# Модель
+model = xgb.XGBRegressor(
+    n_estimators=100,
+    max_depth=6,
+    learning_rate=0.1,
+    random_state=42
+)
+
+# Обучение
+model.fit(X_train, y_train)
+
+# Предсказание
+y_pred = model.predict(X_test)
+
+# Оценка
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+print(f"RMSE: {rmse:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>n_estimators</code></td><td>Число деревьев</td><td>100-1000</td></tr>
+      <tr><td><code>max_depth</code></td><td>Глубина дерева</td><td>3-10</td></tr>
+      <tr><td><code>learning_rate</code></td><td>Темп обучения (eta)</td><td>0.01-0.3</td></tr>
+      <tr><td><code>subsample</code></td><td>Доля выборки</td><td>0.5-1.0</td></tr>
+      <tr><td><code>colsample_bytree</code></td><td>Доля признаков</td><td>0.5-1.0</td></tr>
+      <tr><td><code>gamma</code></td><td>Мин. уменьшение loss</td><td>0-5</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Регуляризация</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Значение</th></tr>
+      <tr><td><code>reg_alpha</code></td><td>L1 регуляризация</td><td>0-1</td></tr>
+      <tr><td><code>reg_lambda</code></td><td>L2 регуляризация</td><td>1 (по умолчанию)</td></tr>
+      <tr><td><code>max_depth</code></td><td>Ограничение глубины</td><td>3-10</td></tr>
+      <tr><td><code>min_child_weight</code></td><td>Мин. вес листа</td><td>1-10</td></tr>
+      <tr><td><code>gamma</code></td><td>Сложность разбиения</td><td>0-5</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Early Stopping</h2>
+    <pre><code># С eval_set для early stopping
+model = xgb.XGBClassifier(
+    n_estimators=1000,
+    learning_rate=0.1,
+    early_stopping_rounds=10
+)
+
+model.fit(
+    X_train, y_train,
+    eval_set=[(X_train, y_train), (X_test, y_test)],
+    verbose=True
+)
+
+# Лучшая итерация
+print(f"Best iteration: {model.best_iteration}")
+print(f"Best score: {model.best_score:.4f}")
+
+# Использовать ntree_limit при предсказании
+y_pred = model.predict(X_test, 
+                       iteration_range=(0, model.best_iteration))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Важность признаков</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Обучить модель
+model.fit(X_train, y_train)
+
+# Важность признаков
+importance = model.feature_importances_
+
+# Сортировка
+indices = np.argsort(importance)[::-1]
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.bar(range(len(importance)), importance[indices])
+plt.xticks(range(len(importance)), 
+           [feature_names[i] for i in indices], 
+           rotation=90)
+plt.xlabel('Признаки')
+plt.ylabel('Важность')
+plt.title('Feature Importance')
+plt.tight_layout()
+plt.show()
+
+# Или встроенный plot
+xgb.plot_importance(model, max_num_features=15)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Cross-Validation</h2>
+    <pre><code># Sklearn CV
+from sklearn.model_selection import cross_val_score
+
+scores = cross_val_score(
+    model, X, y,
+    cv=5,
+    scoring='accuracy'
+)
+print(f"CV Accuracy: {scores.mean():.3f} ± {scores.std():.3f}")
+
+# XGBoost нативный CV
+dtrain = xgb.DMatrix(X_train, label=y_train)
+params = {
+    'objective': 'binary:logistic',
+    'max_depth': 6,
+    'eta': 0.1,
+    'eval_metric': 'auc'
+}
+
+cv_results = xgb.cv(
+    params,
+    dtrain,
+    num_boost_round=100,
+    nfold=5,
+    early_stopping_rounds=10,
+    metrics='auc',
+    seed=42
+)
+
+print(cv_results)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Grid Search для подбора параметров</h2>
+    <pre><code>from sklearn.model_selection import GridSearchCV
+
+# Параметры для поиска
+param_grid = {
+    'max_depth': [3, 5, 7],
+    'learning_rate': [0.01, 0.1, 0.3],
+    'n_estimators': [100, 200, 300],
+    'subsample': [0.8, 1.0],
+    'colsample_bytree': [0.8, 1.0]
+}
+
+# Grid Search
+grid = GridSearchCV(
+    xgb.XGBClassifier(random_state=42),
+    param_grid,
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1,
+    verbose=1
+)
+
+grid.fit(X_train, y_train)
+
+print(f"Best params: {grid.best_params_}")
+print(f"Best score: {grid.best_score_:.3f}")
+
+# Лучшая модель
+best_model = grid.best_estimator_</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. DMatrix (нативный формат)</h2>
+    <pre><code># Создание DMatrix для эффективности
+dtrain = xgb.DMatrix(X_train, label=y_train)
+dtest = xgb.DMatrix(X_test, label=y_test)
+
+# Параметры
+params = {
+    'objective': 'binary:logistic',
+    'max_depth': 6,
+    'eta': 0.1,
+    'eval_metric': 'auc'
+}
+
+# Обучение
+evals = [(dtrain, 'train'), (dtest, 'test')]
+model = xgb.train(
+    params,
+    dtrain,
+    num_boost_round=100,
+    evals=evals,
+    early_stopping_rounds=10,
+    verbose_eval=10
+)
+
+# Предсказание
+y_pred = model.predict(dtest)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Обработка категориальных признаков</h2>
+    <pre><code># С версии 1.6.0 - нативная поддержка
+model = xgb.XGBClassifier(
+    enable_categorical=True,
+    tree_method='hist'
+)
+
+# Данные с категориальными признаками
+# Преобразуем в category
+import pandas as pd
+df['cat_column'] = df['cat_column'].astype('category')
+
+model.fit(df, y)
+
+# Альтернатива: Label Encoding
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+X['cat_column'] = le.fit_transform(X['cat_column'])
+
+# Или One-Hot Encoding
+X_encoded = pd.get_dummies(X, columns=['cat_column'])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Работа с несбалансированными данными</h2>
+    <pre><code># scale_pos_weight
+from collections import Counter
+
+# Подсчитать баланс
+counter = Counter(y_train)
+scale = counter[0] / counter[1]
+
+model = xgb.XGBClassifier(
+    scale_pos_weight=scale,
+    max_depth=6,
+    learning_rate=0.1
+)
+
+model.fit(X_train, y_train)
+
+# Или sample_weight при обучении
+from sklearn.utils.class_weight import compute_sample_weight
+sample_weights = compute_sample_weight('balanced', y_train)
+
+model.fit(X_train, y_train, sample_weight=sample_weights)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Мультиклассовая классификация</h2>
+    <pre><code># Автоматически определяет количество классов
+model = xgb.XGBClassifier(
+    objective='multi:softmax',  # или 'multi:softprob'
+    num_class=3,  # количество классов
+    max_depth=6
+)
+
+model.fit(X_train, y_train)
+
+# softmax - возвращает класс
+# softprob - возвращает вероятности
+y_pred = model.predict(X_test)
+y_proba = model.predict_proba(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Табличные данные</li>
+          <li>Соревнования (Kaggle)</li>
+          <li>Средние датасеты (< 1M строк)</li>
+          <li>Смесь числовых и категориальных признаков</li>
+          <li>Нужна высокая точность</li>
+          <li>Интерпретируемость важна</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень большие данные (используйте LightGBM)</li>
+          <li>Изображения, текст (используйте DL)</li>
+          <li>Нужна максимальная скорость</li>
+          <li>Онлайн обучение</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Сохранение и загрузка модели</h2>
+    <pre><code># Сохранение
+model.save_model('xgboost_model.json')
+
+# Или pickle
+import pickle
+with open('model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+# Загрузка
+model = xgb.XGBClassifier()
+model.load_model('xgboost_model.json')
+
+# Или из pickle
+with open('model.pkl', 'rb') as f:
+    model = pickle.load(f)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Сравнение с другими библиотеками</h2>
+    <table>
+      <tr><th>Библиотека</th><th>Скорость</th><th>Память</th><th>Точность</th></tr>
+      <tr><td><strong>XGBoost</strong></td><td>Средняя</td><td>Средняя</td><td>Высокая</td></tr>
+      <tr><td><strong>LightGBM</strong></td><td>Быстрая</td><td>Низкая</td><td>Высокая</td></tr>
+      <tr><td><strong>CatBoost</strong></td><td>Медленная</td><td>Средняя</td><td>Очень высокая</td></tr>
+      <tr><td><strong>Sklearn GB</strong></td><td>Медленная</td><td>Высокая</td><td>Средняя</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Типичные ошибки</h2>
+    <ul>
+      <li><strong>Слишком большой learning_rate</strong> — уменьшить до 0.01-0.1</li>
+      <li><strong>Слишком глубокие деревья</strong> — переобучение, уменьшить max_depth</li>
+      <li><strong>Не использовать early_stopping</strong> — модель переобучается</li>
+      <li><strong>Забыть масштабировать данные</strong> — не критично для XGBoost, но может помочь</li>
+      <li><strong>Игнорировать class_weight</strong> — плохо для несбалансированных данных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Чек-лист</h2>
+    <ul>
+      <li>[ ] Начать с базовых параметров</li>
+      <li>[ ] Использовать early_stopping_rounds</li>
+      <li>[ ] Подобрать learning_rate и n_estimators</li>
+      <li>[ ] Настроить max_depth (3-10)</li>
+      <li>[ ] Добавить subsample и colsample_bytree</li>
+      <li>[ ] Использовать reg_alpha/reg_lambda для регуляризации</li>
+      <li>[ ] Для несбалансированных данных: scale_pos_weight</li>
+      <li>[ ] Визуализировать важность признаков</li>
+      <li>[ ] Сравнить с LightGBM и CatBoost</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «XGBoost — это очень мощный алгоритм, который строит много простых моделей (деревьев решений) и объединяет их. Каждое новое дерево учится на ошибках предыдущих. Это как команда экспертов, где каждый специализируется на исправлении ошибок коллег».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
