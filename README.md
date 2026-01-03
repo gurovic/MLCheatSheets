@@ -5,29 +5,29 @@
 ## Классическое машинное обучение
 
 ### **1. Подготовка данных**
-1. Предобработка данных (Preprocessing)
+1. [Предобработка данных (Preprocessing)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/preprocessing_cheatsheet.html)
 1. Обработка пропущенных значений
 1. Обработка выбросов
 1. Кодирование категориальных признаков
 1. Масштабирование и нормализация
 1. Feature Engineering
-1. Выбор признаков (Feature Selection)
+1. [Выбор признаков (Feature Selection)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_selection_cheatsheet.html)
 1. Снижение размерности (Dimensionality Reduction)
 1. Балансировка классов
 
 ### **2. Классификация**
-1. Логистическая регрессия
-1. Метод опорных векторов (SVM)
+1. [Логистическая регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/logreg_cheatsheet.html)
+1. [Метод опорных векторов (SVM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/svm_cheatsheet.html)
 1. Наивный Байес (Naive Bayes)
-1. k-ближайших соседей (k-NN)
-1. Деревья решений для классификации
-1. Случайный лес для классификации
-1. Градиентный бустинг для классификации
+1. [k-ближайших соседей (k-NN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/knn_cheatsheet.html)
+1. [Деревья решений для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/decision_trees_cheatsheet.html)
+1. [Случайный лес для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/random_forest_cheatsheet.html)
+1. [Градиентный бустинг для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/boosting_cheatsheet.html)
 1. XGBoost / LightGBM / CatBoost
 1. Ансамбли методов (Voting, Stacking)
 
 ### **3. Регрессия**
-1. Линейная регрессия
+1. [Линейная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/linreg_cheatsheet.html)
 1. Полиномиальная регрессия
 1. Ридж, Лассо, ElasticNet
 1. Деревья решений для регрессии
@@ -37,7 +37,7 @@
 1. Непараметрическая регрессия
 
 ### **4. Кластеризация**
-1. K-means и K-means++
+1. [K-means и K-means++](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/kmeans_cheatsheet.html)
 1. Иерархическая кластеризация
 1. DBSCAN
 1. OPTICS
@@ -46,7 +46,7 @@
 1. Выбор числа кластеров
 
 ### **5. Понижение размерности**
-1. PCA (Principal Component Analysis)
+1. [PCA (Principal Component Analysis)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pca_cheatsheet.html)
 1. t-SNE
 1. UMAP
 1. LDA (Linear Discriminant Analysis)
@@ -54,9 +54,9 @@
 1. Автоэнкодеры (линейные)
 
 ### **6. Оценка моделей и валидация**
-1. Метрики классификации
+1. [Метрики классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/classification_metrics_cheatsheet.html)
 1. Метрики регрессии
-1. Кросс-валидация
+1. [Кросс-валидация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cross_validation_cheatsheet.html)
 1. Кривые обучения
 1. Калибровка моделей
 1. Статистические тесты для сравнения моделей
@@ -165,7 +165,7 @@
 ## Глубокое обучение
 
 ### **1. Основы нейронных сетей**
-1. Искусственный нейрон (перцептрон)
+1. [Искусственный нейрон (перцептрон)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/perceptron_cheatsheet.html)
 1. Архитектура MLP (многослойный перцептрон)
 1. Функции активации (ReLU, Sigmoid, Tanh, Softmax)
 1. Функции потерь для классификации и регрессии
@@ -175,7 +175,7 @@
 1. Регуляризация нейронных сетей
 
 ### **2. Сверточные нейронные сети (CNN)**
-1. Основы свертки
+1. [Основы свертки](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_basics_cheatsheet.html)
 1. Пулинг-слои (Max, Average, Global)
 1. Архитектуры CNN (LeNet, AlexNet, VGG)
 1. Современные архитектуры (ResNet, Inception, EfficientNet)
@@ -185,7 +185,7 @@
 1. 1D-CNN и 3D-CNN
 
 ### **3. Рекуррентные нейронные сети (RNN)**
-1. Основы RNN
+1. [Основы RNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rnn_basics_cheatsheet.html)
 1. Проблема исчезающего градиента
 1. LSTM (Long Short-Term Memory)
 1. GRU (Gated Recurrent Units)
@@ -197,7 +197,7 @@
 1. Механизм внимания (attention)
 1. Self-attention
 1. Multi-head attention
-1. Архитектура Transformer
+1. [Архитектура Transformer](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transformers_cheatsheet.html)
 1. Positional encoding
 1. BERT и языковые модели
 1. Vision Transformers (ViT)
