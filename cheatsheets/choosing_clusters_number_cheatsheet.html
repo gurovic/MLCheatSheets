@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Выбор числа кластеров Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔢 Выбор числа кластеров Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Проблема выбора K</h2>
+    <ul>
+      <li><strong>Нет правильного ответа</strong>: оптимальное K зависит от задачи</li>
+      <li><strong>Компромисс</strong>: слишком мало или слишком много кластеров</li>
+      <li><strong>Множество методов</strong>: каждый со своими плюсами</li>
+      <li><strong>Бизнес-контекст</strong>: иногда важнее статистики</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Метод локтя (Elbow Method)</h2>
+    <p>Самый популярный метод:</p>
+    <pre><code>from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Вычисление inertia для разных K
+inertias = []
+K_range = range(1, 11)
+
+for k in K_range:
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(X_scaled)
+    inertias.append(kmeans.inertia_)
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(K_range, inertias, 'bx-')
+plt.xlabel('Количество кластеров K')
+plt.ylabel('Inertia (WCSS)')
+plt.title('Метод локтя')
+plt.grid(True)
+plt.show()
+
+# Ищем "локоть" — точку перегиба</code></pre>
+    <p><strong>Как найти локоть:</strong> Точка, где уменьшение inertia замедляется</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Silhouette Score</h2>
+    <p>Измеряет качество кластеризации:</p>
+    <pre><code>from sklearn.metrics import silhouette_score
+
+silhouette_scores = []
+K_range = range(2, 11)  # Минимум 2 кластера
+
+for k in K_range:
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    labels = kmeans.fit_predict(X_scaled)
+    score = silhouette_score(X_scaled, labels)
+    silhouette_scores.append(score)
+    print(f"K={k}: Silhouette Score = {score:.3f}")
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(K_range, silhouette_scores, 'bx-')
+plt.xlabel('Количество кластеров K')
+plt.ylabel('Silhouette Score')
+plt.title('Silhouette Score для разных K')
+plt.grid(True)
+plt.show()
+
+# Выбор K с максимальным silhouette score
+optimal_k = K_range[np.argmax(silhouette_scores)]
+print(f"Оптимальное K: {optimal_k}")</code></pre>
+    <p><strong>Диапазон:</strong> [-1, 1], ближе к 1 = лучше</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Silhouette Plot</h2>
+    <pre><code>from sklearn.metrics import silhouette_samples
+import numpy as np
+
+def plot_silhouette(X, n_clusters):
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    labels = kmeans.fit_predict(X)
+    
+    silhouette_avg = silhouette_score(X, labels)
+    sample_silhouette_values = silhouette_samples(X, labels)
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    y_lower = 10
+    
+    for i in range(n_clusters):
+        ith_cluster_values = sample_silhouette_values[labels == i]
+        ith_cluster_values.sort()
+        
+        size_cluster_i = ith_cluster_values.shape[0]
+        y_upper = y_lower + size_cluster_i
+        
+        ax.fill_betweenx(np.arange(y_lower, y_upper),
+                         0, ith_cluster_values,
+                         alpha=0.7, label=f'Cluster {i}')
+        
+        y_lower = y_upper + 10
+    
+    ax.axvline(x=silhouette_avg, color="red", linestyle="--",
+               label=f'Average: {silhouette_avg:.3f}')
+    ax.set_xlabel("Silhouette Coefficient")
+    ax.set_ylabel("Cluster")
+    ax.set_title(f"Silhouette Plot (K={n_clusters})")
+    ax.legend()
+    plt.show()
+
+# Использование
+plot_silhouette(X_scaled, n_clusters=3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Davies-Bouldin Index</h2>
+    <p>Чем меньше, тем лучше:</p>
+    <pre><code>from sklearn.metrics import davies_bouldin_score
+
+db_scores = []
+K_range = range(2, 11)
+
+for k in K_range:
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    labels = kmeans.fit_predict(X_scaled)
+    score = davies_bouldin_score(X_scaled, labels)
+    db_scores.append(score)
+    print(f"K={k}: DB Index = {score:.3f}")
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(K_range, db_scores, 'bx-')
+plt.xlabel('Количество кластеров K')
+plt.ylabel('Davies-Bouldin Index')
+plt.title('Davies-Bouldin Index (меньше = лучше)')
+plt.grid(True)
+plt.show()
+
+# Оптимальное K — минимум
+optimal_k = K_range[np.argmin(db_scores)]
+print(f"Оптимальное K: {optimal_k}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Calinski-Harabasz Index</h2>
+    <p>Чем больше, тем лучше:</p>
+    <pre><code>from sklearn.metrics import calinski_harabasz_score
+
+ch_scores = []
+K_range = range(2, 11)
+
+for k in K_range:
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    labels = kmeans.fit_predict(X_scaled)
+    score = calinski_harabasz_score(X_scaled, labels)
+    ch_scores.append(score)
+    print(f"K={k}: CH Index = {score:.3f}")
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(K_range, ch_scores, 'bx-')
+plt.xlabel('Количество кластеров K')
+plt.ylabel('Calinski-Harabasz Index')
+plt.title('Calinski-Harabasz Index (больше = лучше)')
+plt.grid(True)
+plt.show()
+
+# Оптимальное K — максимум
+optimal_k = K_range[np.argmax(ch_scores)]
+print(f"Оптимальное K: {optimal_k}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Gap Statistic</h2>
+    <p>Сравнение с случайными данными:</p>
+    <pre><code>from sklearn.cluster import KMeans
+import numpy as np
+
+def gap_statistic(X, K_range, n_refs=10):
+    gaps = []
+    
+    for k in K_range:
+        # Реальные данные
+        kmeans = KMeans(n_clusters=k, random_state=42)
+        kmeans.fit(X)
+        ref_dispersion = kmeans.inertia_
+        
+        # Случайные данные
+        ref_dispersions = []
+        for _ in range(n_refs):
+            # Генерируем случайные данные в том же диапазоне
+            random_data = np.random.uniform(
+                X.min(axis=0), 
+                X.max(axis=0), 
+                size=X.shape
+            )
+            kmeans_ref = KMeans(n_clusters=k, random_state=42)
+            kmeans_ref.fit(random_data)
+            ref_dispersions.append(kmeans_ref.inertia_)
+        
+        # Gap = log(ref) - log(real)
+        gap = np.log(np.mean(ref_dispersions)) - np.log(ref_dispersion)
+        gaps.append(gap)
+    
+    return gaps
+
+# Вычисление
+K_range = range(1, 11)
+gaps = gap_statistic(X_scaled, K_range)
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(K_range, gaps, 'bx-')
+plt.xlabel('Количество кластеров K')
+plt.ylabel('Gap Statistic')
+plt.title('Gap Statistic')
+plt.grid(True)
+plt.show()
+
+# Оптимальное K — максимум gap
+optimal_k = K_range[np.argmax(gaps)]
+print(f"Оптимальное K: {optimal_k}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сравнение всех методов</h2>
+    <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+def compare_methods(X, K_range):
+    metrics = {
+        'Inertia': [],
+        'Silhouette': [],
+        'Davies-Bouldin': [],
+        'Calinski-Harabasz': []
+    }
+    
+    for k in K_range:
+        kmeans = KMeans(n_clusters=k, random_state=42)
+        labels = kmeans.fit_predict(X)
+        
+        metrics['Inertia'].append(kmeans.inertia_)
+        if k > 1:
+            metrics['Silhouette'].append(silhouette_score(X, labels))
+            metrics['Davies-Bouldin'].append(davies_bouldin_score(X, labels))
+            metrics['Calinski-Harabasz'].append(calinski_harabasz_score(X, labels))
+    
+    # Визуализация
+    fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+    
+    axes[0, 0].plot(K_range, metrics['Inertia'], 'bx-')
+    axes[0, 0].set_title('Elbow Method (Inertia)')
+    axes[0, 0].set_xlabel('K')
+    axes[0, 0].grid(True)
+    
+    axes[0, 1].plot(K_range[1:], metrics['Silhouette'], 'bx-')
+    axes[0, 1].set_title('Silhouette Score')
+    axes[0, 1].set_xlabel('K')
+    axes[0, 1].grid(True)
+    
+    axes[1, 0].plot(K_range[1:], metrics['Davies-Bouldin'], 'bx-')
+    axes[1, 0].set_title('Davies-Bouldin (меньше = лучше)')
+    axes[1, 0].set_xlabel('K')
+    axes[1, 0].grid(True)
+    
+    axes[1, 1].plot(K_range[1:], metrics['Calinski-Harabasz'], 'bx-')
+    axes[1, 1].set_title('Calinski-Harabasz (больше = лучше)')
+    axes[1, 1].set_xlabel('K')
+    axes[1, 1].grid(True)
+    
+    plt.tight_layout()
+    plt.show()
+
+compare_methods(X_scaled, range(1, 11))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Визуальный анализ</h2>
+    <pre><code># Визуализация для разных K
+from sklearn.decomposition import PCA
+
+# Снижение размерности для визуализации
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+
+for idx, k in enumerate([2, 3, 4, 5, 6, 7]):
+    ax = axes[idx // 3, idx % 3]
+    
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    labels = kmeans.fit_predict(X_scaled)
+    
+    scatter = ax.scatter(X_pca[:, 0], X_pca[:, 1], 
+                        c=labels, cmap='viridis', alpha=0.6)
+    ax.set_title(f'K = {k}')
+    ax.set_xlabel('PC1')
+    ax.set_ylabel('PC2')
+    plt.colorbar(scatter, ax=ax)
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Критерий</th><th>Плюсы</th><th>Минусы</th></tr>
+      <tr>
+        <td><strong>Elbow</strong></td>
+        <td>Визуальный</td>
+        <td>Интуитивный, популярный</td>
+        <td>Субъективный, не всегда четкий</td>
+      </tr>
+      <tr>
+        <td><strong>Silhouette</strong></td>
+        <td>max</td>
+        <td>Четкий критерий</td>
+        <td>Медленный на больших данных</td>
+      </tr>
+      <tr>
+        <td><strong>Davies-Bouldin</strong></td>
+        <td>min</td>
+        <td>Быстрый</td>
+        <td>Менее популярный</td>
+      </tr>
+      <tr>
+        <td><strong>Calinski-Harabasz</strong></td>
+        <td>max</td>
+        <td>Быстрый</td>
+        <td>Чувствителен к плотности</td>
+      </tr>
+      <tr>
+        <td><strong>Gap Statistic</strong></td>
+        <td>max</td>
+        <td>Статистически обоснован</td>
+        <td>Медленный, сложный</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Бизнес-контекст</h2>
+    <p>Иногда K определяется задачей:</p>
+    <ul>
+      <li><strong>Сегментация клиентов</strong>: бюджет на маркетинг (3-5 сегментов)</li>
+      <li><strong>Товарные категории</strong>: структура магазина</li>
+      <li><strong>Региональное деление</strong>: логистические центры</li>
+    </ul>
+    <pre><code># Пример: выбор между статистикой и бизнесом
+optimal_k_stats = 5  # По silhouette score
+optimal_k_business = 3  # Бюджет на 3 кампании
+
+print(f"Статистический оптимум: K={optimal_k_stats}")
+print(f"Бизнес-требование: K={optimal_k_business}")
+print("Решение: Используем K=3 с пояснением для стейкхолдеров")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Чек-лист выбора K</h2>
+    <ul>
+      <li>[ ] Начать с метода локтя (Elbow)</li>
+      <li>[ ] Проверить Silhouette Score</li>
+      <li>[ ] Сравнить Davies-Bouldin и Calinski-Harabasz</li>
+      <li>[ ] Визуализировать кластеры для разных K</li>
+      <li>[ ] Учесть бизнес-контекст</li>
+      <li>[ ] Проверить размеры кластеров</li>
+      <li>[ ] Убедиться, что кластеры интерпретируемы</li>
+      <li>[ ] Документировать выбор</li>
+      <li>[ ] Валидировать на отложенных данных</li>
+    </ul>
+
+    <h3>�� Объяснение заказчику:</h3>
+    <blockquote>
+      «Выбор числа кластеров — это баланс между детализацией и простотой. Слишком мало кластеров теряют важные различия, слишком много — усложняют понимание. Мы используем несколько методов, чтобы найти оптимальное количество для вашей задачи».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

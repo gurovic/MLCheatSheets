@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Масштабирование и нормализация Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 Масштабирование и нормализация Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Зачем масштабировать?</h2>
+    <ul>
+      <li><strong>Разные шкалы</strong>: возраст (20-80) vs доход (20000-100000)</li>
+      <li><strong>Влияние на модели</strong>: градиентный спуск, KNN, SVM чувствительны</li>
+      <li><strong>Ускорение сходимости</strong>: оптимизация работает быстрее</li>
+      <li><strong>Важность признаков</strong>: выравнивание вклада</li>
+    </ul>
+    <p><strong>Когда масштабирование НЕ нужно:</strong></p>
+    <ul>
+      <li>Деревья решений и их ансамбли (Random Forest, XGBoost)</li>
+      <li>Naive Bayes</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. StandardScaler (Z-score нормализация)</h2>
+    <p>Формула: <code>(x - mean) / std</code></p>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+import numpy as np
+
+# Данные
+X = np.array([[1, 2], [3, 4], [5, 6], [7, 8]])
+
+# StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+print("Mean:", X_scaled.mean(axis=0))  # [0, 0]
+print("Std:", X_scaled.std(axis=0))    # [1, 1]
+
+# Обратное преобразование
+X_original = scaler.inverse_transform(X_scaled)
+
+# Параметры scaler
+print("Mean values:", scaler.mean_)
+print("Scale (std):", scaler.scale_)</code></pre>
+    <p><strong>Результат:</strong> Mean = 0, Std = 1</p>
+    <p><strong>Использовать:</strong> для нормально распределённых данных</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. MinMaxScaler</h2>
+    <p>Формула: <code>(x - min) / (max - min)</code></p>
+    <pre><code>from sklearn.preprocessing import MinMaxScaler
+
+# MinMaxScaler [0, 1]
+scaler = MinMaxScaler()
+X_scaled = scaler.fit_transform(X)
+
+print("Min:", X_scaled.min(axis=0))  # [0, 0]
+print("Max:", X_scaled.max(axis=0))  # [1, 1]
+
+# Кастомный диапазон [-1, 1]
+scaler = MinMaxScaler(feature_range=(-1, 1))
+X_scaled = scaler.fit_transform(X)
+
+# Кастомный диапазон [0, 10]
+scaler = MinMaxScaler(feature_range=(0, 10))
+X_scaled = scaler.fit_transform(X)</code></pre>
+    <p><strong>Результат:</strong> Данные в диапазоне [0, 1]</p>
+    <p><strong>⚠️ Чувствителен к выбросам!</strong></p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. RobustScaler</h2>
+    <p>Формула: <code>(x - median) / IQR</code></p>
+    <pre><code>from sklearn.preprocessing import RobustScaler
+
+# RobustScaler — устойчив к выбросам
+scaler = RobustScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Использует медиану и IQR
+print("Median:", scaler.center_)
+print("IQR:", scaler.scale_)
+
+# Кастомные квантили
+scaler = RobustScaler(
+    quantile_range=(10, 90)  # Вместо (25, 75)
+)
+X_scaled = scaler.fit_transform(X)</code></pre>
+    <p><strong>Результат:</strong> Median = 0, масштаб по IQR</p>
+    <p><strong>Использовать:</strong> когда есть выбросы</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. MaxAbsScaler</h2>
+    <p>Формула: <code>x / |max|</code></p>
+    <pre><code>from sklearn.preprocessing import MaxAbsScaler
+
+# MaxAbsScaler — диапазон [-1, 1]
+scaler = MaxAbsScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Не сдвигает центр (no centering)
+# Подходит для sparse данных</code></pre>
+    <p><strong>Результат:</strong> Диапазон [-1, 1], центр не смещён</p>
+    <p><strong>Использовать:</strong> для разреженных данных (sparse matrices)</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Normalizer (L1, L2)</h2>
+    <p>Масштабирование каждой строки (не колонки!):</p>
+    <pre><code>from sklearn.preprocessing import Normalizer
+
+# L2 нормализация (по умолчанию)
+normalizer = Normalizer(norm='l2')
+X_normalized = normalizer.fit_transform(X)
+
+# Каждая строка имеет норму = 1
+print(np.linalg.norm(X_normalized[0]))  # 1.0
+
+# L1 нормализация
+normalizer = Normalizer(norm='l1')
+X_normalized = normalizer.fit_transform(X)
+
+# L1: сумма абсолютных значений = 1
+print(np.sum(np.abs(X_normalized[0])))  # 1.0
+
+# Max нормализация
+normalizer = Normalizer(norm='max')
+X_normalized = normalizer.fit_transform(X)</code></pre>
+    <p><strong>Использовать:</strong> для текстовых данных, TF-IDF</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. QuantileTransformer</h2>
+    <p>Преобразование в равномерное или нормальное распределение:</p>
+    <pre><code>from sklearn.preprocessing import QuantileTransformer
+
+# Равномерное распределение [0, 1]
+qt = QuantileTransformer(
+    output_distribution='uniform',
+    n_quantiles=1000
+)
+X_transformed = qt.fit_transform(X)
+
+# Нормальное распределение
+qt = QuantileTransformer(
+    output_distribution='normal'
+)
+X_transformed = qt.fit_transform(X)
+
+# Проверка
+import matplotlib.pyplot as plt
+plt.hist(X_transformed[:, 0], bins=50)
+plt.title('После QuantileTransformer (normal)')
+plt.show()</code></pre>
+    <p><strong>Использовать:</strong> для сильно скошенных распределений</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. PowerTransformer</h2>
+    <p>Box-Cox и Yeo-Johnson трансформации:</p>
+    <pre><code>from sklearn.preprocessing import PowerTransformer
+
+# Yeo-Johnson (работает с отрицательными)
+pt = PowerTransformer(method='yeo-johnson')
+X_transformed = pt.fit_transform(X)
+
+# Box-Cox (только положительные значения)
+pt = PowerTransformer(method='box-cox')
+X_positive = X + 1  # Убедиться что > 0
+X_transformed = pt.fit_transform(X_positive)
+
+# Автоматически находит лучшую lambda
+print("Lambda:", pt.lambdas_)</code></pre>
+    <p><strong>Результат:</strong> Более Гауссово распределение</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Формула</th><th>Результат</th><th>Когда использовать</th></tr>
+      <tr>
+        <td><strong>StandardScaler</strong></td>
+        <td>(x - μ) / σ</td>
+        <td>μ=0, σ=1</td>
+        <td>Норм. распределение, нет выбросов</td>
+      </tr>
+      <tr>
+        <td><strong>MinMaxScaler</strong></td>
+        <td>(x - min) / (max - min)</td>
+        <td>[0, 1]</td>
+        <td>Ограниченный диапазон, нет выбросов</td>
+      </tr>
+      <tr>
+        <td><strong>RobustScaler</strong></td>
+        <td>(x - med) / IQR</td>
+        <td>med=0</td>
+        <td>Есть выбросы</td>
+      </tr>
+      <tr>
+        <td><strong>MaxAbsScaler</strong></td>
+        <td>x / |max|</td>
+        <td>[-1, 1]</td>
+        <td>Sparse данные</td>
+      </tr>
+      <tr>
+        <td><strong>Normalizer</strong></td>
+        <td>x / ||x||</td>
+        <td>||x||=1</td>
+        <td>Текстовые данные</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Train/Test Split правильно</h2>
+    <pre><code>from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# Разделение данных
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# ❌ НЕПРАВИЛЬНО: fit на всех данных
+scaler = StandardScaler()
+X_all_scaled = scaler.fit_transform(X)  # Утечка данных!
+
+# ✅ ПРАВИЛЬНО: fit только на train
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)  # Только transform!
+
+# Проверка
+print("Train mean:", X_train_scaled.mean(axis=0))  # ~0
+print("Test mean:", X_test_scaled.mean(axis=0))   # Может быть != 0!</code></pre>
+    <p><strong>⚠️ Важно:</strong> fit только на train, transform на test!</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Pipeline для масштабирования</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+# Pipeline
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('classifier', LogisticRegression())
+])
+
+# Обучение (автоматически fit scaler + fit модель)
+pipeline.fit(X_train, y_train)
+
+# Предсказание (автоматически transform + predict)
+y_pred = pipeline.predict(X_test)
+
+# Доступ к компонентам
+scaler = pipeline.named_steps['scaler']
+model = pipeline.named_steps['classifier']
+
+# Сохранение
+import joblib
+joblib.dump(pipeline, 'model_with_scaler.pkl')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Масштабирование по колонкам</h2>
+    <pre><code>from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
+
+# Разные scalers для разных колонок
+ct = ColumnTransformer([
+    ('standard', StandardScaler(), ['age', 'income']),
+    ('minmax', MinMaxScaler(), ['height', 'weight'])
+], remainder='passthrough')  # Остальные без изменений
+
+X_transformed = ct.fit_transform(X)
+
+# С Pipeline
+from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier
+
+pipeline = Pipeline([
+    ('preprocessor', ct),
+    ('classifier', RandomForestClassifier())
+])
+
+pipeline.fit(X_train, y_train)
+y_pred = pipeline.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Визуализация эффекта</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+
+# Исходные данные
+X = np.random.randn(1000, 1) * 10 + 50
+
+fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+
+# Original
+axes[0, 0].hist(X, bins=50)
+axes[0, 0].set_title('Original')
+
+# StandardScaler
+from sklearn.preprocessing import StandardScaler
+X_std = StandardScaler().fit_transform(X)
+axes[0, 1].hist(X_std, bins=50)
+axes[0, 1].set_title('StandardScaler')
+
+# MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler
+X_mm = MinMaxScaler().fit_transform(X)
+axes[0, 2].hist(X_mm, bins=50)
+axes[0, 2].set_title('MinMaxScaler')
+
+# RobustScaler
+from sklearn.preprocessing import RobustScaler
+X_robust = RobustScaler().fit_transform(X)
+axes[1, 0].hist(X_robust, bins=50)
+axes[1, 0].set_title('RobustScaler')
+
+# PowerTransformer
+from sklearn.preprocessing import PowerTransformer
+X_power = PowerTransformer().fit_transform(X)
+axes[1, 1].hist(X_power, bins=50)
+axes[1, 1].set_title('PowerTransformer')
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Лучшие практики</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <ul>
+          <li>Fit только на train данных</li>
+          <li>Использовать Pipeline</li>
+          <li>RobustScaler если есть выбросы</li>
+          <li>StandardScaler для линейных моделей</li>
+          <li>Сохранять scaler вместе с моделью</li>
+          <li>Документировать выбранный метод</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не делать</h3>
+        <ul>
+          <li>Fit на всех данных (train + test)</li>
+          <li>Забывать про масштабирование в продакшене</li>
+          <li>MinMaxScaler с выбросами</li>
+          <li>Масштабировать целевую переменную в классификации</li>
+          <li>Масштабировать для tree-based моделей</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Проверить наличие выбросов</li>
+      <li>[ ] Выбрать метод масштабирования</li>
+      <li>[ ] StandardScaler для нормальных данных</li>
+      <li>[ ] RobustScaler если есть выбросы</li>
+      <li>[ ] MinMaxScaler для ограниченного диапазона</li>
+      <li>[ ] Fit только на train</li>
+      <li>[ ] Использовать Pipeline</li>
+      <li>[ ] Сохранить scaler для продакшена</li>
+      <li>[ ] Проверить метрики до/после масштабирования</li>
+      <li>[ ] Документировать выбор</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Масштабирование — это приведение всех характеристик к единому масштабу. Представьте, что мы сравниваем людей по возрасту (20-80 лет) и зарплате (20,000-100,000$). Без масштабирования зарплата будет казаться в 1000 раз важнее возраста просто из-за разных единиц измерения».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
