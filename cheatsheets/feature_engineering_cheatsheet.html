@@ -474,7 +474,7 @@ df['age_filled'] = df['age'].fillna(df['age'].median())
 df['income_filled'] = df['income'].fillna(df['income'].mean())
 
 # Forward fill
-df['age_ffill'] = df['age'].fillna(method='ffill')
+df['age_ffill'] = df['age'].ffill()
 
 # Предсказание пропущенных значений
 from sklearn.impute import KNNImputer
