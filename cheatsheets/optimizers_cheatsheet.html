@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Optimizers (Adam, SGD, etc.) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Optimizers (Adam, SGD, RMSprop) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Алгоритмы оптимизации • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть оптимизаторов</h2>
+    <ul>
+      <li><strong>Задача</strong>: минимизировать функцию потерь</li>
+      <li><strong>Метод</strong>: итеративное обновление весов</li>
+      <li><strong>Основа</strong>: градиентный спуск</li>
+      <li><strong>Цель</strong>: найти оптимальные веса быстро и эффективно</li>
+    </ul>
+    <p><strong>Общая формула</strong>: θ = θ - α · ∇L(θ)</p>
+    <p>где α — learning rate, ∇L — градиент функции потерь</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. SGD (Stochastic Gradient Descent)</h2>
+    <p><strong>Простейший оптимизатор</strong></p>
+    <p>θ = θ - α · ∇L(θ)</p>
+    <pre><code># PyTorch
+import torch.optim as optim
+
+optimizer = optim.SGD(
+    model.parameters(),
+    lr=0.01
+)
+
+# Keras/TensorFlow
+model.compile(
+    optimizer='sgd',
+    loss='categorical_crossentropy'
+)
+
+# Или с параметрами
+from tensorflow.keras.optimizers import SGD
+optimizer = SGD(learning_rate=0.01)</code></pre>
+    <p><strong>Плюсы</strong>: простой, понятный<br>
+    <strong>Минусы</strong>: медленная сходимость, застревает в локальных минимумах</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. SGD with Momentum</h2>
+    <p><strong>Добавляет инерцию движения</strong></p>
+    <p>v = β · v + α · ∇L(θ)<br>θ = θ - v</p>
+    <pre><code># PyTorch
+optimizer = optim.SGD(
+    model.parameters(),
+    lr=0.01,
+    momentum=0.9  # β = 0.9
+)
+
+# Keras
+optimizer = SGD(
+    learning_rate=0.01,
+    momentum=0.9
+)</code></pre>
+    <p><strong>Плюсы</strong>: быстрее сходимость, преодолевает плато<br>
+    <strong>β</strong>: обычно 0.9 или 0.99</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. RMSprop</h2>
+    <p><strong>Адаптивный learning rate для каждого параметра</strong></p>
+    <p>E[g²] = β · E[g²] + (1-β) · g²<br>θ = θ - α / √(E[g²] + ε) · g</p>
+    <pre><code># PyTorch
+optimizer = optim.RMSprop(
+    model.parameters(),
+    lr=0.001,
+    alpha=0.99,  # decay rate
+    eps=1e-8
+)
+
+# Keras
+from tensorflow.keras.optimizers import RMSprop
+optimizer = RMSprop(learning_rate=0.001)</code></pre>
+    <p><strong>Хорошо работает</strong>: для RNN, нестационарные задачи</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Adam (Adaptive Moment Estimation)</h2>
+    <p><strong>Самый популярный! Комбинация Momentum + RMSprop</strong></p>
+    <p>m = β₁ · m + (1-β₁) · g  (момент первого порядка)<br>
+    v = β₂ · v + (1-β₂) · g²  (момент второго порядка)<br>
+    m̂ = m / (1 - β₁ᵗ)  (bias correction)<br>
+    v̂ = v / (1 - β₂ᵗ)<br>
+    θ = θ - α · m̂ / (√v̂ + ε)</p>
+    <pre><code># PyTorch
+optimizer = optim.Adam(
+    model.parameters(),
+    lr=0.001,  # или 1e-3
+    betas=(0.9, 0.999),  # (β₁, β₂)
+    eps=1e-8,
+    weight_decay=0  # L2 регуляризация
+)
+
+# Keras
+from tensorflow.keras.optimizers import Adam
+optimizer = Adam(learning_rate=0.001)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Сравнение оптимизаторов</h2>
+    <table>
+      <tr><th>Оптимизатор</th><th>LR по умолчанию</th><th>Скорость</th><th>Стабильность</th></tr>
+      <tr><td><strong>SGD</strong></td><td>0.01</td><td>Медленная</td><td>Средняя</td></tr>
+      <tr><td><strong>SGD + Momentum</strong></td><td>0.01</td><td>Средняя</td><td>Хорошая</td></tr>
+      <tr><td><strong>RMSprop</strong></td><td>0.001</td><td>Быстрая</td><td>Хорошая</td></tr>
+      <tr><td><strong>Adam</strong></td><td>0.001</td><td>Очень быстрая</td><td>Отличная</td></tr>
+      <tr><td><strong>AdamW</strong></td><td>0.001</td><td>Очень быстрая</td><td>Отличная</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. AdamW (Adam with decoupled Weight Decay)</h2>
+    <p><strong>Улучшенная версия Adam</strong></p>
+    <pre><code># PyTorch
+optimizer = optim.AdamW(
+    model.parameters(),
+    lr=0.001,
+    betas=(0.9, 0.999),
+    weight_decay=0.01  # Правильный weight decay
+)
+
+# Transformers library
+from transformers import AdamW
+optimizer = AdamW(
+    model.parameters(),
+    lr=5e-5,
+    weight_decay=0.01
+)</code></pre>
+    <p><strong>Почему AdamW лучше Adam</strong>: правильная реализация L2 регуляризации</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Другие популярные оптимизаторы</h2>
+    <ul>
+      <li><strong>Adagrad</strong>: адаптивный LR, хорош для разреженных данных</li>
+      <li><strong>Adadelta</strong>: расширение Adagrad</li>
+      <li><strong>Nadam</strong>: Adam + Nesterov momentum</li>
+      <li><strong>RAdam</strong>: Rectified Adam (warm-up автоматически)</li>
+      <li><strong>Lookahead</strong>: обёртка над другими оптимизаторами</li>
+      <li><strong>LAMB</strong>: для очень больших батчей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Типичные learning rates</h2>
+    <table>
+      <tr><th>Задача</th><th>Оптимизатор</th><th>LR</th></tr>
+      <tr><td><strong>Классификация изображений</strong></td><td>Adam</td><td>1e-3 до 1e-4</td></tr>
+      <tr><td><strong>Fine-tuning (transfer)</strong></td><td>Adam</td><td>1e-5 до 1e-4</td></tr>
+      <tr><td><strong>Transformers</strong></td><td>AdamW</td><td>5e-5 до 3e-4</td></tr>
+      <tr><td><strong>RNN/LSTM</strong></td><td>Adam/RMSprop</td><td>1e-3</td></tr>
+      <tr><td><strong>GAN</strong></td><td>Adam</td><td>2e-4 (малый!)</td></tr>
+      <tr><td><strong>Большие батчи</strong></td><td>SGD + momentum</td><td>0.1 (с LR schedule)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Learning Rate Scheduling</h2>
+    <p><strong>Изменение LR в процессе обучения</strong></p>
+    <pre><code># PyTorch - Step LR
+from torch.optim.lr_scheduler import StepLR
+
+scheduler = StepLR(
+    optimizer,
+    step_size=10,  # каждые 10 эпох
+    gamma=0.1      # умножить на 0.1
+)
+
+# В training loop
+for epoch in range(num_epochs):
+    train(model, optimizer)
+    scheduler.step()  # Обновить LR
+
+# Cosine Annealing
+from torch.optim.lr_scheduler import CosineAnnealingLR
+scheduler = CosineAnnealingLR(
+    optimizer,
+    T_max=50  # период
+)
+
+# ReduceLROnPlateau (уменьшать при плато)
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+scheduler = ReduceLROnPlateau(
+    optimizer,
+    mode='min',
+    factor=0.1,
+    patience=10
+)
+# В validation loop
+scheduler.step(val_loss)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Keras Learning Rate Schedules</h2>
+    <pre><code># Exponential decay
+initial_lr = 0.001
+lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+    initial_lr,
+    decay_steps=10000,
+    decay_rate=0.96
+)
+optimizer = Adam(learning_rate=lr_schedule)
+
+# Cosine decay
+lr_schedule = tf.keras.optimizers.schedules.CosineDecay(
+    initial_lr,
+    decay_steps=10000
+)
+
+# Callback для ReduceLROnPlateau
+from tensorflow.keras.callbacks import ReduceLROnPlateau
+
+reduce_lr = ReduceLROnPlateau(
+    monitor='val_loss',
+    factor=0.2,
+    patience=5,
+    min_lr=1e-7
+)
+
+model.fit(X, y, callbacks=[reduce_lr])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать какой оптимизатор</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Adam/AdamW</h3>
+        <ul>
+          <li>По умолчанию для большинства задач</li>
+          <li>Быстрая сходимость</li>
+          <li>Не требует тщательной настройки</li>
+          <li>NLP, Computer Vision</li>
+          <li>Transformers</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>✅ SGD + Momentum</h3>
+        <ul>
+          <li>Лучшая финальная точность для CV</li>
+          <li>Лучшая обобщающая способность</li>
+          <li>Требует настройки LR schedule</li>
+          <li>ResNet, EfficientNet обучение</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Training Loop с оптимизатором</h2>
+    <pre><code># PyTorch полный пример
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+model = MyModel()
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+
+for epoch in range(num_epochs):
+    model.train()
+    for batch_idx, (data, target) in enumerate(train_loader):
+        # Forward pass
+        output = model(data)
+        loss = criterion(output, target)
+        
+        # Backward pass
+        optimizer.zero_grad()  # ВАЖНО! Обнулить градиенты
+        loss.backward()
+        optimizer.step()       # Обновить веса
+    
+    # После каждой эпохи
+    scheduler.step()
+    
+    # Валидация
+    model.eval()
+    with torch.no_grad():
+        val_loss = validate(model, val_loader)
+    
+    print(f"Epoch {epoch}, LR: {scheduler.get_last_lr()[0]:.6f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Gradient Accumulation</h2>
+    <p><strong>Для эмуляции больших батчей</strong></p>
+    <pre><code># Если batch_size=32, но хотим эффект 128
+accumulation_steps = 4
+
+for epoch in range(num_epochs):
+    for i, (data, target) in enumerate(train_loader):
+        output = model(data)
+        loss = criterion(output, target)
+        
+        # Нормализуем loss
+        loss = loss / accumulation_steps
+        loss.backward()
+        
+        # Обновляем веса каждые accumulation_steps
+        if (i + 1) % accumulation_steps == 0:
+            optimizer.step()
+            optimizer.zero_grad()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Лучшие практики</h2>
+    <ul>
+      <li><strong>Начните с Adam</strong>: работает из коробки</li>
+      <li><strong>LR = 1e-3 или 1e-4</strong>: хорошие начальные значения</li>
+      <li><strong>Используйте LR scheduler</strong>: улучшает сходимость</li>
+      <li><strong>Мониторинг LR</strong>: логируйте текущий learning rate</li>
+      <li><strong>Warm-up</strong>: постепенное увеличение LR в начале</li>
+      <li><strong>Не забывайте optimizer.zero_grad()</strong>: иначе градиенты накапливаются!</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать оптимизатор (по умолчанию Adam)</li>
+      <li>[ ] Установить learning rate (1e-3 или 1e-4)</li>
+      <li>[ ] Добавить LR scheduler (опционально)</li>
+      <li>[ ] Правильно вызывать optimizer.zero_grad()</li>
+      <li>[ ] Правильно вызывать optimizer.step()</li>
+      <li>[ ] Мониторить значение LR</li>
+      <li>[ ] Для fine-tuning — малый LR (1e-5)</li>
+      <li>[ ] Рассмотреть weight_decay для регуляризации</li>
+      <li>[ ] Для больших моделей — gradient accumulation</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Оптимизатор — это "штурман", который направляет модель к оптимальному решению. Adam — самый умный штурман, который автоматически подстраивает скорость движения для каждого параметра. SGD проще, но требует больше ручной настройки, зато иногда находит лучший финальный результат».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
