@@ -1,0 +1,193 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>Bayesian Optimization Cheatsheet — 3 колонки</title><style>@media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}@media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}.container{column-count:3;column-gap:20px;max-width:100%}.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}p,ul,ol{font-size:0.92em;margin:0.6em 0}ul,ol{padding-left:18px}li{margin-bottom:4px}code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}pre code{padding:0;background:none;white-space:pre-wrap}table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}td{padding:4px 6px;border-bottom:1px solid #f0f4ff}tr:nth-child(even){background-color:#f8fbff}.good-vs-bad{display:flex;flex-direction:column;gap:8px}.good-vs-bad div{flex:1;padding:6px 8px;border-radius:4px}.good{background-color:#f0f9f4;border-left:3px solid #2e8b57}.bad{background-color:#fdf0f2;border-left:3px solid #d32f2f}.good h3,.bad h3{margin:0 0 4px;font-size:1em;font-weight:700}.good ul,.bad ul{padding-left:20px;margin:0}.good li::before{content:"✅ ";font-weight:bold}.bad li::before{content:"❌ ";font-weight:bold}blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}.formula{text-align:center;font-family:'Cambria Math',serif;font-size:1em;margin:10px 0;padding:8px;background:#f8fbff;border-radius:4px}@media print{.container{column-gap:12px}.block{box-shadow:none}code,pre,table{font-size:0.78em}h1{font-size:1.4em}h2{font-size:1em}}</style></head><body><div class="container"><h1>🎲 Bayesian Optimization Cheatsheet</h1><div class="subtitle">Гиперпараметры • Дорогие вычисления • Умный поиск<br>📅 3 января 2026</div><div class="block"><h2>🔷 1. Суть</h2><ul><li><strong>Для дорогих функций</strong>: когда каждая оценка дорогая</li><li><strong>Суррогатная модель</strong>: Gaussian Process (GP) для аппроксимации</li><li><strong>Acquisition function</strong>: баланс exploration/exploitation</li><li><strong>Итеративный процесс</strong>: выбор следующей точки для оценки</li></ul><div class="formula">Макс: f(x), где оценка f(x) дорогая</div></div><div class="block"><h2>🔷 2. Базовый код (scikit-optimize)</h2><pre><code>from skopt import gp_minimize
+from skopt.space import Real, Integer
+
+# Определить пространство поиска
+space = [
+    Real(1e-6, 1e-1, prior='log-uniform', name='learning_rate'),
+    Integer(10, 100, name='n_estimators'),
+    Integer(3, 10, name='max_depth')
+]
+
+# Целевая функция (минимизируем, например, -accuracy)
+def objective(params):
+    lr, n_est, depth = params
+    
+    model = RandomForestClassifier(
+        n_estimators=n_est,
+        max_depth=depth,
+        random_state=42
+    )
+    model.fit(X_train, y_train)
+    score = model.score(X_val, y_val)
+    
+    return -score  # минимизируем, поэтому отрицательный
+
+# Bayesian Optimization
+result = gp_minimize(
+    objective,
+    space,
+    n_calls=50,       # число итераций
+    random_state=42,
+    verbose=True
+)
+
+print(f"Best params: {result.x}")
+print(f"Best score: {-result.fun}")</code></pre></div><div class="block"><h2>🔷 3. Базовый код (Optuna)</h2><pre><code>import optuna
+
+def objective(trial):
+    # Определяем гиперпараметры
+    lr = trial.suggest_loguniform('learning_rate', 1e-6, 1e-1)
+    n_est = trial.suggest_int('n_estimators', 10, 100)
+    depth = trial.suggest_int('max_depth', 3, 10)
+    
+    # Обучаем модель
+    model = RandomForestClassifier(
+        n_estimators=n_est,
+        max_depth=depth,
+        random_state=42
+    )
+    model.fit(X_train, y_train)
+    
+    # Возвращаем метрику (максимизируем)
+    return model.score(X_val, y_val)
+
+# Создать study
+study = optuna.create_study(
+    direction='maximize',
+    sampler=optuna.samplers.TPESampler()
+)
+
+# Оптимизация
+study.optimize(objective, n_trials=50)
+
+print(f"Best params: {study.best_params}")
+print(f"Best score: {study.best_value}")</code></pre></div><div class="block"><h2>🔷 4. Как работает</h2><ol><li><strong>Инициализация</strong>: несколько случайных точек</li><li><strong>Surrogate Model</strong>: обучить GP на текущих точках</li><li><strong>Acquisition Function</strong>: найти следующую точку</li><li><strong>Оценка</strong>: вычислить f(x) в новой точке</li><li><strong>Повторить</strong>: обновить GP и повторить</li></ol><p><strong>GP (Gaussian Process)</strong>: дает предсказание + uncertainty</p><p><strong>Acquisition Function</strong>: использует оба для выбора</p></div><div class="block"><h2>🔷 5. Acquisition Functions</h2><table><tr><th>Функция</th><th>Описание</th><th>Когда использовать</th></tr><tr><td><b>EI (Expected Improvement)</b></td><td>Ожидаемое улучшение</td><td>По умолчанию, баланс</td></tr><tr><td><b>PI (Probability of Improvement)</b></td><td>Вероятность улучшения</td><td>Консервативный</td></tr><tr><td><b>UCB (Upper Confidence Bound)</b></td><td>Верхняя граница доверия</td><td>Больше exploration</td></tr><tr><td><b>LCB (Lower Confidence Bound)</b></td><td>Нижняя граница</td><td>Минимизация</td></tr></table></div><div class="block"><h2>🔷 6. Параметры оптимизации</h2><table><tr><th>Параметр</th><th>Описание</th><th>Совет</th></tr><tr><td><code>n_calls</code></td><td>Число итераций</td><td>50-200, зависит от бюджета</td></tr><tr><td><code>n_initial_points</code></td><td>Случайных точек вначале</td><td>10-20</td></tr><tr><td><code>acq_func</code></td><td>Acquisition function</td><td>'EI', 'PI', 'gp_hedge'</td></tr><tr><td><code>kappa</code></td><td>Exploration для UCB</td><td>1.96 по умолчанию</td></tr><tr><td><code>xi</code></td><td>Exploration для EI/PI</td><td>0.01 по умолчанию</td></tr></table></div><div class="block"><h2>🔷 7. Типы пространств поиска</h2><pre><code>from skopt.space import Real, Integer, Categorical
+
+space = [
+    # Непрерывные параметры
+    Real(0.001, 0.1, prior='log-uniform', name='lr'),
+    Real(0.1, 0.9, name='dropout'),
+    
+    # Целочисленные параметры
+    Integer(10, 200, name='n_estimators'),
+    Integer(2, 10, name='max_depth'),
+    
+    # Категориальные параметры
+    Categorical(['adam', 'sgd', 'rmsprop'], name='optimizer'),
+    Categorical([32, 64, 128, 256], name='batch_size')
+]</code></pre></div><div class="block"><h2>🔷 8. Продвинутый пример с CV</h2><pre><code>from skopt import gp_minimize
+from sklearn.model_selection import cross_val_score
+
+def objective(params):
+    lr, n_est, depth = params
+    
+    model = RandomForestClassifier(
+        n_estimators=n_est,
+        max_depth=depth,
+        random_state=42
+    )
+    
+    # Кросс-валидация
+    scores = cross_val_score(
+        model, X_train, y_train,
+        cv=5, scoring='accuracy'
+    )
+    
+    # Минимизируем отрицательный score
+    return -scores.mean()
+
+result = gp_minimize(
+    objective,
+    space,
+    n_calls=50,
+    n_initial_points=10,
+    acq_func='EI',
+    random_state=42
+)
+
+print(f"Best: {result.x}, Score: {-result.fun:.4f}")</code></pre></div><div class="block"><h2>🔷 9. Визуализация результатов</h2><pre><code>from skopt.plots import plot_convergence, plot_objective
+import matplotlib.pyplot as plt
+
+# Convergence plot
+plot_convergence(result)
+plt.title('Convergence Plot')
+plt.show()
+
+# Objective function plot
+plot_objective(result)
+plt.tight_layout()
+plt.show()
+
+# История поиска
+import pandas as pd
+history = pd.DataFrame({
+    'iteration': range(len(result.func_vals)),
+    'score': -result.func_vals
+})
+history['best_so_far'] = history['score'].cummax()
+
+plt.figure(figsize=(10, 6))
+plt.plot(history['iteration'], history['score'], 'o', label='Score')
+plt.plot(history['iteration'], history['best_so_far'], '-', label='Best so far')
+plt.xlabel('Iteration')
+plt.ylabel('Score')
+plt.legend()
+plt.title('Optimization Progress')
+plt.show()</code></pre></div><div class="block"><h2>🔷 10. Преимущества и недостатки</h2><div class="good-vs-bad"><div class="good"><h3>✅ Преимущества</h3><ul><li>Эффективнее Grid/Random Search</li><li>Учитывает прошлые оценки</li><li>Хорошо для дорогих функций</li><li>Баланс exploration/exploitation</li><li>Меньше итераций для хорошего результата</li></ul></div><div class="bad"><h3>❌ Недостатки</h3><ul><li>Медленнее на одну итерацию</li><li>Плохо масштабируется (>20 параметров)</li><li>Требует больше памяти</li><li>GP плохо работает с категориями</li><li>Не параллелизуется легко</li></ul></div></div></div><div class="block"><h2>🔷 11. Когда использовать</h2><div class="good-vs-bad"><div class="good"><h3>✅ Хорошо подходит</h3><ul><li>Дорогие вычисления (обучение модели)</li><li>Малый бюджет итераций (<200)</li><li>Непрерывное пространство</li><li>2-20 параметров</li><li>Нужен оптимум, не просто "хорошо"</li></ul></div><div class="bad"><h3>❌ Плохо подходит</h3><ul><li>Дешевые вычисления (используйте Grid Search)</li><li>Много параметров (>20)</li><li>Нужна параллелизация</li><li>Дискретное пространство с большим числом значений</li></ul></div></div></div><div class="block"><h2>🔷 12. BO vs Grid vs Random Search</h2><table><tr><th>Метод</th><th>Итераций</th><th>Эффективность</th><th>Когда использовать</th></tr><tr><td>Grid Search</td><td>Много</td><td>Низкая</td><td>Малое пространство, дешево</td></tr><tr><td>Random Search</td><td>Средне</td><td>Средняя</td><td>Baseline, высокие размерности</td></tr><tr><td>Bayesian Opt</td><td>Мало</td><td>Высокая</td><td>Дорого, малое число параметров</td></tr></table></div><div class="block"><h2>🔷 13. Использование с XGBoost</h2><pre><code>import xgboost as xgb
+from skopt import gp_minimize
+from skopt.space import Real, Integer
+
+def objective(params):
+    max_depth, learning_rate, n_estimators, subsample = params
+    
+    model = xgb.XGBClassifier(
+        max_depth=max_depth,
+        learning_rate=learning_rate,
+        n_estimators=n_estimators,
+        subsample=subsample,
+        random_state=42,
+        use_label_encoder=False,
+        eval_metric='logloss'
+    )
+    
+    model.fit(X_train, y_train)
+    score = model.score(X_val, y_val)
+    
+    return -score
+
+space = [
+    Integer(3, 10, name='max_depth'),
+    Real(0.01, 0.3, prior='log-uniform', name='learning_rate'),
+    Integer(50, 300, name='n_estimators'),
+    Real(0.5, 1.0, name='subsample')
+]
+
+result = gp_minimize(objective, space, n_calls=50)
+print(f"Best params: {result.x}")</code></pre></div><div class="block"><h2>🔷 14. Параллелизация</h2><pre><code># Optuna поддерживает параллелизацию
+import optuna
+from joblib import Parallel, delayed
+
+def objective(trial):
+    lr = trial.suggest_loguniform('lr', 1e-6, 1e-1)
+    # ... обучение модели
+    return score
+
+# Параллельная оптимизация
+study = optuna.create_study(direction='maximize')
+
+# n_jobs=-1 использует все ядра
+study.optimize(objective, n_trials=100, n_jobs=-1)
+
+# Или ручная параллелизация (для skopt)
+from skopt import Optimizer
+
+opt = Optimizer(space, base_estimator='GP', acq_func='EI')
+
+# Запросить несколько точек параллельно
+x = opt.ask(n_points=4)
+
+# Оценить параллельно
+y = Parallel(n_jobs=4)(delayed(objective)(xi) for xi in x)
+
+# Обновить optimizer
+opt.tell(x, y)</code></pre></div><div class="block"><h2>🔷 15. Практические советы</h2><ul><li><strong>Начните с малого</strong>: 50-100 итераций обычно достаточно</li><li><strong>Log-scale для LR</strong>: используйте prior='log-uniform'</li><li><strong>Мониторьте convergence</strong>: постройте график</li><li><strong>Сравните с Random</strong>: baseline для оценки пользы</li><li><strong>Warmstart</strong>: используйте прошлые результаты</li><li><strong>Optuna для продакшена</strong>: лучше интеграция и DB</li></ul></div><div class="block"><h2>🔷 16. Чек-лист</h2><ul><li>[ ] Определить целевую функцию (objective)</li><li>[ ] Задать пространство поиска</li><li>[ ] Выбрать библиотеку (skopt/Optuna)</li><li>[ ] Определить бюджет итераций</li><li>[ ] Запустить оптимизацию</li><li>[ ] Визуализировать convergence</li><li>[ ] Оценить лучшие параметры на test</li><li>[ ] Сравнить с Random Search</li></ul><blockquote>«Bayesian Optimization — золотой стандарт для подбора гиперпараметров когда вычисления дороги. Находит оптимум в 5-10 раз быстрее чем Random Search».</blockquote></div><div class="block"><h2>🔗 Полезные ссылки</h2><ul><li><a href="https://scikit-optimize.github.io/" target="_blank">📚 scikit-optimize Documentation</a></li><li><a href="https://optuna.org/" target="_blank">📚 Optuna Documentation</a></li><li><a href="https://arxiv.org/abs/1807.02811" target="_blank">📄 Practical Bayesian Optimization Paper</a></li><li><a href="https://distill.pub/2020/bayesian-optimization/" target="_blank">📖 Visual Guide to Bayesian Optimization</a></li></ul></div></div></body></html>
