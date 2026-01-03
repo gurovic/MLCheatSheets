@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Метрики классификации Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 Метрики классификации Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основные понятия</h2>
+    <ul>
+      <li><strong>TP</strong> (True Positive): правильно определён положительный класс</li>
+      <li><strong>TN</strong> (True Negative): правильно определён отрицательный класс</li>
+      <li><strong>FP</strong> (False Positive): ложная тревога (Type I error)</li>
+      <li><strong>FN</strong> (False Negative): пропуск (Type II error)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Confusion Matrix</h2>
+    <pre><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
+
+cm = confusion_matrix(y_test, y_pred)
+disp = ConfusionMatrixDisplay(
+    confusion_matrix=cm,
+    display_labels=['Class 0', 'Class 1']
+)
+
+disp.plot()
+plt.show()
+
+# cm = [[TN, FP],
+#       [FN, TP]]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Accuracy (Точность)</h2>
+    <p><strong>Формула:</strong> (TP + TN) / (TP + TN + FP + FN)</p>
+    <pre><code>from sklearn.metrics import accuracy_score
+
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.3f}")</code></pre>
+    
+    <p><strong>Когда использовать:</strong></p>
+    <ul>
+      <li>✅ Сбалансированные классы</li>
+      <li>❌ Несбалансированные классы (misleading!)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Precision (Точность положительного класса)</h2>
+    <p><strong>Формула:</strong> TP / (TP + FP)</p>
+    <p><strong>Вопрос:</strong> "Из всех предсказанных положительных, сколько действительно положительных?"</p>
+    
+    <pre><code>from sklearn.metrics import precision_score
+
+precision = precision_score(y_test, y_pred)
+print(f"Precision: {precision:.3f}")</code></pre>
+
+    <p><strong>Когда важна:</strong></p>
+    <ul>
+      <li>Стоимость FP высока (спам-фильтр)</li>
+      <li>Медицинская диагностика (не пугать здоровых)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Recall (Полнота, Sensitivity)</h2>
+    <p><strong>Формула:</strong> TP / (TP + FN)</p>
+    <p><strong>Вопрос:</strong> "Из всех реальных положительных, сколько мы нашли?"</p>
+    
+    <pre><code>from sklearn.metrics import recall_score
+
+recall = recall_score(y_test, y_pred)
+print(f"Recall: {recall:.3f}")</code></pre>
+
+    <p><strong>Когда важен:</strong></p>
+    <ul>
+      <li>Стоимость FN высока (пропуск болезни)</li>
+      <li>Fraud detection (найти все мошенничества)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. F1-Score</h2>
+    <p><strong>Формула:</strong> 2 * (Precision * Recall) / (Precision + Recall)</p>
+    <p><strong>Гармоническое среднее</strong> precision и recall</p>
+    
+    <pre><code>from sklearn.metrics import f1_score
+
+f1 = f1_score(y_test, y_pred)
+print(f"F1 Score: {f1:.3f}")</code></pre>
+
+    <p><strong>Когда использовать:</strong></p>
+    <ul>
+      <li>Несбалансированные классы</li>
+      <li>Нужен баланс precision/recall</li>
+      <li>Общая метрика качества</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Выбор метрики</h2>
+    <table>
+      <tr><th>Задача</th><th>Метрика</th><th>Почему</th></tr>
+      <tr><td>Медицинская диагностика</td><td>Recall</td><td>Нельзя пропустить больного</td></tr>
+      <tr><td>Спам-фильтр</td><td>Precision</td><td>Не терять важные письма</td></tr>
+      <tr><td>Fraud detection</td><td>F1 или Recall</td><td>Найти все случаи</td></tr>
+      <tr><td>Balanced dataset</td><td>Accuracy</td><td>Простая интерпретация</td></tr>
+      <tr><td>Imbalanced dataset</td><td>F1, ROC-AUC</td><td>Учёт дисбаланса</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Classification Report</h2>
+    <pre><code>from sklearn.metrics import classification_report
+
+report = classification_report(y_test, y_pred, target_names=['Class 0', 'Class 1'])
+print(report)
+
+# Output:
+#               precision    recall  f1-score   support
+#     Class 0       0.85      0.90      0.87       100
+#     Class 1       0.88      0.82      0.85        90
+#    accuracy                           0.86       190
+#   macro avg       0.86      0.86      0.86       190
+#weighted avg       0.86      0.86      0.86       190</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. ROC-AUC</h2>
+    <p><strong>ROC</strong>: Receiver Operating Characteristic</p>
+    <p><strong>AUC</strong>: Area Under Curve (0.5-1.0)</p>
+    
+    <pre><code>from sklearn.metrics import roc_auc_score, roc_curve
+
+# Нужны вероятности, а не предсказания
+y_proba = model.predict_proba(X_test)[:, 1]
+
+auc = roc_auc_score(y_test, y_proba)
+print(f"ROC-AUC: {auc:.3f}")
+
+# Построение ROC кривой
+fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, label=f'ROC curve (AUC = {auc:.2f})')
+plt.plot([0, 1], [0, 1], 'k--', label='Random')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Precision-Recall Curve</h2>
+    <pre><code>from sklearn.metrics import precision_recall_curve, average_precision_score
+
+precision, recall, thresholds = precision_recall_curve(y_test, y_proba)
+ap = average_precision_score(y_test, y_proba)
+
+plt.figure(figsize=(8, 6))
+plt.plot(recall, precision, label=f'AP = {ap:.2f}')
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall Curve')
+plt.legend()
+plt.show()
+
+# Лучше для несбалансированных классов, чем ROC</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Мультиклассовая классификация</h2>
+    <pre><code># Macro average: усреднение по классам (равный вес)
+f1_macro = f1_score(y_test, y_pred, average='macro')
+
+# Weighted average: взвешенное по количеству примеров
+f1_weighted = f1_score(y_test, y_pred, average='weighted')
+
+# Micro average: глобальный подсчёт
+f1_micro = f1_score(y_test, y_pred, average='micro')
+
+print(f"F1 Macro: {f1_macro:.3f}")
+print(f"F1 Weighted: {f1_weighted:.3f}")
+print(f"F1 Micro: {f1_micro:.3f}")
+
+# ROC-AUC для мультикласса
+from sklearn.preprocessing import label_binarize
+y_test_bin = label_binarize(y_test, classes=[0, 1, 2])
+auc = roc_auc_score(y_test_bin, y_proba_multiclass, multi_class='ovr')
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Чек-лист</h2>
+    <ul>
+      <li>[ ] Построить confusion matrix</li>
+      <li>[ ] Вычислить classification report</li>
+      <li>[ ] Для несбалансированных — F1, not Accuracy</li>
+      <li>[ ] Выбрать метрику под бизнес-цель</li>
+      <li>[ ] Построить ROC-AUC кривую</li>
+      <li>[ ] Для сильного дисбаланса — PR curve</li>
+      <li>[ ] Для мультикласса — macro/weighted avg</li>
+      <li>[ ] Проверить метрики на каждом классе отдельно</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Метрики — это способ измерить качество модели. Accuracy говорит "сколько правильных", Precision — "насколько можно доверять положительным предсказаниям", Recall — "сколько мы нашли из всех случаев". Выбор метрики зависит от того, какие ошибки дороже».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

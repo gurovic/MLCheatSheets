@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>K-means кластеризация Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 K-means кластеризация Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: разделить данные на K групп (кластеров)</li>
+      <li><strong>Метод</strong>: минимизация расстояний до центров</li>
+      <li><strong>Обучение без учителя</strong>: не нужны метки</li>
+      <li><strong>Итеративный</strong>: улучшение на каждом шаге</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Алгоритм</h2>
+    <ol>
+      <li>Инициализировать K центроидов случайно</li>
+      <li>Присвоить каждую точку ближайшему центроиду</li>
+      <li>Пересчитать центроиды как среднее кластера</li>
+      <li>Повторять шаги 2-3 до сходимости</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код</h2>
+    <pre><code>from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+
+# Масштабирование важно!
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# K-means
+kmeans = KMeans(
+    n_clusters=3,
+    init='k-means++',
+    n_init=10,
+    random_state=42
+)
+
+# Обучение и предсказание
+labels = kmeans.fit_predict(X_scaled)
+
+# Центроиды кластеров
+centroids = kmeans.cluster_centers_
+
+# Инерция (сумма квадратов расстояний)
+inertia = kmeans.inertia_</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>n_clusters</code></td><td>Количество кластеров K</td><td>Определить методом локтя</td></tr>
+      <tr><td><code>init</code></td><td>Инициализация центроидов</td><td>'k-means++' (по умолчанию)</td></tr>
+      <tr><td><code>n_init</code></td><td>Количество запусков</td><td>10-20</td></tr>
+      <tr><td><code>max_iter</code></td><td>Макс. итераций</td><td>300 (по умолчанию)</td></tr>
+      <tr><td><code>tol</code></td><td>Порог сходимости</td><td>1e-4</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Метод локтя (Elbow Method)</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+inertias = []
+K_range = range(1, 11)
+
+for k in K_range:
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(X_scaled)
+    inertias.append(kmeans.inertia_)
+
+plt.figure(figsize=(10, 6))
+plt.plot(K_range, inertias, 'bx-')
+plt.xlabel('Количество кластеров K')
+plt.ylabel('Инерция (Within-Cluster Sum of Squares)')
+plt.title('Метод локтя')
+plt.grid(True)
+plt.show()
+
+# Ищем "локоть" - точку, где улучшение замедляется</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Silhouette Score</h2>
+    <pre><code>from sklearn.metrics import silhouette_score, silhouette_samples
+
+# Оценка качества кластеризации
+score = silhouette_score(X_scaled, labels)
+print(f"Silhouette Score: {score:.3f}")
+# Значения: [-1, 1], чем ближе к 1, тем лучше
+
+# Silhouette для каждой точки
+sample_scores = silhouette_samples(X_scaled, labels)
+
+# Визуализация
+import numpy as np
+for i in range(kmeans.n_clusters):
+    cluster_scores = sample_scores[labels == i]
+    cluster_scores.sort()
+    
+    y_lower = i * len(cluster_scores)
+    y_upper = y_lower + len(cluster_scores)
+    
+    plt.fill_betweenx(
+        np.arange(y_lower, y_upper),
+        0, cluster_scores,
+        alpha=0.7
+    )
+
+plt.axvline(x=score, color="red", linestyle="--")
+plt.xlabel("Silhouette coefficient")
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Визуализация результатов</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# 2D визуализация (если больше признаков, используйте PCA)
+plt.figure(figsize=(10, 6))
+
+# Точки данных
+scatter = plt.scatter(X_scaled[:, 0], X_scaled[:, 1], 
+                     c=labels, cmap='viridis', alpha=0.6)
+
+# Центроиды
+plt.scatter(centroids[:, 0], centroids[:, 1],
+           c='red', marker='X', s=200, 
+           edgecolors='black', label='Центроиды')
+
+plt.colorbar(scatter, label='Кластер')
+plt.xlabel('Признак 1')
+plt.ylabel('Признак 2')
+plt.title('K-means кластеризация')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. K-means++</h2>
+    <p>Улучшенная инициализация центроидов:</p>
+    <ul>
+      <li>Выбирает первый центроид случайно</li>
+      <li>Следующие центроиды выбираются пропорционально квадрату расстояния</li>
+      <li>Ускоряет сходимость</li>
+      <li>Даёт лучшие результаты</li>
+    </ul>
+    <pre><code># K-means++ включен по умолчанию
+kmeans = KMeans(n_clusters=3, init='k-means++')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Сферические кластеры одинакового размера</li>
+          <li>Большие датасеты (быстрый)</li>
+          <li>Известно примерное количество групп</li>
+          <li>Сегментация клиентов</li>
+          <li>Сжатие изображений</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Кластеры разных форм/размеров</li>
+          <li>Сильно перекрывающиеся кластеры</li>
+          <li>Неизвестное K (используйте DBSCAN)</li>
+          <li>Нужна устойчивость к выбросам</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Mini-Batch K-means</h2>
+    <p>Для больших датасетов:</p>
+    <pre><code>from sklearn.cluster import MiniBatchKMeans
+
+# Обучение на батчах
+mbk = MiniBatchKMeans(
+    n_clusters=3,
+    batch_size=100,
+    random_state=42
+)
+
+labels = mbk.fit_predict(X_scaled)
+
+# Быстрее, но немного менее точно</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Метрики качества</h2>
+    <table>
+      <tr><th>Метрика</th><th>Диапазон</th><th>Интерпретация</th></tr>
+      <tr><td><strong>Inertia (WCSS)</strong></td><td>[0, ∞)</td><td>Чем меньше, тем компактнее кластеры</td></tr>
+      <tr><td><strong>Silhouette Score</strong></td><td>[-1, 1]</td><td>Близко к 1 — хорошо разделены</td></tr>
+      <tr><td><strong>Davies-Bouldin Index</strong></td><td>[0, ∞)</td><td>Чем меньше, тем лучше</td></tr>
+      <tr><td><strong>Calinski-Harabasz</strong></td><td>[0, ∞)</td><td>Чем больше, тем лучше</td></tr>
+    </table>
+    <pre><code>from sklearn.metrics import davies_bouldin_score, calinski_harabasz_score
+
+db_score = davies_bouldin_score(X_scaled, labels)
+ch_score = calinski_harabasz_score(X_scaled, labels)
+
+print(f"Davies-Bouldin: {db_score:.3f}")
+print(f"Calinski-Harabasz: {ch_score:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Чек-лист</h2>
+    <ul>
+      <li>[ ] <strong>ОБЯЗАТЕЛЬНО</strong> масштабировать данные</li>
+      <li>[ ] Использовать метод локтя для выбора K</li>
+      <li>[ ] Проверить Silhouette Score</li>
+      <li>[ ] Использовать k-means++ инициализацию</li>
+      <li>[ ] Запустить несколько раз (n_init)</li>
+      <li>[ ] Визуализировать кластеры</li>
+      <li>[ ] Проверить размеры кластеров</li>
+      <li>[ ] Для больших данных — MiniBatchKMeans</li>
+      <li>[ ] Рассмотреть альтернативы (DBSCAN, GMM)</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «K-means находит естественные группы в данных — как если бы мы распределяли клиентов по категориям на основе их покупательского поведения, не зная заранее, какие именно категории существуют».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

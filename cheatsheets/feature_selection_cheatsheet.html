@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Отбор признаков Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Отбор признаков (Feature Selection) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Зачем нужен отбор признаков</h2>
+    <ul>
+      <li><strong>Ускорение</strong>: меньше признаков = быстрее обучение</li>
+      <li><strong>Точность</strong>: удаление шумных признаков</li>
+      <li><strong>Интерпретируемость</strong>: проще объяснить модель</li>
+      <li><strong>Переобучение</strong>: меньше риск overfitting</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Три подхода</h2>
+    <table>
+      <tr><th>Метод</th><th>Описание</th></tr>
+      <tr><td><strong>Filter</strong></td><td>Статистические тесты, независимо от модели</td></tr>
+      <tr><td><strong>Wrapper</strong></td><td>Используют модель для оценки подмножеств</td></tr>
+      <tr><td><strong>Embedded</strong></td><td>Встроены в алгоритм обучения</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Filter: Удаление низкодисперсных</h2>
+    <pre><code>from sklearn.feature_selection import VarianceThreshold
+
+# Удалить признаки с малой дисперсией
+selector = VarianceThreshold(threshold=0.01)
+X_reduced = selector.fit_transform(X)
+
+print(f"Признаков до: {X.shape[1]}")
+print(f"Признаков после: {X_reduced.shape[1]}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Filter: Корреляция с целевой переменной</h2>
+    <pre><code>from sklearn.feature_selection import SelectKBest, f_classif, chi2
+
+# Для классификации - f_classif или chi2
+selector = SelectKBest(score_func=f_classif, k=10)
+X_new = selector.fit_transform(X, y)
+
+# Получить выбранные признаки
+selected_features = selector.get_support(indices=True)
+print(f"Selected features: {selected_features}")
+
+# Для регрессии - f_regression
+from sklearn.feature_selection import f_regression
+selector = SelectKBest(score_func=f_regression, k=10)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Filter: Mutual Information</h2>
+    <pre><code>from sklearn.feature_selection import mutual_info_classif
+import pandas as pd
+
+# Mutual Information
+mi = mutual_info_classif(X, y, random_state=42)
+
+# Создать DataFrame с результатами
+mi_df = pd.DataFrame({
+    'feature': feature_names,
+    'MI': mi
+}).sort_values('MI', ascending=False)
+
+print(mi_df.head(10))
+
+# Отбор топ-K признаков
+from sklearn.feature_selection import SelectKBest
+selector = SelectKBest(mutual_info_classif, k=10)
+X_new = selector.fit_transform(X, y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Wrapper: RFE (Recursive Feature Elimination)</h2>
+    <pre><code>from sklearn.feature_selection import RFE
+from sklearn.ensemble import RandomForestClassifier
+
+model = RandomForestClassifier(random_state=42)
+
+# RFE - рекурсивное удаление признаков
+rfe = RFE(
+    estimator=model,
+    n_features_to_select=10,
+    step=1
+)
+
+rfe.fit(X, y)
+X_rfe = rfe.transform(X)
+
+# Получить ранги признаков
+print("Feature ranking:", rfe.ranking_)
+print("Selected features:", rfe.get_support(indices=True))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Wrapper: RFECV с кросс-валидацией</h2>
+    <pre><code>from sklearn.feature_selection import RFECV
+
+# RFE с автоматическим выбором количества признаков
+rfecv = RFECV(
+    estimator=RandomForestClassifier(random_state=42),
+    step=1,
+    cv=5,
+    scoring='accuracy'
+)
+
+rfecv.fit(X, y)
+X_rfecv = rfecv.transform(X)
+
+print(f"Optimal number of features: {rfecv.n_features_}")
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.figure(figsize=(10, 6))
+plt.plot(range(1, len(rfecv.cv_results_['mean_test_score']) + 1),
+         rfecv.cv_results_['mean_test_score'])
+plt.xlabel('Number of features')
+plt.ylabel('Cross-validation score')
+plt.title('RFECV Feature Selection')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Embedded: Lasso (L1 регуляризация)</h2>
+    <pre><code>from sklearn.linear_model import Lasso
+from sklearn.preprocessing import StandardScaler
+
+# Масштабирование обязательно
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Lasso автоматически занулит ненужные признаки
+lasso = Lasso(alpha=0.01)
+lasso.fit(X_scaled, y)
+
+# Получить важные признаки (с ненулевыми коэффициентами)
+important_features = np.where(lasso.coef_ != 0)[0]
+print(f"Selected {len(important_features)} features")
+print(f"Feature indices: {important_features}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Embedded: Tree-based importance</h2>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+from sklearn.feature_selection import SelectFromModel
+
+# Обучить Random Forest
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X, y)
+
+# Получить важности
+importances = rf.feature_importances_
+
+# Отбор по порогу важности
+selector = SelectFromModel(rf, threshold='median')
+X_selected = selector.fit_transform(X, y)
+
+print(f"Selected features: {selector.get_support().sum()}")
+
+# Визуализация важностей
+import pandas as pd
+feat_imp = pd.DataFrame({
+    'feature': feature_names,
+    'importance': importances
+}).sort_values('importance', ascending=False)
+
+feat_imp.head(15).plot(x='feature', y='importance', kind='barh')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Удаление коррелирующих признаков</h2>
+    <pre><code>import pandas as pd
+import numpy as np
+
+# Вычислить корреляционную матрицу
+df = pd.DataFrame(X, columns=feature_names)
+corr_matrix = df.corr().abs()
+
+# Найти пары с высокой корреляцией
+upper = corr_matrix.where(
+    np.triu(np.ones(corr_matrix.shape), k=1).astype(bool)
+)
+
+# Удалить признаки с корреляцией > 0.95
+to_drop = [column for column in upper.columns 
+           if any(upper[column] > 0.95)]
+
+print(f"Features to drop: {to_drop}")
+X_reduced = df.drop(columns=to_drop).values</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Sequential Feature Selection</h2>
+    <pre><code>from sklearn.feature_selection import SequentialFeatureSelector
+
+# Forward или Backward selection
+sfs = SequentialFeatureSelector(
+    estimator=RandomForestClassifier(random_state=42),
+    n_features_to_select=10,
+    direction='forward',  # или 'backward'
+    cv=5,
+    n_jobs=-1
+)
+
+sfs.fit(X, y)
+X_sfs = sfs.transform(X)
+
+print("Selected features:", sfs.get_support(indices=True))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Чек-лист</h2>
+    <ul>
+      <li>[ ] Начать с удаления низкодисперсных признаков</li>
+      <li>[ ] Удалить высококоррелирующие признаки</li>
+      <li>[ ] Попробовать filter методы (быстро)</li>
+      <li>[ ] Использовать tree-based importance</li>
+      <li>[ ] Для linear models — Lasso</li>
+      <li>[ ] RFECV для оптимального количества</li>
+      <li>[ ] Проверить качество после отбора</li>
+      <li>[ ] Сравнить несколько методов</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Отбор признаков — это как уборка в доме: мы избавляемся от ненужных вещей (признаков), оставляя только те, что действительно помогают модели принимать решения. Это делает модель быстрее, проще и точнее».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Скорость</th><th>Качество</th><th>Интерпретируемость</th></tr>
+      <tr><td>Variance Threshold</td><td>⚡⚡⚡</td><td>⭐</td><td>⭐⭐⭐</td></tr>
+      <tr><td>SelectKBest</td><td>⚡⚡⚡</td><td>⭐⭐</td><td>⭐⭐⭐</td></tr>
+      <tr><td>Tree Importance</td><td>⚡⚡</td><td>⭐⭐⭐</td><td>⭐⭐</td></tr>
+      <tr><td>Lasso</td><td>⚡⚡</td><td>⭐⭐⭐</td><td>⭐⭐⭐</td></tr>
+      <tr><td>RFE/RFECV</td><td>⚡</td><td>⭐⭐⭐⭐</td><td>⭐⭐</td></tr>
+    </table>
+  </div>
+
+</div>
+
+</body>
+</html>

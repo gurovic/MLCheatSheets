@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Предобработка данных Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔧 Предобработка данных Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Подготовка данных</strong>: преобразование сырых данных</li>
+      <li><strong>Цель</strong>: улучшить качество модели</li>
+      <li><strong>Этапы</strong>: очистка, преобразование, нормализация</li>
+      <li><strong>Правило</strong>: 80% времени ML — это подготовка данных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Обработка пропусков</h2>
+    <pre><code>from sklearn.impute import SimpleImputer
+
+# Заполнение средним значением
+imputer = SimpleImputer(strategy='mean')
+X_filled = imputer.fit_transform(X)
+
+# Другие стратегии: 'median', 'most_frequent', 'constant'</code></pre>
+    <table>
+      <tr><th>Метод</th><th>Когда использовать</th></tr>
+      <tr><td>Удаление строк</td><td>Мало пропусков (&lt;5%)</td></tr>
+      <tr><td>Заполнение средним</td><td>Числовые данные, нормальное распределение</td></tr>
+      <tr><td>Заполнение медианой</td><td>Числовые данные, выбросы</td></tr>
+      <tr><td>Заполнение модой</td><td>Категориальные данные</td></tr>
+      <tr><td>KNN Imputer</td><td>Сложные зависимости</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Обработка выбросов</h2>
+    <pre><code># IQR метод
+Q1 = df['feature'].quantile(0.25)
+Q3 = df['feature'].quantile(0.75)
+IQR = Q3 - Q1
+lower = Q1 - 1.5 * IQR
+upper = Q3 + 1.5 * IQR
+df_clean = df[(df['feature'] >= lower) & (df['feature'] <= upper)]
+
+# Z-score метод
+from scipy import stats
+df_clean = df[(np.abs(stats.zscore(df['feature'])) < 3)]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Кодирование категорий</h2>
+    <p><strong>One-Hot Encoding</strong> (для номинальных признаков):</p>
+    <pre><code>from sklearn.preprocessing import OneHotEncoder
+
+encoder = OneHotEncoder(sparse_output=False, drop='first')
+X_encoded = encoder.fit_transform(X[['category']])</code></pre>
+    
+    <p><strong>Ordinal Encoding</strong> (для порядковых признаков):</p>
+    <pre><code>from sklearn.preprocessing import OrdinalEncoder
+
+encoder = OrdinalEncoder(categories=[['low', 'medium', 'high']])
+X_encoded = encoder.fit_transform(X[['level']])</code></pre>
+
+    <p><strong>Label Encoding</strong> (для целевой переменной):</p>
+    <pre><code>from sklearn.preprocessing import LabelEncoder
+
+le = LabelEncoder()
+y_encoded = le.fit_transform(y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Масштабирование</h2>
+    <table>
+      <tr><th>Метод</th><th>Формула</th><th>Применение</th></tr>
+      <tr><td><strong>StandardScaler</strong></td><td>(x-μ)/σ</td><td>Нормальное распределение</td></tr>
+      <tr><td><strong>MinMaxScaler</strong></td><td>(x-min)/(max-min)</td><td>Фиксированный диапазон [0,1]</td></tr>
+      <tr><td><strong>RobustScaler</strong></td><td>(x-median)/IQR</td><td>Наличие выбросов</td></tr>
+      <tr><td><strong>Normalizer</strong></td><td>x/||x||</td><td>Нормализация векторов</td></tr>
+    </table>
+
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)  # Важно!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Pipeline для предобработки</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+
+# Определяем числовые и категориальные признаки
+numeric_features = ['age', 'income']
+categorical_features = ['city', 'gender']
+
+# Создаем трансформеры
+numeric_transformer = Pipeline([
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler())
+])
+
+categorical_transformer = Pipeline([
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('encoder', OneHotEncoder(drop='first'))
+])
+
+# Объединяем
+preprocessor = ColumnTransformer([
+    ('num', numeric_transformer, numeric_features),
+    ('cat', categorical_transformer, categorical_features)
+])
+
+# Полный pipeline
+from sklearn.linear_model import LogisticRegression
+model = Pipeline([
+    ('preprocessor', preprocessor),
+    ('classifier', LogisticRegression())
+])
+
+model.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Типичные ошибки</h2>
+    <div class="good-vs-bad">
+      <div class="bad">
+        <h3>❌ Неправильно</h3>
+        <ul>
+          <li>Масштабировать fit_transform на всех данных</li>
+          <li>Удалять выбросы после split</li>
+          <li>Использовать One-Hot для высокой кардинальности</li>
+          <li>Забывать про data leakage</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>✅ Правильно</h3>
+        <ul>
+          <li>fit только на train, transform на test</li>
+          <li>Обработка выбросов до split</li>
+          <li>Target Encoding для высокой кардинальности</li>
+          <li>Использовать Pipeline/ColumnTransformer</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Feature Engineering</h2>
+    <p><strong>Полиномиальные признаки</strong>:</p>
+    <pre><code>from sklearn.preprocessing import PolynomialFeatures
+
+poly = PolynomialFeatures(degree=2, include_bias=False)
+X_poly = poly.fit_transform(X)</code></pre>
+
+    <p><strong>Взаимодействия признаков</strong>:</p>
+    <pre><code># Создание новых признаков
+df['price_per_sqm'] = df['price'] / df['area']
+df['total_rooms'] = df['bedrooms'] + df['bathrooms']</code></pre>
+
+    <p><strong>Бининг (дискретизация)</strong>:</p>
+    <pre><code>from sklearn.preprocessing import KBinsDiscretizer
+
+kbd = KBinsDiscretizer(n_bins=5, encode='ordinal', strategy='quantile')
+X_binned = kbd.fit_transform(X[['age']])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Чек-лист предобработки</h2>
+    <ul>
+      <li>[ ] Исследовать данные (EDA)</li>
+      <li>[ ] Проверить типы данных</li>
+      <li>[ ] Обработать пропущенные значения</li>
+      <li>[ ] Обнаружить и обработать выбросы</li>
+      <li>[ ] Закодировать категориальные признаки</li>
+      <li>[ ] Масштабировать числовые признаки</li>
+      <li>[ ] Создать новые признаки (если нужно)</li>
+      <li>[ ] Разделить на train/val/test</li>
+      <li>[ ] Проверить баланс классов</li>
+      <li>[ ] Использовать Pipeline для автоматизации</li>
+    </ul>
+
+    <h3>💡 Золотое правило:</h3>
+    <blockquote>
+      Всегда fit на train, transform на test. Никогда наоборот! Это предотвращает data leakage.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Балансировка классов</h2>
+    <pre><code># Oversampling (увеличение меньшинства)
+from imblearn.over_sampling import SMOTE
+
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
+
+# Undersampling (уменьшение большинства)
+from imblearn.under_sampling import RandomUnderSampler
+
+rus = RandomUnderSampler(random_state=42)
+X_resampled, y_resampled = rus.fit_resample(X_train, y_train)
+
+# Комбинированный подход
+from imblearn.combine import SMOTETomek
+
+smt = SMOTETomek(random_state=42)
+X_resampled, y_resampled = smt.fit_resample(X_train, y_train)</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>
