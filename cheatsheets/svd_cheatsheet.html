@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>SVD (Singular Value Decomposition) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 600;
+    }
+
+    .good p, .bad p {
+      margin: 0;
+      font-size: 0.88em;
+    }
+
+    em {
+      color: #d32f2f;
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    strong {
+      color: #1a5fb4;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔬 SVD (Singular Value Decomposition) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть SVD</h2>
+    <ul>
+      <li><strong>Цель</strong>: разложить матрицу на три компоненты</li>
+      <li><strong>Формула</strong>: A = U Σ V<sup>T</sup></li>
+      <li><strong>Универсальность</strong>: работает для любых матриц</li>
+      <li><strong>Применение</strong>: сжатие данных, понижение размерности, рекомендации</li>
+      <li><strong>Связь с PCA</strong>: PCA основан на SVD</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Компоненты разложения</h2>
+    <p><strong>A = U Σ V<sup>T</sup></strong></p>
+    <ul>
+      <li><strong>A</strong>: исходная матрица (m × n)</li>
+      <li><strong>U</strong>: левые сингулярные векторы (m × m)</li>
+      <li><strong>Σ</strong>: диагональная матрица сингулярных значений (m × n)</li>
+      <li><strong>V<sup>T</sup></strong>: правые сингулярные векторы (n × n)</li>
+      <li><strong>Сингулярные значения</strong>: отсортированы по убыванию</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код</h2>
+    <pre><code>import numpy as np
+from scipy.linalg import svd
+
+# Исходная матрица
+A = np.array([[1, 2, 3],
+              [4, 5, 6],
+              [7, 8, 9],
+              [10, 11, 12]])
+
+# SVD разложение
+U, s, Vt = svd(A, full_matrices=False)
+
+# s - массив сингулярных значений
+# Преобразуем в диагональную матрицу
+Sigma = np.diag(s)
+
+# Проверка: восстановление A
+A_reconstructed = U @ Sigma @ Vt
+print("Ошибка:", np.allclose(A, A_reconstructed))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Использование sklearn</h2>
+    <pre><code>from sklearn.decomposition import TruncatedSVD
+
+# Понижение размерности
+svd = TruncatedSVD(n_components=2, random_state=42)
+X_reduced = svd.fit_transform(X)
+
+# Объясненная дисперсия
+print(f"Дисперсия: {svd.explained_variance_ratio_}")
+print(f"Сумма: {sum(svd.explained_variance_ratio_):.3f}")
+
+# Компоненты (правые сингулярные векторы)
+components = svd.components_
+
+# Сингулярные значения
+singular_values = svd.singular_values_</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Параметры TruncatedSVD</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Значение</th></tr>
+      <tr><td><code>n_components</code></td><td>Число компонент</td><td>2-100 (зависит от задачи)</td></tr>
+      <tr><td><code>algorithm</code></td><td>Алгоритм</td><td>'randomized' или 'arpack'</td></tr>
+      <tr><td><code>n_iter</code></td><td>Число итераций</td><td>5 (для randomized)</td></tr>
+      <tr><td><code>random_state</code></td><td>Seed</td><td>42 (воспроизводимость)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Усеченное SVD (Truncated)</h2>
+    <p>Оставляем только k наибольших сингулярных значений:</p>
+    <pre><code># Выбираем топ-k компонент
+k = 2
+U_k = U[:, :k]
+Sigma_k = np.diag(s[:k])
+Vt_k = Vt[:k, :]
+
+# Аппроксимация матрицы
+A_approx = U_k @ Sigma_k @ Vt_k
+
+# Ошибка аппроксимации
+error = np.linalg.norm(A - A_approx, 'fro')
+print(f"Ошибка Фробениуса: {error:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Выбор числа компонент</h2>
+    <pre><code>from sklearn.decomposition import TruncatedSVD
+import matplotlib.pyplot as plt
+
+# Вычисляем SVD для разных k
+max_components = min(X.shape) - 1
+svd = TruncatedSVD(n_components=max_components)
+svd.fit(X)
+
+# Накопленная объясненная дисперсия
+cumsum = np.cumsum(svd.explained_variance_ratio_)
+
+# График
+plt.figure(figsize=(10, 6))
+plt.plot(range(1, len(cumsum)+1), cumsum, 'bo-')
+plt.axhline(y=0.90, color='r', linestyle='--', 
+            label='90% дисперсии')
+plt.xlabel('Число компонент')
+plt.ylabel('Накопленная дисперсия')
+plt.title('Выбор числа компонент')
+plt.legend()
+plt.grid(True)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Применения SVD</h2>
+    <table>
+      <tr><th>Задача</th><th>Описание</th></tr>
+      <tr><td><strong>Понижение размерности</strong></td><td>Сжатие признаков</td></tr>
+      <tr><td><strong>Сжатие изображений</strong></td><td>Уменьшение размера</td></tr>
+      <tr><td><strong>Рекомендательные системы</strong></td><td>Матричная факторизация</td></tr>
+      <tr><td><strong>Шумоподавление</strong></td><td>Удаление шума из данных</td></tr>
+      <tr><td><strong>Латентный семантический анализ</strong></td><td>NLP задачи</td></tr>
+      <tr><td><strong>PCA</strong></td><td>Основа для PCA</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Сжатие изображений</h2>
+    <pre><code>from PIL import Image
+import numpy as np
+
+# Загрузка изображения
+img = Image.open('image.jpg').convert('L')
+A = np.array(img)
+
+# SVD
+U, s, Vt = np.linalg.svd(A, full_matrices=False)
+
+# Сжатие с k компонентами
+k = 50
+A_compressed = U[:, :k] @ np.diag(s[:k]) @ Vt[:k, :]
+
+# Степень сжатия
+original_size = A.shape[0] * A.shape[1]
+compressed_size = k * (A.shape[0] + A.shape[1] + 1)
+ratio = compressed_size / original_size
+print(f"Степень сжатия: {ratio:.2%}")
+
+# Сохранение
+img_compressed = Image.fromarray(A_compressed.astype(np.uint8))
+img_compressed.save('compressed.jpg')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Рекомендательные системы</h2>
+    <pre><code>from sklearn.decomposition import TruncatedSVD
+
+# Матрица user-item (пользователи × товары)
+# Пропущенные значения = 0
+ratings = np.array([
+    [5, 3, 0, 1],
+    [4, 0, 0, 1],
+    [1, 1, 0, 5],
+    [1, 0, 0, 4],
+    [0, 1, 5, 4]
+])
+
+# SVD факторизация
+svd = TruncatedSVD(n_components=2, random_state=42)
+user_factors = svd.fit_transform(ratings)
+item_factors = svd.components_.T
+
+# Предсказание рейтингов
+predicted_ratings = user_factors @ item_factors.T
+
+# Рекомендации для пользователя 0
+user_idx = 0
+unrated = ratings[user_idx] == 0
+recommendations = predicted_ratings[user_idx][unrated]
+print(f"Предсказанные рейтинги: {recommendations}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. SVD vs PCA</h2>
+    <table>
+      <tr><th>Аспект</th><th>SVD</th><th>PCA</th></tr>
+      <tr><td><strong>Основа</strong></td><td>Разложение матрицы</td><td>Собственные векторы ковариации</td></tr>
+      <tr><td><strong>Центрирование</strong></td><td>Не требуется</td><td>Требуется</td></tr>
+      <tr><td><strong>Скорость</strong></td><td>Быстрее для больших данных</td><td>Медленнее</td></tr>
+      <tr><td><strong>Разреженные данные</strong></td><td>Да (TruncatedSVD)</td><td>Нет</td></tr>
+      <tr><td><strong>Использование</strong></td><td>Универсальное</td><td>Центрированные данные</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Работа с разреженными матрицами</h2>
+    <pre><code>from scipy.sparse import csr_matrix
+from sklearn.decomposition import TruncatedSVD
+
+# Разреженная матрица (например, TF-IDF)
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+texts = [
+    "машинное обучение deep learning",
+    "нейронные сети и алгоритмы",
+    "данные и анализ"
+]
+
+vectorizer = TfidfVectorizer()
+X_sparse = vectorizer.fit_transform(texts)
+
+# TruncatedSVD для разреженных матриц
+svd = TruncatedSVD(n_components=2, random_state=42)
+X_reduced = svd.fit_transform(X_sparse)
+
+print(f"Исходная размерность: {X_sparse.shape}")
+print(f"После SVD: {X_reduced.shape}")
+print(f"Дисперсия: {svd.explained_variance_ratio_}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Шумоподавление</h2>
+    <pre><code>import numpy as np
+
+# Матрица с шумом
+np.random.seed(42)
+A_clean = np.random.randn(100, 50)
+noise = 0.5 * np.random.randn(100, 50)
+A_noisy = A_clean + noise
+
+# SVD
+U, s, Vt = np.linalg.svd(A_noisy, full_matrices=False)
+
+# Удаляем малые сингулярные значения (шум)
+threshold = 1.0
+s_denoised = s.copy()
+s_denoised[s < threshold] = 0
+
+# Восстановление
+A_denoised = U @ np.diag(s_denoised) @ Vt
+
+# Оценка качества
+mse_noisy = np.mean((A_clean - A_noisy)**2)
+mse_denoised = np.mean((A_clean - A_denoised)**2)
+print(f"MSE с шумом: {mse_noisy:.4f}")
+print(f"MSE после SVD: {mse_denoised:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Латентный семантический анализ</h2>
+    <pre><code>from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics.pairwise import cosine_similarity
+
+documents = [
+    "машинное обучение и искусственный интеллект",
+    "нейронные сети и deep learning",
+    "алгоритмы классификации данных",
+    "Python для анализа данных"
+]
+
+# TF-IDF
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(documents)
+
+# LSA (Latent Semantic Analysis) через SVD
+lsa = TruncatedSVD(n_components=2, random_state=42)
+X_lsa = lsa.fit_transform(X)
+
+# Поиск похожих документов
+query = "алгоритмы машинного обучения"
+query_vec = vectorizer.transform([query])
+query_lsa = lsa.transform(query_vec)
+
+# Косинусное сходство
+similarities = cosine_similarity(query_lsa, X_lsa)[0]
+most_similar = np.argmax(similarities)
+print(f"Наиболее похожий: документ {most_similar}")
+print(f"Сходство: {similarities[most_similar]:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Свойства сингулярных значений</h2>
+    <ul>
+      <li><strong>Упорядочены</strong>: σ₁ ≥ σ₂ ≥ ... ≥ σₙ ≥ 0</li>
+      <li><strong>Норма Фробениуса</strong>: ||A||² = Σσᵢ²</li>
+      <li><strong>Ранг матрицы</strong>: количество ненулевых σ</li>
+      <li><strong>Условное число</strong>: σ₁/σₙ (стабильность)</li>
+      <li><strong>Энергия сигнала</strong>: первые k σ содержат основную информацию</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Вычислительная сложность</h2>
+    <table>
+      <tr><th>Операция</th><th>Сложность</th></tr>
+      <tr><td><strong>Полное SVD</strong></td><td>O(min(mn², m²n))</td></tr>
+      <tr><td><strong>Truncated SVD</strong></td><td>O(mnk) где k << min(m,n)</td></tr>
+      <tr><td><strong>Randomized SVD</strong></td><td>O(mn log k)</td></tr>
+      <tr><td><strong>Sparse SVD</strong></td><td>O(nnz × k) где nnz - число ненулевых</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Рандомизированное SVD</h2>
+    <pre><code>from sklearn.decomposition import TruncatedSVD
+
+# Для больших матриц используем randomized
+svd = TruncatedSVD(
+    n_components=10,
+    algorithm='randomized',
+    n_iter=5,
+    random_state=42
+)
+
+X_reduced = svd.fit_transform(X)
+
+# Преимущества:
+# - Намного быстрее для больших матриц
+# - Хорошая аппроксимация
+# - Подходит для n_components << min(m, n)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Интерпретация компонент</h2>
+    <pre><code>from sklearn.decomposition import TruncatedSVD
+
+# После обучения SVD
+svd = TruncatedSVD(n_components=3, random_state=42)
+X_reduced = svd.fit_transform(X)
+
+# Компоненты показывают направления максимальной вариации
+components = svd.components_
+
+# Топ-признаки для каждой компоненты
+feature_names = vectorizer.get_feature_names_out()
+for i, comp in enumerate(components):
+    top_indices = comp.argsort()[-5:][::-1]
+    top_features = [feature_names[j] for j in top_indices]
+    print(f"Компонента {i+1}: {', '.join(top_features)}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <p>• Нормализовать данные перед SVD<br>
+        • Использовать TruncatedSVD для разреженных матриц<br>
+        • Выбирать k по накопленной дисперсии (90-95%)<br>
+        • Применять randomized для больших данных<br>
+        • Использовать для понижения размерности текстов</p>
+      </div>
+      <div class="bad">
+        <h3>❌ Не делать</h3>
+        <p>• Использовать полное SVD для больших матриц<br>
+        • Забывать про масштабирование признаков<br>
+        • Выбирать слишком много компонент<br>
+        • Применять стандартное PCA к разреженным данным<br>
+        • Игнорировать сингулярные значения</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Типичные ошибки</h2>
+    <table>
+      <tr><th>Ошибка</th><th>Решение</th></tr>
+      <tr><td>Слишком много компонент</td><td>Использовать elbow method</td></tr>
+      <tr><td>Не масштабировать данные</td><td>StandardScaler перед SVD</td></tr>
+      <tr><td>Медленно для больших данных</td><td>algorithm='randomized'</td></tr>
+      <tr><td>Потеря разреженности</td><td>TruncatedSVD вместо PCA</td></tr>
+      <tr><td>Переобучение</td><td>Кросс-валидация для выбора k</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 21. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Преимущество</th><th>Недостаток</th></tr>
+      <tr><td><strong>SVD</strong></td><td>Универсальный, быстрый</td><td>Линейный</td></tr>
+      <tr><td><strong>PCA</strong></td><td>Интерпретируемый</td><td>Требует центрирования</td></tr>
+      <tr><td><strong>t-SNE</strong></td><td>Нелинейный</td><td>Медленный, не параметрический</td></tr>
+      <tr><td><strong>UMAP</strong></td><td>Быстрый, нелинейный</td><td>Сложнее интерпретация</td></tr>
+      <tr><td><strong>NMF</strong></td><td>Неотрицательные факторы</td><td>Только для неотрицательных данных</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 22. Ресурсы</h2>
+    <ul>
+      <li><strong>Документация</strong>: sklearn.decomposition.TruncatedSVD</li>
+      <li><strong>Статья</strong>: "Randomized SVD" - Halko et al.</li>
+      <li><strong>Книга</strong>: "Matrix Computations" - Golub & Van Loan</li>
+      <li><strong>Туториал</strong>: "SVD in Python" на Towards Data Science</li>
+      <li><strong>Курс</strong>: Stanford CS168 - Algebraic Methods</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

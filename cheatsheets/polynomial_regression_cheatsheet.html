@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Polynomial Regression Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 600;
+    }
+
+    .good p, .bad p {
+      margin: 0;
+      font-size: 0.88em;
+    }
+
+    em {
+      color: #d32f2f;
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    strong {
+      color: #1a5fb4;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📈 Polynomial Regression Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть полиномиальной регрессии</h2>
+    <ul>
+      <li><strong>Цель</strong>: моделирование нелинейных зависимостей</li>
+      <li><strong>Идея</strong>: добавить степени признаков (x, x², x³, ...)</li>
+      <li><strong>Остается линейной</strong>: по коэффициентам!</li>
+      <li><strong>Формула</strong>: y = β₀ + β₁x + β₂x² + ... + βₙxⁿ</li>
+      <li><strong>Применение</strong>: когда данные имеют кривизну</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Математическая запись</h2>
+    <p><strong>Для одного признака:</strong></p>
+    <p>y = β₀ + β₁x + β₂x² + β₃x³ + ... + βₙxⁿ + ε</p>
+    <p><strong>Для нескольких признаков:</strong></p>
+    <p>y = β₀ + β₁x₁ + β₂x₂ + β₃x₁² + β₄x₁x₂ + β₅x₂² + ...</p>
+    <ul>
+      <li><strong>n</strong> - степень полинома</li>
+      <li><strong>Взаимодействия</strong>: x₁x₂, x₁x₃, ...</li>
+      <li><strong>ε</strong> - ошибка</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код</h2>
+    <pre><code>from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+from sklearn.pipeline import Pipeline
+import numpy as np
+
+# Данные
+X = np.array([[1], [2], [3], [4], [5]])
+y = np.array([2, 7, 18, 35, 58])
+
+# Создание пайплайна
+model = Pipeline([
+    ('poly', PolynomialFeatures(degree=2)),
+    ('linear', LinearRegression())
+])
+
+# Обучение
+model.fit(X, y)
+
+# Предсказание
+y_pred = model.predict(X)
+
+# R² score
+print(f"R²: {model.score(X, y):.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Ручное создание признаков</h2>
+    <pre><code>from sklearn.preprocessing import PolynomialFeatures
+
+# Исходные данные
+X = np.array([[2, 3]])
+
+# Полиномиальные признаки степени 2
+poly = PolynomialFeatures(degree=2)
+X_poly = poly.fit_transform(X)
+
+# Результат: [1, 2, 3, 4, 6, 9]
+# 1 - bias (константа)
+# 2, 3 - оригинальные признаки
+# 4 - x₁²
+# 6 - x₁x₂ (взаимодействие)
+# 9 - x₂²
+
+print(f"Новые признаки: {X_poly}")
+print(f"Названия: {poly.get_feature_names_out()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Параметры PolynomialFeatures</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Значение</th></tr>
+      <tr><td><code>degree</code></td><td>Степень полинома</td><td>2-4 (обычно)</td></tr>
+      <tr><td><code>interaction_only</code></td><td>Только взаимодействия</td><td>False (умолч.)</td></tr>
+      <tr><td><code>include_bias</code></td><td>Добавить константу</td><td>True (умолч.)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Выбор степени полинома</h2>
+    <pre><code>from sklearn.model_selection import cross_val_score
+import matplotlib.pyplot as plt
+
+degrees = range(1, 11)
+train_scores = []
+cv_scores = []
+
+for degree in degrees:
+    model = Pipeline([
+        ('poly', PolynomialFeatures(degree=degree)),
+        ('linear', LinearRegression())
+    ])
+    
+    # Train score
+    model.fit(X_train, y_train)
+    train_scores.append(model.score(X_train, y_train))
+    
+    # CV score
+    cv_score = cross_val_score(
+        model, X_train, y_train, 
+        cv=5, scoring='r2'
+    ).mean()
+    cv_scores.append(cv_score)
+
+plt.plot(degrees, train_scores, label='Train')
+plt.plot(degrees, cv_scores, label='CV')
+plt.xlabel('Степень полинома')
+plt.ylabel('R² Score')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Полный пример с визуализацией</h2>
+    <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+
+# Генерация данных
+np.random.seed(42)
+X = np.linspace(0, 10, 100).reshape(-1, 1)
+y = 2 + 3*X + 0.5*X**2 + np.random.randn(100, 1)*2
+
+# Модели разных степеней
+degrees = [1, 2, 3, 5]
+plt.figure(figsize=(12, 8))
+
+for i, degree in enumerate(degrees, 1):
+    plt.subplot(2, 2, i)
+    
+    # Обучение
+    poly = PolynomialFeatures(degree=degree)
+    X_poly = poly.fit_transform(X)
+    model = LinearRegression()
+    model.fit(X_poly, y)
+    
+    # Предсказание
+    X_test = np.linspace(0, 10, 300).reshape(-1, 1)
+    X_test_poly = poly.transform(X_test)
+    y_pred = model.predict(X_test_poly)
+    
+    # Визуализация
+    plt.scatter(X, y, alpha=0.5)
+    plt.plot(X_test, y_pred, 'r-', linewidth=2)
+    plt.title(f'Степень {degree}')
+    plt.xlabel('X')
+    plt.ylabel('y')
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Переобучение и недообучение</h2>
+    <table>
+      <tr><th>Степень</th><th>Проблема</th><th>Признаки</th></tr>
+      <tr><td><strong>1</strong></td><td>Недообучение</td><td>Низкий R² на train и test</td></tr>
+      <tr><td><strong>2-3</strong></td><td>Оптимально</td><td>Хороший R² на обоих</td></tr>
+      <tr><td><strong>4-6</strong></td><td>Риск переобучения</td><td>High train, low test R²</td></tr>
+      <tr><td><strong>>7</strong></td><td>Переобучение</td><td>Огромная разница train/test</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Регуляризация полиномиальной регрессии</h2>
+    <pre><code>from sklearn.linear_model import Ridge, Lasso
+from sklearn.preprocessing import StandardScaler
+
+# Ridge регрессия с полиномами
+model = Pipeline([
+    ('poly', PolynomialFeatures(degree=5)),
+    ('scaler', StandardScaler()),
+    ('ridge', Ridge(alpha=1.0))
+])
+
+model.fit(X_train, y_train)
+
+# Или Lasso
+model_lasso = Pipeline([
+    ('poly', PolynomialFeatures(degree=5)),
+    ('scaler', StandardScaler()),
+    ('lasso', Lasso(alpha=0.1))
+])
+
+model_lasso.fit(X_train, y_train)
+
+# Сравнение
+print(f"Ridge R²: {model.score(X_test, y_test):.4f}")
+print(f"Lasso R²: {model_lasso.score(X_test, y_test):.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Только взаимодействия</h2>
+    <pre><code># Без степеней, только взаимодействия признаков
+poly = PolynomialFeatures(
+    degree=2, 
+    interaction_only=True,
+    include_bias=False
+)
+
+X = np.array([[1, 2, 3]])
+X_inter = poly.fit_transform(X)
+
+# [1, 2, 3, 2, 3, 6]
+# x₁, x₂, x₃, x₁x₂, x₁x₃, x₂x₃
+# Без x₁², x₂², x₃²
+
+print(poly.get_feature_names_out())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Масштабирование признаков</h2>
+    <p><strong>Важно!</strong> Полиномиальные признаки могут иметь очень разные масштабы:</p>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+# Правильный пайплайн
+model = Pipeline([
+    ('poly', PolynomialFeatures(degree=3)),
+    ('scaler', StandardScaler()),  # ← Важно!
+    ('linear', LinearRegression())
+])
+
+# Без масштабирования признаки типа x³ 
+# будут намного больше x, что может привести 
+# к численной нестабильности</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Оценка важности признаков</h2>
+    <pre><code>from sklearn.preprocessing import PolynomialFeatures
+from sklearn.linear_model import LinearRegression
+
+# Обучение
+poly = PolynomialFeatures(degree=2)
+X_poly = poly.fit_transform(X)
+model = LinearRegression()
+model.fit(X_poly, y)
+
+# Коэффициенты
+feature_names = poly.get_feature_names_out()
+coefficients = model.coef_[0]
+
+# Сортировка по важности
+importance = sorted(
+    zip(feature_names, np.abs(coefficients)), 
+    key=lambda x: x[1], 
+    reverse=True
+)
+
+for name, coef in importance[:5]:
+    print(f"{name}: {coef:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Многомерные полиномы</h2>
+    <pre><code># Для 3 признаков, степень 2
+X = np.array([[1, 2, 3]])
+poly = PolynomialFeatures(degree=2)
+X_poly = poly.fit_transform(X)
+
+# Количество новых признаков:
+# (n + d)! / (n! × d!)
+# где n - исходное число признаков
+# d - степень полинома
+
+# Для 3 признаков, степень 2: 10 признаков
+# Для 10 признаков, степень 2: 66 признаков
+# Для 10 признаков, степень 3: 286 признаков!
+
+print(f"Новых признаков: {X_poly.shape[1]}")
+print(f"Названия:\n{poly.get_feature_names_out()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Применения</h2>
+    <table>
+      <tr><th>Область</th><th>Задача</th></tr>
+      <tr><td><strong>Физика</strong></td><td>Траектории, ускорения</td></tr>
+      <tr><td><strong>Экономика</strong></td><td>Кривые спроса/предложения</td></tr>
+      <tr><td><strong>Биология</strong></td><td>Рост популяций</td></tr>
+      <tr><td><strong>Инженерия</strong></td><td>Калибровочные кривые</td></tr>
+      <tr><td><strong>Маркетинг</strong></td><td>Кривые отклика</td></tr>
+      <tr><td><strong>Финансы</strong></td><td>Доходность портфеля</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Преимущества</th><th>Недостатки</th></tr>
+      <tr><td><strong>Линейная</strong></td><td>Простая, быстрая</td><td>Только линейные связи</td></tr>
+      <tr><td><strong>Полиномиальная</strong></td><td>Нелинейные кривые</td><td>Переобучение, масштаб</td></tr>
+      <tr><td><strong>Дерево</strong></td><td>Нелинейные, автомасштаб</td><td>Ступенчатые предсказания</td></tr>
+      <tr><td><strong>SVM (RBF)</strong></td><td>Гибкая нелинейность</td><td>Медленнее, сложнее</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Кросс-валидация для выбора степени</h2>
+    <pre><code>from sklearn.model_selection import GridSearchCV
+
+# Определяем пайплайн
+pipeline = Pipeline([
+    ('poly', PolynomialFeatures()),
+    ('scaler', StandardScaler()),
+    ('linear', LinearRegression())
+])
+
+# Параметры для поиска
+param_grid = {
+    'poly__degree': [1, 2, 3, 4, 5]
+}
+
+# Grid search с кросс-валидацией
+grid_search = GridSearchCV(
+    pipeline, 
+    param_grid, 
+    cv=5,
+    scoring='r2',
+    n_jobs=-1
+)
+
+grid_search.fit(X_train, y_train)
+
+print(f"Лучшая степень: {grid_search.best_params_}")
+print(f"Лучший R²: {grid_search.best_score_:.4f}")
+
+# Тестовая оценка
+test_score = grid_search.score(X_test, y_test)
+print(f"Тест R²: {test_score:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Экстраполяция</h2>
+    <p><strong>Осторожно!</strong> Полиномиальная регрессия плохо экстраполирует за пределы обучающих данных:</p>
+    <pre><code># Обучение на X ∈ [0, 10]
+X_train = np.linspace(0, 10, 100).reshape(-1, 1)
+y_train = 2*X_train + noise
+
+# Тестирование на X ∈ [10, 20]
+X_test = np.linspace(10, 20, 50).reshape(-1, 1)
+
+# Высокие степени дают плохие результаты!
+# Особенно степени > 3
+
+# Рекомендация: не использовать для 
+# прогнозирования за пределами данных</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Пример: прогноз температуры</h2>
+    <pre><code>import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+
+# Данные: день года → температура
+days = np.arange(1, 366)
+# Синусоидальная зависимость (годичный цикл)
+temps = 15 + 10*np.sin(2*np.pi*days/365) + np.random.randn(365)*2
+
+X = days.reshape(-1, 1)
+y = temps
+
+# Разделение
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Модель
+model = Pipeline([
+    ('poly', PolynomialFeatures(degree=5)),
+    ('scaler', StandardScaler()),
+    ('ridge', Ridge(alpha=10.0))
+])
+
+model.fit(X_train, y_train)
+print(f"R²: {model.score(X_test, y_test):.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Проверка на переобучение</h2>
+    <pre><code>from sklearn.metrics import mean_squared_error
+
+degrees = [1, 2, 3, 5, 10]
+
+for degree in degrees:
+    model = Pipeline([
+        ('poly', PolynomialFeatures(degree=degree)),
+        ('scaler', StandardScaler()),
+        ('linear', LinearRegression())
+    ])
+    
+    model.fit(X_train, y_train)
+    
+    train_rmse = np.sqrt(mean_squared_error(
+        y_train, model.predict(X_train)
+    ))
+    test_rmse = np.sqrt(mean_squared_error(
+        y_test, model.predict(X_test)
+    ))
+    
+    print(f"Степень {degree}:")
+    print(f"  Train RMSE: {train_rmse:.3f}")
+    print(f"  Test RMSE: {test_rmse:.3f}")
+    print(f"  Разница: {test_rmse - train_rmse:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <p>• Начинать со степени 2-3<br>
+        • Всегда масштабировать признаки<br>
+        • Использовать кросс-валидацию<br>
+        • Применять регуляризацию для высоких степеней<br>
+        • Визуализировать предсказания</p>
+      </div>
+      <div class="bad">
+        <h3>❌ Не делать</h3>
+        <p>• Использовать степень > 5 без регуляризации<br>
+        • Забывать про масштабирование<br>
+        • Экстраполировать за пределы данных<br>
+        • Игнорировать переобучение<br>
+        • Применять без визуального анализа</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 21. Типичные ошибки</h2>
+    <table>
+      <tr><th>Ошибка</th><th>Решение</th></tr>
+      <tr><td>Слишком высокая степень</td><td>Использовать CV для выбора</td></tr>
+      <tr><td>Не масштабировать</td><td>Добавить StandardScaler</td></tr>
+      <tr><td>Переобучение</td><td>Регуляризация (Ridge/Lasso)</td></tr>
+      <tr><td>Медленное обучение</td><td>Уменьшить степень или число признаков</td></tr>
+      <tr><td>Плохая экстраполяция</td><td>Не использовать за пределами данных</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 22. Интерпретация результатов</h2>
+    <pre><code># После обучения
+poly = PolynomialFeatures(degree=2)
+X_poly = poly.fit_transform(X)
+model = LinearRegression()
+model.fit(X_poly, y)
+
+# Уравнение
+features = poly.get_feature_names_out()
+coefs = model.coef_[0]
+intercept = model.intercept_
+
+print(f"y = {intercept:.2f}")
+for feat, coef in zip(features[1:], coefs[1:]):
+    if coef >= 0:
+        print(f"  + {coef:.2f}*{feat}")
+    else:
+        print(f"  - {abs(coef):.2f}*{feat}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 23. Ресурсы</h2>
+    <ul>
+      <li><strong>Документация</strong>: sklearn.preprocessing.PolynomialFeatures</li>
+      <li><strong>Статья</strong>: "Polynomial Regression" на StatQuest</li>
+      <li><strong>Книга</strong>: "Introduction to Statistical Learning"</li>
+      <li><strong>Видео</strong>: "Polynomial Regression" - StatQuest</li>
+      <li><strong>Практика</strong>: Kaggle - Polynomial Regression Tutorial</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

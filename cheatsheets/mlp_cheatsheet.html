@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>MLP (Multi-Layer Perceptron) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 600;
+    }
+
+    .good p, .bad p {
+      margin: 0;
+      font-size: 0.88em;
+    }
+
+    em {
+      color: #d32f2f;
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    strong {
+      color: #1a5fb4;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🧠 MLP (Multi-Layer Perceptron) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое MLP?</h2>
+    <ul>
+      <li><strong>Определение</strong>: многослойная нейронная сеть прямого распространения</li>
+      <li><strong>Архитектура</strong>: входной слой → скрытые слои → выходной слой</li>
+      <li><strong>Полносвязность</strong>: каждый нейрон связан со всеми нейронами следующего слоя</li>
+      <li><strong>Универсальность</strong>: может аппроксимировать любую функцию</li>
+      <li><strong>Применение</strong>: классификация, регрессия, табличные данные</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Структура MLP</h2>
+    <p><strong>Слои:</strong></p>
+    <ul>
+      <li><strong>Входной (Input)</strong>: размер = число признаков</li>
+      <li><strong>Скрытые (Hidden)</strong>: 1 или несколько слоев</li>
+      <li><strong>Выходной (Output)</strong>: размер зависит от задачи</li>
+    </ul>
+    <p><strong>Выходной слой:</strong></p>
+    <ul>
+      <li>Бинарная классификация: 1 нейрон (sigmoid)</li>
+      <li>Многоклассовая: N нейронов (softmax)</li>
+      <li>Регрессия: 1 нейрон (линейная активация)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код (sklearn)</h2>
+    <pre><code>from sklearn.neural_network import MLPClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
+
+# Разделение данных
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Масштабирование (обязательно!)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# MLP классификатор
+mlp = MLPClassifier(
+    hidden_layer_sizes=(100, 50),  # 2 скрытых слоя
+    activation='relu',
+    solver='adam',
+    max_iter=500,
+    random_state=42
+)
+
+# Обучение
+mlp.fit(X_train_scaled, y_train)
+
+# Предсказание
+y_pred = mlp.predict(X_test_scaled)
+
+# Оценка
+score = mlp.score(X_test_scaled, y_test)
+print(f"Accuracy: {score:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Параметры MLPClassifier</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>hidden_layer_sizes</code></td><td>Размеры скрытых слоев</td><td>(100,), (100, 50)</td></tr>
+      <tr><td><code>activation</code></td><td>Функция активации</td><td>'relu' (по умолч.)</td></tr>
+      <tr><td><code>solver</code></td><td>Оптимизатор</td><td>'adam' (лучший)</td></tr>
+      <tr><td><code>alpha</code></td><td>L2 регуляризация</td><td>0.0001-0.01</td></tr>
+      <tr><td><code>batch_size</code></td><td>Размер батча</td><td>'auto' или 32-256</td></tr>
+      <tr><td><code>learning_rate</code></td><td>Стратегия LR</td><td>'constant', 'adaptive'</td></tr>
+      <tr><td><code>max_iter</code></td><td>Макс. эпох</td><td>200-1000</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Функции активации</h2>
+    <table>
+      <tr><th>Функция</th><th>Формула</th><th>Когда использовать</th></tr>
+      <tr><td><strong>ReLU</strong></td><td>max(0, x)</td><td>По умолчанию</td></tr>
+      <tr><td><strong>Sigmoid</strong></td><td>1/(1+e<sup>-x</sup>)</td><td>Выходной слой (бинарная)</td></tr>
+      <tr><td><strong>Tanh</strong></td><td>(e<sup>x</sup>-e<sup>-x</sup>)/(e<sup>x</sup>+e<sup>-x</sup>)</td><td>Альтернатива ReLU</td></tr>
+      <tr><td><strong>Softmax</strong></td><td>e<sup>xᵢ</sup>/Σe<sup>xⱼ</sup></td><td>Выходной слой (многоклассовая)</td></tr>
+      <tr><td><strong>Linear</strong></td><td>x</td><td>Регрессия</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Базовый код (PyTorch)</h2>
+    <pre><code>import torch
+import torch.nn as nn
+import torch.optim as optim
+
+# Определение архитектуры
+class MLP(nn.Module):
+    def __init__(self, input_size, hidden_sizes, output_size):
+        super(MLP, self).__init__()
+        
+        layers = []
+        prev_size = input_size
+        
+        # Скрытые слои
+        for hidden_size in hidden_sizes:
+            layers.append(nn.Linear(prev_size, hidden_size))
+            layers.append(nn.ReLU())
+            prev_size = hidden_size
+        
+        # Выходной слой
+        layers.append(nn.Linear(prev_size, output_size))
+        
+        self.network = nn.Sequential(*layers)
+    
+    def forward(self, x):
+        return self.network(x)
+
+# Инициализация
+model = MLP(input_size=10, hidden_sizes=[100, 50], 
+            output_size=2)
+
+# Функция потерь и оптимизатор
+criterion = nn.CrossEntropyLoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Обучение MLP (PyTorch)</h2>
+    <pre><code>import torch
+from torch.utils.data import DataLoader, TensorDataset
+
+# Подготовка данных
+X_train_t = torch.FloatTensor(X_train_scaled)
+y_train_t = torch.LongTensor(y_train)
+
+dataset = TensorDataset(X_train_t, y_train_t)
+dataloader = DataLoader(dataset, batch_size=32, 
+                        shuffle=True)
+
+# Обучение
+num_epochs = 100
+for epoch in range(num_epochs):
+    model.train()
+    total_loss = 0
+    
+    for batch_X, batch_y in dataloader:
+        # Forward pass
+        outputs = model(batch_X)
+        loss = criterion(outputs, batch_y)
+        
+        # Backward pass
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+        total_loss += loss.item()
+    
+    if (epoch + 1) % 10 == 0:
+        avg_loss = total_loss / len(dataloader)
+        print(f'Epoch [{epoch+1}/{num_epochs}], '
+              f'Loss: {avg_loss:.4f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Базовый код (Keras)</h2>
+    <pre><code>from tensorflow import keras
+from tensorflow.keras import layers
+
+# Создание модели
+model = keras.Sequential([
+    layers.Dense(100, activation='relu', 
+                input_shape=(input_dim,)),
+    layers.Dense(50, activation='relu'),
+    layers.Dense(num_classes, activation='softmax')
+])
+
+# Компиляция
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Обучение
+history = model.fit(
+    X_train_scaled, y_train,
+    epochs=100,
+    batch_size=32,
+    validation_split=0.2,
+    verbose=1
+)
+
+# Оценка
+test_loss, test_acc = model.evaluate(
+    X_test_scaled, y_test, verbose=0
+)
+print(f'Test accuracy: {test_acc:.4f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Выбор архитектуры</h2>
+    <table>
+      <tr><th>Размер данных</th><th>Архитектура</th></tr>
+      <tr><td><strong>Маленький (&lt;1000)</strong></td><td>1 слой, 10-50 нейронов</td></tr>
+      <tr><td><strong>Средний (1K-10K)</strong></td><td>1-2 слоя, 50-100 нейронов</td></tr>
+      <tr><td><strong>Большой (&gt;10K)</strong></td><td>2-3 слоя, 100-500 нейронов</td></tr>
+    </table>
+    <p><strong>Правило большого пальца:</strong></p>
+    <ul>
+      <li>Первый слой: в 2-3 раза больше входных признаков</li>
+      <li>Каждый следующий: уменьшается в 2 раза</li>
+      <li>Последний скрытый: в 2 раза больше выходов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Регуляризация</h2>
+    <pre><code># sklearn - L2 регуляризация
+mlp = MLPClassifier(
+    hidden_layer_sizes=(100, 50),
+    alpha=0.001,  # L2 penalty
+    early_stopping=True,
+    validation_fraction=0.1
+)
+
+# Keras - Dropout и L2
+from tensorflow.keras import regularizers
+
+model = keras.Sequential([
+    layers.Dense(100, activation='relu',
+                kernel_regularizer=regularizers.l2(0.001)),
+    layers.Dropout(0.3),
+    layers.Dense(50, activation='relu',
+                kernel_regularizer=regularizers.l2(0.001)),
+    layers.Dropout(0.2),
+    layers.Dense(num_classes, activation='softmax')
+])
+
+# PyTorch - Dropout
+class MLPWithDropout(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(input_size, 100)
+        self.dropout1 = nn.Dropout(0.3)
+        self.fc2 = nn.Linear(100, 50)
+        self.dropout2 = nn.Dropout(0.2)
+        self.fc3 = nn.Linear(50, output_size)
+    
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        x = self.dropout1(x)
+        x = torch.relu(self.fc2(x))
+        x = self.dropout2(x)
+        x = self.fc3(x)
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Early Stopping</h2>
+    <pre><code># sklearn
+mlp = MLPClassifier(
+    hidden_layer_sizes=(100, 50),
+    early_stopping=True,
+    validation_fraction=0.1,
+    n_iter_no_change=10,  # Остановка после 10 эпох без улучшения
+    tol=1e-4
+)
+
+# Keras
+from tensorflow.keras.callbacks import EarlyStopping
+
+early_stop = EarlyStopping(
+    monitor='val_loss',
+    patience=10,
+    restore_best_weights=True
+)
+
+history = model.fit(
+    X_train, y_train,
+    validation_split=0.2,
+    epochs=1000,
+    callbacks=[early_stop]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Batch Normalization</h2>
+    <pre><code># Keras
+model = keras.Sequential([
+    layers.Dense(100, activation='relu'),
+    layers.BatchNormalization(),
+    layers.Dense(50, activation='relu'),
+    layers.BatchNormalization(),
+    layers.Dense(num_classes, activation='softmax')
+])
+
+# PyTorch
+class MLPWithBatchNorm(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(input_size, 100)
+        self.bn1 = nn.BatchNorm1d(100)
+        self.fc2 = nn.Linear(100, 50)
+        self.bn2 = nn.BatchNorm1d(50)
+        self.fc3 = nn.Linear(50, output_size)
+    
+    def forward(self, x):
+        x = torch.relu(self.bn1(self.fc1(x)))
+        x = torch.relu(self.bn2(self.fc2(x)))
+        x = self.fc3(x)
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Инициализация весов</h2>
+    <pre><code># Keras
+from tensorflow.keras.initializers import HeNormal, GlorotUniform
+
+model = keras.Sequential([
+    layers.Dense(100, activation='relu',
+                kernel_initializer=HeNormal()),  # Для ReLU
+    layers.Dense(50, activation='tanh',
+                kernel_initializer=GlorotUniform()),  # Для tanh/sigmoid
+    layers.Dense(num_classes, activation='softmax')
+])
+
+# PyTorch
+import torch.nn.init as init
+
+def init_weights(m):
+    if isinstance(m, nn.Linear):
+        init.kaiming_normal_(m.weight)  # He init для ReLU
+        # или
+        # init.xavier_normal_(m.weight)  # Xavier для tanh/sigmoid
+        if m.bias is not None:
+            init.constant_(m.bias, 0)
+
+model.apply(init_weights)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Learning Rate Scheduling</h2>
+    <pre><code># sklearn
+mlp = MLPClassifier(
+    learning_rate='adaptive',
+    learning_rate_init=0.001
+)
+
+# Keras
+from tensorflow.keras.callbacks import ReduceLROnPlateau
+
+reduce_lr = ReduceLROnPlateau(
+    monitor='val_loss',
+    factor=0.5,
+    patience=5,
+    min_lr=1e-6
+)
+
+history = model.fit(
+    X_train, y_train,
+    validation_split=0.2,
+    epochs=100,
+    callbacks=[reduce_lr]
+)
+
+# PyTorch
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+scheduler = ReduceLROnPlateau(
+    optimizer, 
+    mode='min', 
+    factor=0.5, 
+    patience=5
+)
+
+# В цикле обучения
+scheduler.step(val_loss)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Регрессия с MLP</h2>
+    <pre><code># sklearn
+from sklearn.neural_network import MLPRegressor
+
+mlp_reg = MLPRegressor(
+    hidden_layer_sizes=(100, 50),
+    activation='relu',
+    solver='adam',
+    max_iter=500,
+    random_state=42
+)
+
+mlp_reg.fit(X_train_scaled, y_train)
+
+# Keras
+model = keras.Sequential([
+    layers.Dense(100, activation='relu', 
+                input_shape=(input_dim,)),
+    layers.Dense(50, activation='relu'),
+    layers.Dense(1)  # Один выход, без активации
+])
+
+model.compile(
+    optimizer='adam',
+    loss='mse',  # MSE для регрессии
+    metrics=['mae']
+)
+
+history = model.fit(
+    X_train_scaled, y_train,
+    epochs=100,
+    batch_size=32,
+    validation_split=0.2
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Визуализация обучения</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# sklearn - график loss
+plt.figure(figsize=(10, 6))
+plt.plot(mlp.loss_curve_)
+plt.xlabel('Iterations')
+plt.ylabel('Loss')
+plt.title('Training Loss')
+plt.grid(True)
+plt.show()
+
+# Keras - история обучения
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+plt.plot(history.history['loss'], label='Train')
+plt.plot(history.history['val_loss'], label='Val')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.title('Loss')
+
+plt.subplot(1, 2, 2)
+plt.plot(history.history['accuracy'], label='Train')
+plt.plot(history.history['val_accuracy'], label='Val')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.title('Accuracy')
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Подбор гиперпараметров</h2>
+    <pre><code>from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+    'hidden_layer_sizes': [(50,), (100,), (100, 50)],
+    'activation': ['relu', 'tanh'],
+    'alpha': [0.0001, 0.001, 0.01],
+    'learning_rate': ['constant', 'adaptive']
+}
+
+mlp = MLPClassifier(max_iter=500, random_state=42)
+
+grid_search = GridSearchCV(
+    mlp, 
+    param_grid, 
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1,
+    verbose=1
+)
+
+grid_search.fit(X_train_scaled, y_train)
+
+print(f"Лучшие параметры: {grid_search.best_params_}")
+print(f"Лучший score: {grid_search.best_score_:.4f}")
+
+# Тестирование
+test_score = grid_search.score(X_test_scaled, y_test)
+print(f"Test score: {test_score:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Диагностика проблем</h2>
+    <table>
+      <tr><th>Проблема</th><th>Признаки</th><th>Решение</th></tr>
+      <tr><td><strong>Переобучение</strong></td><td>Train >> Val</td><td>Dropout, L2, больше данных</td></tr>
+      <tr><td><strong>Недообучение</strong></td><td>Train и Val низкие</td><td>Больше слоев/нейронов</td></tr>
+      <tr><td><strong>Исчезающий градиент</strong></td><td>Нет обучения</td><td>ReLU, BatchNorm, меньше слоев</td></tr>
+      <tr><td><strong>Взрывающийся градиент</strong></td><td>NaN в loss</td><td>Gradient clipping, меньше LR</td></tr>
+      <tr><td><strong>Медленное обучение</strong></td><td>Loss падает медленно</td><td>Увеличить LR, использовать Adam</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Применения MLP</h2>
+    <table>
+      <tr><th>Область</th><th>Задача</th></tr>
+      <tr><td><strong>Табличные данные</strong></td><td>Классификация, регрессия</td></tr>
+      <tr><td><strong>Финансы</strong></td><td>Предсказание цен, риск</td></tr>
+      <tr><td><strong>Медицина</strong></td><td>Диагностика</td></tr>
+      <tr><td><strong>Маркетинг</strong></td><td>Churn prediction, рекомендации</td></tr>
+      <tr><td><strong>NLP</strong></td><td>Простая классификация текста</td></tr>
+      <tr><td><strong>Сенсоры</strong></td><td>Обработка сигналов</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <p>• Всегда масштабировать входные данные<br>
+        • Начинать с малой архитектуры<br>
+        • Использовать early stopping<br>
+        • Применять dropout для больших сетей<br>
+        • Мониторить train и validation loss</p>
+      </div>
+      <div class="bad">
+        <h3>❌ Не делать</h3>
+        <p>• Забывать про масштабирование<br>
+        • Сразу делать глубокую сеть<br>
+        • Игнорировать переобучение<br>
+        • Использовать слишком большой learning rate<br>
+        • Обучать без validation split</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 21. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Преимущества</th><th>Недостатки</th></tr>
+      <tr><td><strong>MLP</strong></td><td>Универсальный, нелинейный</td><td>Требует масштабирования, медленный</td></tr>
+      <tr><td><strong>Random Forest</strong></td><td>Не требует масштабирования</td><td>Хуже для больших данных</td></tr>
+      <tr><td><strong>XGBoost</strong></td><td>Лучше для табличных</td><td>Линейный в каждом листе</td></tr>
+      <tr><td><strong>SVM</strong></td><td>Хорош для малых данных</td><td>Не масштабируется</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 22. Типичные ошибки</h2>
+    <table>
+      <tr><th>Ошибка</th><th>Решение</th></tr>
+      <tr><td>Не масштабировать данные</td><td>StandardScaler перед обучением</td></tr>
+      <tr><td>Слишком большая сеть</td><td>Начать с малой, увеличивать</td></tr>
+      <tr><td>Высокий learning rate</td><td>Начать с 0.001, использовать scheduling</td></tr>
+      <tr><td>Мало эпох</td><td>Использовать early stopping</td></tr>
+      <tr><td>Нет регуляризации</td><td>Dropout или L2</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 23. Ресурсы</h2>
+    <ul>
+      <li><strong>Документация</strong>: sklearn.neural_network.MLPClassifier</li>
+      <li><strong>Книга</strong>: "Deep Learning" - Goodfellow et al.</li>
+      <li><strong>Курс</strong>: Fast.ai Practical Deep Learning</li>
+      <li><strong>Видео</strong>: "Neural Networks" - 3Blue1Brown</li>
+      <li><strong>Статья</strong>: "Understanding Neural Networks" на Towards DS</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

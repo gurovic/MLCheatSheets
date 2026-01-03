@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Feature Engineering Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 600;
+    }
+
+    .good p, .bad p {
+      margin: 0;
+      font-size: 0.88em;
+    }
+
+    em {
+      color: #d32f2f;
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    strong {
+      color: #1a5fb4;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🛠️ Feature Engineering Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Feature Engineering?</h2>
+    <ul>
+      <li><strong>Цель</strong>: создание новых признаков из существующих</li>
+      <li><strong>Зачем</strong>: улучшить качество модели</li>
+      <li><strong>Когда</strong>: перед обучением модели</li>
+      <li><strong>Искусство и наука</strong>: требует знания предметной области</li>
+      <li><strong>Ключ к успеху</strong>: часто важнее выбора алгоритма!</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные техники</h2>
+    <table>
+      <tr><th>Техника</th><th>Описание</th></tr>
+      <tr><td><strong>Масштабирование</strong></td><td>Нормализация значений</td></tr>
+      <tr><td><strong>Биннинг</strong></td><td>Группировка в интервалы</td></tr>
+      <tr><td><strong>Преобразования</strong></td><td>Log, sqrt, Box-Cox</td></tr>
+      <tr><td><strong>Кодирование</strong></td><td>Категориальные → числовые</td></tr>
+      <tr><td><strong>Взаимодействия</strong></td><td>Комбинации признаков</td></tr>
+      <tr><td><strong>Агрегации</strong></td><td>Группировка и статистики</td></tr>
+      <tr><td><strong>Временные признаки</strong></td><td>Извлечение из дат</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Численные преобразования</h2>
+    <pre><code>import numpy as np
+import pandas as pd
+
+df = pd.DataFrame({'value': [1, 10, 100, 1000]})
+
+# Логарифм (для скошенных распределений)
+df['log_value'] = np.log1p(df['value'])
+
+# Квадратный корень
+df['sqrt_value'] = np.sqrt(df['value'])
+
+# Степень
+df['squared'] = df['value'] ** 2
+
+# Обратное значение
+df['inverse'] = 1 / (df['value'] + 1)
+
+# Box-Cox (нормализация)
+from scipy.stats import boxcox
+df['boxcox'], lambda_param = boxcox(df['value'])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Биннинг (дискретизация)</h2>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({'age': [5, 15, 25, 35, 45, 55, 65]})
+
+# Равные интервалы
+df['age_binned'] = pd.cut(
+    df['age'], 
+    bins=3, 
+    labels=['young', 'middle', 'old']
+)
+
+# Равное количество в каждом бине
+df['age_qbinned'] = pd.qcut(
+    df['age'], 
+    q=3, 
+    labels=['Q1', 'Q2', 'Q3']
+)
+
+# Пользовательские границы
+df['age_custom'] = pd.cut(
+    df['age'], 
+    bins=[0, 18, 40, 100],
+    labels=['child', 'adult', 'senior']
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. One-Hot Encoding</h2>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    'color': ['red', 'blue', 'green', 'red']
+})
+
+# pandas get_dummies
+encoded = pd.get_dummies(df, columns=['color'])
+
+# sklearn OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder
+
+encoder = OneHotEncoder(sparse_output=False)
+encoded = encoder.fit_transform(df[['color']])
+
+# Получить названия колонок
+feature_names = encoder.get_feature_names_out(['color'])
+
+# Избежать dummy variable trap
+encoded_df = pd.get_dummies(df, columns=['color'], 
+                            drop_first=True)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Label Encoding</h2>
+    <pre><code>from sklearn.preprocessing import LabelEncoder
+
+df = pd.DataFrame({
+    'size': ['S', 'M', 'L', 'XL', 'M']
+})
+
+# LabelEncoder
+le = LabelEncoder()
+df['size_encoded'] = le.fit_transform(df['size'])
+# Result: [2, 1, 0, 3, 1]
+
+# Обратное преобразование
+original = le.inverse_transform(df['size_encoded'])
+
+# Порядковое кодирование (ordinal)
+from sklearn.preprocessing import OrdinalEncoder
+
+oe = OrdinalEncoder(categories=[['S', 'M', 'L', 'XL']])
+df['size_ordinal'] = oe.fit_transform(df[['size']])
+# Result: [0, 1, 2, 3, 1] - сохраняет порядок!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Target Encoding</h2>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    'category': ['A', 'B', 'A', 'C', 'B', 'A'],
+    'target': [1, 0, 1, 1, 0, 0]
+})
+
+# Среднее значение target для каждой категории
+target_mean = df.groupby('category')['target'].mean()
+df['category_encoded'] = df['category'].map(target_mean)
+
+# С регуляризацией (smoothing)
+def target_encode_smooth(df, col, target, alpha=5):
+    global_mean = df[target].mean()
+    agg = df.groupby(col)[target].agg(['mean', 'count'])
+    
+    # Smoothed mean
+    smooth = (agg['mean'] * agg['count'] + 
+              global_mean * alpha) / (agg['count'] + alpha)
+    
+    return df[col].map(smooth)
+
+df['category_smooth'] = target_encode_smooth(
+    df, 'category', 'target'
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Взаимодействия признаков</h2>
+    <pre><code>import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    'x1': [1, 2, 3, 4],
+    'x2': [2, 4, 6, 8]
+})
+
+# Умножение
+df['x1_x2'] = df['x1'] * df['x2']
+
+# Деление
+df['x1_div_x2'] = df['x1'] / (df['x2'] + 1e-8)
+
+# Сложение
+df['x1_plus_x2'] = df['x1'] + df['x2']
+
+# Разность
+df['x1_minus_x2'] = df['x1'] - df['x2']
+
+# Полиномиальные признаки
+from sklearn.preprocessing import PolynomialFeatures
+
+poly = PolynomialFeatures(degree=2, 
+                          interaction_only=True,
+                          include_bias=False)
+interactions = poly.fit_transform(df[['x1', 'x2']])
+print(poly.get_feature_names_out())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Временные признаки</h2>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    'date': pd.date_range('2024-01-01', periods=365)
+})
+
+# Извлечение компонент
+df['year'] = df['date'].dt.year
+df['month'] = df['date'].dt.month
+df['day'] = df['date'].dt.day
+df['dayofweek'] = df['date'].dt.dayofweek
+df['quarter'] = df['date'].dt.quarter
+df['week'] = df['date'].dt.isocalendar().week
+
+# Выходные
+df['is_weekend'] = df['dayofweek'].isin([5, 6]).astype(int)
+
+# Циклические признаки
+df['month_sin'] = np.sin(2 * np.pi * df['month'] / 12)
+df['month_cos'] = np.cos(2 * np.pi * df['month'] / 12)
+df['day_sin'] = np.sin(2 * np.pi * df['day'] / 31)
+df['day_cos'] = np.cos(2 * np.pi * df['day'] / 31)
+
+# Временные лаги
+df['value'] = np.random.randn(365)
+df['lag_1'] = df['value'].shift(1)
+df['lag_7'] = df['value'].shift(7)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Агрегации</h2>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    'user_id': [1, 1, 1, 2, 2, 3],
+    'amount': [100, 150, 200, 50, 75, 300],
+    'category': ['A', 'B', 'A', 'A', 'B', 'C']
+})
+
+# Группировка по пользователю
+user_stats = df.groupby('user_id')['amount'].agg([
+    ('total', 'sum'),
+    ('mean', 'mean'),
+    ('std', 'std'),
+    ('count', 'count'),
+    ('min', 'min'),
+    ('max', 'max')
+])
+
+# Соединение с исходными данными
+df = df.merge(user_stats, on='user_id', how='left')
+
+# Rolling статистики
+df = df.sort_values('user_id')
+df['rolling_mean_3'] = df.groupby('user_id')['amount'] \
+                         .rolling(3, min_periods=1) \
+                         .mean().reset_index(drop=True)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Текстовые признаки</h2>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    'text': ['Hello World', 'Python ML', 'Data Science!']
+})
+
+# Длина текста
+df['text_length'] = df['text'].str.len()
+
+# Количество слов
+df['word_count'] = df['text'].str.split().str.len()
+
+# Среднее количество символов в слове
+df['avg_word_len'] = df['text_length'] / df['word_count']
+
+# Количество заглавных букв
+df['upper_count'] = df['text'].str.count(r'[A-Z]')
+
+# Количество цифр
+df['digit_count'] = df['text'].str.count(r'\d')
+
+# Количество специальных символов
+df['special_count'] = df['text'].str.count(r'[^a-zA-Z0-9\s]')
+
+# TF-IDF
+from sklearn.feature_extraction.text import TfidfVectorizer
+tfidf = TfidfVectorizer(max_features=100)
+tfidf_features = tfidf.fit_transform(df['text'])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Обработка пропущенных значений</h2>
+    <pre><code>import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    'age': [25, np.nan, 35, np.nan, 45],
+    'income': [50000, 60000, np.nan, 70000, np.nan]
+})
+
+# Индикатор пропуска
+df['age_missing'] = df['age'].isna().astype(int)
+
+# Заполнение медианой
+df['age_filled'] = df['age'].fillna(df['age'].median())
+
+# Заполнение средним
+df['income_filled'] = df['income'].fillna(df['income'].mean())
+
+# Forward fill
+df['age_ffill'] = df['age'].fillna(method='ffill')
+
+# Предсказание пропущенных значений
+from sklearn.impute import KNNImputer
+imputer = KNNImputer(n_neighbors=2)
+df_imputed = pd.DataFrame(
+    imputer.fit_transform(df[['age', 'income']]),
+    columns=['age', 'income']
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Выбросы и ограничения</h2>
+    <pre><code>import numpy as np
+import pandas as pd
+
+df = pd.DataFrame({'value': [1, 2, 3, 100, 4, 5, 200]})
+
+# Winsorization (ограничение выбросов)
+lower = df['value'].quantile(0.05)
+upper = df['value'].quantile(0.95)
+df['value_winsorized'] = df['value'].clip(lower, upper)
+
+# Z-score фильтрация
+z_scores = np.abs((df['value'] - df['value'].mean()) / 
+                   df['value'].std())
+df['is_outlier'] = (z_scores > 3).astype(int)
+
+# IQR метод
+Q1 = df['value'].quantile(0.25)
+Q3 = df['value'].quantile(0.75)
+IQR = Q3 - Q1
+df['is_outlier_iqr'] = (
+    (df['value'] < Q1 - 1.5*IQR) | 
+    (df['value'] > Q3 + 1.5*IQR)
+).astype(int)
+
+# Robustный масштабировщик
+from sklearn.preprocessing import RobustScaler
+scaler = RobustScaler()
+df['value_robust'] = scaler.fit_transform(df[['value']])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Частотное кодирование</h2>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    'category': ['A', 'B', 'A', 'C', 'B', 'A', 'D']
+})
+
+# Подсчет частот
+freq_map = df['category'].value_counts()
+df['category_freq'] = df['category'].map(freq_map)
+
+# Нормализованная частота
+freq_norm = df['category'].value_counts(normalize=True)
+df['category_freq_norm'] = df['category'].map(freq_norm)
+
+# Rank (ранг по частоте)
+freq_rank = df['category'].value_counts().rank(
+    ascending=False
+)
+df['category_rank'] = df['category'].map(freq_rank)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Комбинирование категорий</h2>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    'city': ['Moscow', 'SPb', 'Moscow', 'Kazan', 
+             'Moscow', 'SPb', 'Other'],
+    'region': ['Central', 'Northwest', 'Central', 
+               'Volga', 'Central', 'Northwest', 'South']
+})
+
+# Объединение редких категорий
+freq = df['city'].value_counts()
+threshold = 2
+df['city_grouped'] = df['city'].apply(
+    lambda x: x if freq[x] >= threshold else 'Other'
+)
+
+# Создание составных признаков
+df['city_region'] = df['city'] + '_' + df['region']
+
+# Хеширование (для многих категорий)
+from sklearn.feature_extraction import FeatureHasher
+hasher = FeatureHasher(n_features=10, input_type='string')
+hashed = hasher.transform(df['city'].values.reshape(-1, 1))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Географические признаки</h2>
+    <pre><code>import numpy as np
+import pandas as pd
+
+df = pd.DataFrame({
+    'lat': [55.75, 59.93, 51.51],
+    'lon': [37.62, 30.36, -0.13]
+})
+
+# Расстояние от центра
+center_lat, center_lon = 55.75, 37.62
+
+# Haversine расстояние
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371  # Радиус Земли в км
+    
+    lat1, lon1, lat2, lon2 = map(np.radians, 
+                                  [lat1, lon1, lat2, lon2])
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    
+    a = np.sin(dlat/2)**2 + np.cos(lat1) * \
+        np.cos(lat2) * np.sin(dlon/2)**2
+    c = 2 * np.arcsin(np.sqrt(a))
+    
+    return R * c
+
+df['distance_to_center'] = haversine(
+    df['lat'], df['lon'], center_lat, center_lon
+)
+
+# Сетка (grid)
+df['lat_grid'] = (df['lat'] // 0.1).astype(int)
+df['lon_grid'] = (df['lon'] // 0.1).astype(int)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Автоматический Feature Engineering</h2>
+    <pre><code># Featuretools
+import featuretools as ft
+import pandas as pd
+
+# Создание EntitySet
+es = ft.EntitySet(id='data')
+
+df = pd.DataFrame({
+    'id': [1, 2, 3, 4],
+    'value': [10, 20, 30, 40],
+    'category': ['A', 'B', 'A', 'B']
+})
+
+es = es.add_dataframe(
+    dataframe_name='main',
+    dataframe=df,
+    index='id'
+)
+
+# Автоматическое создание признаков
+feature_matrix, feature_defs = ft.dfs(
+    entityset=es,
+    target_dataframe_name='main',
+    max_depth=2
+)
+
+print(feature_matrix.columns)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Признаки из соотношений</h2>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    'total_price': [100, 200, 300],
+    'quantity': [2, 5, 10],
+    'area': [50, 100, 150]
+})
+
+# Цена за единицу
+df['price_per_unit'] = df['total_price'] / df['quantity']
+
+# Цена за квадратный метр
+df['price_per_sqm'] = df['total_price'] / df['area']
+
+# Плотность
+df['density'] = df['quantity'] / df['area']
+
+# Доля от максимума
+df['price_ratio'] = df['total_price'] / df['total_price'].max()
+
+# Отклонение от среднего
+df['price_deviation'] = (df['total_price'] - 
+                          df['total_price'].mean())
+
+# Процентиль
+df['price_percentile'] = df['total_price'].rank(pct=True)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Кросс-валидация для Feature Engineering</h2>
+    <pre><code>from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import RandomForestClassifier
+import pandas as pd
+
+# Базовая модель
+base_score = cross_val_score(
+    RandomForestClassifier(random_state=42),
+    X_base, y, cv=5, scoring='accuracy'
+).mean()
+
+# С новыми признаками
+enhanced_score = cross_val_score(
+    RandomForestClassifier(random_state=42),
+    X_enhanced, y, cv=5, scoring='accuracy'
+).mean()
+
+print(f"Base accuracy: {base_score:.4f}")
+print(f"Enhanced accuracy: {enhanced_score:.4f}")
+print(f"Improvement: {enhanced_score - base_score:.4f}")
+
+# Важность признаков
+rf = RandomForestClassifier(random_state=42)
+rf.fit(X_enhanced, y)
+importance = pd.DataFrame({
+    'feature': X_enhanced.columns,
+    'importance': rf.feature_importances_
+}).sort_values('importance', ascending=False)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <p>• Начинать с простых преобразований<br>
+        • Использовать знания предметной области<br>
+        • Проверять важность новых признаков<br>
+        • Документировать все трансформации<br>
+        • Использовать кросс-валидацию</p>
+      </div>
+      <div class="bad">
+        <h3>❌ Не делать</h3>
+        <p>• Создавать сотни случайных признаков<br>
+        • Забывать про утечку данных (data leakage)<br>
+        • Игнорировать корреляции признаков<br>
+        • Применять сложные преобразования без тестирования<br>
+        • Использовать target encoding без CV</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 21. Типичные ошибки</h2>
+    <table>
+      <tr><th>Ошибка</th><th>Решение</th></tr>
+      <tr><td>Data leakage</td><td>Использовать Pipeline и CV</td></tr>
+      <tr><td>Слишком много признаков</td><td>Feature selection</td></tr>
+      <tr><td>Мультиколлинеарность</td><td>Проверить корреляции</td></tr>
+      <tr><td>Переобучение</td><td>Регуляризация и CV</td></tr>
+      <tr><td>Не масштабировать</td><td>StandardScaler после FE</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 22. Проверка на data leakage</h2>
+    <pre><code>from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# ❌ НЕПРАВИЛЬНО - leakage!
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.2
+)
+
+# ✅ ПРАВИЛЬНО - без leakage
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2
+)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# ✅ ЕЩЕ ЛУЧШЕ - Pipeline
+from sklearn.pipeline import Pipeline
+
+pipeline = Pipeline([
+    ('feature_eng', CustomTransformer()),
+    ('scaler', StandardScaler()),
+    ('model', RandomForestClassifier())
+])
+
+# Автоматически избегает leakage!
+pipeline.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 23. Ресурсы</h2>
+    <ul>
+      <li><strong>Книга</strong>: "Feature Engineering for Machine Learning"</li>
+      <li><strong>Kaggle</strong>: Feature Engineering tutorials</li>
+      <li><strong>Библиотека</strong>: Featuretools для автоматизации</li>
+      <li><strong>Статья</strong>: "Feature Engineering Techniques" на Medium</li>
+      <li><strong>Курс</strong>: Fast.ai - Practical Deep Learning</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
