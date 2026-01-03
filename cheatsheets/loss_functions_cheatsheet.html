@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Loss Functions Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 600;
+    }
+
+    .good p, .bad p {
+      margin: 0;
+      font-size: 0.88em;
+    }
+
+    em {
+      color: #d32f2f;
+      font-style: normal;
+      font-weight: 600;
+    }
+
+    strong {
+      color: #1a5fb4;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📉 Loss Functions Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое функция потерь?</h2>
+    <ul>
+      <li><strong>Определение</strong>: метрика ошибки модели</li>
+      <li><strong>Цель</strong>: минимизировать в процессе обучения</li>
+      <li><strong>Градиентный спуск</strong>: оптимизирует функцию потерь</li>
+      <li><strong>Выбор</strong>: зависит от задачи (регрессия, классификация)</li>
+      <li><strong>Важность</strong>: правильный выбор критичен для успеха!</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Функции для регрессии</h2>
+    <table>
+      <tr><th>Функция</th><th>Формула</th><th>Когда использовать</th></tr>
+      <tr><td><strong>MSE</strong></td><td>mean((y-ŷ)²)</td><td>По умолчанию</td></tr>
+      <tr><td><strong>MAE</strong></td><td>mean(|y-ŷ|)</td><td>Устойчива к выбросам</td></tr>
+      <tr><td><strong>Huber</strong></td><td>MSE + MAE</td><td>Комбинация обеих</td></tr>
+      <tr><td><strong>RMSE</strong></td><td>√MSE</td><td>Интерпретация в исходных единицах</td></tr>
+      <tr><td><strong>MSLE</strong></td><td>mean((log(y+1)-log(ŷ+1))²)</td><td>Для экспоненциального роста</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. MSE (Mean Squared Error)</h2>
+    <pre><code>import numpy as np
+import torch
+import torch.nn as nn
+
+# NumPy
+def mse_numpy(y_true, y_pred):
+    return np.mean((y_true - y_pred) ** 2)
+
+# PyTorch
+criterion = nn.MSELoss()
+loss = criterion(y_pred, y_true)
+
+# TensorFlow/Keras
+from tensorflow.keras.losses import MeanSquaredError
+criterion = MeanSquaredError()
+loss = criterion(y_true, y_pred)
+
+# Характеристики:
+# - Сильно штрафует большие ошибки
+# - Дифференцируема везде
+# - Чувствительна к выбросам
+# - Градиент: 2(ŷ - y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. MAE (Mean Absolute Error)</h2>
+    <pre><code># NumPy
+def mae_numpy(y_true, y_pred):
+    return np.mean(np.abs(y_true - y_pred))
+
+# PyTorch
+criterion = nn.L1Loss()
+loss = criterion(y_pred, y_true)
+
+# TensorFlow/Keras
+from tensorflow.keras.losses import MeanAbsoluteError
+criterion = MeanAbsoluteError()
+
+# Характеристики:
+# - Устойчива к выбросам
+# - Все ошибки штрафуются одинаково
+# - Не дифференцируема в 0
+# - Градиент: sign(ŷ - y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Huber Loss</h2>
+    <pre><code>import torch.nn as nn
+
+# PyTorch
+criterion = nn.HuberLoss(delta=1.0)
+loss = criterion(y_pred, y_true)
+
+# TensorFlow/Keras
+from tensorflow.keras.losses import Huber
+criterion = Huber(delta=1.0)
+
+# NumPy (реализация)
+def huber_loss(y_true, y_pred, delta=1.0):
+    error = y_true - y_pred
+    abs_error = np.abs(error)
+    
+    quadratic = np.minimum(abs_error, delta)
+    linear = abs_error - quadratic
+    
+    return np.mean(0.5 * quadratic**2 + delta * linear)
+
+# Характеристики:
+# - MSE для малых ошибок (|e| < δ)
+# - MAE для больших ошибок (|e| ≥ δ)
+# - Баланс между MSE и MAE</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Функции для бинарной классификации</h2>
+    <table>
+      <tr><th>Функция</th><th>Выход модели</th><th>Когда использовать</th></tr>
+      <tr><td><strong>BCE</strong></td><td>Sigmoid (0-1)</td><td>По умолчанию</td></tr>
+      <tr><td><strong>BCE with logits</strong></td><td>Logits (любые)</td><td>Более стабильно</td></tr>
+      <tr><td><strong>Hinge Loss</strong></td><td>-1 или +1</td><td>SVM-подобные модели</td></tr>
+      <tr><td><strong>Focal Loss</strong></td><td>Sigmoid (0-1)</td><td>Несбалансированные классы</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Binary Cross-Entropy (BCE)</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+# PyTorch (с sigmoid внутри - более стабильно!)
+criterion = nn.BCEWithLogitsLoss()
+loss = criterion(logits, y_true)
+
+# PyTorch (если уже sigmoid применен)
+criterion = nn.BCELoss()
+loss = criterion(y_pred, y_true)
+
+# TensorFlow/Keras
+from tensorflow.keras.losses import BinaryCrossentropy
+
+# С logits (рекомендуется)
+criterion = BinaryCrossentropy(from_logits=True)
+
+# После sigmoid
+criterion = BinaryCrossentropy(from_logits=False)
+
+# NumPy
+def bce_numpy(y_true, y_pred, epsilon=1e-7):
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+    return -np.mean(y_true * np.log(y_pred) + 
+                    (1 - y_true) * np.log(1 - y_pred))
+
+# Формула: -[y·log(ŷ) + (1-y)·log(1-ŷ)]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Функции для многоклассовой классификации</h2>
+    <table>
+      <tr><th>Функция</th><th>Формат y</th><th>Когда использовать</th></tr>
+      <tr><td><strong>Categorical CE</strong></td><td>One-hot</td><td>One-hot кодирование</td></tr>
+      <tr><td><strong>Sparse CE</strong></td><td>Целые числа</td><td>Индексы классов</td></tr>
+      <tr><td><strong>KL Divergence</strong></td><td>Распределения</td><td>Сравнение распределений</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Categorical Cross-Entropy</h2>
+    <pre><code># PyTorch
+import torch.nn as nn
+
+# Ожидает logits (без softmax!)
+criterion = nn.CrossEntropyLoss()
+loss = criterion(logits, y_true)
+
+# TensorFlow/Keras
+from tensorflow.keras.losses import CategoricalCrossentropy
+
+# С one-hot labels
+criterion = CategoricalCrossentropy(from_logits=True)
+loss = criterion(y_true_onehot, logits)
+
+# NumPy (после softmax)
+def categorical_crossentropy(y_true, y_pred, epsilon=1e-7):
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+    return -np.mean(np.sum(y_true * np.log(y_pred), axis=1))
+
+# Формула: -Σ yᵢ·log(ŷᵢ)
+# где i - индекс класса</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Sparse Categorical Cross-Entropy</h2>
+    <pre><code># TensorFlow/Keras (удобнее для целочисленных меток)
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+
+criterion = SparseCategoricalCrossentropy(from_logits=True)
+
+# y_true = [0, 1, 2] (индексы классов)
+# y_pred = logits размером (batch, num_classes)
+
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# PyTorch (CrossEntropyLoss уже принимает индексы)
+criterion = nn.CrossEntropyLoss()
+# y_true должен быть LongTensor индексов
+loss = criterion(logits, y_true_indices)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Focal Loss</h2>
+    <pre><code># Для несбалансированных классов
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class FocalLoss(nn.Module):
+    def __init__(self, alpha=1, gamma=2):
+        super().__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+    
+    def forward(self, inputs, targets):
+        BCE_loss = F.binary_cross_entropy_with_logits(
+            inputs, targets, reduction='none'
+        )
+        pt = torch.exp(-BCE_loss)
+        F_loss = self.alpha * (1-pt)**self.gamma * BCE_loss
+        return torch.mean(F_loss)
+
+# Использование
+criterion = FocalLoss(alpha=0.25, gamma=2)
+loss = criterion(logits, targets)
+
+# Преимущества:
+# - Фокусируется на сложных примерах
+# - Уменьшает вес легких примеров
+# - Отлично для несбалансированных данных</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Hinge Loss</h2>
+    <pre><code># Для SVM и margin-based моделей
+import torch.nn as nn
+
+# PyTorch (бинарная)
+criterion = nn.HingeEmbeddingLoss()
+
+# Многоклассовая hinge loss
+criterion = nn.MultiMarginLoss()
+
+# NumPy реализация
+def hinge_loss(y_true, y_pred):
+    # y_true в {-1, +1}
+    return np.mean(np.maximum(0, 1 - y_true * y_pred))
+
+# Формула: max(0, 1 - y·ŷ)
+# где y ∈ {-1, +1}
+
+# Преимущества:
+# - Создает margin между классами
+# - Не требует вероятностных выходов
+# - Используется в SVM</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. KL Divergence</h2>
+    <pre><code>import torch.nn as nn
+
+# PyTorch
+criterion = nn.KLDivLoss(reduction='batchmean')
+# input должен быть log-probabilities
+loss = criterion(log_probs, target_probs)
+
+# TensorFlow
+from tensorflow.keras.losses import KLDivergence
+criterion = KLDivergence()
+
+# NumPy
+def kl_divergence(p, q, epsilon=1e-7):
+    p = np.clip(p, epsilon, 1)
+    q = np.clip(q, epsilon, 1)
+    return np.sum(p * np.log(p / q))
+
+# Формула: KL(P||Q) = Σ P(x)·log(P(x)/Q(x))
+
+# Применения:
+# - Knowledge distillation
+# - Вариационные автоэнкодеры (VAE)
+# - Сравнение распределений</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Contrastive Loss</h2>
+    <pre><code># Для метрического обучения
+import torch
+import torch.nn as nn
+
+class ContrastiveLoss(nn.Module):
+    def __init__(self, margin=1.0):
+        super().__init__()
+        self.margin = margin
+    
+    def forward(self, output1, output2, label):
+        # label: 1 для похожих, 0 для разных
+        euclidean_distance = F.pairwise_distance(
+            output1, output2
+        )
+        
+        loss_contrastive = torch.mean(
+            label * torch.pow(euclidean_distance, 2) +
+            (1 - label) * torch.pow(
+                torch.clamp(self.margin - euclidean_distance, 
+                           min=0.0), 2
+            )
+        )
+        return loss_contrastive
+
+# Применения:
+# - Siamese networks
+# - Face verification
+# - Similarity learning</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Triplet Loss</h2>
+    <pre><code># Для метрического обучения
+import torch
+import torch.nn as nn
+
+class TripletLoss(nn.Module):
+    def __init__(self, margin=1.0):
+        super().__init__()
+        self.margin = margin
+    
+    def forward(self, anchor, positive, negative):
+        distance_positive = (anchor - positive).pow(2).sum(1)
+        distance_negative = (anchor - negative).pow(2).sum(1)
+        
+        losses = F.relu(
+            distance_positive - distance_negative + self.margin
+        )
+        return losses.mean()
+
+# Формула: max(0, ||a-p||² - ||a-n||² + margin)
+# a: anchor, p: positive, n: negative
+
+# Применения:
+# - Face recognition
+# - Image retrieval
+# - Ranking tasks</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Dice Loss</h2>
+    <pre><code># Для сегментации изображений
+import torch
+import torch.nn as nn
+
+class DiceLoss(nn.Module):
+    def __init__(self, smooth=1.0):
+        super().__init__()
+        self.smooth = smooth
+    
+    def forward(self, pred, target):
+        pred = torch.sigmoid(pred)
+        
+        # Flatten
+        pred = pred.view(-1)
+        target = target.view(-1)
+        
+        intersection = (pred * target).sum()
+        dice = (2. * intersection + self.smooth) / (
+            pred.sum() + target.sum() + self.smooth
+        )
+        
+        return 1 - dice
+
+# Формула: 1 - (2·|X∩Y|)/(|X|+|Y|)
+
+# Преимущества:
+# - Отлично для несбалансированных сегментаций
+# - Учитывает overlap между предсказанием и GT
+# - Популярна в медицинской сегментации</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Cosine Embedding Loss</h2>
+    <pre><code>import torch.nn as nn
+
+# PyTorch
+criterion = nn.CosineEmbeddingLoss(margin=0.5)
+
+# input1, input2: эмбеддинги
+# y: +1 для похожих, -1 для разных
+loss = criterion(input1, input2, y)
+
+# Формула:
+# loss = 1 - cos(x₁, x₂)        если y = 1
+# loss = max(0, cos(x₁, x₂) - margin)  если y = -1
+
+# где cos(x₁, x₂) = (x₁·x₂)/(||x₁||·||x₂||)
+
+# Применения:
+# - Similarity learning
+# - Text embeddings
+# - Recommendation systems</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Выбор функции потерь</h2>
+    <table>
+      <tr><th>Задача</th><th>Функция</th><th>Причина</th></tr>
+      <tr><td><strong>Регрессия</strong></td><td>MSE</td><td>Стандартный выбор</td></tr>
+      <tr><td><strong>Регрессия с выбросами</strong></td><td>MAE, Huber</td><td>Устойчивость</td></tr>
+      <tr><td><strong>Бинарная классификация</strong></td><td>BCE with logits</td><td>Стабильность</td></tr>
+      <tr><td><strong>Многоклассовая</strong></td><td>Cross-Entropy</td><td>Стандарт</td></tr>
+      <tr><td><strong>Несбалансированные классы</strong></td><td>Focal Loss</td><td>Фокус на сложных</td></tr>
+      <tr><td><strong>Сегментация</strong></td><td>Dice Loss</td><td>Overlap метрика</td></tr>
+      <tr><td><strong>Метрическое обучение</strong></td><td>Triplet Loss</td><td>Расстояния</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>�� 19. Взвешенные функции потерь</h2>
+    <pre><code># Для несбалансированных классов
+
+# PyTorch - веса классов
+class_weights = torch.FloatTensor([0.3, 0.7])
+criterion = nn.CrossEntropyLoss(weight=class_weights)
+
+# TensorFlow/Keras
+from tensorflow.keras.losses import SparseCategoricalCrossentropy
+
+# Веса для классов
+class_weight = {0: 1.0, 1: 2.0, 2: 1.5}
+
+model.fit(
+    X_train, y_train,
+    class_weight=class_weight,
+    epochs=10
+)
+
+# Или через sample_weight
+sample_weights = np.array([weight_map[y] for y in y_train])
+model.fit(
+    X_train, y_train,
+    sample_weight=sample_weights,
+    epochs=10
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Комбинированные функции потерь</h2>
+    <pre><code># Комбинация нескольких loss функций
+import torch.nn as nn
+
+class CombinedLoss(nn.Module):
+    def __init__(self, alpha=0.5, beta=0.5):
+        super().__init__()
+        self.alpha = alpha
+        self.beta = beta
+        self.bce = nn.BCEWithLogitsLoss()
+        self.dice = DiceLoss()
+    
+    def forward(self, pred, target):
+        loss1 = self.bce(pred, target)
+        loss2 = self.dice(pred, target)
+        return self.alpha * loss1 + self.beta * loss2
+
+# Использование
+criterion = CombinedLoss(alpha=0.5, beta=0.5)
+loss = criterion(predictions, targets)
+
+# Применения:
+# - Сегментация: BCE + Dice
+# - Multi-task learning
+# - Balancing разных аспектов задачи</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 21. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <p>• Использовать "with logits" версии (стабильнее)<br>
+        • Проверять range выходов модели<br>
+        • Мониторить значения loss<br>
+        • Использовать веса для несбалансированных классов<br>
+        • Тестировать разные loss функции</p>
+      </div>
+      <div class="bad">
+        <h3>❌ Не делать</h3>
+        <p>• Применять sigmoid/softmax перед "with logits"<br>
+        • Игнорировать NaN/Inf в loss<br>
+        • Забывать про reduction='mean'<br>
+        • Использовать MSE для классификации<br>
+        • Игнорировать дисбаланс классов</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 22. Типичные ошибки</h2>
+    <table>
+      <tr><th>Ошибка</th><th>Решение</th></tr>
+      <tr><td>NaN в loss</td><td>Проверить learning rate, clipping</td></tr>
+      <tr><td>Loss не уменьшается</td><td>Проверить данные, архитектуру</td></tr>
+      <tr><td>Двойной sigmoid</td><td>Использовать "with logits"</td></tr>
+      <tr><td>Неправильный формат y</td><td>Проверить shape и dtype</td></tr>
+      <tr><td>Игнорирование дисбаланса</td><td>Использовать веса или focal loss</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 23. Ресурсы</h2>
+    <ul>
+      <li><strong>Документация PyTorch</strong>: torch.nn loss functions</li>
+      <li><strong>Документация TensorFlow</strong>: tf.keras.losses</li>
+      <li><strong>Статья</strong>: "Loss Functions Explained" на Towards DS</li>
+      <li><strong>Книга</strong>: "Deep Learning" - Goodfellow</li>
+      <li><strong>Paper</strong>: "Focal Loss for Dense Object Detection"</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
