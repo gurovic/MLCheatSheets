@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Градиентный спуск Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📉 Градиентный спуск Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: найти минимум функции потерь</li>
+      <li><strong>Метод</strong>: итеративно двигаться против градиента</li>
+      <li><strong>Градиент</strong>: направление наибольшего роста функции</li>
+      <li><strong>Применение</strong>: обучение всех ML-моделей</li>
+    </ul>
+    <blockquote>
+      Представьте, что вы спускаетесь с горы в тумане: градиент показывает направление наибольшего подъёма, а мы идём в противоположную сторону.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовая формула</h2>
+    <p><strong>Обновление параметров:</strong></p>
+    <pre><code>θ = θ - α * ∇L(θ)
+
+где:
+θ — параметры модели (веса)
+α — learning rate (скорость обучения)
+∇L(θ) — градиент функции потерь
+L(θ) — функция потерь</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Типы градиентного спуска</h2>
+    <table>
+      <tr><th>Тип</th><th>Использует</th><th>Плюсы</th><th>Минусы</th></tr>
+      <tr><td><strong>Batch GD</strong></td><td>Все данные</td><td>Стабильный</td><td>Медленный</td></tr>
+      <tr><td><strong>Stochastic GD</strong></td><td>1 образец</td><td>Быстрый</td><td>Нестабильный</td></tr>
+      <tr><td><strong>Mini-Batch GD</strong></td><td>Батч данных</td><td>Баланс</td><td>Нужен размер батча</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Batch Gradient Descent</h2>
+    <pre><code>import numpy as np
+
+def batch_gradient_descent(X, y, lr=0.01, epochs=1000):
+    n_samples, n_features = X.shape
+    weights = np.zeros(n_features)
+    bias = 0
+    
+    for epoch in range(epochs):
+        # Предсказание
+        y_pred = X.dot(weights) + bias
+        
+        # Градиенты
+        dw = (1/n_samples) * X.T.dot(y_pred - y)
+        db = (1/n_samples) * np.sum(y_pred - y)
+        
+        # Обновление
+        weights -= lr * dw
+        bias -= lr * db
+        
+        # Лосс (опционально)
+        loss = np.mean((y_pred - y)**2)
+        if epoch % 100 == 0:
+            print(f"Epoch {epoch}, Loss: {loss:.4f}")
+    
+    return weights, bias</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Stochastic Gradient Descent (SGD)</h2>
+    <pre><code>def stochastic_gradient_descent(X, y, lr=0.01, epochs=100):
+    n_samples, n_features = X.shape
+    weights = np.zeros(n_features)
+    bias = 0
+    
+    for epoch in range(epochs):
+        # Перемешиваем данные
+        indices = np.random.permutation(n_samples)
+        
+        for i in indices:
+            xi = X[i:i+1]
+            yi = y[i:i+1]
+            
+            # Предсказание
+            y_pred = xi.dot(weights) + bias
+            
+            # Градиенты
+            dw = xi.T.dot(y_pred - yi)
+            db = y_pred - yi
+            
+            # Обновление
+            weights -= lr * dw
+            bias -= lr * db
+    
+    return weights, bias</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Mini-Batch Gradient Descent</h2>
+    <pre><code>def mini_batch_gd(X, y, lr=0.01, batch_size=32, epochs=100):
+    n_samples, n_features = X.shape
+    weights = np.zeros(n_features)
+    bias = 0
+    
+    for epoch in range(epochs):
+        # Перемешиваем данные
+        indices = np.random.permutation(n_samples)
+        X_shuffled = X[indices]
+        y_shuffled = y[indices]
+        
+        # Обрабатываем батчи
+        for i in range(0, n_samples, batch_size):
+            X_batch = X_shuffled[i:i+batch_size]
+            y_batch = y_shuffled[i:i+batch_size]
+            
+            # Предсказание
+            y_pred = X_batch.dot(weights) + bias
+            
+            # Градиенты
+            batch_size_actual = len(X_batch)
+            dw = (1/batch_size_actual) * X_batch.T.dot(y_pred - y_batch)
+            db = (1/batch_size_actual) * np.sum(y_pred - y_batch)
+            
+            # Обновление
+            weights -= lr * dw
+            bias -= lr * db
+    
+    return weights, bias</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Learning Rate (α)</h2>
+    <p><strong>Ключевой гиперпараметр:</strong></p>
+    <ul>
+      <li><strong>Слишком большой</strong>: модель расходится</li>
+      <li><strong>Слишком маленький</strong>: медленное обучение</li>
+      <li><strong>Оптимальный</strong>: быстрая сходимость</li>
+    </ul>
+    <table>
+      <tr><th>Задача</th><th>Типичные значения</th></tr>
+      <tr><td>Линейная регрессия</td><td>0.001 - 0.1</td></tr>
+      <tr><td>Нейронные сети</td><td>0.0001 - 0.01</td></tr>
+      <tr><td>SGD</td><td>0.01 - 0.1</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Проблемы градиентного спуска</h2>
+    <table>
+      <tr><th>Проблема</th><th>Причина</th><th>Решение</th></tr>
+      <tr><td>Медленная сходимость</td><td>Малый LR</td><td>Увеличить LR или использовать Momentum</td></tr>
+      <tr><td>Расхождение</td><td>Большой LR</td><td>Уменьшить LR</td></tr>
+      <tr><td>Локальный минимум</td><td>Негладкая функция</td><td>SGD, Momentum</td></tr>
+      <tr><td>Седловая точка</td><td>Плоская область</td><td>Адаптивные методы (Adam)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Learning Rate Scheduling</h2>
+    <pre><code>from sklearn.linear_model import SGDRegressor
+from sklearn.model_selection import train_test_split
+
+# Константный LR
+sgd = SGDRegressor(learning_rate='constant', eta0=0.01)
+
+# Инверсное масштабирование
+sgd = SGDRegressor(learning_rate='invscaling', 
+                   eta0=0.01, power_t=0.25)
+
+# Адаптивный LR
+sgd = SGDRegressor(learning_rate='adaptive', eta0=0.01)
+
+# Обучение
+sgd.fit(X_train, y_train)
+
+# Ручное расписание
+import numpy as np
+
+def lr_schedule(epoch):
+    initial_lr = 0.01
+    decay = 0.95
+    return initial_lr * (decay ** epoch)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Визуализация сходимости</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+def gradient_descent_with_history(X, y, lr=0.01, epochs=1000):
+    weights = np.zeros(X.shape[1])
+    bias = 0
+    loss_history = []
+    
+    for epoch in range(epochs):
+        y_pred = X.dot(weights) + bias
+        
+        # Лосс
+        loss = np.mean((y_pred - y)**2)
+        loss_history.append(loss)
+        
+        # Градиенты и обновление
+        dw = (1/len(X)) * X.T.dot(y_pred - y)
+        db = (1/len(X)) * np.sum(y_pred - y)
+        
+        weights -= lr * dw
+        bias -= lr * db
+    
+    # Визуализация
+    plt.figure(figsize=(10, 6))
+    plt.plot(loss_history)
+    plt.xlabel('Эпоха')
+    plt.ylabel('Loss (MSE)')
+    plt.title('Сходимость градиентного спуска')
+    plt.grid(True)
+    plt.show()
+    
+    return weights, bias, loss_history</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Продвинутые оптимизаторы</h2>
+    <p><strong>Улучшения классического GD:</strong></p>
+    <ul>
+      <li><strong>Momentum</strong>: учитывает предыдущие градиенты</li>
+      <li><strong>RMSprop</strong>: адаптивный learning rate</li>
+      <li><strong>Adam</strong>: комбинация Momentum + RMSprop</li>
+      <li><strong>AdaGrad</strong>: для разреженных данных</li>
+    </ul>
+    <pre><code>from sklearn.neural_network import MLPRegressor
+
+# SGD с momentum
+mlp = MLPRegressor(solver='sgd', momentum=0.9, 
+                   learning_rate_init=0.01)
+
+# Adam (рекомендуется)
+mlp = MLPRegressor(solver='adam', learning_rate_init=0.001)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать каждый тип</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>Batch GD</h3>
+        <ul>
+          <li>Малые датасеты (< 10000 образцов)</li>
+          <li>Нужна стабильная сходимость</li>
+          <li>Выпуклые функции потерь</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>Stochastic GD</h3>
+        <ul>
+          <li>Очень большие датасеты</li>
+          <li>Онлайн-обучение</li>
+          <li>Избегание локальных минимумов</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>Mini-Batch GD</h3>
+        <ul>
+          <li>Средние и большие датасеты</li>
+          <li>Баланс скорости и стабильности</li>
+          <li>Использование GPU (параллелизм)</li>
+          <li>Самый популярный выбор</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Проверка градиентов</h2>
+    <pre><code>def numerical_gradient(f, x, epsilon=1e-5):
+    """Численная аппроксимация градиента"""
+    grad = np.zeros_like(x)
+    
+    for i in range(len(x)):
+        x_plus = x.copy()
+        x_minus = x.copy()
+        
+        x_plus[i] += epsilon
+        x_minus[i] -= epsilon
+        
+        grad[i] = (f(x_plus) - f(x_minus)) / (2 * epsilon)
+    
+    return grad
+
+# Сравнение аналитического и численного градиента
+def check_gradient(analytical_grad, x, f):
+    numerical_grad = numerical_gradient(f, x)
+    diff = np.linalg.norm(analytical_grad - numerical_grad)
+    
+    if diff < 1e-7:
+        print("✅ Градиент корректен")
+    else:
+        print(f"❌ Ошибка в градиенте: {diff}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Нормализовать/стандартизировать данные</li>
+      <li>[ ] Выбрать подходящий learning rate</li>
+      <li>[ ] Использовать mini-batch для больших данных</li>
+      <li>[ ] Мониторить функцию потерь</li>
+      <li>[ ] Использовать learning rate scheduling</li>
+      <li>[ ] Рассмотреть продвинутые оптимизаторы (Adam)</li>
+      <li>[ ] Проверить сходимость</li>
+      <li>[ ] Установить критерий остановки</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Градиентный спуск — это способ, которым компьютер учится на ошибках: он пробует разные варианты, смотрит на результат и постепенно улучшает свои решения, двигаясь в направлении лучших результатов».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Практические советы</h2>
+    <ul>
+      <li><strong>Начните с Adam</strong>: универсальный выбор</li>
+      <li><strong>Batch size</strong>: начните с 32 или 64</li>
+      <li><strong>Мониторинг</strong>: сохраняйте историю потерь</li>
+      <li><strong>Early stopping</strong>: остановите при plateau</li>
+      <li><strong>Warm restart</strong>: периодически перезапускайте с новым LR</li>
+      <li><strong>Gradient clipping</strong>: ограничьте большие градиенты</li>
+    </ul>
+    <pre><code># Пример с PyTorch
+import torch.optim as optim
+
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+for epoch in range(num_epochs):
+    optimizer.zero_grad()
+    loss = compute_loss(model(X), y)
+    loss.backward()
+    optimizer.step()</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>
