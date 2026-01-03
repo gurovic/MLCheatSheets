@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Деревья решений Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🌳 Деревья решений Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Идея</strong>: последовательность if-else правил</li>
+      <li><strong>Разделение</strong>: выбор признака для разбиения данных</li>
+      <li><strong>Интерпретируемость</strong>: легко понять логику</li>
+      <li><strong>Универсальность</strong>: классификация и регрессия</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый код</h2>
+    <p><strong>Классификация:</strong></p>
+    <pre><code>from sklearn.tree import DecisionTreeClassifier
+
+model = DecisionTreeClassifier(
+    max_depth=5,
+    min_samples_split=20,
+    random_state=42
+)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)</code></pre>
+
+    <p><strong>Регрессия:</strong></p>
+    <pre><code>from sklearn.tree import DecisionTreeRegressor
+
+model = DecisionTreeRegressor(
+    max_depth=5,
+    min_samples_leaf=10
+)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Типичные значения</th></tr>
+      <tr><td><code>max_depth</code></td><td>Максимальная глубина дерева</td><td>3-10</td></tr>
+      <tr><td><code>min_samples_split</code></td><td>Минимум образцов для разделения</td><td>2-50</td></tr>
+      <tr><td><code>min_samples_leaf</code></td><td>Минимум образцов в листе</td><td>1-20</td></tr>
+      <tr><td><code>max_features</code></td><td>Максимум признаков для разделения</td><td>'auto', 'sqrt', 'log2'</td></tr>
+      <tr><td><code>criterion</code></td><td>Функция разделения</td><td>'gini', 'entropy', 'mse'</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Критерии разделения</h2>
+    <p><strong>Для классификации:</strong></p>
+    <ul>
+      <li><strong>Gini</strong>: быстрее, по умолчанию</li>
+      <li><strong>Entropy (Information Gain)</strong>: более сбалансированные деревья</li>
+    </ul>
+
+    <p><strong>Для регрессии:</strong></p>
+    <ul>
+      <li><strong>MSE</strong>: минимизация среднеквадратичной ошибки</li>
+      <li><strong>MAE</strong>: минимизация абсолютной ошибки</li>
+    </ul>
+
+    <pre><code># Классификация с энтропией
+clf = DecisionTreeClassifier(criterion='entropy')
+
+# Регрессия с MAE
+reg = DecisionTreeRegressor(criterion='absolute_error')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Борьба с переобучением</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Слишком глубокое дерево</td><td>Ограничить <code>max_depth</code></td></tr>
+      <tr><td>Малые листья</td><td>Увеличить <code>min_samples_leaf</code></td></tr>
+      <tr><td>Много разделений</td><td>Увеличить <code>min_samples_split</code></td></tr>
+      <tr><td>Переобучение на всех признаках</td><td>Ограничить <code>max_features</code></td></tr>
+    </table>
+
+    <pre><code># Хорошо регуляризованное дерево
+model = DecisionTreeClassifier(
+    max_depth=7,
+    min_samples_split=30,
+    min_samples_leaf=15,
+    max_features='sqrt'
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Визуализация дерева</h2>
+    <pre><code>from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(20, 10))
+plot_tree(
+    model, 
+    filled=True,
+    feature_names=feature_names,
+    class_names=class_names,
+    rounded=True,
+    fontsize=10
+)
+plt.show()
+
+# Экспорт в текстовый формат
+from sklearn.tree import export_text
+tree_rules = export_text(model, feature_names=feature_names)
+print(tree_rules)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Важность признаков</h2>
+    <pre><code>import pandas as pd
+
+# Получить важность признаков
+importances = model.feature_importances_
+
+# Создать DataFrame для визуализации
+feature_importance = pd.DataFrame({
+    'feature': feature_names,
+    'importance': importances
+}).sort_values('importance', ascending=False)
+
+print(feature_importance)
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.barh(feature_importance['feature'][:10], 
+         feature_importance['importance'][:10])
+plt.xlabel('Importance')
+plt.title('Top 10 Feature Importances')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Нужна интерпретируемость</li>
+          <li>Нелинейные зависимости</li>
+          <li>Категориальные признаки</li>
+          <li>Не требуется масштабирование</li>
+          <li>Быстрое прототипирование</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Высокая размерность данных</li>
+          <li>Линейные зависимости</li>
+          <li>Нужна высокая точность (используйте ансамбли)</li>
+          <li>Малый размер данных</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Оптимизация гиперпараметров</h2>
+    <pre><code>from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+    'max_depth': [3, 5, 7, 10],
+    'min_samples_split': [2, 10, 20, 50],
+    'min_samples_leaf': [1, 5, 10, 20],
+    'criterion': ['gini', 'entropy']
+}
+
+grid_search = GridSearchCV(
+    DecisionTreeClassifier(random_state=42),
+    param_grid,
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1
+)
+
+grid_search.fit(X_train, y_train)
+best_model = grid_search.best_estimator_
+print("Best params:", grid_search.best_params_)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Не нужно масштабировать данные</li>
+      <li>[ ] Обработать пропуски (деревья не работают с NaN)</li>
+      <li>[ ] Закодировать категориальные признаки</li>
+      <li>[ ] Настроить max_depth для контроля переобучения</li>
+      <li>[ ] Попробовать разные критерии (gini/entropy)</li>
+      <li>[ ] Визуализировать дерево для понимания</li>
+      <li>[ ] Проверить важность признаков</li>
+      <li>[ ] Использовать кросс-валидацию</li>
+      <li>[ ] Рассмотреть ансамбли (Random Forest, Boosting)</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Алгоритм задает последовательность простых вопросов о данных (например, "возраст > 30?", "доход > 50000?") и по ответам принимает решение. Как игра в "20 вопросов"».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Метрики качества</h2>
+    <p><strong>Классификация:</strong></p>
+    <pre><code>from sklearn.metrics import classification_report, accuracy_score
+
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred))</code></pre>
+
+    <p><strong>Регрессия:</strong></p>
+    <pre><code>from sklearn.metrics import mean_squared_error, r2_score
+
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f"MSE: {mse:.4f}, R²: {r2:.4f}")</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>
