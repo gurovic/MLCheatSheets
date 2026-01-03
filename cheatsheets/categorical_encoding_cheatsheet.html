@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Кодирование категориальных признаков Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔤 Кодирование категориальных признаков Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Зачем кодировать?</h2>
+    <ul>
+      <li><strong>ML-алгоритмы</strong> работают только с числами</li>
+      <li><strong>Категориальные данные</strong>: текст, категории, группы</li>
+      <li><strong>Примеры</strong>: цвет, город, тип продукта</li>
+      <li><strong>Правильное кодирование</strong> критично для качества модели</li>
+    </ul>
+    <p><strong>Типы категориальных признаков:</strong></p>
+    <ul>
+      <li><strong>Номинальные</strong>: нет порядка (цвет, город)</li>
+      <li><strong>Порядковые</strong>: есть порядок (low, medium, high)</li>
+      <li><strong>Бинарные</strong>: два значения (да/нет)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Label Encoding</h2>
+    <p>Простое присвоение чисел категориям:</p>
+    <pre><code>from sklearn.preprocessing import LabelEncoder
+
+# Пример данных
+colors = ['red', 'blue', 'green', 'red', 'green']
+
+# Label Encoding
+le = LabelEncoder()
+encoded = le.fit_transform(colors)
+print(encoded)  # [2 0 1 2 1]
+
+# Обратное преобразование
+decoded = le.inverse_transform(encoded)
+print(decoded)  # ['red' 'blue' 'green' 'red' 'green']
+
+# Получить соответствие
+print(dict(zip(le.classes_, le.transform(le.classes_))))
+# {'blue': 0, 'green': 1, 'red': 2}
+
+# Для pandas DataFrame
+import pandas as pd
+df = pd.DataFrame({'color': colors})
+df['color_encoded'] = le.fit_transform(df['color'])</code></pre>
+    <p><strong>⚠️ Проблема:</strong> создаёт искусственный порядок!</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. One-Hot Encoding</h2>
+    <p>Создание бинарных колонок для каждой категории:</p>
+    <pre><code>import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
+
+# Pandas способ (проще)
+df = pd.DataFrame({'color': ['red', 'blue', 'green', 'red']})
+df_encoded = pd.get_dummies(df, columns=['color'], prefix='color')
+print(df_encoded)
+#    color_blue  color_green  color_red
+# 0           0            0          1
+# 1           1            0          0
+# 2           0            1          0
+# 3           0            0          1
+
+# Sklearn способ
+ohe = OneHotEncoder(sparse_output=False, drop=None)
+encoded = ohe.fit_transform(df[['color']])
+feature_names = ohe.get_feature_names_out(['color'])
+
+# С удалением первой категории (избежать мультиколлинеарности)
+ohe = OneHotEncoder(sparse_output=False, drop='first')
+encoded = ohe.fit_transform(df[['color']])
+
+# Pandas с drop_first
+df_encoded = pd.get_dummies(df, columns=['color'], drop_first=True)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Ordinal Encoding</h2>
+    <p>Для категорий с естественным порядком:</p>
+    <pre><code>from sklearn.preprocessing import OrdinalEncoder
+
+# Данные с порядком
+sizes = [['small'], ['medium'], ['large'], ['small'], ['large']]
+
+# Определяем порядок
+encoder = OrdinalEncoder(
+    categories=[['small', 'medium', 'large']]
+)
+
+encoded = encoder.fit_transform(sizes)
+print(encoded)  # [[0.] [1.] [2.] [0.] [2.]]
+
+# Pandas способ
+df = pd.DataFrame({'size': ['small', 'medium', 'large', 'small']})
+
+size_mapping = {'small': 0, 'medium': 1, 'large': 2}
+df['size_encoded'] = df['size'].map(size_mapping)
+
+# Или более гибко
+from pandas.api.types import CategoricalDtype
+
+size_order = CategoricalDtype(
+    categories=['small', 'medium', 'large'], 
+    ordered=True
+)
+df['size_cat'] = df['size'].astype(size_order)
+df['size_encoded'] = df['size_cat'].cat.codes</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Frequency Encoding</h2>
+    <p>Замена на частоту появления:</p>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    'city': ['Moscow', 'SPB', 'Moscow', 'Kazan', 'SPB', 'Moscow']
+})
+
+# Подсчёт частот
+freq = df['city'].value_counts(normalize=True)
+print(freq)
+# Moscow    0.50
+# SPB       0.33
+# Kazan     0.17
+
+# Кодирование
+df['city_freq'] = df['city'].map(freq)
+
+# Или подсчёт количества
+counts = df['city'].value_counts()
+df['city_count'] = df['city'].map(counts)
+
+# Функция для использования
+def frequency_encoding(df, column):
+    freq = df[column].value_counts(normalize=True)
+    return df[column].map(freq)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Target Encoding (Mean Encoding)</h2>
+    <p>Замена на среднее значение целевой переменной:</p>
+    <pre><code>import pandas as pd
+import numpy as np
+
+# Данные
+df = pd.DataFrame({
+    'city': ['Moscow', 'SPB', 'Moscow', 'Kazan', 'SPB'],
+    'target': [100, 80, 120, 90, 85]
+})
+
+# Простой target encoding (ТОЛЬКО на train!)
+target_mean = df.groupby('city')['target'].mean()
+df['city_target_enc'] = df['city'].map(target_mean)
+
+# С регуляризацией (smoothing)
+def target_encode_smooth(df, cat_col, target_col, alpha=5):
+    global_mean = df[target_col].mean()
+    agg = df.groupby(cat_col)[target_col].agg(['mean', 'count'])
+    
+    # Smoothed mean
+    smooth = (agg['count'] * agg['mean'] + alpha * global_mean) / (agg['count'] + alpha)
+    
+    return df[cat_col].map(smooth)
+
+df['city_smooth'] = target_encode_smooth(df, 'city', 'target', alpha=5)
+
+# Category Encoders библиотека
+from category_encoders import TargetEncoder
+
+te = TargetEncoder(cols=['city'])
+# Fit только на train!
+X_train_enc = te.fit_transform(X_train, y_train)
+X_test_enc = te.transform(X_test)</code></pre>
+    <p><strong>⚠️ Риск переобучения!</strong> Используйте cross-validation</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Binary Encoding</h2>
+    <p>Комбинация label и one-hot encoding:</p>
+    <pre><code>from category_encoders import BinaryEncoder
+
+# Данные
+df = pd.DataFrame({
+    'city': ['Moscow', 'SPB', 'Kazan', 'Omsk', 'Moscow']
+})
+
+# Binary encoding
+be = BinaryEncoder(cols=['city'])
+df_encoded = be.fit_transform(df)
+
+print(df_encoded)
+#    city_0  city_1  city_2
+# 0       0       0       1
+# 1       0       1       0
+# 2       0       1       1
+# 3       1       0       0
+# 4       0       0       1
+
+# Плюсы: меньше колонок чем one-hot
+# Для N категорий создаёт log2(N) колонок</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Hash Encoding</h2>
+    <p>Для высококардинальных признаков:</p>
+    <pre><code>from sklearn.feature_extraction import FeatureHasher
+from category_encoders import HashingEncoder
+
+# Category Encoders способ
+he = HashingEncoder(cols=['city'], n_components=8)
+df_encoded = he.fit_transform(df)
+
+# Sklearn способ
+hasher = FeatureHasher(n_features=8, input_type='string')
+hashed = hasher.fit_transform(df['city'].values)
+
+# Плюсы: 
+# - Фиксированное число колонок
+# - Не нужно запоминать все категории
+# - Работает с новыми категориями
+
+# Минусы:
+# - Возможны коллизии (разные категории → один хеш)
+# - Сложнее интерпретировать</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Leave-One-Out Encoding</h2>
+    <p>Target encoding без утечки данных:</p>
+    <pre><code>from category_encoders import LeaveOneOutEncoder
+
+# Для каждой строки вычисляет mean target 
+# по всем остальным строкам с той же категорией
+
+df = pd.DataFrame({
+    'city': ['Moscow', 'SPB', 'Moscow', 'SPB', 'Moscow'],
+    'target': [100, 80, 120, 85, 110]
+})
+
+loo = LeaveOneOutEncoder(cols=['city'])
+df_encoded = loo.fit_transform(df['city'], df['target'])
+
+print(df_encoded)
+# Для 1-й Moscow: среднее по 2-й и 3-й Moscow
+# Для 2-й Moscow: среднее по 1-й и 3-й Moscow
+
+# Преимущество: меньше переобучения чем обычный target encoding</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Обработка редких категорий</h2>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    'city': ['Moscow', 'SPB', 'Moscow', 'Kazan', 'Omsk', 
+             'Moscow', 'Tver', 'SPB', 'Moscow']
+})
+
+# Метод 1: Группировка редких в "Other"
+def group_rare_categories(df, column, threshold=0.05):
+    # Частота каждой категории
+    freq = df[column].value_counts(normalize=True)
+    
+    # Редкие категории
+    rare = freq[freq < threshold].index
+    
+    # Замена
+    df[column + '_grouped'] = df[column].where(
+        ~df[column].isin(rare), 
+        'Other'
+    )
+    
+    return df
+
+df = group_rare_categories(df, 'city', threshold=0.15)
+
+# Метод 2: Топ-N категорий + Other
+def keep_top_categories(df, column, n=5):
+    top_n = df[column].value_counts().head(n).index
+    df[column + '_top'] = df[column].where(
+        df[column].isin(top_n), 
+        'Other'
+    )
+    return df
+
+df = keep_top_categories(df, 'city', n=3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Обработка новых категорий</h2>
+    <pre><code># Проблема: в test появляются новые категории
+
+# Решение 1: handle_unknown в OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder
+
+ohe = OneHotEncoder(
+    handle_unknown='ignore',  # Игнорировать новые
+    sparse_output=False
+)
+
+X_train = [['Moscow'], ['SPB'], ['Kazan']]
+X_test = [['Moscow'], ['NewCity']]  # Новая категория
+
+ohe.fit(X_train)
+encoded_test = ohe.transform(X_test)
+# NewCity будет закодирован как все нули
+
+# Решение 2: Заранее добавить категорию "Unknown"
+df['city_with_unknown'] = df['city'].cat.add_categories(['Unknown'])
+
+# Решение 3: Заменить неизвестные на частую категорию
+train_categories = set(X_train['city'])
+X_test['city_safe'] = X_test['city'].where(
+    X_test['city'].isin(train_categories),
+    'Moscow'  # Самая частая из train
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Выбор метода кодирования</h2>
+    <table>
+      <tr><th>Метод</th><th>Когда использовать</th><th>Плюсы/Минусы</th></tr>
+      <tr>
+        <td><strong>Label</strong></td>
+        <td>Порядковые признаки, таргет в классификации</td>
+        <td>✅ Простой<br>❌ Создаёт ложный порядок</td>
+      </tr>
+      <tr>
+        <td><strong>One-Hot</strong></td>
+        <td>Мало категорий (&lt;10), линейные модели</td>
+        <td>✅ Нет ложных связей<br>❌ Много колонок</td>
+      </tr>
+      <tr>
+        <td><strong>Ordinal</strong></td>
+        <td>Есть естественный порядок</td>
+        <td>✅ Сохраняет порядок<br>❌ Нужно знать порядок</td>
+      </tr>
+      <tr>
+        <td><strong>Target</strong></td>
+        <td>Высокая кардинальность, tree-based модели</td>
+        <td>✅ Мощный<br>❌ Риск переобучения</td>
+      </tr>
+      <tr>
+        <td><strong>Frequency</strong></td>
+        <td>Когда частота категории важна</td>
+        <td>✅ Простой<br>❌ Теряет идентичность</td>
+      </tr>
+      <tr>
+        <td><strong>Binary</strong></td>
+        <td>Средняя кардинальность (10-100)</td>
+        <td>✅ Компактный<br>❌ Менее интерпретируем</td>
+      </tr>
+      <tr>
+        <td><strong>Hashing</strong></td>
+        <td>Очень высокая кардинальность (&gt;1000)</td>
+        <td>✅ Фикс. размер<br>❌ Коллизии</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Лучшие практики</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <ul>
+          <li>Fit encoding только на train данных</li>
+          <li>One-hot для линейных моделей</li>
+          <li>Target encoding для gradient boosting</li>
+          <li>Обрабатывать редкие категории</li>
+          <li>Продумать стратегию для новых категорий</li>
+          <li>Использовать Pipeline для автоматизации</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не делать</h3>
+        <ul>
+          <li>Fit на всех данных (train + test)</li>
+          <li>Label encoding для номинальных признаков</li>
+          <li>Target encoding без cross-validation</li>
+          <li>One-hot для высокой кардинальности</li>
+          <li>Игнорировать новые категории в test</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Pipeline для кодирования</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+
+# Определяем типы колонок
+cat_features = ['city', 'color']
+num_features = ['price', 'age']
+
+# Трансформеры
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), num_features),
+        ('cat', OneHotEncoder(handle_unknown='ignore'), cat_features)
+    ]
+)
+
+# Pipeline
+pipeline = Pipeline([
+    ('preprocessor', preprocessor),
+    ('classifier', RandomForestClassifier())
+])
+
+# Обучение и предсказание в один шаг
+pipeline.fit(X_train, y_train)
+predictions = pipeline.predict(X_test)
+
+# Сохранение pipeline
+import joblib
+joblib.dump(pipeline, 'model_pipeline.pkl')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить тип категориальных признаков</li>
+      <li>[ ] Проверить кардинальность (количество уникальных)</li>
+      <li>[ ] Для низкой (&lt;10) → One-Hot Encoding</li>
+      <li>[ ] Для средней (10-100) → Binary/Target Encoding</li>
+      <li>[ ] Для высокой (&gt;100) → Target/Hash Encoding</li>
+      <li>[ ] Обработать редкие категории</li>
+      <li>[ ] Продумать стратегию для новых категорий</li>
+      <li>[ ] Использовать Pipeline</li>
+      <li>[ ] Проверить метрики с разными методами</li>
+      <li>[ ] Документировать выбранный метод</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Кодирование категорий — это преобразование текстовых значений в числа, понятные для алгоритмов. Например, цвета "красный", "синий", "зелёный" можно закодировать как 0, 1, 2, или создать отдельный признак для каждого цвета».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

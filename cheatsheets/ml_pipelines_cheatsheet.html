@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="UTF-8"><title>ML Pipelines Cheatsheet</title>
+<style>@media screen{{body{{font-family:-apple-system,sans-serif;color:#333;background:#fafcff;padding:10px}}}}.container{{column-count:3;column-gap:20px}}.block{{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px}}h1{{font-size:1.6em;color:#1a5fb4;text-align:center;column-span:all}}h2{{font-size:1.15em;color:#1a5fb4;margin:8px 0;border-bottom:1px solid #e0e7ff}}code{{background:#f0f4ff;padding:2px 4px}}pre{{background:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em}}</style></head><body>
+<div class="container"><h1>🔧 ML Pipelines</h1>
+<div class="block"><h2>1. Базовый Pipeline</h2><pre><code>from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('classifier', RandomForestClassifier())
+])
+
+pipeline.fit(X_train, y_train)
+predictions = pipeline.predict(X_test)</code></pre></div>
+<div class="block"><h2>2. ColumnTransformer</h2><pre><code>from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+
+preprocessor = ColumnTransformer([
+    ('num', StandardScaler(), ['age', 'income']),
+    ('cat', OneHotEncoder(), ['city', 'category'])
+])
+
+pipeline = Pipeline([
+    ('prep', preprocessor),
+    ('model', RandomForestClassifier())
+])</code></pre></div>
+<div class="block"><h2>3. make_pipeline</h2><pre><code>from sklearn.pipeline import make_pipeline
+
+# Автоматические имена
+pipeline = make_pipeline(
+    StandardScaler(),
+    PCA(n_components=2),
+    LogisticRegression()
+)
+
+# Доступ к шагам
+pipeline.steps
+pipeline.named_steps['pca']</code></pre></div>
+<div class="block"><h2>4. FeatureUnion</h2><pre><code>from sklearn.pipeline import FeatureUnion
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import SelectKBest
+
+combined = FeatureUnion([
+    ('pca', PCA(n_components=2)),
+    ('select', SelectKBest(k=3))
+])
+
+X_combined = combined.fit_transform(X, y)</code></pre></div>
+<div class="block"><h2>5. Кастомный трансформер</h2><pre><code>from sklearn.base import BaseEstimator, TransformerMixin
+
+class MyTransformer(BaseEstimator, TransformerMixin):
+    def __init__(self, factor=1):
+        self.factor = factor
+    
+    def fit(self, X, y=None):
+        return self
+    
+    def transform(self, X):
+        return X * self.factor
+
+pipeline = Pipeline([
+    ('custom', MyTransformer(factor=2)),
+    ('scaler', StandardScaler())
+])</code></pre></div>
+<div class="block"><h2>6. Сохранение Pipeline</h2><pre><code>import joblib
+
+# Сохранение
+joblib.dump(pipeline, 'model_pipeline.pkl')
+
+# Загрузка
+pipeline = joblib.load('model_pipeline.pkl')
+
+# Использование
+predictions = pipeline.predict(new_data)</code></pre></div>
+<div class="block"><h2>7. GridSearch с Pipeline</h2><pre><code>from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+    'scaler__with_mean': [True, False],
+    'classifier__n_estimators': [50, 100],
+    'classifier__max_depth': [5, 10]
+}
+
+grid = GridSearchCV(pipeline, param_grid, cv=5)
+grid.fit(X_train, y_train)
+
+best_params = grid.best_params_
+best_model = grid.best_estimator_</code></pre></div>
+<div class="block"><h2>8. Условные шаги</h2><pre><code>from sklearn.pipeline import Pipeline
+
+def create_pipeline(use_pca=False):
+    steps = [('scaler', StandardScaler())]
+    
+    if use_pca:
+        steps.append(('pca', PCA(n_components=2)))
+    
+    steps.append(('model', LogisticRegression()))
+    
+    return Pipeline(steps)</code></pre></div>
+<div class="block"><h2>9. Преимущества Pipeline</h2><ul><li>Избегает data leakage</li><li>Упрощает код</li><li>Легко сохранить/загрузить</li><li>Grid search проще</li><li>Воспроизводимость</li></ul></div>
+<div class="block"><h2>10. Чек-лист</h2><ul><li>[ ] Использовать Pipeline для всех проектов</li><li>[ ] Включить препроцессинг в Pipeline</li><li>[ ] Сохранять вместе с моделью</li><li>[ ] Тестировать на новых данных</li><li>[ ] Документировать шаги</li></ul></div>
+</div></body></html>

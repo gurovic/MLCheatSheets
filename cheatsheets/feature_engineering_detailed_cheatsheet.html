@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Feature Engineering Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🛠️ Feature Engineering Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: создание новых признаков для улучшения моделей</li>
+      <li><strong>Важнее алгоритма</strong>: хорошие признаки > сложная модель</li>
+      <li><strong>Доменные знания</strong>: понимание данных критично</li>
+      <li><strong>Итеративный процесс</strong>: создание → тестирование → отбор</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Полиномиальные признаки</h2>
+    <p>Создание степеней и произведений признаков:</p>
+    <pre><code>from sklearn.preprocessing import PolynomialFeatures
+
+# Степень 2: x1, x2 → x1², x2², x1*x2
+poly = PolynomialFeatures(
+    degree=2,
+    include_bias=False,  # Не добавлять колонку 1
+    interaction_only=False  # Включить степени
+)
+
+X_poly = poly.fit_transform(X)
+
+# Названия признаков
+feature_names = poly.get_feature_names_out()
+print(feature_names)
+# ['x0', 'x1', 'x0^2', 'x0 x1', 'x1^2']</code></pre>
+    <p><strong>⚠️ Внимание</strong>: быстро растёт число признаков!</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Взаимодействия признаков</h2>
+    <p>Только произведения, без степеней:</p>
+    <pre><code># Только взаимодействия
+poly = PolynomialFeatures(
+    degree=2,
+    interaction_only=True,  # Только произведения
+    include_bias=False
+)
+
+X_interactions = poly.fit_transform(X)
+
+# Ручное создание взаимодействий
+df['price_per_sqm'] = df['price'] / df['area']
+df['age_income'] = df['age'] * df['income']
+df['total_rooms'] = df['bedrooms'] + df['bathrooms']</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Биннинг (дискретизация)</h2>
+    <p>Преобразование непрерывных в категориальные:</p>
+    <pre><code>import pandas as pd
+import numpy as np
+
+# Равные интервалы
+df['age_binned'] = pd.cut(
+    df['age'],
+    bins=5,  # 5 равных интервалов
+    labels=['very_young', 'young', 'middle', 'senior', 'old']
+)
+
+# Равное количество в каждом бине
+df['income_binned'] = pd.qcut(
+    df['income'],
+    q=4,  # 4 квартиля
+    labels=['Q1', 'Q2', 'Q3', 'Q4']
+)
+
+# Кастомные границы
+bins = [0, 18, 35, 60, 100]
+df['age_custom'] = pd.cut(df['age'], bins=bins)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Target Encoding</h2>
+    <p>Замена категорий средним значением таргета:</p>
+    <pre><code># Простой target encoding (осторожно с переобучением!)
+target_means = df.groupby('category')['target'].mean()
+df['category_encoded'] = df['category'].map(target_means)
+
+# С регуляризацией (smoothing)
+from category_encoders import TargetEncoder
+
+te = TargetEncoder(
+    cols=['category', 'city'],
+    smoothing=1.0  # Чем больше, тем ближе к общему среднему
+)
+
+# ВАЖНО: fit только на train!
+X_train_encoded = te.fit_transform(X_train, y_train)
+X_test_encoded = te.transform(X_test)
+
+# K-fold target encoding для защиты от переобучения
+from sklearn.model_selection import KFold
+
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+df['category_te'] = 0
+
+for train_idx, val_idx in kf.split(df):
+    means = df.iloc[train_idx].groupby('category')['target'].mean()
+    df.loc[val_idx, 'category_te'] = df.loc[val_idx, 'category'].map(means)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Признаки из дат</h2>
+    <pre><code>import pandas as pd
+
+df['date'] = pd.to_datetime(df['date'])
+
+# Базовые
+df['year'] = df['date'].dt.year
+df['month'] = df['date'].dt.month
+df['day'] = df['date'].dt.day
+df['dayofweek'] = df['date'].dt.dayofweek  # 0=Пн
+df['quarter'] = df['date'].dt.quarter
+df['week'] = df['date'].dt.isocalendar().week
+
+# Дополнительные
+df['is_weekend'] = df['dayofweek'].isin([5, 6]).astype(int)
+df['is_month_start'] = df['date'].dt.is_month_start.astype(int)
+df['is_month_end'] = df['date'].dt.is_month_end.astype(int)
+df['days_in_month'] = df['date'].dt.days_in_month
+
+# Циклические признаки (важно для периодичности!)
+df['month_sin'] = np.sin(2 * np.pi * df['month'] / 12)
+df['month_cos'] = np.cos(2 * np.pi * df['month'] / 12)
+df['day_sin'] = np.sin(2 * np.pi * df['day'] / 31)
+df['day_cos'] = np.cos(2 * np.pi * df['day'] / 31)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Временные признаки</h2>
+    <pre><code># Разница между датами
+df['days_since_registration'] = (
+    pd.to_datetime('today') - df['registration_date']
+).dt.days
+
+df['days_between'] = (
+    df['end_date'] - df['start_date']
+).dt.days
+
+# Временные окна (rolling)
+df['sales_7d_avg'] = df['sales'].rolling(window=7).mean()
+df['sales_7d_std'] = df['sales'].rolling(window=7).std()
+df['sales_7d_max'] = df['sales'].rolling(window=7).max()
+
+# Лаги (для временных рядов)
+df['sales_lag1'] = df['sales'].shift(1)
+df['sales_lag7'] = df['sales'].shift(7)
+
+# Экспоненциальное скользящее среднее
+df['sales_ema'] = df['sales'].ewm(span=7).mean()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Текстовые признаки</h2>
+    <pre><code># Базовые признаки
+df['text_length'] = df['text'].str.len()
+df['word_count'] = df['text'].str.split().str.len()
+df['char_count'] = df['text'].apply(lambda x: len(x))
+
+# Дополнительные
+df['uppercase_count'] = df['text'].str.count(r'[A-Z]')
+df['digit_count'] = df['text'].str.count(r'\d')
+df['special_char_count'] = df['text'].str.count(r'[!@#$%^&*()]')
+
+# Среднее количество символов в слове
+df['avg_word_length'] = (
+    df['char_count'] / df['word_count']
+)
+
+# Уникальные слова
+df['unique_words'] = df['text'].apply(
+    lambda x: len(set(x.split()))
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Агрегации по группам</h2>
+    <pre><code># Статистики по группам
+agg_features = df.groupby('category').agg({
+    'price': ['mean', 'std', 'min', 'max', 'median'],
+    'quantity': ['sum', 'count']
+}).reset_index()
+
+# Переименование колонок
+agg_features.columns = ['_'.join(col).strip('_') 
+                        for col in agg_features.columns]
+
+# Присоединение к основной таблице
+df = df.merge(agg_features, on='category', how='left')
+
+# Отклонение от среднего по группе
+df['price_vs_category_mean'] = (
+    df['price'] - df['price_mean']
+) / df['price_std']
+
+# Ранг внутри группы
+df['price_rank'] = df.groupby('category')['price'].rank()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Математические преобразования</h2>
+    <pre><code>import numpy as np
+
+# Логарифм (для скошенных распределений)
+df['log_price'] = np.log1p(df['price'])  # log(1+x)
+
+# Квадратный корень
+df['sqrt_area'] = np.sqrt(df['area'])
+
+# Степени
+df['price_squared'] = df['price'] ** 2
+df['price_cubed'] = df['price'] ** 3
+
+# Box-Cox преобразование
+from scipy.stats import boxcox
+df['price_boxcox'], lambda_param = boxcox(df['price'] + 1)
+
+# Обратные значения
+df['price_reciprocal'] = 1 / (df['price'] + 1)
+
+# Экспонента
+df['exp_value'] = np.exp(df['value'] / 10)  # Делим для стабильности</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Булевы признаки</h2>
+    <pre><code># Пороговые значения
+df['is_expensive'] = (df['price'] > 1000).astype(int)
+df['is_large'] = (df['area'] > 100).astype(int)
+
+# Проверки
+df['has_discount'] = (df['discount'] > 0).astype(int)
+df['is_null'] = df['some_col'].isnull().astype(int)
+
+# Комбинации условий
+df['premium'] = (
+    (df['price'] > 1000) & 
+    (df['quality'] == 'high')
+).astype(int)
+
+# Наличие ключевых слов
+df['has_keyword'] = df['text'].str.contains(
+    'важно|срочно', 
+    case=False, 
+    na=False
+).astype(int)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Частотное кодирование</h2>
+    <pre><code># Частота появления категории
+freq = df['category'].value_counts(normalize=True)
+df['category_freq'] = df['category'].map(freq)
+
+# Количество появлений
+counts = df['user_id'].value_counts()
+df['user_frequency'] = df['user_id'].map(counts)
+
+# Процент от общего
+df['category_pct'] = df.groupby('category')['id'].transform(
+    lambda x: len(x) / len(df) * 100
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Автоматический feature engineering</h2>
+    <pre><code># Featuretools
+import featuretools as ft
+
+# Создание EntitySet
+es = ft.EntitySet(id='data')
+es = es.add_dataframe(
+    dataframe_name='transactions',
+    dataframe=df,
+    index='transaction_id',
+    time_index='timestamp'
+)
+
+# Автоматическое создание признаков
+feature_matrix, feature_defs = ft.dfs(
+    entityset=es,
+    target_dataframe_name='transactions',
+    max_depth=2,
+    verbose=True
+)
+
+# tsfresh для временных рядов
+from tsfresh import extract_features
+from tsfresh.utilities.dataframe_functions import impute
+
+features = extract_features(
+    df, 
+    column_id='id', 
+    column_sort='time'
+)
+impute(features)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Лучшие практики</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <ul>
+          <li>Создавать признаки на основе доменных знаний</li>
+          <li>Использовать cross-validation для оценки</li>
+          <li>Target encoding только на train данных</li>
+          <li>Сохранять преобразования для test данных</li>
+          <li>Проверять важность новых признаков</li>
+          <li>Документировать логику создания</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не делать</h3>
+        <ul>
+          <li>Создавать признаки на всех данных сразу</li>
+          <li>Использовать информацию из будущего</li>
+          <li>Забывать про мультиколлинеарность</li>
+          <li>Создавать слишком много признаков</li>
+          <li>Игнорировать пропуски в новых признаках</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Отбор признаков после создания</h2>
+    <pre><code>from sklearn.feature_selection import (
+    SelectKBest, f_classif, mutual_info_classif
+)
+
+# Топ-K лучших признаков
+selector = SelectKBest(f_classif, k=10)
+X_selected = selector.fit_transform(X, y)
+
+# Важность признаков из модели
+from sklearn.ensemble import RandomForestClassifier
+
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X, y)
+
+# Сортировка по важности
+importances = pd.DataFrame({
+    'feature': X.columns,
+    'importance': rf.feature_importances_
+}).sort_values('importance', ascending=False)
+
+print(importances.head(10))
+
+# Удаление коррелирующих признаков
+corr_matrix = X.corr().abs()
+upper = corr_matrix.where(
+    np.triu(np.ones(corr_matrix.shape), k=1).astype(bool)
+)
+to_drop = [col for col in upper.columns 
+           if any(upper[col] > 0.95)]
+X_uncorr = X.drop(columns=to_drop)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Изучить доменную область данных</li>
+      <li>[ ] Визуализировать распределения признаков</li>
+      <li>[ ] Создать базовые взаимодействия</li>
+      <li>[ ] Добавить агрегации по группам</li>
+      <li>[ ] Извлечь признаки из дат/текста</li>
+      <li>[ ] Попробовать полиномиальные признаки</li>
+      <li>[ ] Применить математические преобразования</li>
+      <li>[ ] Использовать target encoding с осторожностью</li>
+      <li>[ ] Проверить важность новых признаков</li>
+      <li>[ ] Удалить низкозначимые/коррелирующие</li>
+      <li>[ ] Сохранить pipeline для продакшена</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Feature Engineering — это создание новых характеристик из существующих данных. Например, из даты рождения мы можем вычислить возраст, а из цены и площади — цену за квадратный метр. Эти новые признаки часто важнее выбора самого алгоритма».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

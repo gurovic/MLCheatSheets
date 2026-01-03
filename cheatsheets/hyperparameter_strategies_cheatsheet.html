@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru"><head><meta charset="UTF-8"><title>Стратегии поиска гиперпараметров Cheatsheet</title>
+<style>@media screen{{body{{font-family:-apple-system,sans-serif;color:#333;background:#fafcff;padding:10px}}}}.container{{column-count:3;column-gap:20px}}.block{{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px}}h1{{font-size:1.6em;color:#1a5fb4;text-align:center;column-span:all}}h2{{font-size:1.15em;color:#1a5fb4;margin:8px 0;border-bottom:1px solid #e0e7ff}}code{{background:#f0f4ff;padding:2px 4px}}pre{{background:#f0f4ff;padding:8px;border-radius:4px;font-size:0.84em}}table{{width:100%;border-collapse:collapse;font-size:0.82em}}th{{background:#e6f0ff;padding:4px}}td{{padding:4px;border-bottom:1px solid #f0f4ff}}</style></head><body>
+<div class="container"><h1>🔍 Стратегии поиска гиперпараметров</h1>
+<div class="block"><h2>1. Grid Search</h2><pre><code>from sklearn.model_selection import GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+
+param_grid = {
+    'n_estimators': [50, 100, 200],
+    'max_depth': [5, 10, 15],
+    'min_samples_split': [2, 5, 10]
+}
+
+grid = GridSearchCV(
+    RandomForestClassifier(),
+    param_grid,
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1
+)
+
+grid.fit(X_train, y_train)
+print(f"Best params: {grid.best_params_}")
+print(f"Best score: {grid.best_score_:.3f}")</code></pre></div>
+<div class="block"><h2>2. Random Search</h2><pre><code>from sklearn.model_selection import RandomizedSearchCV
+from scipy.stats import randint, uniform
+
+param_dist = {
+    'n_estimators': randint(50, 500),
+    'max_depth': randint(5, 50),
+    'min_samples_split': randint(2, 20),
+    'max_features': uniform(0.1, 0.9)
+}
+
+random = RandomizedSearchCV(
+    RandomForestClassifier(),
+    param_dist,
+    n_iter=100,  # Количество комбинаций
+    cv=5,
+    random_state=42
+)
+
+random.fit(X_train, y_train)</code></pre></div>
+<div class="block"><h2>3. Bayesian Optimization</h2><pre><code>from skopt import BayesSearchCV
+from skopt.space import Real, Integer
+
+search_spaces = {
+    'n_estimators': Integer(50, 500),
+    'max_depth': Integer(5, 50),
+    'min_samples_split': Integer(2, 20),
+    'max_features': Real(0.1, 1.0)
+}
+
+bayes = BayesSearchCV(
+    RandomForestClassifier(),
+    search_spaces,
+    n_iter=50,
+    cv=5,
+    n_jobs=-1
+)
+
+bayes.fit(X_train, y_train)</code></pre></div>
+<div class="block"><h2>4. Optuna</h2><pre><code>import optuna
+from sklearn.ensemble import RandomForestClassifier
+
+def objective(trial):
+    params = {
+        'n_estimators': trial.suggest_int('n_estimators', 50, 500),
+        'max_depth': trial.suggest_int('max_depth', 5, 50),
+        'min_samples_split': trial.suggest_int('min_samples_split', 2, 20)
+    }
+    
+    model = RandomForestClassifier(**params)
+    model.fit(X_train, y_train)
+    score = model.score(X_val, y_val)
+    return score
+
+study = optuna.create_study(direction='maximize')
+study.optimize(objective, n_trials=100)
+
+print(f"Best params: {study.best_params}")
+print(f"Best score: {study.best_value:.3f}")</code></pre></div>
+<div class="block"><h2>5. Hyperopt</h2><pre><code>from hyperopt import fmin, tpe, hp, Trials
+
+space = {
+    'n_estimators': hp.choice('n_estimators', range(50, 500)),
+    'max_depth': hp.choice('max_depth', range(5, 50)),
+    'min_samples_split': hp.choice('min_samples_split', range(2, 20))
+}
+
+def objective(params):
+    model = RandomForestClassifier(**params)
+    model.fit(X_train, y_train)
+    return -model.score(X_val, y_val)  # Минимизируем
+
+trials = Trials()
+best = fmin(objective, space, algo=tpe.suggest, 
+            max_evals=100, trials=trials)</code></pre></div>
+<div class="block"><h2>6. Halving Grid Search</h2><pre><code>from sklearn.experimental import enable_halving_search_cv
+from sklearn.model_selection import HalvingGridSearchCV
+
+# Быстрее чем GridSearch
+halving_grid = HalvingGridSearchCV(
+    RandomForestClassifier(),
+    param_grid,
+    factor=3,  # Сколько кандидатов отсеивать
+    cv=5
+)
+
+halving_grid.fit(X_train, y_train)</code></pre></div>
+<div class="block"><h2>7. Сравнение методов</h2><table><tr><th>Метод</th><th>Скорость</th><th>Качество</th><th>Когда</th></tr><tr><td>Grid</td><td>Медленно</td><td>Отлично</td><td>Мало параметров</td></tr><tr><td>Random</td><td>Быстро</td><td>Хорошо</td><td>Много параметров</td></tr><tr><td>Bayesian</td><td>Средне</td><td>Отлично</td><td>Дорогие модели</td></tr><tr><td>Optuna</td><td>Быстро</td><td>Отлично</td><td>Сложные пространства</td></tr></table></div>
+<div class="block"><h2>8. Early Stopping</h2><pre><code># Остановка при отсутствии улучшения
+from sklearn.model_selection import GridSearchCV
+
+grid = GridSearchCV(
+    model,
+    param_grid,
+    cv=5,
+    error_score='raise'  # Прервать при ошибке
+)
+
+# Для Optuna
+study.optimize(objective, n_trials=100, 
+               timeout=600)  # Макс 10 минут</code></pre></div>
+<div class="block"><h2>9. Лучшие практики</h2><ul><li>Начать с Random Search</li><li>Использовать логарифмические шкалы</li><li>Cross-validation обязательно</li><li>Сохранить историю поиска</li><li>Bayesian для дорогих моделей</li></ul></div>
+<div class="block"><h2>10. Чек-лист</h2><ul><li>[ ] Определить диапазоны параметров</li><li>[ ] Выбрать стратегию поиска</li><li>[ ] Настроить cross-validation</li><li>[ ] Логировать результаты</li><li>[ ] Валидировать на test</li><li>[ ] Документировать best params</li></ul></div>
+</div></body></html>

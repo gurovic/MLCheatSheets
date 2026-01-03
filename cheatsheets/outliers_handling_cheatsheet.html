@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Обработка выбросов Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Обработка выбросов Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое выбросы?</h2>
+    <ul>
+      <li><strong>Выброс (outlier)</strong> — значение, сильно отличающееся от других</li>
+      <li><strong>Могут быть ошибками</strong> или реальными редкими случаями</li>
+      <li><strong>Влияют на модели</strong>: особенно на линейные</li>
+      <li><strong>Не всегда плохо</strong>: иногда важны для бизнеса</li>
+    </ul>
+    <p><strong>Примеры:</strong></p>
+    <ul>
+      <li>Возраст = 150 лет (ошибка ввода)</li>
+      <li>Зарплата = $10M (редкий, но реальный случай)</li>
+      <li>Температура = -999 (маркер пропущенного значения)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Визуализация выбросов</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Box plot — основной инструмент
+plt.figure(figsize=(10, 6))
+sns.boxplot(data=df, x='feature')
+plt.title('Box Plot для обнаружения выбросов')
+plt.show()
+
+# Histogram
+plt.figure(figsize=(10, 6))
+df['feature'].hist(bins=50)
+plt.title('Гистограмма')
+plt.show()
+
+# Scatter plot для двух признаков
+plt.figure(figsize=(10, 6))
+plt.scatter(df['feature1'], df['feature2'], alpha=0.5)
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.title('Scatter Plot')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Метод IQR (Межквартильный размах)</h2>
+    <p>Классический статистический метод:</p>
+    <pre><code>import numpy as np
+
+def detect_outliers_iqr(data, column):
+    Q1 = data[column].quantile(0.25)
+    Q3 = data[column].quantile(0.75)
+    IQR = Q3 - Q1
+    
+    # Границы выбросов
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    
+    # Выбросы
+    outliers = data[
+        (data[column] < lower_bound) | 
+        (data[column] > upper_bound)
+    ]
+    
+    print(f"Нижняя граница: {lower_bound:.2f}")
+    print(f"Верхняя граница: {upper_bound:.2f}")
+    print(f"Найдено выбросов: {len(outliers)}")
+    
+    return outliers, lower_bound, upper_bound
+
+# Использование
+outliers, lb, ub = detect_outliers_iqr(df, 'price')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Z-score метод</h2>
+    <p>Для нормально распределённых данных:</p>
+    <pre><code>from scipy import stats
+
+def detect_outliers_zscore(data, column, threshold=3):
+    z_scores = np.abs(stats.zscore(data[column]))
+    outliers = data[z_scores > threshold]
+    
+    print(f"Найдено выбросов (|z| > {threshold}): {len(outliers)}")
+    
+    return outliers
+
+# Использование
+outliers = detect_outliers_zscore(df, 'price', threshold=3)
+
+# Визуализация
+df['z_score'] = np.abs(stats.zscore(df['price']))
+plt.figure(figsize=(10, 6))
+plt.scatter(df.index, df['z_score'], alpha=0.5)
+plt.axhline(y=3, color='r', linestyle='--', label='Порог = 3')
+plt.xlabel('Индекс')
+plt.ylabel('|Z-score|')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Modified Z-score (MAD)</h2>
+    <p>Более устойчивый к выбросам метод:</p>
+    <pre><code>def detect_outliers_mad(data, column, threshold=3.5):
+    median = data[column].median()
+    mad = np.median(np.abs(data[column] - median))
+    
+    # Modified Z-score
+    modified_z_scores = 0.6745 * (data[column] - median) / mad
+    outliers = data[np.abs(modified_z_scores) > threshold]
+    
+    print(f"Median: {median:.2f}")
+    print(f"MAD: {mad:.2f}")
+    print(f"Найдено выбросов: {len(outliers)}")
+    
+    return outliers
+
+# Использование
+outliers = detect_outliers_mad(df, 'price')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Isolation Forest</h2>
+    <p>ML-подход для многомерных выбросов:</p>
+    <pre><code>from sklearn.ensemble import IsolationForest
+
+# Подготовка данных
+X = df[['feature1', 'feature2', 'feature3']]
+
+# Модель
+iso_forest = IsolationForest(
+    contamination=0.05,  # Ожидаемая доля выбросов
+    random_state=42,
+    n_estimators=100
+)
+
+# Предсказание: 1 = норма, -1 = выброс
+predictions = iso_forest.fit_predict(X)
+
+# Добавление в dataframe
+df['is_outlier'] = predictions
+outliers = df[df['is_outlier'] == -1]
+
+print(f"Найдено выбросов: {len(outliers)}")
+print(f"Процент выбросов: {len(outliers)/len(df)*100:.2f}%")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Local Outlier Factor (LOF)</h2>
+    <p>Обнаружение локальных выбросов:</p>
+    <pre><code>from sklearn.neighbors import LocalOutlierFactor
+
+# Модель
+lof = LocalOutlierFactor(
+    n_neighbors=20,
+    contamination=0.05
+)
+
+# Предсказание
+predictions = lof.fit_predict(X)
+
+# LOF scores (чем меньше, тем больше выброс)
+lof_scores = lof.negative_outlier_factor_
+
+df['is_outlier'] = predictions
+df['lof_score'] = lof_scores
+
+outliers = df[df['is_outlier'] == -1]
+
+print(f"Найдено выбросов: {len(outliers)}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Удаление выбросов</h2>
+    <pre><code># Метод 1: IQR
+Q1 = df['price'].quantile(0.25)
+Q3 = df['price'].quantile(0.75)
+IQR = Q3 - Q1
+lower = Q1 - 1.5 * IQR
+upper = Q3 + 1.5 * IQR
+
+df_cleaned = df[
+    (df['price'] >= lower) & 
+    (df['price'] <= upper)
+]
+
+print(f"Удалено строк: {len(df) - len(df_cleaned)}")
+
+# Метод 2: Percentile
+lower_bound = df['price'].quantile(0.01)  # 1-й перцентиль
+upper_bound = df['price'].quantile(0.99)  # 99-й перцентиль
+
+df_cleaned = df[
+    (df['price'] >= lower_bound) & 
+    (df['price'] <= upper_bound)
+]
+
+# Метод 3: Z-score
+from scipy import stats
+z_scores = np.abs(stats.zscore(df['price']))
+df_cleaned = df[z_scores < 3]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Замена выбросов (Capping/Winsorizing)</h2>
+    <pre><code># Метод 1: Capping на перцентилях
+lower = df['price'].quantile(0.01)
+upper = df['price'].quantile(0.99)
+
+df['price_capped'] = df['price'].clip(lower, upper)
+
+# Метод 2: Winsorizing
+from scipy.stats.mstats import winsorize
+
+df['price_winsorized'] = winsorize(
+    df['price'], 
+    limits=[0.01, 0.01]  # 1% с каждой стороны
+)
+
+# Метод 3: IQR boundaries
+Q1 = df['price'].quantile(0.25)
+Q3 = df['price'].quantile(0.75)
+IQR = Q3 - Q1
+lower = Q1 - 1.5 * IQR
+upper = Q3 + 1.5 * IQR
+
+df['price_iqr_capped'] = df['price'].clip(lower, upper)
+
+# Проверка
+print("До:", df['price'].min(), df['price'].max())
+print("После:", df['price_capped'].min(), df['price_capped'].max())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Преобразование данных</h2>
+    <p>Снижение влияния выбросов через трансформации:</p>
+    <pre><code>import numpy as np
+
+# Логарифм (для положительных значений)
+df['log_price'] = np.log1p(df['price'])  # log(1 + x)
+
+# Квадратный корень
+df['sqrt_price'] = np.sqrt(df['price'])
+
+# Box-Cox преобразование
+from scipy.stats import boxcox
+df['price_boxcox'], lambda_param = boxcox(df['price'] + 1)
+print(f"Оптимальная lambda: {lambda_param:.4f}")
+
+# Yeo-Johnson (работает с отрицательными)
+from sklearn.preprocessing import PowerTransformer
+
+pt = PowerTransformer(method='yeo-johnson')
+df['price_yeo_johnson'] = pt.fit_transform(
+    df[['price']]
+)
+
+# Проверка распределения
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+df['price'].hist(bins=50, ax=axes[0, 0])
+axes[0, 0].set_title('Original')
+df['log_price'].hist(bins=50, ax=axes[0, 1])
+axes[0, 1].set_title('Log')
+df['sqrt_price'].hist(bins=50, ax=axes[1, 0])
+axes[1, 0].set_title('Sqrt')
+df['price_boxcox'].hist(bins=50, ax=axes[1, 1])
+axes[1, 1].set_title('Box-Cox')
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Robust Scaler</h2>
+    <p>Масштабирование устойчивое к выбросам:</p>
+    <pre><code>from sklearn.preprocessing import RobustScaler
+
+# Использует медиану и IQR
+scaler = RobustScaler()
+df['price_robust'] = scaler.fit_transform(df[['price']])
+
+# Сравнение с StandardScaler
+from sklearn.preprocessing import StandardScaler
+
+std_scaler = StandardScaler()
+df['price_standard'] = std_scaler.fit_transform(df[['price']])
+
+# Визуализация разницы
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+df['price'].hist(bins=50, ax=axes[0])
+axes[0].set_title('Original')
+df['price_standard'].hist(bins=50, ax=axes[1])
+axes[1].set_title('StandardScaler')
+df['price_robust'].hist(bins=50, ax=axes[2])
+axes[2].set_title('RobustScaler')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Обработка по группам</h2>
+    <pre><code># Выбросы внутри категорий
+def remove_outliers_by_group(df, group_col, value_col):
+    def filter_group(group):
+        Q1 = group[value_col].quantile(0.25)
+        Q3 = group[value_col].quantile(0.75)
+        IQR = Q3 - Q1
+        lower = Q1 - 1.5 * IQR
+        upper = Q3 + 1.5 * IQR
+        return group[
+            (group[value_col] >= lower) & 
+            (group[value_col] <= upper)
+        ]
+    
+    return df.groupby(group_col, group_keys=False).apply(filter_group)
+
+# Использование
+df_cleaned = remove_outliers_by_group(df, 'category', 'price')
+
+print(f"До: {len(df)} строк")
+print(f"После: {len(df_cleaned)} строк")
+print(f"Удалено: {len(df) - len(df_cleaned)} строк")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Когда удалять vs когда оставлять</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Удалять выбросы</h3>
+        <ul>
+          <li>Очевидные ошибки ввода данных</li>
+          <li>Технические артефакты</li>
+          <li>Для линейных моделей</li>
+          <li>Если выбросов мало (&lt;1%)</li>
+          <li>Для улучшения визуализации</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Оставлять выбросы</h3>
+        <ul>
+          <li>Важны для бизнес-задачи</li>
+          <li>Обнаружение мошенничества</li>
+          <li>Редкие, но реальные события</li>
+          <li>Tree-based модели (устойчивы)</li>
+          <li>Когда выбросов много (&gt;5%)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Выбор метода</h2>
+    <table>
+      <tr><th>Метод</th><th>Когда использовать</th><th>Плюсы/Минусы</th></tr>
+      <tr>
+        <td><strong>IQR</strong></td>
+        <td>Универсальный, первый выбор</td>
+        <td>✅ Простой<br>❌ Чувствителен к скосу</td>
+      </tr>
+      <tr>
+        <td><strong>Z-score</strong></td>
+        <td>Нормальное распределение</td>
+        <td>✅ Интерпретируемый<br>❌ Только для норм. данных</td>
+      </tr>
+      <tr>
+        <td><strong>Modified Z (MAD)</strong></td>
+        <td>Устойчивая альтернатива Z-score</td>
+        <td>✅ Robust<br>❌ Менее известен</td>
+      </tr>
+      <tr>
+        <td><strong>Isolation Forest</strong></td>
+        <td>Многомерные выбросы</td>
+        <td>✅ Многомерный<br>❌ Требует настройки</td>
+      </tr>
+      <tr>
+        <td><strong>LOF</strong></td>
+        <td>Локальные аномалии</td>
+        <td>✅ Локальная структура<br>❌ Медленный</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист обработки выбросов</h2>
+    <ul>
+      <li>[ ] Визуализировать данные (box plot, histogram)</li>
+      <li>[ ] Понять природу выбросов (ошибка или реальность)</li>
+      <li>[ ] Применить несколько методов обнаружения</li>
+      <li>[ ] Сравнить результаты разных методов</li>
+      <li>[ ] Решить: удалить, заменить или оставить</li>
+      <li>[ ] Попробовать трансформации (log, sqrt)</li>
+      <li>[ ] Использовать Robust Scaler при масштабировании</li>
+      <li>[ ] Обрабатывать выбросы отдельно для train/test</li>
+      <li>[ ] Проверить влияние на метрики модели</li>
+      <li>[ ] Документировать решения</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Выбросы — это необычные значения в данных, как зарплата в $10 миллионов среди обычных работников. Иногда это ошибки, иногда — важные редкие случаи. Мы анализируем их и решаем, нужно ли их учитывать в модели».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
