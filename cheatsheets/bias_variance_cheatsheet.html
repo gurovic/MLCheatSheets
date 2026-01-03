@@ -1,0 +1,88 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>Bias-Variance Trade-off Cheatsheet — 3 колонки</title><style>@media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}@media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}.container{column-count:3;column-gap:20px;max-width:100%}.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}p,ul,ol{font-size:0.92em;margin:0.6em 0}ul,ol{padding-left:18px}li{margin-bottom:4px}code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}pre code{padding:0;background:none;white-space:pre-wrap}table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}td{padding:4px 6px;border-bottom:1px solid #f0f4ff}tr:nth-child(even){background-color:#f8fbff}.good-vs-bad{display:flex;flex-direction:column;gap:8px}.good-vs-bad div{flex:1;padding:6px 8px;border-radius:4px}.good{background-color:#f0f9f4;border-left:3px solid #2e8b57}.bad{background-color:#fdf0f2;border-left:3px solid #d32f2f}.good h3,.bad h3{margin:0 0 4px;font-size:1em;font-weight:700}.good ul,.bad ul{padding-left:20px;margin:0}.good li::before{content:"✅ ";font-weight:bold}.bad li::before{content:"❌ ";font-weight:bold}blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}.formula{text-align:center;font-family:'Cambria Math',serif;font-size:1em;margin:10px 0;padding:8px;background:#f8fbff;border-radius:4px}@media print{.container{column-gap:12px}.block{box-shadow:none}code,pre,table{font-size:0.78em}h1{font-size:1.4em}h2{font-size:1em}}</style></head><body><div class="container"><h1>⚖️ Bias-Variance Trade-off Cheatsheet</h1><div class="subtitle">Переобучение • Недообучение • Оптимальная сложность модели<br>📅 3 января 2026</div><div class="block"><h2>🔷 1. Суть</h2><ul><li><strong>Ошибка модели</strong> = Bias² + Variance + Irreducible Error</li><li><strong>Bias (смещение)</strong>: ошибка из-за упрощений модели</li><li><strong>Variance (дисперсия)</strong>: чувствительность к обучающим данным</li><li><strong>Trade-off</strong>: уменьшение одного увеличивает другое</li></ul><div class="formula">Error = Bias² + Variance + σ²</div></div><div class="block"><h2>🔷 2. Bias (Смещение)</h2><ul><li><strong>Определение</strong>: насколько модель систематически ошибается</li><li><strong>Высокий bias</strong>: модель слишком простая (недообучение)</li><li><strong>Примеры</strong>: линейная модель для нелинейных данных</li><li><strong>Симптомы</strong>: плохая точность на train и test</li></ul><pre><code># Пример: высокий bias
+from sklearn.linear_model import LinearRegression
+model = LinearRegression()
+model.fit(X_train, y_train)
+# Ошибка на train высокая → высокий bias</code></pre></div><div class="block"><h2>🔷 3. Variance (Дисперсия)</h2><ul><li><strong>Определение</strong>: насколько предсказания меняются при разных train данных</li><li><strong>Высокая variance</strong>: модель слишком сложная (переобучение)</li><li><strong>Примеры</strong>: глубокое дерево без ограничений</li><li><strong>Симптомы</strong>: отличная точность на train, плохая на test</li></ul><pre><code># Пример: высокая variance
+from sklearn.tree import DecisionTreeRegressor
+model = DecisionTreeRegressor()  # без ограничений
+model.fit(X_train, y_train)
+# Train отлично, test плохо → высокая variance</code></pre></div><div class="block"><h2>🔷 4. Визуальное сравнение</h2><table><tr><th>Модель</th><th>Bias</th><th>Variance</th><th>Описание</th></tr><tr><td>Линейная регрессия</td><td>Высокий</td><td>Низкая</td><td>Недообучение</td></tr><tr><td>Дерево (depth=3)</td><td>Средний</td><td>Средняя</td><td>Баланс ✓</td></tr><tr><td>Дерево (без лимитов)</td><td>Низкий</td><td>Высокая</td><td>Переобучение</td></tr><tr><td>Random Forest</td><td>Низкий</td><td>Средняя</td><td>Хороший баланс</td></tr></table></div><div class="block"><h2>🔷 5. Кривые обучения</h2><pre><code>from sklearn.model_selection import learning_curve
+import matplotlib.pyplot as plt
+import numpy as np
+
+train_sizes, train_scores, test_scores = learning_curve(
+    model, X, y,
+    train_sizes=np.linspace(0.1, 1.0, 10),
+    cv=5, scoring='r2'
+)
+
+plt.figure(figsize=(10, 6))
+plt.plot(train_sizes, train_scores.mean(axis=1), label='Train')
+plt.plot(train_sizes, test_scores.mean(axis=1), label='Test')
+plt.xlabel('Training examples')
+plt.ylabel('Score')
+plt.legend()
+plt.title('Learning Curves')
+plt.show()</code></pre></div><div class="block"><h2>🔷 6. Интерпретация кривых обучения</h2><ul><li><strong>Высокий bias</strong>: train и test ошибки близки, но высоки</li><li><strong>Высокая variance</strong>: большой разрыв между train и test</li><li><strong>Хороший баланс</strong>: train и test близки, обе низкие</li></ul><p>📊 <strong>Высокий bias:</strong> train ≈ test, обе плохие</p><p>📊 <strong>Высокая variance:</strong> train отлично, test плохо</p><p>📊 <strong>Баланс:</strong> train ≈ test, обе хорошие</p></div><div class="block"><h2>🔷 7. Способы уменьшить Bias</h2><ul><li>✅ Усложнить модель (больше параметров)</li><li>✅ Добавить больше признаков</li><li>✅ Полиномиальные признаки</li><li>✅ Уменьшить регуляризацию</li><li>✅ Использовать более сложный алгоритм</li></ul><pre><code># Уменьшить bias
+from sklearn.preprocessing import PolynomialFeatures
+
+# Добавить полиномиальные признаки
+poly = PolynomialFeatures(degree=2)
+X_poly = poly.fit_transform(X)
+
+model = LinearRegression()
+model.fit(X_poly, y)</code></pre></div><div class="block"><h2>🔷 8. Способы уменьшить Variance</h2><ul><li>✅ Упростить модель (меньше параметров)</li><li>✅ Больше обучающих данных</li><li>✅ Увеличить регуляризацию</li><li>✅ Кросс-валидация</li><li>✅ Ансамбли (Random Forest, Bagging)</li><li>✅ Early stopping</li><li>✅ Dropout (для нейросетей)</li></ul><pre><code># Уменьшить variance
+from sklearn.ensemble import RandomForestRegressor
+
+# Ансамбль уменьшает variance
+model = RandomForestRegressor(
+    n_estimators=100,
+    max_depth=5  # ограничить сложность
+)
+model.fit(X_train, y_train)</code></pre></div><div class="block"><h2>🔷 9. Регуляризация</h2><pre><code>from sklearn.linear_model import Ridge, Lasso
+
+# Ridge (L2) регуляризация
+ridge = Ridge(alpha=1.0)
+ridge.fit(X_train, y_train)
+
+# Lasso (L1) регуляризация
+lasso = Lasso(alpha=1.0)
+lasso.fit(X_train, y_train)
+
+# alpha ↑ → bias ↑, variance ↓
+# alpha ↓ → bias ↓, variance ↑</code></pre></div><div class="block"><h2>🔷 10. Validation Curves</h2><pre><code>from sklearn.model_selection import validation_curve
+
+param_range = [1, 2, 3, 5, 7, 10, 15, 20]
+train_scores, test_scores = validation_curve(
+    DecisionTreeRegressor(random_state=42),
+    X, y,
+    param_name='max_depth',
+    param_range=param_range,
+    cv=5, scoring='r2'
+)
+
+plt.figure(figsize=(10, 6))
+plt.plot(param_range, train_scores.mean(axis=1), label='Train')
+plt.plot(param_range, test_scores.mean(axis=1), label='Test')
+plt.xlabel('max_depth')
+plt.ylabel('R² Score')
+plt.legend()
+plt.title('Validation Curve')
+plt.show()</code></pre></div><div class="block"><h2>🔷 11. Диагностика проблемы</h2><table><tr><th>Симптомы</th><th>Проблема</th><th>Решение</th></tr><tr><td>Train ↓, Test ↓</td><td>Высокий bias</td><td>Усложнить модель</td></tr><tr><td>Train ↑, Test ↓</td><td>Высокая variance</td><td>Упростить или больше данных</td></tr><tr><td>Train ↑, Test ↑</td><td>Хороший баланс</td><td>Продолжить оптимизацию</td></tr></table></div><div class="block"><h2>🔷 12. Сложность модели</h2><div class="good-vs-bad"><div class="bad"><h3>❌ Слишком простая (High Bias)</h3><ul><li>Линейная модель для нелинейных данных</li><li>Малое число признаков</li><li>Сильная регуляризация</li><li>Мелкое дерево (max_depth=1)</li></ul></div><div class="good"><h3>✅ Оптимальная сложность</h3><ul><li>Баланс bias-variance</li><li>Хорошо на train и test</li><li>Кросс-валидация</li><li>Подобранная регуляризация</li></ul></div></div></div><div class="block"><h2>🔷 13. Практический пример</h2><pre><code>import numpy as np
+from sklearn.model_selection import cross_val_score
+
+# Простая модель (высокий bias)
+simple = LinearRegression()
+simple_scores = cross_val_score(simple, X, y, cv=5, scoring='r2')
+
+# Сложная модель (высокая variance)
+complex = DecisionTreeRegressor()
+complex_scores = cross_val_score(complex, X, y, cv=5, scoring='r2')
+
+# Сбалансированная модель
+balanced = DecisionTreeRegressor(max_depth=5, min_samples_split=20)
+balanced_scores = cross_val_score(balanced, X, y, cv=5, scoring='r2')
+
+print(f"Simple: {simple_scores.mean():.3f}")
+print(f"Complex: {complex_scores.mean():.3f}")
+print(f"Balanced: {balanced_scores.mean():.3f}")</code></pre></div><div class="block"><h2>🔷 14. Роль количества данных</h2><ul><li><strong>Мало данных</strong>: высокая variance (переобучение легко)</li><li><strong>Много данных</strong>: variance ↓, но bias остается</li><li><strong>Bias не уменьшается</strong> с увеличением данных</li><li><strong>Variance уменьшается</strong> с увеличением данных</li></ul><blockquote>«Больше данных помогает только при высокой variance. При высоком bias нужна более сложная модель»</blockquote></div><div class="block"><h2>🔷 15. Чек-лист диагностики</h2><ul><li>[ ] Оценить ошибку на train и test</li><li>[ ] Построить learning curves</li><li>[ ] Построить validation curves</li><li>[ ] Определить проблему (bias/variance)</li><li>[ ] Применить соответствующие решения</li><li>[ ] Повторить оценку</li></ul></div><div class="block"><h2>🔷 16. Практические советы</h2><ul><li><strong>Начните с простой модели</strong>: постепенно усложняйте</li><li><strong>Всегда используйте кросс-валидацию</strong></li><li><strong>Визуализируйте кривые обучения</strong></li><li><strong>Не гонитесь за 100% на train</strong>: это переобучение</li><li><strong>Баланс важнее максимума</strong>: test важнее train</li></ul><blockquote>«Bias-variance trade-off — фундаментальная концепция ML. Понимание этого баланса критично для построения хороших моделей».</blockquote></div><div class="block"><h2>🔗 Полезные ссылки</h2><ul><li><a href="https://scikit-learn.org/stable/auto_examples/model_selection/plot_underfitting_overfitting.html" target="_blank">📚 Scikit-learn: Underfitting vs Overfitting</a></li><li><a href="https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff" target="_blank">📝 Wikipedia: Bias-variance tradeoff</a></li><li><a href="http://scott.fortmann-roe.com/docs/BiasVariance.html" target="_blank">📖 Understanding Bias-Variance</a></li></ul></div></div></body></html>

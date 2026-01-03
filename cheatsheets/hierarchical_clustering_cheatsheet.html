@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Иерархическая кластеризация Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    .formula {
+      text-align: center;
+      font-family: 'Cambria Math', serif;
+      font-size: 1em;
+      margin: 10px 0;
+      padding: 8px;
+      background: #f8fbff;
+      border-radius: 4px;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🌳 Иерархическая кластеризация Cheatsheet</h1>
+  <div class="subtitle">Дендрограммы • Агломеративный и дивизивный подходы • Без сложной математики<br>📅 3 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Иерархия кластеров</strong>: строит дерево (дендрограмму)</li>
+      <li><strong>Не требует числа кластеров</strong>: можно выбрать позже</li>
+      <li><strong>Два подхода</strong>: агломеративный (снизу-вверх) и дивизивный (сверху-вниз)</li>
+      <li><strong>Визуализация</strong>: дендрограмма показывает структуру</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый код (Агломеративный)</h2>
+    <pre><code>from sklearn.cluster import AgglomerativeClustering
+from scipy.cluster.hierarchy import dendrogram, linkage
+import matplotlib.pyplot as plt
+
+# Кластеризация
+model = AgglomerativeClustering(
+    n_clusters=3, 
+    linkage='ward'
+)
+labels = model.fit_predict(X)
+
+# Дендрограмма
+Z = linkage(X, method='ward')
+plt.figure(figsize=(10, 5))
+dendrogram(Z)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Методы связи (linkage)</h2>
+    <table>
+      <tr><th>Метод</th><th>Описание</th><th>Когда использовать</th></tr>
+      <tr><td><code>ward</code></td><td>Минимизация дисперсии</td><td>По умолчанию, сбалансированные кластеры</td></tr>
+      <tr><td><code>complete</code></td><td>Максимальное расстояние</td><td>Компактные кластеры</td></tr>
+      <tr><td><code>average</code></td><td>Среднее расстояние</td><td>Умеренная чувствительность к выбросам</td></tr>
+      <tr><td><code>single</code></td><td>Минимальное расстояние</td><td>Вытянутые кластеры</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Совет</th></tr>
+      <tr><td><code>n_clusters</code></td><td>Число кластеров</td><td>Определить по дендрограмме</td></tr>
+      <tr><td><code>linkage</code></td><td>Метод связи</td><td>'ward' для большинства случаев</td></tr>
+      <tr><td><code>distance_threshold</code></td><td>Порог расстояния</td><td>Альтернатива n_clusters</td></tr>
+      <tr><td><code>metric</code></td><td>Метрика расстояния</td><td>'euclidean', 'manhattan', 'cosine'</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Определение числа кластеров</h2>
+    <pre><code># Метод 1: визуально по дендрограмме
+from scipy.cluster.hierarchy import dendrogram, linkage
+Z = linkage(X, method='ward')
+plt.figure(figsize=(12, 5))
+dendrogram(Z)
+plt.axhline(y=threshold, color='r', linestyle='--')
+plt.show()
+
+# Метод 2: без фиксированного числа кластеров
+model = AgglomerativeClustering(
+    n_clusters=None,
+    distance_threshold=10,
+    linkage='ward'
+)
+labels = model.fit_predict(X)
+print(f"Найдено кластеров: {model.n_clusters_}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Метрики расстояния</h2>
+    <ul>
+      <li><code>euclidean</code>: стандартное евклидово расстояние</li>
+      <li><code>manhattan</code>: сумма абсолютных разностей</li>
+      <li><code>cosine</code>: косинусное расстояние (для текстов)</li>
+      <li><code>correlation</code>: корреляционное расстояние</li>
+    </ul>
+    <p><strong>Важно:</strong> Масштабируйте данные перед использованием euclidean или manhattan!</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Предобработка данных</h2>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+# Масштабирование обязательно
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Затем кластеризация
+model = AgglomerativeClustering(n_clusters=3)
+labels = model.fit_predict(X_scaled)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Оценка качества</h2>
+    <pre><code>from sklearn.metrics import silhouette_score, davies_bouldin_score
+
+# Silhouette Score (больше = лучше, [-1, 1])
+sil = silhouette_score(X, labels)
+print(f"Silhouette: {sil:.3f}")
+
+# Davies-Bouldin Index (меньше = лучше)
+db = davies_bouldin_score(X, labels)
+print(f"Davies-Bouldin: {db:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Преимущества и недостатки</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Преимущества</h3>
+        <ul>
+          <li>Не требует заранее знать число кластеров</li>
+          <li>Дендрограмма дает понимание структуры данных</li>
+          <li>Детерминированный результат</li>
+          <li>Работает с любой метрикой расстояния</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Недостатки</h3>
+        <ul>
+          <li>O(n²) сложность по памяти</li>
+          <li>Медленный на больших данных (>10k точек)</li>
+          <li>Чувствителен к выбросам</li>
+          <li>Неэффективен для высоких размерностей</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо подходит</h3>
+        <ul>
+          <li>Небольшие датасеты (<5000 объектов)</li>
+          <li>Нужна визуализация иерархии</li>
+          <li>Исследовательский анализ данных</li>
+          <li>Биологическая таксономия</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо подходит</h3>
+        <ul>
+          <li>Большие датасеты (>10k объектов)</li>
+          <li>Высокая размерность (>50 признаков)</li>
+          <li>Нужна быстрая кластеризация</li>
+          <li>Данные с сильными выбросами</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Практические советы</h2>
+    <ul>
+      <li><strong>Масштабирование</strong>: всегда используйте StandardScaler</li>
+      <li><strong>Визуализация</strong>: стройте дендрограмму перед выбором числа кластеров</li>
+      <li><strong>Выбор linkage</strong>: начните с 'ward', затем пробуйте другие</li>
+      <li><strong>Валидация</strong>: используйте несколько метрик (Silhouette, Davies-Bouldin)</li>
+      <li><strong>Размер данных</strong>: для >10k объектов рассмотрите Mini-Batch версию или другие методы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сравнение методов связи</h2>
+    <pre><code># Сравнить разные методы связи
+from sklearn.metrics import silhouette_score
+
+methods = ['ward', 'complete', 'average', 'single']
+for method in methods:
+    model = AgglomerativeClustering(
+        n_clusters=3, 
+        linkage=method
+    )
+    labels = model.fit_predict(X_scaled)
+    score = silhouette_score(X_scaled, labels)
+    print(f"{method}: {score:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Связь с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Когда предпочесть</th></tr>
+      <tr><td><strong>K-Means</strong></td><td>Большие данные, сферические кластеры</td></tr>
+      <tr><td><strong>DBSCAN</strong></td><td>Кластеры произвольной формы, есть шум</td></tr>
+      <tr><td><strong>Hierarchical</strong></td><td>Нужна иерархия, небольшие данные</td></tr>
+      <tr><td><strong>GMM</strong></td><td>Вероятностные кластеры, мягкая кластеризация</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Дендрограмма с цветами</h2>
+    <pre><code>from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+
+Z = linkage(X, method='ward')
+
+# Раскрасить дендрограмму
+plt.figure(figsize=(12, 6))
+dendrogram(
+    Z,
+    color_threshold=7.5,
+    above_threshold_color='gray'
+)
+plt.title('Иерархическая кластеризация')
+plt.xlabel('Индекс объекта')
+plt.ylabel('Расстояние')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Масштабировать данные (StandardScaler)</li>
+      <li>[ ] Построить дендрограмму</li>
+      <li>[ ] Определить оптимальное число кластеров</li>
+      <li>[ ] Выбрать метод связи (linkage)</li>
+      <li>[ ] Обучить модель</li>
+      <li>[ ] Оценить качество (Silhouette, Davies-Bouldin)</li>
+      <li>[ ] Визуализировать результаты</li>
+    </ul>
+    <blockquote>
+      «Иерархическая кластеризация — отличный инструмент для исследовательского анализа и понимания структуры данных, особенно когда число кластеров заранее неизвестно».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔗 Полезные ссылки</h2>
+    <ul>
+      <li><a href="https://scikit-learn.org/stable/modules/clustering.html#hierarchical-clustering" target="_blank">📚 Scikit-learn: Hierarchical clustering</a></li>
+      <li><a href="https://docs.scipy.org/doc/scipy/reference/cluster.hierarchy.html" target="_blank">📖 SciPy: Hierarchical clustering</a></li>
+      <li><a href="https://en.wikipedia.org/wiki/Hierarchical_clustering" target="_blank">📝 Wikipedia: Hierarchical clustering</a></li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
