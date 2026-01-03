@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>🔓 Semi-supervised Learning Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔓 Semi-supervised Learning</h1>
+  <div class="subtitle">Обучение с неполной разметкой • Self-training • Co-training<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Semi-supervised Learning?</h2>
+    <ul>
+      <li><strong>Определение</strong>: обучение на labeled + unlabeled данных</li>
+      <li><strong>Проблема</strong>: разметка данных дорогая</li>
+      <li><strong>Решение</strong>: использовать структуру unlabeled данных</li>
+      <li><strong>Предположения</strong>: smoothness, cluster, manifold</li>
+      <li><strong>Применение</strong>: тексты, изображения, медицина</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Self-training</h2>
+    <pre><code>from sklearn.semi_supervised import SelfTrainingClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+# -1 для unlabeled данных
+y_train = np.array([1, 0, 1, -1, -1, 0, -1, 1])
+
+# Self-training wrapper
+base_classifier = RandomForestClassifier(random_state=42)
+self_training = SelfTrainingClassifier(
+    base_classifier,
+    threshold=0.75,  # confidence threshold
+    max_iter=10
+)
+
+self_training.fit(X_train, y_train)
+y_pred = self_training.predict(X_test)
+
+# Вручную
+def self_training_manual(X_labeled, y_labeled, X_unlabeled, 
+                         threshold=0.9, max_iter=10):
+    model = RandomForestClassifier()
+    model.fit(X_labeled, y_labeled)
+    
+    for iteration in range(max_iter):
+        # Предсказания на unlabeled
+        proba = model.predict_proba(X_unlabeled)
+        max_proba = proba.max(axis=1)
+        
+        # Высокоуверенные
+        confident = max_proba >= threshold
+        
+        if confident.sum() == 0:
+            break
+        
+        # Добавить к labeled
+        X_new = X_unlabeled[confident]
+        y_new = model.predict(X_new)
+        
+        X_labeled = np.vstack([X_labeled, X_new])
+        y_labeled = np.hstack([y_labeled, y_new])
+        X_unlabeled = X_unlabeled[~confident]
+        
+        # Переобучение
+        model.fit(X_labeled, y_labeled)
+    
+    return model</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Co-training</h2>
+    <pre><code># Два представления данных (feature splits)
+X1_labeled, X2_labeled = X_labeled[:, :5], X_labeled[:, 5:]
+X1_unlabeled, X2_unlabeled = X_unlabeled[:, :5], X_unlabeled[:, 5:]
+
+def co_training(X1_lab, X2_lab, y_lab, X1_unlab, X2_unlab, 
+                iterations=10, k=5):
+    model1 = RandomForestClassifier(random_state=42)
+    model2 = RandomForestClassifier(random_state=43)
+    
+    model1.fit(X1_lab, y_lab)
+    model2.fit(X2_lab, y_lab)
+    
+    for _ in range(iterations):
+        # Model1 предсказывает для model2
+        proba1 = model1.predict_proba(X1_unlab)
+        top_k1 = np.argsort(proba1.max(axis=1))[-k:]
+        
+        # Model2 предсказывает для model1
+        proba2 = model2.predict_proba(X2_unlab)
+        top_k2 = np.argsort(proba2.max(axis=1))[-k:]
+        
+        # Добавить predictions к labeled
+        X1_lab = np.vstack([X1_lab, X1_unlab[top_k2]])
+        X2_lab = np.vstack([X2_lab, X2_unlab[top_k1]])
+        
+        y_lab = np.hstack([y_lab, model2.predict(X2_unlab[top_k1])])
+        y_lab = np.hstack([y_lab, model1.predict(X1_unlab[top_k2])])
+        
+        # Удалить из unlabeled
+        X1_unlab = np.delete(X1_unlab, top_k2, axis=0)
+        X2_unlab = np.delete(X2_unlab, top_k1, axis=0)
+        
+        # Переобучение
+        model1.fit(X1_lab, y_lab)
+        model2.fit(X2_lab, y_lab)
+    
+    return model1, model2</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Label Propagation</h2>
+    <pre><code>from sklearn.semi_supervised import LabelPropagation, LabelSpreading
+
+# Label Propagation
+lp = LabelPropagation(
+    kernel='rbf',  # 'rbf' или 'knn'
+    gamma=20,
+    n_neighbors=7,
+    max_iter=1000
+)
+
+lp.fit(X_train, y_train)  # -1 для unlabeled
+
+# Предсказания
+y_pred = lp.predict(X_test)
+
+# Label distributions
+label_distributions = lp.label_distributions_
+print(f"Shape: {label_distributions.shape}")
+
+# Label Spreading (с регуляризацией)
+ls = LabelSpreading(
+    kernel='rbf',
+    gamma=20,
+    alpha=0.2,  # clamping factor (0=hard labels, 1=soft)
+    max_iter=30
+)
+
+ls.fit(X_train, y_train)
+y_pred = ls.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Pseudo-labeling</h2>
+    <pre><code>def pseudo_labeling(model, X_labeled, y_labeled, X_unlabeled,
+                   threshold=0.95, iterations=5):
+    for iteration in range(iterations):
+        # Обучение на labeled
+        model.fit(X_labeled, y_labeled)
+        
+        # Предсказания на unlabeled
+        proba = model.predict_proba(X_unlabeled)
+        pseudo_labels = model.predict(X_unlabeled)
+        confidence = proba.max(axis=1)
+        
+        # Выбор уверенных предсказаний
+        confident_mask = confidence >= threshold
+        
+        if confident_mask.sum() == 0:
+            break
+        
+        # Добавление pseudo-labels
+        X_labeled = np.vstack([
+            X_labeled, 
+            X_unlabeled[confident_mask]
+        ])
+        y_labeled = np.hstack([
+            y_labeled, 
+            pseudo_labels[confident_mask]
+        ])
+        
+        # Удаление из unlabeled
+        X_unlabeled = X_unlabeled[~confident_mask]
+        
+        print(f"Iteration {iteration}: added {confident_mask.sum()} samples")
+    
+    return model, X_labeled, y_labeled</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Consistency Regularization</h2>
+    <pre><code># Идея: предсказания должны быть стабильны к возмущениям
+import numpy as np
+
+def add_noise(X, noise_level=0.1):
+    noise = np.random.normal(0, noise_level, X.shape)
+    return X + noise
+
+def consistency_loss(model, X, n_augmentations=5):
+    predictions = []
+    
+    for _ in range(n_augmentations):
+        X_aug = add_noise(X)
+        pred = model.predict_proba(X_aug)
+        predictions.append(pred)
+    
+    # Variance of predictions
+    predictions = np.array(predictions)
+    consistency = predictions.var(axis=0).mean()
+    
+    return consistency
+
+# В обучении минимизируем consistency loss на unlabeled</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Когда использовать SSL</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо подходит</h3>
+        <ul>
+          <li>Много unlabeled, мало labeled</li>
+          <li>Дорогая разметка</li>
+          <li>Unlabeled data информативна</li>
+          <li>Похожее распределение labeled/unlabeled</li>
+          <li>Кластерная структура в данных</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не подходит</h3>
+        <ul>
+          <li>Достаточно labeled данных</li>
+          <li>Unlabeled не репрезентативна</li>
+          <li>Разные распределения</li>
+          <li>Нужна высокая точность</li>
+          <li>Малый объем данных</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Чек-лист</h2>
+    <ul>
+      <li>[ ] Оценить соотношение labeled/unlabeled</li>
+      <li>[ ] Проверить распределения</li>
+      <li>[ ] Обучить baseline на labeled</li>
+      <li>[ ] Выбрать SSL метод</li>
+      <li>[ ] Подобрать threshold/параметры</li>
+      <li>[ ] Валидировать на hold-out</li>
+      <li>[ ] Сравнить с supervised baseline</li>
+      <li>[ ] Мониторить качество pseudo-labels</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Semi-supervised Learning — это когда у нас есть немного размеченных примеров и много неразмеченных. Модель учится на размеченных, затем использует свои знания для разметки неразмеченных данных с высокой уверенностью, постепенно улучшаясь».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

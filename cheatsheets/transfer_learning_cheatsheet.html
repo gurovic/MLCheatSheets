@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Transfer Learning классические подходы Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔄 Transfer Learning: Классические подходы Cheatsheet</h1>
+  <div class="subtitle">Перенос знаний • Domain Adaptation • Feature Transfer<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Transfer Learning?</h2>
+    <ul>
+      <li><strong>Определение</strong>: использование знаний из одной задачи для другой</li>
+      <li><strong>Идея</strong>: не учиться с нуля, а адаптировать готовое</li>
+      <li><strong>Зачем</strong>: экономия данных, времени, вычислений</li>
+      <li><strong>Домены</strong>: source domain (откуда) → target domain (куда)</li>
+      <li><strong>Задачи</strong>: source task → target task</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы Transfer Learning</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Пример</th></tr>
+      <tr>
+        <td><strong>Inductive</strong></td>
+        <td>Разные задачи, может быть тот же домен</td>
+        <td>ImageNet → медицина</td>
+      </tr>
+      <tr>
+        <td><strong>Transductive</strong></td>
+        <td>Та же задача, разные домены</td>
+        <td>Отзывы книг → фильмы</td>
+      </tr>
+      <tr>
+        <td><strong>Unsupervised</strong></td>
+        <td>Нет меток в обоих доменах</td>
+        <td>Кластеризация cross-domain</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Feature-based Transfer</h2>
+    <p>Перенос представлений признаков:</p>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+from sklearn.decomposition import PCA
+
+# Source domain - большой датасет
+rf_source = RandomForestClassifier(n_estimators=100)
+rf_source.fit(X_source, y_source)
+
+# Извлечение признаков (листья деревьев как признаки)
+X_source_features = rf_source.apply(X_source)
+X_target_features = rf_source.apply(X_target)
+
+# PCA на source
+pca = PCA(n_components=50)
+pca.fit(X_source_features)
+
+# Применение к target
+X_target_transformed = pca.transform(X_target_features)
+
+# Обучение на новых признаках
+model_target = RandomForestClassifier()
+model_target.fit(X_target_transformed, y_target)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Instance Transfer</h2>
+    <p>Взвешивание примеров из source domain:</p>
+    <pre><code>import numpy as np
+from sklearn.ensemble import GradientBoostingClassifier
+
+# Оценка важности каждого примера из source
+def importance_weighting(X_source, X_target):
+    # Обучаем классификатор различать домены
+    from sklearn.linear_model import LogisticRegression
+    
+    # Метки: 0 = source, 1 = target
+    X_combined = np.vstack([X_source, X_target])
+    y_domain = np.hstack([
+        np.zeros(len(X_source)),
+        np.ones(len(X_target))
+    ])
+    
+    domain_clf = LogisticRegression()
+    domain_clf.fit(X_combined, y_domain)
+    
+    # Вероятность принадлежности target
+    proba_target = domain_clf.predict_proba(X_source)[:, 1]
+    proba_source = domain_clf.predict_proba(X_source)[:, 0]
+    
+    # Веса = P(target) / P(source)
+    weights = proba_target / (proba_source + 1e-10)
+    return weights
+
+weights = importance_weighting(X_source, X_target)
+
+# Обучение с весами
+model = GradientBoostingClassifier()
+model.fit(X_source, y_source, sample_weight=weights)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Parameter Transfer</h2>
+    <pre><code># Начинаем с параметров source модели
+from sklearn.linear_model import LogisticRegression
+
+# Модель на source
+model_source = LogisticRegression(max_iter=1000)
+model_source.fit(X_source, y_source)
+
+# Инициализация target модели параметрами source
+model_target = LogisticRegression(
+    max_iter=1000,
+    warm_start=True
+)
+
+# Установка начальных весов
+model_target.coef_ = model_source.coef_.copy()
+model_target.intercept_ = model_source.intercept_.copy()
+model_target.classes_ = model_source.classes_
+
+# Fine-tuning на target
+model_target.fit(X_target, y_target)
+
+# Или частичное обновление
+from sklearn.linear_model import SGDClassifier
+
+sgd = SGDClassifier(warm_start=True)
+sgd.coef_ = model_source.coef_.copy()
+sgd.intercept_ = model_source.intercept_.copy()
+
+# Постепенное дообучение
+sgd.partial_fit(X_target, y_target, classes=np.unique(y_target))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Domain Adaptation</h2>
+    <p>Минимизация domain shift:</p>
+    <pre><code># Maximum Mean Discrepancy (MMD)
+def mmd_loss(X_source, X_target, kernel='rbf', gamma=1.0):
+    from sklearn.metrics.pairwise import rbf_kernel
+    
+    n_source = len(X_source)
+    n_target = len(X_target)
+    
+    # Kernel matrices
+    K_ss = rbf_kernel(X_source, X_source, gamma)
+    K_tt = rbf_kernel(X_target, X_target, gamma)
+    K_st = rbf_kernel(X_source, X_target, gamma)
+    
+    # MMD^2
+    mmd = (K_ss.sum() / (n_source ** 2) + 
+           K_tt.sum() / (n_target ** 2) - 
+           2 * K_st.sum() / (n_source * n_target))
+    
+    return mmd
+
+# Feature alignment
+from sklearn.preprocessing import StandardScaler
+
+scaler_source = StandardScaler()
+X_source_scaled = scaler_source.fit_transform(X_source)
+
+scaler_target = StandardScaler()
+X_target_scaled = scaler_target.fit_transform(X_target)
+
+# Align distributions
+from scipy.stats import wasserstein_distance
+
+def align_features(X_source, X_target):
+    X_aligned = X_target.copy()
+    for i in range(X_target.shape[1]):
+        # Match moments
+        mean_s, std_s = X_source[:, i].mean(), X_source[:, i].std()
+        mean_t, std_t = X_target[:, i].mean(), X_target[:, i].std()
+        
+        X_aligned[:, i] = (X_target[:, i] - mean_t) / std_t * std_s + mean_s
+    
+    return X_aligned
+
+X_target_aligned = align_features(X_source_scaled, X_target_scaled)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. TrAdaBoost</h2>
+    <p>Transfer AdaBoost для domain adaptation:</p>
+    <pre><code>from sklearn.tree import DecisionTreeClassifier
+import numpy as np
+
+class TrAdaBoost:
+    def __init__(self, n_estimators=10):
+        self.n_estimators = n_estimators
+        self.models = []
+        self.alphas = []
+    
+    def fit(self, X_source, y_source, X_target, y_target):
+        n_source = len(X_source)
+        n_target = len(X_target)
+        
+        # Объединение данных
+        X_all = np.vstack([X_source, X_target])
+        y_all = np.hstack([y_source, y_target])
+        
+        # Начальные веса
+        weights = np.ones(n_source + n_target)
+        weights[:n_source] = 1.0 / n_source
+        weights[n_source:] = 1.0 / n_target
+        
+        for t in range(self.n_estimators):
+            # Обучение слабого классификатора
+            clf = DecisionTreeClassifier(max_depth=3)
+            clf.fit(X_all, y_all, sample_weight=weights)
+            
+            # Предсказания
+            y_pred = clf.predict(X_all)
+            errors = (y_pred != y_all).astype(int)
+            
+            # Ошибка на target
+            error_target = (weights[n_source:] * errors[n_source:]).sum()
+            
+            if error_target > 0.5 or error_target == 0:
+                break
+            
+            # Альфа
+            beta = error_target / (1 - error_target)
+            alpha = np.log(1 / beta) / 2
+            
+            # Обновление весов
+            # Source: уменьшаем вес при ошибке
+            weights[:n_source] *= np.power(beta, -errors[:n_source])
+            # Target: увеличиваем вес при ошибке
+            weights[n_source:] *= np.power(beta, errors[n_source:])
+            
+            # Нормализация
+            weights /= weights.sum()
+            
+            self.models.append(clf)
+            self.alphas.append(alpha)
+    
+    def predict(self, X):
+        predictions = np.zeros((len(X), len(self.models)))
+        for i, (model, alpha) in enumerate(zip(self.models, self.alphas)):
+            predictions[:, i] = model.predict(X) * alpha
+        
+        return (predictions.sum(axis=1) > 0).astype(int)
+
+# Использование
+tradaboost = TrAdaBoost(n_estimators=10)
+tradaboost.fit(X_source, y_source, X_target, y_target)
+y_pred = tradaboost.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Self-training для Transfer</h2>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+import numpy as np
+
+def self_training_transfer(X_source, y_source, X_target, 
+                          confidence_threshold=0.9, max_iter=10):
+    # Начальная модель на source
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X_source, y_source)
+    
+    # Unlabeled target data
+    X_unlabeled = X_target.copy()
+    X_labeled = X_source.copy()
+    y_labeled = y_source.copy()
+    
+    for iteration in range(max_iter):
+        # Предсказания на unlabeled
+        proba = model.predict_proba(X_unlabeled)
+        max_proba = proba.max(axis=1)
+        
+        # Высокоуверенные предсказания
+        confident_mask = max_proba >= confidence_threshold
+        
+        if confident_mask.sum() == 0:
+            break
+        
+        # Добавление к labeled
+        X_new = X_unlabeled[confident_mask]
+        y_new = model.predict(X_new)
+        
+        X_labeled = np.vstack([X_labeled, X_new])
+        y_labeled = np.hstack([y_labeled, y_new])
+        
+        # Удаление из unlabeled
+        X_unlabeled = X_unlabeled[~confident_mask]
+        
+        # Переобучение
+        model.fit(X_labeled, y_labeled)
+        
+        print(f"Iteration {iteration+1}: added {confident_mask.sum()} samples")
+    
+    return model
+
+model = self_training_transfer(X_source, y_source, X_target)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Multi-task Learning</h2>
+    <p>Одновременное обучение на нескольких задачах:</p>
+    <pre><code>from sklearn.multioutput import MultiOutputClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+# Несколько связанных задач
+# y_task1, y_task2 - разные задачи
+y_multi = np.column_stack([y_task1, y_task2])
+
+# Multi-task модель
+model = MultiOutputClassifier(
+    RandomForestClassifier(n_estimators=100, random_state=42)
+)
+
+model.fit(X, y_multi)
+
+# Предсказания для обеих задач
+predictions = model.predict(X_test)
+pred_task1 = predictions[:, 0]
+pred_task2 = predictions[:, 1]
+
+# Или с разделяемыми параметрами
+from sklearn.linear_model import MultiTaskLasso
+
+# Lasso с общими признаками
+mtl = MultiTaskLasso(alpha=0.1)
+mtl.fit(X_train, y_multi_train)
+
+# Коэффициенты показывают общие признаки
+shared_features = (mtl.coef_[:, :] != 0).sum(axis=0) > 1
+print(f"Shared features: {shared_features.sum()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Метрики для Transfer Learning</h2>
+    <pre><code>from sklearn.metrics import accuracy_score
+
+# A-distance - мера различия доменов
+def a_distance(X_source, X_target):
+    from sklearn.svm import LinearSVC
+    
+    X_combined = np.vstack([X_source, X_target])
+    y_domain = np.hstack([
+        np.zeros(len(X_source)),
+        np.ones(len(X_target))
+    ])
+    
+    clf = LinearSVC()
+    from sklearn.model_selection import cross_val_score
+    scores = cross_val_score(clf, X_combined, y_domain, cv=5)
+    
+    # A-distance ≈ 2(1 - 2*error)
+    error = 1 - scores.mean()
+    a_dist = 2 * (1 - 2 * error)
+    return a_dist
+
+# Transfer ratio
+def transfer_ratio(source_perf, target_perf, baseline_perf):
+    # Насколько transfer помог по сравнению с baseline
+    return (target_perf - baseline_perf) / (source_perf - baseline_perf)
+
+# Negative transfer detection
+baseline_acc = accuracy_score(y_test, model_baseline.predict(X_test))
+transfer_acc = accuracy_score(y_test, model_transfer.predict(X_test))
+
+if transfer_acc < baseline_acc:
+    print("Warning: Negative transfer detected!")
+    print(f"Baseline: {baseline_acc:.3f}, Transfer: {transfer_acc:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать Transfer Learning</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо подходит</h3>
+        <ul>
+          <li>Мало данных в target domain</li>
+          <li>Source и target похожи</li>
+          <li>Есть качественная source модель</li>
+          <li>Высокая стоимость разметки</li>
+          <li>Ограниченные вычислительные ресурсы</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не подходит</h3>
+        <ul>
+          <li>Домены сильно различаются</li>
+          <li>Достаточно данных в target</li>
+          <li>Риск negative transfer</li>
+          <li>Нет подходящей source задачи</li>
+          <li>Требуется полный контроль</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Fine-tuning стратегии</h2>
+    <ul>
+      <li><strong>Full fine-tuning</strong>: обучаем все параметры</li>
+      <li><strong>Frozen layers</strong>: замораживаем ранние слои</li>
+      <li><strong>Learning rate</strong>: меньше для source параметров</li>
+      <li><strong>Gradual unfreezing</strong>: размораживаем постепенно</li>
+      <li><strong>Discriminative rates</strong>: разные LR для разных слоев</li>
+    </ul>
+    <pre><code># Пример с scikit-learn SGD
+from sklearn.linear_model import SGDClassifier
+
+# Начальная модель
+source_model = SGDClassifier(max_iter=1000, random_state=42)
+source_model.fit(X_source, y_source)
+
+# Fine-tuning с меньшим learning rate
+target_model = SGDClassifier(
+    max_iter=100,
+    learning_rate='constant',
+    eta0=0.001,  # меньше чем обычно
+    warm_start=True,
+    random_state=42
+)
+
+# Копирование весов
+target_model.coef_ = source_model.coef_.copy()
+target_model.intercept_ = source_model.intercept_.copy()
+target_model.classes_ = source_model.classes_
+
+# Дообучение
+target_model.fit(X_target, y_target)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Лучшие практики</h2>
+    <ul>
+      <li><strong>Проверяйте similarity</strong> между source и target</li>
+      <li><strong>Начинайте с baseline</strong> без transfer</li>
+      <li><strong>Мониторинг negative transfer</strong> важен</li>
+      <li><strong>Используйте validation set</strong> из target domain</li>
+      <li><strong>Экспериментируйте</strong> с замороженными слоями</li>
+      <li><strong>Адаптируйте learning rate</strong> для fine-tuning</li>
+      <li><strong>Учитывайте domain shift</strong> в метриках</li>
+      <li><strong>Документируйте</strong> источник и процесс transfer</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист Transfer Learning</h2>
+    <ul>
+      <li>[ ] Определить source и target domains</li>
+      <li>[ ] Оценить similarity доменов</li>
+      <li>[ ] Выбрать тип transfer (feature/instance/parameter)</li>
+      <li>[ ] Обучить baseline модель на target</li>
+      <li>[ ] Обучить/загрузить source модель</li>
+      <li>[ ] Применить transfer learning</li>
+      <li>[ ] Сравнить с baseline</li>
+      <li>[ ] Проверить на negative transfer</li>
+      <li>[ ] Fine-tune если нужно</li>
+      <li>[ ] Валидация на target domain</li>
+      <li>[ ] Документировать результаты</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Transfer Learning — это как использование опыта врача из одной специальности в смежной области. Модель, обученная на большом датасете, уже знает общие паттерны, и нам нужно лишь адаптировать эти знания под нашу конкретную задачу, экономя время и данные».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>🎯 Target Encoding Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Target Encoding</h1>
+  <div class="subtitle">Кодирование категорий • Mean Encoding • Overfitting prevention<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Target Encoding?</h2>
+    <ul>
+      <li><strong>Определение</strong>: замена категорий средним значением таргета</li>
+      <li><strong>Также известно как</strong>: Mean Encoding, Likelihood Encoding</li>
+      <li><strong>Преимущество</strong>: работает с high-cardinality признаками</li>
+      <li><strong>Риск</strong>: overfitting, утечка информации</li>
+      <li><strong>Применение</strong>: Kaggle, индустрия</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 2. Базовый Target Encoding</h2>
+    <pre><code>import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    'category': ['A', 'B', 'A', 'C', 'B', 'A', 'C', 'B'],
+    'target': [1, 0, 1, 0, 1, 0, 1, 0]
+})
+
+# Простой target encoding (НЕ ИСПОЛЬЗОВАТЬ НА ПРАКТИКЕ!)
+target_mean = df.groupby('category')['target'].mean()
+df['category_encoded'] = df['category'].map(target_mean)
+
+print(target_mean)
+# A    0.666667
+# B    0.333333
+# C    0.500000</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 3. Smoothing (сглаживание)</h2>
+    <p>Предотвращение overfitting:</p>
+    <pre><code>def target_encode_with_smoothing(df, category_col, target_col, alpha=10):
+    # Глобальное среднее
+    global_mean = df[target_col].mean()
+    
+    # Статистика по категориям
+    agg = df.groupby(category_col)[target_col].agg(['sum', 'count'])
+    
+    # Smoothed mean
+    # weight = n / (n + alpha)
+    smoothed_mean = (agg['sum'] + global_mean * alpha) / (agg['count'] + alpha)
+    
+    return smoothed_mean
+
+# Применение
+smoothed_encoding = target_encode_with_smoothing(df, 'category', 'target', alpha=10)
+df['category_smoothed'] = df['category'].map(smoothed_encoding)
+
+# alpha - гиперпараметр:
+# alpha большое → ближе к global mean (меньше overfitting)
+# alpha малое → ближе к category mean (может overfit)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 4. Cross-validation Target Encoding</h2>
+    <p>Правильный способ избежать утечки:</p>
+    <pre><code>from sklearn.model_selection import KFold
+
+def cv_target_encode(X, y, col, n_splits=5, alpha=10):
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=42)
+    encoded = np.zeros(len(X))
+    global_mean = y.mean()
+    
+    for train_idx, val_idx in kf.split(X):
+        # Вычисляем encoding только на train
+        X_train, y_train = X.iloc[train_idx], y.iloc[train_idx]
+        
+        # Статистика на train
+        agg = pd.DataFrame({
+            'sum': X_train.groupby(col)[col].count() * 
+                   y_train.groupby(X_train[col]).mean(),
+            'count': X_train.groupby(col)[col].count()
+        })
+        
+        # Smoothed encoding
+        smoothed = (agg['sum'] + global_mean * alpha) / (agg['count'] + alpha)
+        
+        # Применяем к validation
+        encoded[val_idx] = X.iloc[val_idx][col].map(smoothed).fillna(global_mean)
+    
+    return encoded
+
+# Использование
+X_train['category_encoded'] = cv_target_encode(
+    X_train, y_train, 'category', n_splits=5
+)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 5. Category Encoders библиотека</h2>
+    <pre><code># pip install category_encoders
+
+import category_encoders as ce
+
+# Target Encoder с встроенной защитой
+encoder = ce.TargetEncoder(
+    cols=['category'],  # колонки для encoding
+    smoothing=1.0,      # сглаживание
+    min_samples_leaf=1  # минимум примеров в категории
+)
+
+# Обучение на train
+X_train_encoded = encoder.fit_transform(X_train, y_train)
+
+# Применение к test
+X_test_encoded = encoder.transform(X_test)
+
+# С кросс-валидацией
+from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import RandomForestClassifier
+
+# Encoder в пайплайне
+from sklearn.pipeline import Pipeline
+
+pipeline = Pipeline([
+    ('encoder', ce.TargetEncoder(cols=['category'])),
+    ('model', RandomForestClassifier())
+])
+
+scores = cross_val_score(pipeline, X, y, cv=5)
+print(f"CV Score: {scores.mean():.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 6. Leave-One-Out Encoding</h2>
+    <pre><code># LOO для каждого примера использует все остальные
+encoder_loo = ce.LeaveOneOutEncoder(
+    cols=['category'],
+    sigma=0.05  # добавляет шум для регуляризации
+)
+
+X_train_loo = encoder_loo.fit_transform(X_train, y_train)
+X_test_loo = encoder_loo.transform(X_test)
+
+# Ручная реализация LOO
+def loo_encode(df, cat_col, target_col):
+    encoded = np.zeros(len(df))
+    
+    for idx in range(len(df)):
+        # Все кроме текущего
+        mask = df.index != df.index[idx]
+        category = df.loc[df.index[idx], cat_col]
+        
+        # Mean без текущего примера
+        same_category = (df.loc[mask, cat_col] == category)
+        if same_category.sum() > 0:
+            encoded[idx] = df.loc[mask & same_category, target_col].mean()
+        else:
+            encoded[idx] = df[target_col].mean()
+    
+    return encoded</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 7. Множественные категориальные признаки</h2>
+    <pre><code># Encoding нескольких колонок
+categorical_cols = ['category1', 'category2', 'category3']
+
+encoder = ce.TargetEncoder(cols=categorical_cols)
+X_encoded = encoder.fit_transform(X_train[categorical_cols], y_train)
+
+# Добавление к исходным данным
+X_train_full = X_train.copy()
+for col in categorical_cols:
+    X_train_full[f'{col}_encoded'] = X_encoded[col]
+
+# Комбинация с One-Hot Encoding
+# Для low-cardinality - OHE, для high-cardinality - Target Encoding
+low_card_cols = [col for col in categorical_cols 
+                 if X_train[col].nunique() < 10]
+high_card_cols = [col for col in categorical_cols 
+                  if X_train[col].nunique() >= 10]
+
+from sklearn.preprocessing import OneHotEncoder
+
+ohe = OneHotEncoder(sparse=False, handle_unknown='ignore')
+te = ce.TargetEncoder(cols=high_card_cols)
+
+X_ohe = ohe.fit_transform(X_train[low_card_cols])
+X_te = te.fit_transform(X_train[high_card_cols], y_train)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 8. Добавление noise для регуляризации</h2>
+    <pre><code># Добавление шума к encoding
+def target_encode_with_noise(X, y, col, alpha=10, noise_level=0.01):
+    smoothed = target_encode_with_smoothing(X, col, y, alpha)
+    encoded = X[col].map(smoothed)
+    
+    # Добавление гауссовского шума
+    noise = np.random.normal(0, noise_level, len(encoded))
+    encoded_noisy = encoded + noise
+    
+    return encoded_noisy
+
+# Использование в category_encoders
+encoder = ce.TargetEncoder(
+    cols=['category'],
+    smoothing=1.0,
+    min_samples_leaf=1
+)
+
+X_encoded = encoder.fit_transform(X_train, y_train)
+
+# Ручное добавление шума
+noise = np.random.normal(0, 0.01, X_encoded.shape)
+X_encoded_noisy = X_encoded + noise</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 9. Когда использовать Target Encoding</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо подходит</h3>
+        <ul>
+          <li>High-cardinality категории (>50 значений)</li>
+          <li>Tree-based модели (XGBoost, LightGBM)</li>
+          <li>Регрессия с категориями</li>
+          <li>Категории коррелируют с таргетом</li>
+          <li>Достаточно данных в каждой категории</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо подходит</h3>
+        <ul>
+          <li>Малые данные (риск overfitting)</li>
+          <li>Low-cardinality (OHE лучше)</li>
+          <li>Нужна интерпретируемость</li>
+          <li>Редкие категории</li>
+          <li>Временные ряды (утечка)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Проверить cardinality категорий</li>
+      <li>[ ] Использовать CV или LOO encoding</li>
+      <li>[ ] Применить smoothing</li>
+      <li>[ ] Добавить noise (опционально)</li>
+      <li>[ ] Обработать редкие категории</li>
+      <li>[ ] Проверить на overfitting</li>
+      <li>[ ] Сравнить с One-Hot Encoding</li>
+      <li>[ ] Валидировать на hold-out set</li>
+    </ul>
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Target Encoding — это умный способ работы с категориями: вместо создания сотен dummy-переменных, мы заменяем категорию одним числом — средним результатом для этой категории. Как если бы мы заменили название города на средний доход его жителей».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
