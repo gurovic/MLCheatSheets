@@ -1,3 +1,7 @@
+* [Классическое машинное обучение](https://github.com/gurovic/MLCheatSheets/edit/main/README.md#%D0%BA%D0%BB%D0%B0%D1%81%D1%81%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%BE%D0%B5-%D0%BC%D0%B0%D1%88%D0%B8%D0%BD%D0%BD%D0%BE%D0%B5-%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5)
+* [Глубокое обучение](https://github.com/gurovic/MLCheatSheets/edit/main/README.md#%D0%B3%D0%BB%D1%83%D0%B1%D0%BE%D0%BA%D0%BE%D0%B5-%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5)
+* [Разные темы машинного обучения]()
+
 ## Классическое машинное обучение
 
 ### **1. Подготовка данных**
@@ -157,4 +161,208 @@
 1. Multi-task Learning
 1. Multi-output модели
 1. Квантильная регрессия
+
+## Глубокое обучение
+
+### **1. Основы нейронных сетей**
+1. Искусственный нейрон (перцептрон)
+1. Архитектура MLP (многослойный перцептрон)
+1. Функции активации (ReLU, Sigmoid, Tanh, Softmax)
+1. Функции потерь для классификации и регрессии
+1. Алгоритм обратного распространения ошибки
+1. Оптимизаторы (SGD, Momentum, Adam, RMSProp)
+1. Инициализация весов
+1. Регуляризация нейронных сетей
+
+### **2. Сверточные нейронные сети (CNN)**
+1. Основы свертки
+1. Пулинг-слои (Max, Average, Global)
+1. Архитектуры CNN (LeNet, AlexNet, VGG)
+1. Современные архитектуры (ResNet, Inception, EfficientNet)
+1. Transfer learning для CNN
+1. Data augmentation для изображений
+1. Визуализация CNN
+1. 1D-CNN и 3D-CNN
+
+### **3. Рекуррентные нейронные сети (RNN)**
+1. Основы RNN
+1. Проблема исчезающего градиента
+1. LSTM (Long Short-Term Memory)
+1. GRU (Gated Recurrent Units)
+1. Двунаправленные RNN
+1. Рекуррентная регуляризация
+1. Архитектуры encoder-decoder
+
+### **4. Трансформеры и механизмы внимания**
+1. Механизм внимания (attention)
+1. Self-attention
+1. Multi-head attention
+1. Архитектура Transformer
+1. Positional encoding
+1. BERT и языковые модели
+1. Vision Transformers (ViT)
+1. Efficient Transformers
+
+### **5. Генеративные модели**
+1. Автоэнкодеры
+1. Вариационные автоэнкодеры (VAE)
+1. Генеративно-состязательные сети (GAN)
+1. DCGAN, Conditional GAN
+1. StyleGAN
+1. Diffusion модели
+1. Нормализующие потоки (Normalizing Flows)
+
+### **6. Обучение с подкреплением (Deep RL)**
+1. Deep Q-Networks (DQN)
+1. Policy Gradient методы
+1. Actor-Critic методы
+1. PPO (Proximal Policy Optimization)
+1. Многозадачное RL
+1. Иерархическое RL
+1. Имитационное обучение
+
+### **7. Обработка естественного языка (NLP)**
+1. Векторные представления слов (Word2Vec, GloVe, FastText)
+1. RNN/LSTM для NLP
+1. Transformer для NLP
+1. BERT и его вариации
+1. GPT-архитектуры
+1. Токенизация (BPE, WordPiece, SentencePiece)
+1. Задачи NLP (NER, классификация, суммаризация)
+
+### **8. Компьютерное зрение (Computer Vision)**
+1. Классификация изображений
+1. Детекция объектов (YOLO, SSD, Faster R-CNN)
+1. Сегментация (Semantic, Instance, Panoptic)
+1. Детекция ключевых точек
+1. Слежение за объектами
+1. Оценка позы человека
+1. 3D Computer Vision
+
+### **9. Обработка аудио и речь**
+1. Спектрограммы и MFCC
+1. Модели для распознавания речи (ASR)
+1. Модели для синтеза речи (TTS)
+1. Классификация звуков
+1. Source separation
+1. Audio generation
+
+### **10. Мультимодальное обучение**
+11. Модели для изображений и текста
+11. CLIP и похожие архитектуры
+11. Видео-аудио модели
+11. Cross-modal retrieval
+11. Мультимодальные трансформеры
+
+### **11. Малоресурсное обучение**
+11. Few-shot learning
+11. Zero-shot learning
+11. Transfer learning
+11. Meta-learning (MAML, Prototypical Networks)
+11. Domain adaptation
+
+### **12. Объяснимость и интерпретируемость**
+11. CAM и Grad-CAM
+11. Saliency maps
+11. Integrated gradients
+11. LIME для нейросетей
+11. SHAP для нейросетей
+11. Concept activation vectors
+
+### **13. Оптимизация и ускорение**
+11. Mixed precision training
+11. Gradient checkpointing
+11. Distributed training
+11. Квантизация (quantization)
+11. Прунинг (pruning)
+11. Дистилляция знаний (knowledge distillation)
+11. Neural Architecture Search (NAS)
+
+### **14. Графовые нейронные сети (GNN)**
+11. Основы GNN
+11. Graph Convolutional Networks (GCN)
+11. Graph Attention Networks (GAT)
+11. Message Passing Networks
+11. Применения GNN
+
+### **15. Временные ряды и прогнозирование**
+11. RNN/LSTM для временных рядов
+11. CNN для временных рядов (TCN)
+11. Transformers для временных рядов
+11. Многомерные временные ряды
+11. Аномалии во временных рядах
+11. Прогнозирование спроса и трафика
+
+### **16. Нейросети для табличных данных**
+11. MLP для табличных данных
+11. TabNet
+11. Neural Oblivious Decision Ensembles
+11. AutoML для нейросетей
+11. Сравнение с классическими методами
+
+### **17. Этичные аспекты и безопасность**
+11. Adversarial attacks
+11. Defensive distillation
+11. Adversarial training
+11. Bias в нейросетях
+11. Fairness в ML
+11. Federated learning
+11. Differential privacy
+
+### **18. Производство и MLOps**
+11. Сериализация нейросетей
+11. ONNX формат
+11. TensorFlow Serving
+11. TorchServe
+11. Мониторинг моделей
+11. CI/CD для ML
+11. Feature stores
+
+### **19. Фреймворки и библиотеки**
+11. PyTorch полный гайд
+11. TensorFlow/Keras полный гайд
+11. JAX и Flax
+11. Hugging Face Transformers
+11. PyTorch Lightning
+11. FastAI
+
+### **20. Теория глубокого обучения**
+21. Теорема универсальной аппроксимации
+21. Теория обобщения для нейросетей
+21. Динамика обучения нейросетей
+21. Neural tangent kernel
+21. Information bottleneck theory
+
+### **21. Специальные архитектуры**
+21. Capsule networks
+21. Spiking neural networks
+21. Neural ODEs
+21. Differentiable programming
+21. Memory networks
+21. Hypernetworks
+
+### **22. Нейронаука и биологически правдоподобные модели**
+21. Биологически вдохновленные архитектуры
+21. Нейроморфные вычисления
+21. Связь нейросетей и мозга
+
+### **23. Креативные приложения**
+21. Neural style transfer
+21. Image-to-image translation
+21. Text-to-image generation
+21. Музыкальные нейросети
+21. Генерация видео
+
+### **24. Научные применения**
+21. Нейросети в физике
+21. Нейросети в химии
+21. Нейросети в биологии
+21. Нейросети в медицине
+21. Нейросети в астрономии
+
+### **25. История и эволюция**
+21. Хронология глубокого обучения
+21. Ключевые прорывы
+21. Современные тенденции
+21. Будущее глубокого обучения
 
