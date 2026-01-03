@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>LightGBM Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    a {
+      color: #1a5fb4;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⚡ LightGBM Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Быстрый градиентный бустинг • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Алгоритм</strong>: градиентный бустинг от Microsoft</li>
+      <li><strong>Особенность</strong>: листовое (leaf-wise) построение деревьев</li>
+      <li><strong>Преимущества</strong>: быстрый, экономный по памяти</li>
+      <li><strong>Применение</strong>: табличные данные, соревнования Kaggle</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Установка</h2>
+    <pre><code># pip
+pip install lightgbm
+
+# С GPU поддержкой (опционально)
+pip install lightgbm --install-option=--gpu
+
+# conda
+conda install -c conda-forge lightgbm</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код — Классификация</h2>
+    <pre><code>import lightgbm as lgb
+from sklearn.model_selection import train_test_split
+
+# Разделение данных
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Создание датасета LightGBM
+train_data = lgb.Dataset(X_train, label=y_train)
+test_data = lgb.Dataset(X_test, label=y_test, reference=train_data)
+
+# Параметры
+params = {
+    'objective': 'binary',  # или 'multiclass'
+    'metric': 'binary_logloss',
+    'boosting_type': 'gbdt',
+    'num_leaves': 31,
+    'learning_rate': 0.05,
+    'feature_fraction': 0.9
+}
+
+# Обучение
+model = lgb.train(
+    params,
+    train_data,
+    num_boost_round=100,
+    valid_sets=[test_data],
+    callbacks=[lgb.early_stopping(stopping_rounds=10)]
+)
+
+# Предсказание
+y_pred = model.predict(X_test)
+y_pred_binary = [1 if x > 0.5 else 0 for x in y_pred]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Sklearn API</h2>
+    <pre><code>from lightgbm import LGBMClassifier, LGBMRegressor
+
+# Классификация
+clf = LGBMClassifier(
+    n_estimators=100,
+    learning_rate=0.05,
+    num_leaves=31,
+    random_state=42
+)
+
+clf.fit(
+    X_train, y_train,
+    eval_set=[(X_test, y_test)],
+    eval_metric='logloss',
+    callbacks=[lgb.early_stopping(stopping_rounds=10)]
+)
+
+# Предсказание
+y_pred = clf.predict(X_test)
+y_proba = clf.predict_proba(X_test)
+
+# Регрессия
+reg = LGBMRegressor(n_estimators=100, learning_rate=0.05)
+reg.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Типичные значения</th></tr>
+      <tr><td><code>num_leaves</code></td><td>Макс. листьев в дереве</td><td>31, 63, 127</td></tr>
+      <tr><td><code>learning_rate</code></td><td>Скорость обучения</td><td>0.01-0.1</td></tr>
+      <tr><td><code>n_estimators</code></td><td>Количество деревьев</td><td>100-1000</td></tr>
+      <tr><td><code>max_depth</code></td><td>Глубина дерева</td><td>-1 (без ограничений)</td></tr>
+      <tr><td><code>min_child_samples</code></td><td>Мин. примеров в листе</td><td>20-100</td></tr>
+      <tr><td><code>feature_fraction</code></td><td>% признаков на дерево</td><td>0.8-1.0</td></tr>
+      <tr><td><code>bagging_fraction</code></td><td>% данных на дерево</td><td>0.8-1.0</td></tr>
+      <tr><td><code>lambda_l1</code></td><td>L1 регуляризация</td><td>0-10</td></tr>
+      <tr><td><code>lambda_l2</code></td><td>L2 регуляризация</td><td>0-10</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Objectives (цели)</h2>
+    <table>
+      <tr><th>Задача</th><th>Objective</th></tr>
+      <tr><td>Бинарная классификация</td><td><code>binary</code></td></tr>
+      <tr><td>Мультиклассовая</td><td><code>multiclass</code></td></tr>
+      <tr><td>Регрессия</td><td><code>regression</code></td></tr>
+      <tr><td>Регрессия L1</td><td><code>regression_l1</code></td></tr>
+      <tr><td>Ranking</td><td><code>lambdarank</code></td></tr>
+      <tr><td>Пуассон</td><td><code>poisson</code></td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Метрики</h2>
+    <table>
+      <tr><th>Метрика</th><th>Применение</th></tr>
+      <tr><td><code>binary_logloss</code></td><td>Бинарная классификация</td></tr>
+      <tr><td><code>multi_logloss</code></td><td>Мультиклассовая</td></tr>
+      <tr><td><code>auc</code></td><td>ROC AUC</td></tr>
+      <tr><td><code>rmse</code></td><td>Регрессия</td></tr>
+      <tr><td><code>mae</code></td><td>Регрессия (MAE)</td></tr>
+      <tr><td><code>mape</code></td><td>Регрессия (%)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Важность признаков</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Split importance (по умолчанию)
+lgb.plot_importance(model, max_num_features=20)
+plt.title('Feature Importance (Split)')
+plt.show()
+
+# Gain importance (более информативно)
+lgb.plot_importance(model, importance_type='gain', max_num_features=20)
+plt.title('Feature Importance (Gain)')
+plt.show()
+
+# Получить значения
+importances = model.feature_importance(importance_type='gain')
+feature_names = model.feature_name()
+
+# Создать DataFrame
+import pandas as pd
+importance_df = pd.DataFrame({
+    'feature': feature_names,
+    'importance': importances
+}).sort_values('importance', ascending=False)
+
+print(importance_df.head(10))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Categorical Features</h2>
+    <pre><code># LightGBM работает с категориями напрямую!
+# Категориальные признаки как целые числа
+
+# Вариант 1: указать индексы
+train_data = lgb.Dataset(
+    X_train, 
+    label=y_train,
+    categorical_feature=[0, 2, 5]  # индексы категорий
+)
+
+# Вариант 2: указать имена
+train_data = lgb.Dataset(
+    X_train, 
+    label=y_train,
+    categorical_feature=['city', 'color', 'brand']
+)
+
+# Вариант 3: sklearn API
+clf = LGBMClassifier(categorical_feature=[0, 2, 5])
+clf.fit(X_train, y_train)
+
+# ВАЖНО: категории должны быть целыми числами (int)
+# LightGBM автоматически найдет оптимальные разбиения</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Гиперпараметры для тюнинга</h2>
+    <pre><code>from sklearn.model_selection import GridSearchCV
+
+# Начальные параметры
+param_grid = {
+    'num_leaves': [31, 63, 127],
+    'learning_rate': [0.01, 0.05, 0.1],
+    'n_estimators': [100, 200, 500],
+    'min_child_samples': [20, 50, 100],
+    'feature_fraction': [0.8, 0.9, 1.0]
+}
+
+# Grid Search
+clf = LGBMClassifier(random_state=42)
+grid = GridSearchCV(clf, param_grid, cv=5, scoring='roc_auc')
+grid.fit(X_train, y_train)
+
+print(f"Best params: {grid.best_params_}")
+print(f"Best score: {grid.best_score_:.4f}")
+
+# Optuna (более эффективно)
+import optuna
+
+def objective(trial):
+    params = {
+        'num_leaves': trial.suggest_int('num_leaves', 20, 150),
+        'learning_rate': trial.suggest_float('learning_rate', 0.01, 0.3),
+        'n_estimators': trial.suggest_int('n_estimators', 50, 500),
+        'min_child_samples': trial.suggest_int('min_child_samples', 5, 100),
+    }
+    
+    clf = LGBMClassifier(**params, random_state=42)
+    clf.fit(X_train, y_train, eval_set=[(X_test, y_test)])
+    return clf.best_score_['valid_0']['binary_logloss']
+
+study = optuna.create_study(direction='minimize')
+study.optimize(objective, n_trials=50)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Борьба с переобучением</h2>
+    <pre><code># 1. Early Stopping
+model = lgb.train(
+    params,
+    train_data,
+    num_boost_round=1000,
+    valid_sets=[test_data],
+    callbacks=[lgb.early_stopping(stopping_rounds=50)]
+)
+
+# 2. Регуляризация
+params = {
+    'lambda_l1': 0.1,  # L1 регуляризация
+    'lambda_l2': 0.1,  # L2 регуляризация
+    'min_gain_to_split': 0.1,  # мин. прирост для разбиения
+    'min_child_samples': 50,  # больше примеров в листе
+}
+
+# 3. Feature/Bagging fraction
+params = {
+    'feature_fraction': 0.8,  # используем 80% признаков
+    'bagging_fraction': 0.8,  # используем 80% данных
+    'bagging_freq': 5,  # каждые 5 итераций
+}
+
+# 4. Уменьшить num_leaves
+params = {
+    'num_leaves': 31,  # меньше листьев = проще модель
+    'max_depth': 5,  # ограничение глубины
+}</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Cross-Validation</h2>
+    <pre><code># Native LightGBM CV
+cv_results = lgb.cv(
+    params,
+    train_data,
+    num_boost_round=1000,
+    nfold=5,
+    stratified=True,
+    shuffle=True,
+    callbacks=[lgb.early_stopping(stopping_rounds=50)]
+)
+
+print(f"Best iteration: {len(cv_results['valid binary_logloss-mean'])}")
+print(f"Best score: {cv_results['valid binary_logloss-mean'][-1]:.4f}")
+
+# Sklearn CV
+from sklearn.model_selection import cross_val_score
+
+clf = LGBMClassifier(n_estimators=100)
+scores = cross_val_score(clf, X, y, cv=5, scoring='roc_auc')
+print(f"CV scores: {scores}")
+print(f"Mean: {scores.mean():.4f} (+/- {scores.std():.4f})")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. GPU ускорение</h2>
+    <pre><code># Параметры для GPU
+params = {
+    'device': 'gpu',
+    'gpu_platform_id': 0,
+    'gpu_device_id': 0,
+}
+
+# Или в sklearn API
+clf = LGBMClassifier(device='gpu')
+
+# CUDA версия (самая быстрая)
+# Требует компиляции LightGBM с CUDA
+params = {
+    'device': 'cuda',
+    'gpu_use_dp': False,  # single precision
+}</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Сохранение и загрузка</h2>
+    <pre><code># Сохранение (native API)
+model.save_model('model.txt')
+
+# Загрузка
+model = lgb.Booster(model_file='model.txt')
+
+# Сохранение (sklearn API)
+import joblib
+joblib.dump(clf, 'model.pkl')
+clf = joblib.load('model.pkl')
+
+# Pickle
+import pickle
+with open('model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+with open('model.pkl', 'rb') as f:
+    model = pickle.load(f)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Табличные данные</li>
+          <li>Большие датасеты (>10k строк)</li>
+          <li>Категориальные признаки</li>
+          <li>Нужна скорость обучения</li>
+          <li>Ограниченная память</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Малые датасеты (<1k строк)</li>
+          <li>Нужна интерпретируемость</li>
+          <li>Изображения, тексты (используйте нейросети)</li>
+          <li>Сильный дисбаланс классов (требует настройки)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. LightGBM vs XGBoost</h2>
+    <table>
+      <tr><th>Критерий</th><th>LightGBM</th><th>XGBoost</th></tr>
+      <tr><td>Скорость</td><td>⚡ Быстрее</td><td>Медленнее</td></tr>
+      <tr><td>Память</td><td>Меньше</td><td>Больше</td></tr>
+      <tr><td>Точность</td><td>≈ Равная</td><td>≈ Равная</td></tr>
+      <tr><td>Рост дерева</td><td>Leaf-wise</td><td>Level-wise</td></tr>
+      <tr><td>Категории</td><td>✅ Нативно</td><td>❌ Нужно кодировать</td></tr>
+      <tr><td>Малые данные</td><td>Переобучается</td><td>Стабильнее</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Типичные ошибки</h2>
+    <div class="good-vs-bad">
+      <div class="bad">
+        <h3>❌ Неправильно</h3>
+        <ul>
+          <li>Не использовать early stopping</li>
+          <li>Слишком большой <code>num_leaves</code> (переобучение)</li>
+          <li>Не указывать категориальные признаки</li>
+          <li>Использовать на малых данных без настройки</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>✅ Правильно</h3>
+        <ul>
+          <li>Всегда использовать early stopping</li>
+          <li>Начинать с <code>num_leaves=31</code></li>
+          <li>Указывать <code>categorical_feature</code></li>
+          <li>Увеличить <code>min_child_samples</code> для малых данных</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист</h2>
+    <ul>
+      <li>[ ] Преобразовать категории в int</li>
+      <li>[ ] Указать <code>categorical_feature</code></li>
+      <li>[ ] Использовать early stopping</li>
+      <li>[ ] Начать с дефолтных параметров</li>
+      <li>[ ] Настроить <code>num_leaves</code> и <code>learning_rate</code></li>
+      <li>[ ] Проверить переобучение на валидации</li>
+      <li>[ ] Использовать регуляризацию при необходимости</li>
+      <li>[ ] Сохранить модель для production</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «LightGBM — это очень быстрая версия градиентного бустинга, как гоночный автомобиль среди ML алгоритмов. Он строит деревья решений особым способом, что позволяет обучаться в разы быстрее и экономить память».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔗 Полезные ссылки</h2>
+    <ul>
+      <li><a href="https://lightgbm.readthedocs.io/" target="_blank">📚 Официальная документация</a></li>
+      <li><a href="https://github.com/microsoft/LightGBM" target="_blank">💻 GitHub репозиторий</a></li>
+      <li><a href="https://lightgbm.readthedocs.io/en/latest/Parameters.html" target="_blank">⚙️ Полный список параметров</a></li>
+      <li><a href="https://lightgbm.readthedocs.io/en/latest/Parameters-Tuning.html" target="_blank">🎯 Гайд по тюнингу</a></li>
+      <li><a href="https://www.kaggle.com/learn/intermediate-machine-learning" target="_blank">📖 Kaggle Learn: ML с LightGBM</a></li>
+      <li><a href="https://neptune.ai/blog/lightgbm-parameters-guide" target="_blank">📝 Neptune.ai: гайд по параметрам</a></li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
