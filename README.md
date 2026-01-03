@@ -12,7 +12,7 @@
 1. Масштабирование и нормализация
 1. Feature Engineering
 1. [Выбор признаков (Feature Selection)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_selection_cheatsheet.html)
-1. Снижение размерности (Dimensionality Reduction)
+1. [Снижение размерности (Dimensionality Reduction)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dimensionality_reduction_cheatsheet.html)
 1. [Балансировка классов (Imbalanced Data)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/imbalanced_data_cheatsheet.html)
 
 ### **2. Классификация**
@@ -31,18 +31,18 @@
 1. [Полиномиальная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/polynomial_regression_cheatsheet.html)
 1. [Ридж, Лассо, ElasticNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ridge_lasso_elasticnet_cheatsheet.html)
 1. [Деревья решений для регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/decision_trees_regression_cheatsheet.html)
-1. Случайный лес для регрессии
-1. Градиентный бустинг для регрессии
-1. Методы регуляризации
+1. [Случайный лес для регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/random_forest_regression_cheatsheet.html)
+1. [Градиентный бустинг для регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gradient_boosting_regression_cheatsheet.html)
+1. [Методы регуляризации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/regularization_methods_cheatsheet.html)
 1. Непараметрическая регрессия
 
 ### **4. Кластеризация**
 1. [K-means и K-means++](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/kmeans_cheatsheet.html)
 1. [Иерархическая кластеризация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hierarchical_clustering_cheatsheet.html)
 1. [DBSCAN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dbscan_cheatsheet.html)
-1. OPTICS
+1. [OPTICS](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/optics_cheatsheet.html)
 1. [Gaussian Mixture Models (GMM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gmm_cheatsheet.html)
-1. Метрики оценки кластеризации
+1. [Метрики оценки кластеризации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/clustering_metrics_cheatsheet.html)
 1. Выбор числа кластеров
 
 ### **5. Понижение размерности**
@@ -59,8 +59,8 @@
 1. [ROC и AUC](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/roc_auc_cheatsheet.html)
 1. [Метрики регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/regression_metrics_cheatsheet.html)
 1. [Кросс-валидация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cross_validation_cheatsheet.html)
-1. Кривые обучения
-1. Калибровка моделей
+1. [Кривые обучения](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/learning_curves_cheatsheet.html)
+1. [Калибровка моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_calibration_cheatsheet.html)
 1. Статистические тесты для сравнения моделей
 
 ### **7. Поиск гиперпараметров**
@@ -78,8 +78,8 @@
 
 ### **9. Обнаружение аномалий**
 1. [Isolation Forest](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/isolation_forest_cheatsheet.html)
-1. One-Class SVM
-1. Local Outlier Factor
+1. [One-Class SVM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/one_class_svm_cheatsheet.html)
+1. [Local Outlier Factor](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/local_outlier_factor_cheatsheet.html)
 1. Elliptic Envelope
 1. Статистические методы
 
