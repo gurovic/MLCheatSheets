@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>SHAP Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    a { color: #1a5fb4; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🔍 SHAP Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Интерпретация моделей • Практический фокус<br>📅 Январь 2026</div>
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>SHAP</strong>: SHapley Additive exPlanations</li>
+      <li><strong>Цель</strong>: объяснить предсказания ML моделей</li>
+      <li><strong>Основа</strong>: теория игр (Shapley values)</li>
+      <li><strong>Применение</strong>: интерпретация любых моделей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Установка и базовый код</h2>
+    <pre><code># Установка
+pip install shap
+
+# Базовое использование
+import shap
+import xgboost as xgb
+
+# Обучить модель
+model = xgb.XGBClassifier()
+model.fit(X_train, y_train)
+
+# Создать explainer
+explainer = shap.Explainer(model, X_train)
+
+# Вычислить SHAP values
+shap_values = explainer(X_test)
+
+# Визуализация
+shap.plots.waterfall(shap_values[0])  # для одного примера
+shap.plots.beeswarm(shap_values)  # summary plot</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Типы Explainers</h2>
+    <table>
+      <tr><th>Explainer</th><th>Применение</th></tr>
+      <tr><td><code>Explainer</code></td><td>Авто-выбор (рекомендуется)</td></tr>
+      <tr><td><code>TreeExplainer</code></td><td>Деревья (XGB, LightGBM, CatBoost)</td></tr>
+      <tr><td><code>LinearExplainer</code></td><td>Линейные модели</td></tr>
+      <tr><td><code>DeepExplainer</code></td><td>Нейронные сети</td></tr>
+      <tr><td><code>KernelExplainer</code></td><td>Любые модели (медленно)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Waterfall plot</h2>
+    <pre><code># Объяснение одного предсказания
+import shap
+
+# Для одного примера
+shap.plots.waterfall(shap_values[0])
+
+# С пользовательским заголовком
+shap.plots.waterfall(
+    shap_values[0],
+    max_display=10,  # топ-10 признаков
+    show=True
+)
+
+# Интерпретация:
+# - Красный = увеличивает предсказание
+# - Синий = уменьшает предсказание
+# - Длина = важность влияния</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Summary plot (Beeswarm)</h2>
+    <pre><code># Общая картина для всех данных
+shap.plots.beeswarm(shap_values, max_display=15)
+
+# Интерпретация:
+# - Ось Y: признаки (сверху = важнее)
+# - Ось X: SHAP value (влияние)
+# - Цвет: значение признака (красный=высокое, синий=низкое)
+# - Плотность точек: частота значений
+
+# Bar plot (средняя важность)
+shap.plots.bar(shap_values)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Dependence plot</h2>
+    <pre><code># Как признак влияет на предсказание
+shap.plots.scatter(
+    shap_values[:, "Age"],  # признак для анализа
+    color=shap_values  # цвет по другому признаку
+)
+
+# С выбором признака для цвета
+shap.plots.scatter(
+    shap_values[:, "Age"],
+    color=shap_values[:, "Income"]
+)
+
+# Интерпретация:
+# - Ось X: значения признака
+# - Ось Y: SHAP value (влияние)
+# - Видны нелинейные зависимости</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Force plot</h2>
+    <pre><code># Интерактивное объяснение
+shap.initjs()  # для Jupyter
+
+# Один пример
+shap.plots.force(shap_values[0])
+
+# Несколько примеров
+shap.plots.force(shap_values[:100])
+
+# Сохранить в HTML
+shap.save_html("force_plot.html", shap.plots.force(shap_values[0]))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Для разных моделей</h2>
+    <pre><code># XGBoost / LightGBM / CatBoost
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(X_test)
+
+# Random Forest / Sklearn
+explainer = shap.TreeExplainer(model)
+shap_values = explainer(X_test)
+
+# Линейные модели
+explainer = shap.LinearExplainer(model, X_train)
+shap_values = explainer(X_test)
+
+# Любая модель (медленно!)
+explainer = shap.KernelExplainer(model.predict, X_train_sample)
+shap_values = explainer(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Нейронные сети</h2>
+    <pre><code>import shap
+import tensorflow as tf
+
+# Обучить модель
+model = tf.keras.Sequential([...])
+model.fit(X_train, y_train)
+
+# Deep SHAP
+explainer = shap.DeepExplainer(model, X_train[:100])
+shap_values = explainer.shap_values(X_test[:10])
+
+# Визуализация
+shap.image_plot(shap_values, X_test[:10])  # для изображений
+
+# Gradient SHAP (быстрее)
+explainer = shap.GradientExplainer(model, X_train[:100])
+shap_values = explainer.shap_values(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Объяснить предсказания моделей</li>
+          <li>Найти важные признаки</li>
+          <li>Дебаг моделей</li>
+          <li>Презентация заказчику</li>
+          <li>Feature selection</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень большие данные (>100k)</li>
+          <li>Real-time inference</li>
+          <li>Строгая интерпретация (есть ограничения)</li>
+          <li>Коррелирующие признаки (осторожно)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Чек-лист</h2>
+    <ul>
+      <li>[ ] Использовать автоматический Explainer</li>
+      <li>[ ] Начать с summary plot для обзора</li>
+      <li>[ ] Waterfall для отдельных примеров</li>
+      <li>[ ] Dependence plot для интересных признаков</li>
+      <li>[ ] Проверить на тестовых данных</li>
+      <li>[ ] Сохранить важные визуализации</li>
+    </ul>
+    <blockquote>
+      «SHAP показывает, как каждый признак повлиял на конкретное предсказание модели. Это как детальное объяснение: "Модель предсказала X, потому что признак A увеличил на Y, а признак B уменьшил на Z"».
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔗 Полезные ссылки</h2>
+    <ul>
+      <li><a href="https://shap.readthedocs.io/" target="_blank">📚 Официальная документация</a></li>
+      <li><a href="https://github.com/slundberg/shap" target="_blank">💻 GitHub репозиторий</a></li>
+      <li><a href="https://christophm.github.io/interpretable-ml-book/shap.html" target="_blank">📖 Interpretable ML Book: SHAP</a></li>
+      <li><a href="https://www.youtube.com/watch?v=VB9uV-x0gtg" target="_blank">🎥 SHAP explained</a></li>
+      <li><a href="https://arxiv.org/abs/1705.07874" target="_blank">📄 Научная статья</a></li>
+    </ul>
+  </div>
+</div>
+</body>
+</html>
