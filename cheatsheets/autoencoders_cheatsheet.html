@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Автоэнкодеры (Autoencoders) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Автоэнкодеры (Autoencoders) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Автоэнкодер</strong> — нейросеть для обучения представлений</li>
+      <li><strong>Архитектура</strong>: Encoder → Bottleneck → Decoder</li>
+      <li><strong>Цель</strong>: воссоздать вход на выходе</li>
+      <li><strong>Обучение</strong>: без учителя (unsupervised)</li>
+      <li><strong>Bottleneck</strong>: сжатое представление данных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Архитектура</h2>
+    <p><strong>Input → Encoder → Latent Space (z) → Decoder → Output</strong></p>
+    <table>
+      <tr><th>Компонент</th><th>Функция</th></tr>
+      <tr><td><strong>Encoder</strong></td><td>Сжатие данных в latent space</td></tr>
+      <tr><td><strong>Latent space (z)</strong></td><td>Компактное представление</td></tr>
+      <tr><td><strong>Decoder</strong></td><td>Восстановление из latent space</td></tr>
+    </table>
+    <p>Размерность latent space << размерность входа</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Простой автоэнкодер (Keras)</h2>
+    <pre><code>import tensorflow as tf
+from tensorflow.keras import layers, models
+
+# Параметры
+input_dim = 784  # например, MNIST 28x28
+encoding_dim = 32  # размер латентного пространства
+
+# Encoder
+encoder_input = layers.Input(shape=(input_dim,))
+encoded = layers.Dense(128, activation='relu')(encoder_input)
+encoded = layers.Dense(encoding_dim, activation='relu')(encoded)
+
+encoder = models.Model(encoder_input, encoded, name='encoder')
+
+# Decoder
+decoder_input = layers.Input(shape=(encoding_dim,))
+decoded = layers.Dense(128, activation='relu')(decoder_input)
+decoded = layers.Dense(input_dim, activation='sigmoid')(decoded)
+
+decoder = models.Model(decoder_input, decoded, name='decoder')
+
+# Autoencoder
+autoencoder_input = layers.Input(shape=(input_dim,))
+encoded_output = encoder(autoencoder_input)
+decoded_output = decoder(encoded_output)
+
+autoencoder = models.Model(
+    autoencoder_input, 
+    decoded_output, 
+    name='autoencoder'
+)
+
+autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
+autoencoder.summary()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Простой автоэнкодер (PyTorch)</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class Autoencoder(nn.Module):
+    def __init__(self, input_dim, encoding_dim):
+        super(Autoencoder, self).__init__()
+        
+        # Encoder
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, encoding_dim),
+            nn.ReLU()
+        )
+        
+        # Decoder
+        self.decoder = nn.Sequential(
+            nn.Linear(encoding_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, input_dim),
+            nn.Sigmoid()
+        )
+    
+    def forward(self, x):
+        encoded = self.encoder(x)
+        decoded = self.decoder(encoded)
+        return decoded
+    
+    def encode(self, x):
+        return self.encoder(x)
+    
+    def decode(self, z):
+        return self.decoder(z)
+
+# Создание модели
+model = Autoencoder(input_dim=784, encoding_dim=32)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Convolutional Autoencoder</h2>
+    <pre><code># Для изображений
+from tensorflow.keras import layers, models
+
+def build_conv_autoencoder(input_shape):
+    # Encoder
+    encoder_input = layers.Input(shape=input_shape)
+    x = layers.Conv2D(32, (3, 3), activation='relu', padding='same')(encoder_input)
+    x = layers.MaxPooling2D((2, 2), padding='same')(x)
+    x = layers.Conv2D(64, (3, 3), activation='relu', padding='same')(x)
+    x = layers.MaxPooling2D((2, 2), padding='same')(x)
+    encoded = layers.Conv2D(128, (3, 3), activation='relu', padding='same')(x)
+    
+    encoder = models.Model(encoder_input, encoded, name='encoder')
+    
+    # Decoder
+    decoder_input = layers.Input(shape=encoded.shape[1:])
+    x = layers.Conv2D(128, (3, 3), activation='relu', padding='same')(decoder_input)
+    x = layers.UpSampling2D((2, 2))(x)
+    x = layers.Conv2D(64, (3, 3), activation='relu', padding='same')(x)
+    x = layers.UpSampling2D((2, 2))(x)
+    decoded = layers.Conv2D(input_shape[-1], (3, 3), 
+                           activation='sigmoid', padding='same')(x)
+    
+    decoder = models.Model(decoder_input, decoded, name='decoder')
+    
+    # Autoencoder
+    autoencoder_input = layers.Input(shape=input_shape)
+    autoencoder = models.Model(
+        autoencoder_input,
+        decoder(encoder(autoencoder_input))
+    )
+    
+    return encoder, decoder, autoencoder
+
+encoder, decoder, autoencoder = build_conv_autoencoder((28, 28, 1))
+autoencoder.compile(optimizer='adam', loss='binary_crossentropy')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Обучение автоэнкодера</h2>
+    <pre><code># Keras
+from tensorflow.keras.callbacks import EarlyStopping
+
+# Подготовка данных (например, MNIST)
+from tensorflow.keras.datasets import mnist
+(x_train, _), (x_test, _) = mnist.load_data()
+
+# Нормализация
+x_train = x_train.astype('float32') / 255.
+x_test = x_test.astype('float32') / 255.
+
+# Flatten для обычного AE
+x_train = x_train.reshape((len(x_train), -1))
+x_test = x_test.reshape((len(x_test), -1))
+
+# Обучение
+history = autoencoder.fit(
+    x_train, x_train,  # вход = выход!
+    epochs=50,
+    batch_size=256,
+    shuffle=True,
+    validation_data=(x_test, x_test),
+    callbacks=[EarlyStopping(patience=5)]
+)
+
+# Предсказание
+encoded_imgs = encoder.predict(x_test)
+decoded_imgs = decoder.predict(encoded_imgs)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Типы автоэнкодеров</h2>
+    <table>
+      <tr><th>Тип</th><th>Особенность</th><th>Применение</th></tr>
+      <tr><td><strong>Vanilla</strong></td><td>Простой MLP</td><td>Базовое сжатие</td></tr>
+      <tr><td><strong>Convolutional</strong></td><td>CNN слои</td><td>Изображения</td></tr>
+      <tr><td><strong>Sparse</strong></td><td>Разреженная активация</td><td>Feature learning</td></tr>
+      <tr><td><strong>Denoising</strong></td><td>Шум на входе</td><td>Шумоподавление</td></tr>
+      <tr><td><strong>Variational (VAE)</strong></td><td>Вероятностный</td><td>Генерация</td></tr>
+      <tr><td><strong>Contractive</strong></td><td>Регуляризация градиентов</td><td>Робастность</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Sparse Autoencoder</h2>
+    <pre><code># Добавление L1 регуляризации для разреженности
+from tensorflow.keras import regularizers
+
+encoded = layers.Dense(
+    encoding_dim, 
+    activation='relu',
+    activity_regularizer=regularizers.l1(1e-5)
+)(encoder_input)
+
+# Или KL-дивергенция для sparsity
+from tensorflow.keras import backend as K
+
+def kl_divergence_regularizer(rho=0.05):
+    def loss(y_true, y_pred):
+        rho_hat = K.mean(y_pred, axis=0)
+        kl = rho * K.log(rho / rho_hat) + \
+             (1 - rho) * K.log((1 - rho) / (1 - rho_hat))
+        return K.sum(kl)
+    return loss
+
+# rho — желаемая средняя активация (обычно 0.05)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Denoising Autoencoder</h2>
+    <pre><code>import numpy as np
+
+# Добавление шума к данным
+noise_factor = 0.5
+x_train_noisy = x_train + noise_factor * np.random.normal(
+    loc=0.0, scale=1.0, size=x_train.shape
+)
+x_test_noisy = x_test + noise_factor * np.random.normal(
+    loc=0.0, scale=1.0, size=x_test.shape
+)
+
+# Clip значения в [0, 1]
+x_train_noisy = np.clip(x_train_noisy, 0., 1.)
+x_test_noisy = np.clip(x_test_noisy, 0., 1.)
+
+# Обучение: вход — зашумлённые данные, выход — чистые
+autoencoder.fit(
+    x_train_noisy, x_train,
+    epochs=50,
+    batch_size=256,
+    validation_data=(x_test_noisy, x_test)
+)
+
+# Теперь модель умеет убирать шум!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Variational Autoencoder (VAE)</h2>
+    <pre><code>from tensorflow.keras import backend as K
+
+class Sampling(layers.Layer):
+    """Reparameterization trick"""
+    def call(self, inputs):
+        z_mean, z_log_var = inputs
+        batch = K.shape(z_mean)[0]
+        dim = K.shape(z_mean)[1]
+        epsilon = K.random_normal(shape=(batch, dim))
+        return z_mean + K.exp(0.5 * z_log_var) * epsilon
+
+# Encoder
+encoder_input = layers.Input(shape=(input_dim,))
+x = layers.Dense(128, activation='relu')(encoder_input)
+z_mean = layers.Dense(latent_dim)(x)
+z_log_var = layers.Dense(latent_dim)(x)
+z = Sampling()([z_mean, z_log_var])
+
+encoder = models.Model(encoder_input, [z_mean, z_log_var, z])
+
+# Decoder
+decoder_input = layers.Input(shape=(latent_dim,))
+x = layers.Dense(128, activation='relu')(decoder_input)
+decoder_output = layers.Dense(input_dim, activation='sigmoid')(x)
+
+decoder = models.Model(decoder_input, decoder_output)
+
+# VAE loss
+def vae_loss(x, x_decoded):
+    # Reconstruction loss
+    reconstruction_loss = K.binary_crossentropy(x, x_decoded)
+    reconstruction_loss *= input_dim
+    
+    # KL divergence
+    kl_loss = 1 + z_log_var - K.square(z_mean) - K.exp(z_log_var)
+    kl_loss = K.sum(kl_loss, axis=-1)
+    kl_loss *= -0.5
+    
+    return K.mean(reconstruction_loss + kl_loss)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Применения автоэнкодеров</h2>
+    <ul>
+      <li><strong>Снижение размерности</strong> — альтернатива PCA</li>
+      <li><strong>Шумоподавление</strong> — denoising autoencoder</li>
+      <li><strong>Обнаружение аномалий</strong> — высокая ошибка реконструкции</li>
+      <li><strong>Генерация данных</strong> — VAE</li>
+      <li><strong>Предобучение</strong> — transfer learning</li>
+      <li><strong>Feature extraction</strong> — использовать encoder</li>
+      <li><strong>Сжатие данных</strong> — lossy compression</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Обнаружение аномалий</h2>
+    <pre><code># Обучить на нормальных данных
+autoencoder.fit(x_train_normal, x_train_normal, epochs=50)
+
+# Вычислить ошибку реконструкции
+reconstructed = autoencoder.predict(x_test)
+mse = np.mean(np.square(x_test - reconstructed), axis=1)
+
+# Установить порог
+threshold = np.percentile(mse, 95)
+
+# Аномалии — это данные с высокой ошибкой
+anomalies = mse > threshold
+
+print(f"Обнаружено аномалий: {anomalies.sum()}")
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.hist(mse, bins=50)
+plt.axvline(threshold, color='r', linestyle='--', label='Threshold')
+plt.xlabel('Reconstruction Error')
+plt.ylabel('Count')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Визуализация латентного пространства</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Для 2D латентного пространства
+encoding_dim = 2
+# ... обучить autoencoder ...
+
+# Закодировать тестовые данные
+encoded_imgs = encoder.predict(x_test)
+
+# Визуализация
+plt.figure(figsize=(10, 8))
+plt.scatter(encoded_imgs[:, 0], encoded_imgs[:, 1], 
+           c=y_test, cmap='viridis', alpha=0.5)
+plt.colorbar()
+plt.xlabel('Latent dimension 1')
+plt.ylabel('Latent dimension 2')
+plt.title('Latent Space Visualization')
+plt.show()
+
+# Для размерности > 2 использовать t-SNE или UMAP
+from sklearn.manifold import TSNE
+tsne = TSNE(n_components=2, random_state=42)
+encoded_2d = tsne.fit_transform(encoded_imgs)
+
+plt.scatter(encoded_2d[:, 0], encoded_2d[:, 1], 
+           c=y_test, cmap='viridis', alpha=0.5)
+plt.colorbar()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Генерация новых данных (VAE)</h2>
+    <pre><code># Семплировать из латентного пространства
+import numpy as np
+
+# Случайные точки из стандартного нормального распределения
+n_samples = 10
+random_latent_vectors = np.random.normal(size=(n_samples, latent_dim))
+
+# Декодировать
+generated_images = decoder.predict(random_latent_vectors)
+
+# Визуализация
+import matplotlib.pyplot as plt
+n = 10
+plt.figure(figsize=(20, 2))
+for i in range(n):
+    ax = plt.subplot(1, n, i + 1)
+    plt.imshow(generated_images[i].reshape(28, 28), cmap='gray')
+    plt.axis('off')
+plt.show()
+
+# Интерполяция между двумя точками
+def interpolate(encoder, decoder, img1, img2, steps=10):
+    z1 = encoder.predict(img1.reshape(1, -1))[0]  # mean для VAE
+    z2 = encoder.predict(img2.reshape(1, -1))[0]
+    
+    interpolated = []
+    for alpha in np.linspace(0, 1, steps):
+        z = (1 - alpha) * z1 + alpha * z2
+        interpolated.append(decoder.predict(z.reshape(1, -1)))
+    
+    return interpolated</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Снижение размерности для визуализации</li>
+          <li>Обнаружение аномалий</li>
+          <li>Шумоподавление</li>
+          <li>Feature extraction</li>
+          <li>Генерация данных (VAE)</li>
+          <li>Предобучение для других задач</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо / Есть лучше</h3>
+        <ul>
+          <li>Простое сжатие → используйте PCA</li>
+          <li>Классификация → используйте supervised learning</li>
+          <li>Реалистичная генерация → используйте GAN</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Оптимизация автоэнкодера</h2>
+    <pre><code># 1. Архитектура
+# - Симметричный encoder/decoder
+# - Постепенное уменьшение/увеличение размерности
+
+# 2. Функция потерь
+# Binary crossentropy для [0,1]
+autoencoder.compile(optimizer='adam', loss='binary_crossentropy')
+
+# MSE для других
+autoencoder.compile(optimizer='adam', loss='mse')
+
+# 3. Регуляризация
+from tensorflow.keras import regularizers
+layers.Dense(128, activation='relu',
+            kernel_regularizer=regularizers.l2(1e-4))
+
+# 4. Batch Normalization
+from tensorflow.keras.layers import BatchNormalization
+x = layers.Dense(128)(x)
+x = BatchNormalization()(x)
+x = layers.Activation('relu')(x)
+
+# 5. Learning rate scheduling
+from tensorflow.keras.callbacks import ReduceLROnPlateau
+reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=5)
+
+history = autoencoder.fit(
+    x_train, x_train,
+    epochs=100,
+    callbacks=[reduce_lr]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Метрики качества</h2>
+    <pre><code># 1. Reconstruction Loss
+from sklearn.metrics import mean_squared_error
+
+reconstructed = autoencoder.predict(x_test)
+mse = mean_squared_error(x_test.flatten(), 
+                         reconstructed.flatten())
+print(f"MSE: {mse:.4f}")
+
+# 2. SSIM (для изображений)
+from skimage.metrics import structural_similarity as ssim
+
+ssim_scores = []
+for i in range(len(x_test)):
+    score = ssim(x_test[i], reconstructed[i])
+    ssim_scores.append(score)
+
+print(f"Mean SSIM: {np.mean(ssim_scores):.4f}")
+
+# 3. Visualization
+n = 10
+plt.figure(figsize=(20, 4))
+for i in range(n):
+    # Оригинал
+    ax = plt.subplot(2, n, i + 1)
+    plt.imshow(x_test[i].reshape(28, 28), cmap='gray')
+    plt.axis('off')
+    
+    # Реконструкция
+    ax = plt.subplot(2, n, i + 1 + n)
+    plt.imshow(reconstructed[i].reshape(28, 28), cmap='gray')
+    plt.axis('off')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист</h2>
+    <ul>
+      <li>[ ] Нормализовать входные данные (0-1 или стандартизация)</li>
+      <li>[ ] Выбрать правильный тип AE для задачи</li>
+      <li>[ ] Подобрать размер латентного пространства</li>
+      <li>[ ] Симметричная архитектура encoder/decoder</li>
+      <li>[ ] Использовать appropriate activation functions</li>
+      <li>[ ] Правильная функция потерь (BCE vs MSE)</li>
+      <li>[ ] Регуляризация для предотвращения переобучения</li>
+      <li>[ ] Визуализировать реконструкции</li>
+      <li>[ ] Для VAE: балансировать reconstruction и KL loss</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Автоэнкодер — это нейросеть, которая учится сжимать данные до самого важного, а потом восстанавливать их обратно. Как ZIP-архив, но "умный" — он понимает, что важно в данных, а что можно отбросить».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

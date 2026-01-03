@@ -18,7 +18,7 @@
 ### **2. Классификация**
 1. [Логистическая регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/logreg_cheatsheet.html)
 1. [Метод опорных векторов (SVM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/svm_cheatsheet.html)
-1. Наивный Байес (Naive Bayes)
+1. [Наивный Байес (Naive Bayes)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/naive_bayes_cheatsheet.html)
 1. [k-ближайших соседей (k-NN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/knn_cheatsheet.html)
 1. [Деревья решений для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/decision_trees_cheatsheet.html)
 1. [Случайный лес для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/random_forest_cheatsheet.html)
@@ -29,7 +29,7 @@
 ### **3. Регрессия**
 1. [Линейная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/linreg_cheatsheet.html)
 1. Полиномиальная регрессия
-1. Ридж, Лассо, ElasticNet
+1. [Ридж, Лассо, ElasticNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ridge_lasso_elasticnet_cheatsheet.html)
 1. Деревья решений для регрессии
 1. Случайный лес для регрессии
 1. Градиентный бустинг для регрессии
@@ -39,7 +39,7 @@
 ### **4. Кластеризация**
 1. [K-means и K-means++](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/kmeans_cheatsheet.html)
 1. Иерархическая кластеризация
-1. DBSCAN
+1. [DBSCAN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dbscan_cheatsheet.html)
 1. OPTICS
 1. Gaussian Mixture Models
 1. Метрики оценки кластеризации
@@ -55,7 +55,7 @@
 
 ### **6. Оценка моделей и валидация**
 1. [Метрики классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/classification_metrics_cheatsheet.html)
-1. Метрики регрессии
+1. [Метрики регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/regression_metrics_cheatsheet.html)
 1. [Кросс-валидация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cross_validation_cheatsheet.html)
 1. Кривые обучения
 1. Калибровка моделей
@@ -187,7 +187,7 @@
 ### **3. Рекуррентные нейронные сети (RNN)**
 1. [Основы RNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rnn_basics_cheatsheet.html)
 1. Проблема исчезающего градиента
-1. LSTM (Long Short-Term Memory)
+1. [LSTM (Long Short-Term Memory)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lstm_cheatsheet.html)
 1. GRU (Gated Recurrent Units)
 1. Двунаправленные RNN
 1. Рекуррентная регуляризация
@@ -204,7 +204,7 @@
 1. Efficient Transformers
 
 ### **5. Генеративные модели**
-1. Автоэнкодеры
+1. [Автоэнкодеры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/autoencoders_cheatsheet.html)
 1. Вариационные автоэнкодеры (VAE)
 1. Генеративно-состязательные сети (GAN)
 1. DCGAN, Conditional GAN
