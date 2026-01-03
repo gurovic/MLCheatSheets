@@ -6,14 +6,14 @@
 
 ### **1. Подготовка данных**
 1. [Предобработка данных (Preprocessing)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/preprocessing_cheatsheet.html)
-1. Обработка пропущенных значений
+1. [Data Preprocessing (missing values, encoding)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/data_preprocessing_cheatsheet.html)
 1. [Обработка выбросов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/outlier_detection_cheatsheet.html)
 1. Кодирование категориальных признаков
 1. Масштабирование и нормализация
-1. Feature Engineering
+1. [Feature Engineering](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_engineering_cheatsheet.html)
 1. [Выбор признаков (Feature Selection)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_selection_cheatsheet.html)
 1. Снижение размерности (Dimensionality Reduction)
-1. Балансировка классов
+1. [Балансировка классов (Imbalanced Data)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/imbalanced_data_cheatsheet.html)
 
 ### **2. Классификация**
 1. [Логистическая регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/logreg_cheatsheet.html)
@@ -23,7 +23,7 @@
 1. [Деревья решений для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/decision_trees_cheatsheet.html)
 1. [Случайный лес для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/random_forest_cheatsheet.html)
 1. [Градиентный бустинг для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/boosting_cheatsheet.html)
-1. [XGBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/xgboost_cheatsheet.html) / LightGBM / CatBoost
+1. [XGBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/xgboost_cheatsheet.html) / [LightGBM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lightgbm_cheatsheet.html) / [CatBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/catboost_cheatsheet.html)
 1. [Ансамбли методов (Voting, Stacking)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ensemble_methods_cheatsheet.html)
 
 ### **3. Регрессия**
@@ -41,15 +41,15 @@
 1. [Иерархическая кластеризация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hierarchical_clustering_cheatsheet.html)
 1. [DBSCAN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dbscan_cheatsheet.html)
 1. OPTICS
-1. Gaussian Mixture Models
+1. [Gaussian Mixture Models](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gmm_cheatsheet.html)
 1. Метрики оценки кластеризации
 1. Выбор числа кластеров
 
 ### **5. Понижение размерности**
 1. [PCA (Principal Component Analysis)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pca_cheatsheet.html)
 1. [t-SNE](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tsne_cheatsheet.html)
-1. UMAP
-1. LDA (Linear Discriminant Analysis)
+1. [UMAP](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/umap_cheatsheet.html)
+1. [LDA (Linear Discriminant Analysis)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lda_cheatsheet.html)
 1. SVD (Singular Value Decomposition)
 1. Автоэнкодеры (линейные)
 
@@ -67,29 +67,29 @@
 1. Стратегии поиска гиперпараметров
 
 ### **8. Работа с временными рядами (классические методы)**
-1. ARIMA / SARIMA
+1. [ARIMA / SARIMA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_forecasting_cheatsheet.html)
 1. Экспоненциальное сглаживание
 1. Методы на основе скользящих средних
 1. Feature Engineering для временных рядов
 1. Валидация временных рядов
 
 ### **9. Обнаружение аномалий**
-1. Isolation Forest
-1. One-Class SVM
+1. [Isolation Forest](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/isolation_forest_cheatsheet.html)
+1. [One-Class SVM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/one_class_svm_cheatsheet.html)
 1. Local Outlier Factor
 1. Elliptic Envelope
 1. Статистические методы
 
 ### **10. Рекомендательные системы (классические)**
-1. Коллаборативная фильтрация
+1. [Коллаборативная фильтрация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/recommender_systems_cheatsheet.html)
 1. Контентная фильтрация
 1. Матричная факторизация (SVD)
 1. ALS (Alternating Least Squares)
 
 ### **11. Градиентный бустинг**
-1. XGBoost
-1. LightGBM
-1. CatBoost
+1. [XGBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/xgboost_cheatsheet.html)
+1. [LightGBM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lightgbm_cheatsheet.html)
+1. [CatBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/catboost_cheatsheet.html)
 1. Гиперпараметры градиентного бустинга
 1. Особенности и тонкости настройки
 
@@ -176,9 +176,9 @@
 1. [Основы свертки](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_basics_cheatsheet.html)
 1. Пулинг-слои (Max, Average, Global)
 1. Архитектуры CNN (LeNet, AlexNet, VGG)
-1. Современные архитектуры (ResNet, Inception, EfficientNet)
-1. Transfer learning для CNN
-1. Data augmentation для изображений
+1. [Современные архитектуры (ResNet, Inception, EfficientNet)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/resnet_cheatsheet.html)
+1. [Transfer learning для CNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transfer_learning_cheatsheet.html)
+1. [Data augmentation для изображений](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/data_augmentation_cheatsheet.html)
 1. [Batch Normalization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/batch_normalization_cheatsheet.html)
 1. Визуализация CNN
 1. 1D-CNN и 3D-CNN
@@ -193,12 +193,12 @@
 1. Архитектуры encoder-decoder
 
 ### **4. Трансформеры и механизмы внимания**
-1. Механизм внимания (attention)
+1. [Механизм внимания (attention)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/attention_mechanism_cheatsheet.html)
 1. Self-attention
 1. Multi-head attention
 1. [Архитектура Transformer](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transformers_cheatsheet.html)
 1. Positional encoding
-1. BERT и языковые модели
+1. [BERT и языковые модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bert_cheatsheet.html)
 1. Vision Transformers (ViT)
 1. Efficient Transformers
 
@@ -231,7 +231,7 @@
 
 ### **8. Компьютерное зрение (Computer Vision)**
 1. Классификация изображений
-1. Детекция объектов (YOLO, SSD, Faster R-CNN)
+1. [Детекция объектов (YOLO, SSD, Faster R-CNN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/object_detection_cheatsheet.html)
 1. Сегментация (Semantic, Instance, Panoptic)
 1. Детекция ключевых точек
 1. Слежение за объектами
@@ -269,6 +269,7 @@
 11. Concept activation vectors
 
 ### **13. Оптимизация и ускорение**
+11. [Learning Rate Scheduling](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/learning_rate_scheduling_cheatsheet.html)
 11. Mixed precision training
 11. Gradient checkpointing
 11. Distributed training
@@ -309,6 +310,7 @@
 11. Differential privacy
 
 ### **18. Производство и MLOps**
+11. [Model Deployment](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_deployment_cheatsheet.html)
 11. Сериализация нейросетей
 11. ONNX формат
 11. TensorFlow Serving
