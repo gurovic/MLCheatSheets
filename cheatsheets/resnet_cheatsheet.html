@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><title>ResNet Architecture Cheatsheet</title>
+<style>@media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}@media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}.container{column-count:3;column-gap:20px;max-width:100%}.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}p,ul,ol{font-size:0.92em;margin:0.6em 0}ul,ol{padding-left:18px}li{margin-bottom:4px}code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}pre code{padding:0;background:none;white-space:pre-wrap}table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}td{padding:4px 6px;border-bottom:1px solid #f0f4ff}tr:nth-child(even){background-color:#f8fbff}blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}</style>
+</head>
+<body>
+<div class="container">
+<h1>🎯 ResNet Architecture Cheatsheet</h1>
+<div class="subtitle">Для начинающих • Residual Networks • Практический фокус<br>📅 Январь 2026</div>
+
+<div class="block"><h2>🔷 1. Основная идея</h2><ul><li><strong>Проблема</strong>: глубокие сети сложно обучать (degradation)</li><li><strong>Решение</strong>: skip connections (residual connections)</li><li><strong>Формула</strong>: F(x) + x вместо просто F(x)</li><li><strong>Эффект</strong>: можно обучать сети 50-152+ слоёв</li><li><strong>Авторы</strong>: Kaiming He et al., Microsoft, 2015</li><li><strong>Прорыв</strong>: выиграл ImageNet 2015</li></ul></div>
+
+<div class="block"><h2>🔷 2. Residual Block</h2><p><strong>Основной строительный блок</strong></p><pre><code>x → [Conv → BN → ReLU → Conv → BN] → +x → ReLU</code></pre><p>Вместо обучения H(x), обучаем остаток F(x) = H(x) - x</p></div>
+
+<div class="block"><h2>�� 3. PyTorch Implementation</h2><pre><code>import torch.nn as nn
+
+class BasicBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, stride=1):
+        super().__init__()
+        
+        self.conv1 = nn.Conv2d(in_channels, out_channels, 3, stride, 1)
+        self.bn1 = nn.BatchNorm2d(out_channels)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, 3, 1, 1)
+        self.bn2 = nn.BatchNorm2d(out_channels)
+        
+        self.shortcut = nn.Sequential()
+        if stride != 1 or in_channels != out_channels:
+            self.shortcut = nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, 1, stride),
+                nn.BatchNorm2d(out_channels)
+            )
+    
+    def forward(self, x):
+        out = F.relu(self.bn1(self.conv1(x)))
+        out = self.bn2(self.conv2(out))
+        out += self.shortcut(x)  # Skip connection!
+        out = F.relu(out)
+        return out</code></pre></div>
+
+<div class="block"><h2>🔷 4. Варианты ResNet</h2><table><tr><th>Модель</th><th>Слои</th><th>Параметры</th><th>Точность</th></tr><tr><td><strong>ResNet-18</strong></td><td>18</td><td>11.7M</td><td>69.8%</td></tr><tr><td><strong>ResNet-34</strong></td><td>34</td><td>21.8M</td><td>73.3%</td></tr><tr><td><strong>ResNet-50</strong></td><td>50</td><td>25.6M</td><td>76.2%</td></tr><tr><td><strong>ResNet-101</strong></td><td>101</td><td>44.5M</td><td>77.4%</td></tr><tr><td><strong>ResNet-152</strong></td><td>152</td><td>60.2M</td><td>78.3%</td></tr></table></div>
+
+<div class="block"><h2>🔷 5. Bottleneck Block (ResNet-50+)</h2><pre><code>class Bottleneck(nn.Module):
+    expansion = 4
+    
+    def __init__(self, in_ch, out_ch, stride=1):
+        super().__init__()
+        # 1x1 уменьшение
+        self.conv1 = nn.Conv2d(in_ch, out_ch, 1)
+        self.bn1 = nn.BatchNorm2d(out_ch)
+        
+        # 3x3 основная свёртка
+        self.conv2 = nn.Conv2d(out_ch, out_ch, 3, stride, 1)
+        self.bn2 = nn.BatchNorm2d(out_ch)
+        
+        # 1x1 увеличение
+        self.conv3 = nn.Conv2d(out_ch, out_ch*4, 1)
+        self.bn3 = nn.BatchNorm2d(out_ch*4)</code></pre></div>
+
+<div class="block"><h2>🔷 6. Использование pretrained</h2><pre><code># PyTorch
+from torchvision import models
+
+# Загрузить pretrained
+model = models.resnet50(pretrained=True)
+
+# Заморозить веса
+for param in model.parameters():
+    param.requires_grad = False
+
+# Заменить последний слой
+num_classes = 10
+model.fc = nn.Linear(model.fc.in_features, num_classes)
+
+# Fine-tuning
+model = models.resnet50(pretrained=True)
+# Не замораживаем, малый LR
+optimizer = optim.Adam(model.parameters(), lr=1e-4)</code></pre></div>
+
+<div class="block"><h2>🔷 7. Почему работают skip connections</h2><ul><li><strong>Gradient flow</strong>: градиенты текут напрямую назад</li><li><strong>Identity mapping</strong>: в худшем случае F(x)=0, H(x)=x</li><li><strong>Ensemble effect</strong>: множество путей через сеть</li><li><strong>Легче оптимизировать</strong>: проще обучить остаток</li></ul></div>
+
+<div class="block"><h2>🔷 8. Лучшие практики</h2><ul><li><strong>BatchNorm</strong>: после каждой свёртки</li><li><strong>ReLU после addition</strong>: активация после сложения</li><li><strong>Projection shortcuts</strong>: 1x1 conv когда размеры не совпадают</li><li><strong>Strided convolutions</strong>: для downsampling</li><li><strong>Global Average Pooling</strong>: перед FC слоем</li></ul></div>
+
+<div class="block"><h2>🔷 9. Применения</h2><ul><li><strong>Image Classification</strong>: стандарт для CV</li><li><strong>Object Detection</strong>: backbone для Faster R-CNN, YOLO</li><li><strong>Semantic Segmentation</strong>: encoder в U-Net</li><li><strong>Transfer Learning</strong>: pretrained features</li></ul></div>
+
+<div class="block"><h2>🔷 10. Чек-лист</h2><ul><li>[ ] Использовать skip connections</li><li>[ ] BatchNorm после каждой Conv</li><li>[ ] ReLU после addition</li><li>[ ] Projection для несовпадающих размеров</li><li>[ ] Попробовать pretrained модель</li><li>[ ] Fine-tuning с малым LR</li></ul><blockquote>«ResNet — это магистрали в нейросети: информация и градиенты могут течь напрямую через всю сеть, минуя промежуточные слои. Это позволяет обучать очень глубокие сети без проблем».</blockquote></div>
+
+</div>
+</body>
+</html>

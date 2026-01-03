@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Data Augmentation Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Data Augmentation Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Увеличение данных • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: искусственно увеличить размер обучающей выборки</li>
+      <li><strong>Метод</strong>: создание модифицированных копий данных</li>
+      <li><strong>Эффект</strong>: улучшение обобщающей способности модели</li>
+      <li><strong>Борьба с переобучением</strong>: модель видит больше вариаций</li>
+      <li><strong>Применение</strong>: особенно критично при малом объёме данных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Аугментация изображений (основные техники)</h2>
+    <table>
+      <tr><th>Трансформация</th><th>Описание</th></tr>
+      <tr><td><strong>Поворот</strong></td><td>Вращение на случайный угол</td></tr>
+      <tr><td><strong>Отражение</strong></td><td>Горизонтальное/вертикальное</td></tr>
+      <tr><td><strong>Масштабирование</strong></td><td>Увеличение/уменьшение</td></tr>
+      <tr><td><strong>Сдвиг</strong></td><td>Смещение по осям</td></tr>
+      <tr><td><strong>Обрезка</strong></td><td>Random crop</td></tr>
+      <tr><td><strong>Яркость</strong></td><td>Изменение освещённости</td></tr>
+      <tr><td><strong>Контраст</strong></td><td>Изменение контраста</td></tr>
+      <tr><td><strong>Шум</strong></td><td>Добавление гауссовского шума</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Keras/TensorFlow (базовый)</h2>
+    <pre><code>from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+# Создаём генератор с аугментацией
+datagen = ImageDataGenerator(
+    rotation_range=20,        # Поворот ±20°
+    width_shift_range=0.2,    # Сдвиг по ширине
+    height_shift_range=0.2,   # Сдвиг по высоте
+    horizontal_flip=True,     # Отражение
+    zoom_range=0.2,           # Масштабирование
+    fill_mode='nearest'       # Заполнение пикселей
+)
+
+# Обучение с аугментацией
+model.fit(
+    datagen.flow(X_train, y_train, batch_size=32),
+    epochs=50,
+    validation_data=(X_val, y_val)
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Albumentations (продвинутая библиотека)</h2>
+    <pre><code>import albumentations as A
+from albumentations.pytorch import ToTensorV2
+
+# Композиция трансформаций
+transform = A.Compose([
+    A.Rotate(limit=30, p=0.5),
+    A.HorizontalFlip(p=0.5),
+    A.RandomBrightnessContrast(p=0.3),
+    A.GaussNoise(var_limit=(10, 50), p=0.2),
+    A.RandomCrop(height=224, width=224),
+    A.Normalize(mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]),
+    ToTensorV2()
+])
+
+# Применение
+augmented = transform(image=image)
+aug_image = augmented['image']
+
+# В PyTorch DataLoader
+class AugmentedDataset(Dataset):
+    def __init__(self, images, labels, transform):
+        self.images = images
+        self.labels = labels
+        self.transform = transform
+    
+    def __getitem__(self, idx):
+        image = self.images[idx]
+        augmented = self.transform(image=image)
+        return augmented['image'], self.labels[idx]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. PyTorch (transforms)</h2>
+    <pre><code>from torchvision import transforms
+
+# Трансформации для обучения
+train_transform = transforms.Compose([
+    transforms.RandomResizedCrop(224),
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomRotation(15),
+    transforms.ColorJitter(
+        brightness=0.2,
+        contrast=0.2,
+        saturation=0.2,
+        hue=0.1
+    ),
+    transforms.ToTensor(),
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    )
+])
+
+# Для валидации - только нормализация!
+val_transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    )
+])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Продвинутые техники для изображений</h2>
+    <ul>
+      <li><strong>Cutout</strong>: случайное закрытие квадратных областей</li>
+      <li><strong>Mixup</strong>: смешивание двух изображений</li>
+      <li><strong>CutMix</strong>: вырезание и вставка частей изображений</li>
+      <li><strong>AutoAugment</strong>: автоматический поиск политик</li>
+      <li><strong>RandAugment</strong>: упрощённый AutoAugment</li>
+      <li><strong>GridMask</strong>: удаление регулярных сеток</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Mixup (код)</h2>
+    <pre><code>import numpy as np
+
+def mixup(x1, y1, x2, y2, alpha=0.2):
+    """
+    Смешивает два изображения и метки
+    """
+    lam = np.random.beta(alpha, alpha)
+    
+    # Смешиваем изображения
+    x_mixed = lam * x1 + (1 - lam) * x2
+    
+    # Смешиваем метки
+    y_mixed = lam * y1 + (1 - lam) * y2
+    
+    return x_mixed, y_mixed
+
+# В training loop:
+idx = np.random.permutation(len(X_batch))
+X_mixed, y_mixed = mixup(
+    X_batch, y_batch,
+    X_batch[idx], y_batch[idx],
+    alpha=0.2
+)
+
+loss = model.train_on_batch(X_mixed, y_mixed)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Аугментация текста</h2>
+    <ul>
+      <li><strong>Синонимы</strong>: замена слов синонимами</li>
+      <li><strong>Обратный перевод</strong>: перевести на другой язык и обратно</li>
+      <li><strong>Вставка</strong>: вставка случайных слов</li>
+      <li><strong>Удаление</strong>: удаление случайных слов</li>
+      <li><strong>Перестановка</strong>: изменение порядка слов</li>
+      <li><strong>Контекстная замена</strong>: BERT-based замены</li>
+    </ul>
+    <pre><code># Пример с nlpaug
+import nlpaug.augmenter.word as naw
+
+# Синонимы
+aug = naw.SynonymAug(aug_src='wordnet')
+text = "Машинное обучение очень интересно"
+augmented = aug.augment(text)
+
+# Обратный перевод
+aug = naw.BackTranslationAug(
+    from_model_name='Helsinki-NLP/opus-mt-ru-en',
+    to_model_name='Helsinki-NLP/opus-mt-en-ru'
+)
+augmented = aug.augment(text)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Аугментация временных рядов</h2>
+    <ul>
+      <li><strong>Jittering</strong>: добавление шума</li>
+      <li><strong>Scaling</strong>: масштабирование амплитуды</li>
+      <li><strong>Time Warping</strong>: растяжение/сжатие времени</li>
+      <li><strong>Window Slicing</strong>: извлечение подокон</li>
+      <li><strong>Rotation</strong>: поворот в пространстве признаков</li>
+    </ul>
+    <pre><code>import numpy as np
+
+# Jittering
+def jitter(x, sigma=0.03):
+    return x + np.random.normal(0, sigma, x.shape)
+
+# Scaling
+def scaling(x, sigma=0.1):
+    factor = np.random.normal(1, sigma)
+    return x * factor
+
+# Window Slicing
+def window_slice(x, reduce_ratio=0.9):
+    target_len = int(len(x) * reduce_ratio)
+    start = np.random.randint(0, len(x) - target_len)
+    return x[start:start+target_len]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Аугментация аудио</h2>
+    <ul>
+      <li><strong>Time Stretching</strong>: изменение скорости</li>
+      <li><strong>Pitch Shifting</strong>: изменение тона</li>
+      <li><strong>Background Noise</strong>: добавление шума</li>
+      <li><strong>Volume Control</strong>: изменение громкости</li>
+      <li><strong>Time Masking</strong>: маскирование временных интервалов</li>
+      <li><strong>Frequency Masking</strong>: маскирование частот</li>
+    </ul>
+    <pre><code># С использованием audiomentations
+from audiomentations import Compose, AddGaussianNoise, TimeStretch
+
+augment = Compose([
+    AddGaussianNoise(min_amplitude=0.001, max_amplitude=0.015, p=0.5),
+    TimeStretch(min_rate=0.8, max_rate=1.25, p=0.5),
+])
+
+augmented_audio = augment(samples=audio, sample_rate=16000)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда применять</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Малый размер обучающей выборки</li>
+          <li>Модель переобучается</li>
+          <li>Нужна инвариантность к трансформациям</li>
+          <li>Несбалансированные классы (аугментировать миноритарный)</li>
+          <li>Computer vision задачи</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень большой датасет (не нужно)</li>
+          <li>Трансформации меняют семантику</li>
+          <li>Медицинские изображения (осторожно!)</li>
+          <li>Тест и валидация (НИКОГДА!)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Лучшие практики</h2>
+    <ul>
+      <li><strong>Не аугментируйте валидацию/тест</strong>: только train!</li>
+      <li><strong>Реалистичность</strong>: трансформации должны быть правдоподобными</li>
+      <li><strong>Разумность</strong>: не переусердствуйте (можно ухудшить качество)</li>
+      <li><strong>Доменные знания</strong>: учитывайте специфику задачи</li>
+      <li><strong>Экспериментируйте</strong>: найдите оптимальный набор</li>
+      <li><strong>On-the-fly</strong>: аугментация на лету экономит память</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Offline vs Online аугментация</h2>
+    <table>
+      <tr><th>Подход</th><th>Описание</th><th>Плюсы/Минусы</th></tr>
+      <tr><td><strong>Offline</strong></td><td>Заранее создать аугментированные данные</td><td>✅ Быстрее обучение<br>❌ Больше места на диске</td></tr>
+      <tr><td><strong>Online</strong></td><td>Аугментация во время обучения</td><td>✅ Экономия памяти<br>✅ Больше вариаций<br>❌ Медленнее эпоха</td></tr>
+    </table>
+    <p><strong>Рекомендация</strong>: Online для большинства случаев</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить, нужна ли аугментация (малая выборка? переобучение?)</li>
+      <li>[ ] Выбрать подходящие трансформации для домена</li>
+      <li>[ ] Применять ТОЛЬКО к обучающей выборке</li>
+      <li>[ ] Проверить, что аугментированные данные выглядят реалистично</li>
+      <li>[ ] Начать с простых трансформаций</li>
+      <li>[ ] Экспериментировать с интенсивностью</li>
+      <li>[ ] Использовать on-the-fly аугментацию</li>
+      <li>[ ] Мониторить метрики на валидации</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Аугментация данных — это как если бы мы показывали модели одно и то же изображение, но с разных углов, при разном освещении, в разных размерах. Модель учится распознавать объект в любых условиях, а не запоминать конкретные примеры».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Gaussian Mixture Models (GMM) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Gaussian Mixture Models (GMM) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Вероятностный подход • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: моделировать данные как смесь гауссовских распределений</li>
+      <li><strong>Вероятностный подход</strong>: мягкая кластеризация (soft clustering)</li>
+      <li><strong>Каждый кластер</strong>: многомерное нормальное распределение</li>
+      <li><strong>EM-алгоритм</strong>: Expectation-Maximization для обучения</li>
+      <li><strong>Гибкость</strong>: кластеры разных форм и размеров</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Математика (упрощённо)</h2>
+    <p>Вероятность точки x принадлежать модели:</p>
+    <p><strong>P(x) = Σ πₖ · N(x | μₖ, Σₖ)</strong></p>
+    <ul>
+      <li><strong>πₖ</strong>: вес компонента k (доля кластера)</li>
+      <li><strong>μₖ</strong>: среднее (центроид)</li>
+      <li><strong>Σₖ</strong>: ковариационная матрица (форма)</li>
+      <li><strong>N(...)</strong>: нормальное распределение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код</h2>
+    <pre><code>from sklearn.mixture import GaussianMixture
+from sklearn.preprocessing import StandardScaler
+
+# Масштабирование
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# GMM
+gmm = GaussianMixture(
+    n_components=3,
+    covariance_type='full',
+    random_state=42
+)
+
+# Обучение
+gmm.fit(X_scaled)
+
+# Предсказание кластеров (жёсткая кластеризация)
+labels = gmm.predict(X_scaled)
+
+# Вероятности принадлежности (мягкая кластеризация)
+probabilities = gmm.predict_proba(X_scaled)
+
+# Логарифм правдоподобия
+log_likelihood = gmm.score(X_scaled)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Типы ковариационных матриц</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Когда использовать</th></tr>
+      <tr><td><code>full</code></td><td>Каждый кластер — своя ковариационная матрица</td><td>По умолчанию, максимальная гибкость</td></tr>
+      <tr><td><code>tied</code></td><td>Общая ковариация для всех кластеров</td><td>Кластеры одинаковой формы</td></tr>
+      <tr><td><code>diag</code></td><td>Диагональная (признаки независимы)</td><td>Средняя гибкость, быстрее</td></tr>
+      <tr><td><code>spherical</code></td><td>Сферические кластеры</td><td>Похоже на K-means, но вероятностно</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Выбор числа компонентов</h2>
+    <p>Используйте BIC (Bayesian Information Criterion):</p>
+    <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+n_components_range = range(1, 11)
+bic_scores = []
+aic_scores = []
+
+for n in n_components_range:
+    gmm = GaussianMixture(n_components=n, random_state=42)
+    gmm.fit(X_scaled)
+    bic_scores.append(gmm.bic(X_scaled))
+    aic_scores.append(gmm.aic(X_scaled))
+
+plt.figure(figsize=(10, 6))
+plt.plot(n_components_range, bic_scores, 'bx-', label='BIC')
+plt.plot(n_components_range, aic_scores, 'rx-', label='AIC')
+plt.xlabel('Количество компонентов')
+plt.ylabel('Критерий')
+plt.title('Выбор числа компонентов')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# Выбираем n с минимальным BIC
+best_n = n_components_range[np.argmin(bic_scores)]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. EM-алгоритм (2 шага)</h2>
+    <ol>
+      <li><strong>E-step (Expectation)</strong>:
+        <ul>
+          <li>Вычислить вероятность принадлежности каждой точки к кластерам</li>
+          <li>«Мягкое» присвоение кластеров</li>
+        </ul>
+      </li>
+      <li><strong>M-step (Maximization)</strong>:
+        <ul>
+          <li>Обновить параметры (μₖ, Σₖ, πₖ)</li>
+          <li>Максимизировать log-likelihood</li>
+        </ul>
+      </li>
+    </ol>
+    <p>Повторять до сходимости</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Мягкая кластеризация</h2>
+    <pre><code># Вероятности принадлежности
+probs = gmm.predict_proba(X_scaled)
+
+# Например, для первой точки:
+print(f"Точка 0:")
+print(f"  Кластер 0: {probs[0, 0]:.3f}")
+print(f"  Кластер 1: {probs[0, 1]:.3f}")
+print(f"  Кластер 2: {probs[0, 2]:.3f}")
+
+# Можно использовать как веса
+# Точка может принадлежать нескольким кластерам одновременно!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Генерация новых данных</h2>
+    <p>GMM — генеративная модель:</p>
+    <pre><code># Сгенерировать новые точки из модели
+X_new, y_new = gmm.sample(n_samples=100)
+
+# X_new — новые данные похожие на исходные
+# y_new — метки компонентов, из которых они сгенерированы
+
+# Можно использовать для:
+# - Аугментации данных
+# - Синтеза данных
+# - Обнаружения аномалий</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Обнаружение аномалий</h2>
+    <pre><code># Точки с низкой вероятностью — аномалии
+densities = gmm.score_samples(X_scaled)
+
+# Установить порог (например, 5-й перцентиль)
+threshold = np.percentile(densities, 5)
+
+# Аномалии
+anomalies = X_scaled[densities < threshold]
+
+print(f"Найдено {len(anomalies)} аномалий")
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.scatter(X_scaled[:, 0], X_scaled[:, 1], 
+           c=densities, cmap='viridis', alpha=0.6)
+plt.colorbar(label='Log-вероятность')
+plt.scatter(anomalies[:, 0], anomalies[:, 1], 
+           c='red', marker='x', s=100, label='Аномалии')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. GMM vs K-means</h2>
+    <table>
+      <tr><th>Критерий</th><th>K-means</th><th>GMM</th></tr>
+      <tr><td><strong>Тип</strong></td><td>Жёсткая кластеризация</td><td>Мягкая кластеризация</td></tr>
+      <tr><td><strong>Форма кластеров</strong></td><td>Только сферические</td><td>Эллипсоидальные</td></tr>
+      <tr><td><strong>Вероятности</strong></td><td>Нет</td><td>Да (вероятность принадлежности)</td></tr>
+      <tr><td><strong>Скорость</strong></td><td>Быстрее</td><td>Медленнее</td></tr>
+      <tr><td><strong>Гибкость</strong></td><td>Меньше</td><td>Больше</td></tr>
+      <tr><td><strong>Выбор K</strong></td><td>Метод локтя</td><td>BIC/AIC</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Визуализация</h2>
+    <pre><code>import matplotlib.pyplot as plt
+from matplotlib.patches import Ellipse
+
+def plot_gmm(gmm, X, labels):
+    plt.figure(figsize=(10, 6))
+    
+    # Точки
+    plt.scatter(X[:, 0], X[:, 1], c=labels, 
+               cmap='viridis', alpha=0.6)
+    
+    # Эллипсы для каждого кластера
+    for i in range(gmm.n_components):
+        mean = gmm.means_[i]
+        covar = gmm.covariances_[i]
+        
+        # Собственные значения и векторы
+        eigenvalues, eigenvectors = np.linalg.eigh(covar)
+        angle = np.degrees(np.arctan2(eigenvectors[1, 0], 
+                                      eigenvectors[0, 0]))
+        width, height = 2 * np.sqrt(eigenvalues)
+        
+        # Рисуем эллипс (2σ)
+        ellipse = Ellipse(mean, width, height, 
+                         angle=angle, alpha=0.3)
+        plt.gca().add_patch(ellipse)
+        
+        # Центр
+        plt.plot(mean[0], mean[1], 'kx', markersize=10)
+    
+    plt.title('GMM кластеризация с эллипсами')
+    plt.xlabel('Признак 1')
+    plt.ylabel('Признак 2')
+    plt.show()
+
+plot_gmm(gmm, X_scaled, labels)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Кластеры эллипсоидальной формы</li>
+          <li>Нужны вероятности принадлежности</li>
+          <li>Обнаружение аномалий</li>
+          <li>Генерация синтетических данных</li>
+          <li>Мягкая кластеризация</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень большие датасеты (медленно)</li>
+          <li>Высокая размерность (проблемы с ковариацией)</li>
+          <li>Нужна простота и скорость (K-means лучше)</li>
+          <li>Негауссовские распределения</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Практические советы</h2>
+    <ul>
+      <li><strong>Масштабирование</strong>: обязательно!</li>
+      <li><strong>Инициализация</strong>: можно использовать K-means (<code>init_params='kmeans'</code>)</li>
+      <li><strong>Регуляризация</strong>: параметр <code>reg_covar</code> для стабильности</li>
+      <li><strong>Критерии выбора</strong>: BIC консервативнее, AIC более либерален</li>
+      <li><strong>Сходимость</strong>: увеличить <code>max_iter</code> если не сходится</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Масштабировать данные</li>
+      <li>[ ] Выбрать тип ковариации (<code>covariance_type</code>)</li>
+      <li>[ ] Найти оптимальное число компонентов (BIC/AIC)</li>
+      <li>[ ] Проверить сходимость (<code>converged_</code>)</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Проверить вероятности (<code>predict_proba</code>)</li>
+      <li>[ ] Сравнить с K-means</li>
+      <li>[ ] Проверить размеры кластеров</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «GMM не просто делит данные на группы, но и говорит, насколько уверенно каждая точка принадлежит каждой группе. Это как если бы клиент мог одновременно относиться к нескольким сегментам с разными весами».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

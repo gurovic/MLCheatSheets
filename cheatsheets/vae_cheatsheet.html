@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>VAE (Variational Autoencoders) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 VAE (Variational Autoencoders) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Вариационные автоэнкодеры • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть VAE</h2>
+    <ul>
+      <li><strong>Генеративная модель</strong>: создаёт новые данные</li>
+      <li><strong>Вероятностный подход</strong>: моделирует распределение данных</li>
+      <li><strong>Encoder</strong>: сжимает данные в latent space (μ, σ)</li>
+      <li><strong>Decoder</strong>: восстанавливает из latent space</li>
+      <li><strong>Reparameterization trick</strong>: z = μ + σ · ε</li>
+      <li><strong>Отличие от AE</strong>: упорядоченное латентное пространство</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Архитектура</h2>
+    <p><strong>Encoder</strong>: x → μ, log(σ²)</p>
+    <p><strong>Sampling</strong>: z = μ + σ · ε, где ε ~ N(0,1)</p>
+    <p><strong>Decoder</strong>: z → x̂</p>
+    <p><strong>Loss</strong> = Reconstruction Loss + KL Divergence</p>
+    <ul>
+      <li><strong>Reconstruction</strong>: насколько хорошо восстановили</li>
+      <li><strong>KL Divergence</strong>: штраф за отклонение от N(0,1)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код (PyTorch)</h2>
+    <pre><code>import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class VAE(nn.Module):
+    def __init__(self, input_dim=784, hidden_dim=400, latent_dim=20):
+        super().__init__()
+        
+        # Encoder
+        self.fc1 = nn.Linear(input_dim, hidden_dim)
+        self.fc_mu = nn.Linear(hidden_dim, latent_dim)
+        self.fc_logvar = nn.Linear(hidden_dim, latent_dim)
+        
+        # Decoder
+        self.fc3 = nn.Linear(latent_dim, hidden_dim)
+        self.fc4 = nn.Linear(hidden_dim, input_dim)
+    
+    def encode(self, x):
+        h = F.relu(self.fc1(x))
+        mu = self.fc_mu(h)
+        logvar = self.fc_logvar(h)
+        return mu, logvar
+    
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        z = mu + eps * std
+        return z
+    
+    def decode(self, z):
+        h = F.relu(self.fc3(z))
+        x_recon = torch.sigmoid(self.fc4(h))
+        return x_recon
+    
+    def forward(self, x):
+        mu, logvar = self.encode(x.view(-1, 784))
+        z = self.reparameterize(mu, logvar)
+        x_recon = self.decode(z)
+        return x_recon, mu, logvar</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Loss Function</h2>
+    <pre><code>def vae_loss(recon_x, x, mu, logvar):
+    # Reconstruction loss (BCE для изображений)
+    BCE = F.binary_cross_entropy(
+        recon_x, 
+        x.view(-1, 784), 
+        reduction='sum'
+    )
+    
+    # KL Divergence
+    # KL(q(z|x) || p(z)) где p(z) = N(0,1)
+    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    
+    return BCE + KLD
+
+# Training loop
+for epoch in range(num_epochs):
+    for batch_idx, (data, _) in enumerate(train_loader):
+        optimizer.zero_grad()
+        
+        recon_batch, mu, logvar = model(data)
+        loss = vae_loss(recon_batch, data, mu, logvar)
+        
+        loss.backward()
+        optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Генерация новых данных</h2>
+    <pre><code># Сэмплирование из N(0,1)
+with torch.no_grad():
+    z = torch.randn(64, latent_dim)
+    samples = model.decode(z)
+    
+# Интерполяция между двумя точками
+z1 = torch.randn(1, latent_dim)
+z2 = torch.randn(1, latent_dim)
+
+# Линейная интерполяция
+alphas = torch.linspace(0, 1, 10)
+interpolated = []
+for alpha in alphas:
+    z_interp = alpha * z1 + (1 - alpha) * z2
+    x_interp = model.decode(z_interp)
+    interpolated.append(x_interp)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Сверточный VAE для изображений</h2>
+    <pre><code>class ConvVAE(nn.Module):
+    def __init__(self, latent_dim=128):
+        super().__init__()
+        
+        # Encoder
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 32, 4, 2, 1),  # 16x16
+            nn.ReLU(),
+            nn.Conv2d(32, 64, 4, 2, 1), # 8x8
+            nn.ReLU(),
+            nn.Conv2d(64, 128, 4, 2, 1), # 4x4
+            nn.ReLU(),
+        )
+        
+        self.fc_mu = nn.Linear(128 * 4 * 4, latent_dim)
+        self.fc_logvar = nn.Linear(128 * 4 * 4, latent_dim)
+        
+        # Decoder
+        self.fc_decode = nn.Linear(latent_dim, 128 * 4 * 4)
+        
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(128, 64, 4, 2, 1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(64, 32, 4, 2, 1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(32, 3, 4, 2, 1),
+            nn.Sigmoid()
+        )</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. β-VAE</h2>
+    <p><strong>Добавляет вес β к KL Divergence</strong></p>
+    <pre><code>def beta_vae_loss(recon_x, x, mu, logvar, beta=4.0):
+    BCE = F.binary_cross_entropy(recon_x, x, reduction='sum')
+    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    
+    return BCE + beta * KLD
+
+# β > 1: больше disentanglement (разделение признаков)
+# β < 1: лучше reconstruction
+# β = 1: обычный VAE</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Преимущества VAE</h2>
+    <ul>
+      <li><strong>Стабильное обучение</strong>: в отличие от GAN</li>
+      <li><strong>Интерполяция</strong>: гладкое латентное пространство</li>
+      <li><strong>Теоретическое обоснование</strong>: вероятностный подход</li>
+      <li><strong>Контроль генерации</strong>: можно варьировать z</li>
+      <li><strong>Anomaly detection</strong>: высокий reconstruction loss = аномалия</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. VAE vs GAN</h2>
+    <table>
+      <tr><th>Критерий</th><th>VAE</th><th>GAN</th></tr>
+      <tr><td><strong>Обучение</strong></td><td>Стабильное</td><td>Нестабильное</td></tr>
+      <tr><td><strong>Качество</strong></td><td>Средне (размыто)</td><td>Высокое</td></tr>
+      <tr><td><strong>Разнообразие</strong></td><td>Хорошее</td><td>Mode collapse</td></tr>
+      <tr><td><strong>Латентное пространство</strong></td><td>Упорядоченное</td><td>Неупорядоченное</td></tr>
+      <tr><td><strong>Интерполяция</strong></td><td>Гладкая</td><td>Сложно</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применения VAE</h2>
+    <ul>
+      <li><strong>Генерация изображений</strong></li>
+      <li><strong>Anomaly detection</strong>: реконструкция аномалий плохая</li>
+      <li><strong>Data augmentation</strong>: генерация вариаций</li>
+      <li><strong>Denoising</strong>: удаление шума</li>
+      <li><strong>Feature extraction</strong>: latent space как признаки</li>
+      <li><strong>Semi-supervised learning</strong></li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Conditional VAE</h2>
+    <pre><code>class ConditionalVAE(nn.Module):
+    def __init__(self, input_dim=784, latent_dim=20, n_classes=10):
+        super().__init__()
+        self.label_emb = nn.Embedding(n_classes, n_classes)
+        
+        # Encoder получает x + label
+        self.fc1 = nn.Linear(input_dim + n_classes, 400)
+        # ... mu, logvar
+        
+        # Decoder получает z + label
+        self.fc3 = nn.Linear(latent_dim + n_classes, 400)
+        
+    def forward(self, x, labels):
+        label_emb = self.label_emb(labels)
+        
+        # Encode с label
+        x_with_label = torch.cat([x, label_emb], dim=1)
+        mu, logvar = self.encode(x_with_label)
+        
+        z = self.reparameterize(mu, logvar)
+        
+        # Decode с label
+        z_with_label = torch.cat([z, label_emb], dim=1)
+        recon_x = self.decode(z_with_label)
+        
+        return recon_x, mu, logvar</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Лучшие практики</h2>
+    <ul>
+      <li><strong>Latent dim</strong>: 20-200 (зависит от сложности)</li>
+      <li><strong>β</strong>: начать с 1.0, экспериментировать</li>
+      <li><strong>Learning rate</strong>: 1e-3 до 1e-4</li>
+      <li><strong>Warm-up</strong>: постепенно увеличивать вес KL</li>
+      <li><strong>BatchNorm</strong>: помогает стабильности</li>
+      <li><strong>Визуализировать</strong>: latent space и reconstruction</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. KL Annealing</h2>
+    <pre><code># Постепенно увеличиваем вес KL
+kl_weight = min(1.0, epoch / kl_anneal_epochs)
+
+loss = reconstruction_loss + kl_weight * kl_divergence
+
+# Помогает избежать "posterior collapse"
+# (когда encoder игнорирует input)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Реализовать reparameterization trick</li>
+      <li>[ ] Правильно вычислить KL Divergence</li>
+      <li>[ ] Выбрать подходящий latent_dim</li>
+      <li>[ ] Логировать reconstruction loss и KL отдельно</li>
+      <li>[ ] Визуализировать reconstruction</li>
+      <li>[ ] Визуализировать latent space (t-SNE/PCA)</li>
+      <li>[ ] Попробовать β-VAE для лучшего disentanglement</li>
+      <li>[ ] Рассмотреть KL annealing</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «VAE — это как "умный архиватор" для данных. Он сжимает изображения в компактное представление, но делает это особым образом: все похожие изображения оказываются рядом в этом сжатом пространстве. Благодаря этому мы можем плавно переходить от одного изображения к другому, генерировать новые варианты, или находить аномалии».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
