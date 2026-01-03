@@ -1,0 +1,125 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>Деревья решений для регрессии Cheatsheet — 3 колонки</title><style>@media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}@media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}.container{column-count:3;column-gap:20px;max-width:100%}.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}p,ul,ol{font-size:0.92em;margin:0.6em 0}ul,ol{padding-left:18px}li{margin-bottom:4px}code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}pre code{padding:0;background:none;white-space:pre-wrap}table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}td{padding:4px 6px;border-bottom:1px solid #f0f4ff}tr:nth-child(even){background-color:#f8fbff}.good-vs-bad{display:flex;flex-direction:column;gap:8px}.good-vs-bad div{flex:1;padding:6px 8px;border-radius:4px}.good{background-color:#f0f9f4;border-left:3px solid #2e8b57}.bad{background-color:#fdf0f2;border-left:3px solid #d32f2f}.good h3,.bad h3{margin:0 0 4px;font-size:1em;font-weight:700}.good ul,.bad ul{padding-left:20px;margin:0}.good li::before{content:"✅ ";font-weight:bold}.bad li::before{content:"❌ ";font-weight:bold}blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}.formula{text-align:center;font-family:'Cambria Math',serif;font-size:1em;margin:10px 0;padding:8px;background:#f8fbff;border-radius:4px}@media print{.container{column-gap:12px}.block{box-shadow:none}code,pre,table{font-size:0.78em}h1{font-size:1.4em}h2{font-size:1em}}</style></head><body><div class="container"><h1>🌲 Деревья решений для регрессии Cheatsheet</h1><div class="subtitle">Регрессия • Нелинейные зависимости • Интерпретируемость<br>📅 3 января 2026</div><div class="block"><h2>🔷 1. Суть</h2><ul><li><strong>Предсказание непрерывных значений</strong>: не классы, а числа</li><li><strong>Иерархическое разбиение</strong>: дерево решений</li><li><strong>Среднее в листьях</strong>: предсказание = среднее значение в листе</li><li><strong>Критерий</strong>: минимизация MSE или MAE</li></ul></div><div class="block"><h2>🔷 2. Базовый код</h2><pre><code>from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Модель
+model = DecisionTreeRegressor(
+    max_depth=5,
+    random_state=42
+)
+model.fit(X_train, y_train)
+
+# Предсказание
+y_pred = model.predict(X_test)
+
+# Оценка
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f"MSE: {mse:.3f}, R²: {r2:.3f}")</code></pre></div><div class="block"><h2>🔷 3. Ключевые параметры</h2><table><tr><th>Параметр</th><th>Описание</th><th>Совет</th></tr><tr><td><code>max_depth</code></td><td>Макс. глубина дерева</td><td>3-10 для начала</td></tr><tr><td><code>min_samples_split</code></td><td>Мин. объектов для разбиения</td><td>2-20, увеличить для регуляризации</td></tr><tr><td><code>min_samples_leaf</code></td><td>Мин. объектов в листе</td><td>1-10, увеличить для сглаживания</td></tr><tr><td><code>criterion</code></td><td>Критерий разбиения</td><td>'squared_error', 'absolute_error'</td></tr><tr><td><code>max_features</code></td><td>Макс. признаков на разбиение</td><td>None, 'sqrt', 'log2', int</td></tr></table></div><div class="block"><h2>🔷 4. Критерии разбиения</h2><ul><li><code>squared_error</code>: MSE (Mean Squared Error) - по умолчанию</li><li><code>absolute_error</code>: MAE (Mean Absolute Error) - устойчив к выбросам</li><li><code>friedman_mse</code>: улучшенный MSE с Фридман</li><li><code>poisson</code>: для счетных данных</li></ul><pre><code># Выбор критерия
+model = DecisionTreeRegressor(
+    criterion='absolute_error',  # устойчив к выбросам
+    max_depth=5
+)
+model.fit(X_train, y_train)</code></pre></div><div class="block"><h2>🔷 5. Визуализация дерева</h2><pre><code>from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(20, 10))
+plot_tree(
+    model,
+    feature_names=feature_names,
+    filled=True,
+    rounded=True,
+    fontsize=10
+)
+plt.show()
+
+# Или экспорт в текст
+from sklearn.tree import export_text
+tree_rules = export_text(model, feature_names=feature_names)
+print(tree_rules)</code></pre></div><div class="block"><h2>🔷 6. Важность признаков</h2><pre><code># Важность признаков
+importances = model.feature_importances_
+indices = np.argsort(importances)[::-1]
+
+print("Важность признаков:")
+for i in indices:
+    print(f"{feature_names[i]}: {importances[i]:.3f}")
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.bar(range(len(importances)), importances[indices])
+plt.xticks(range(len(importances)), 
+           [feature_names[i] for i in indices], 
+           rotation=45)
+plt.title('Важность признаков')
+plt.show()</code></pre></div><div class="block"><h2>🔷 7. Переобучение и регуляризация</h2><pre><code># Без регуляризации - переобучение!
+bad_model = DecisionTreeRegressor()  # нет ограничений
+bad_model.fit(X_train, y_train)
+print(f"Train R²: {bad_model.score(X_train, y_train):.3f}")
+print(f"Test R²: {bad_model.score(X_test, y_test):.3f}")
+
+# С регуляризацией
+good_model = DecisionTreeRegressor(
+    max_depth=5,
+    min_samples_split=20,
+    min_samples_leaf=10
+)
+good_model.fit(X_train, y_train)
+print(f"Train R²: {good_model.score(X_train, y_train):.3f}")
+print(f"Test R²: {good_model.score(X_test, y_test):.3f}")</code></pre></div><div class="block"><h2>🔷 8. Подбор гиперпараметров</h2><pre><code>from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+    'max_depth': [3, 5, 7, 10],
+    'min_samples_split': [2, 10, 20],
+    'min_samples_leaf': [1, 5, 10],
+    'criterion': ['squared_error', 'absolute_error']
+}
+
+grid = GridSearchCV(
+    DecisionTreeRegressor(random_state=42),
+    param_grid,
+    cv=5,
+    scoring='r2'
+)
+grid.fit(X_train, y_train)
+
+print(f"Best params: {grid.best_params_}")
+print(f"Best R²: {grid.best_score_:.3f}")</code></pre></div><div class="block"><h2>🔷 9. Преимущества и недостатки</h2><div class="good-vs-bad"><div class="good"><h3>✅ Преимущества</h3><ul><li>Интерпретируемость</li><li>Не требует масштабирования</li><li>Обрабатывает нелинейности</li><li>Работает с категориями</li><li>Устойчив к выбросам (с MAE)</li></ul></div><div class="bad"><h3>❌ Недостатки</h3><ul><li>Склонность к переобучению</li><li>Нестабильность (чувствителен к данным)</li><li>Ступенчатые предсказания</li><li>Плохо экстраполирует</li><li>Менее точен чем ансамбли</li></ul></div></div></div><div class="block"><h2>🔷 10. Когда использовать</h2><div class="good-vs-bad"><div class="good"><h3>✅ Хорошо подходит</h3><ul><li>Нужна интерпретируемость</li><li>Нелинейные зависимости</li><li>Смешанные типы признаков</li><li>Быстрое прототипирование</li><li>Базовая модель для ансамблей</li></ul></div><div class="bad"><h3>❌ Плохо подходит</h3><ul><li>Нужна максимальная точность (используйте RF/GB)</li><li>Линейные зависимости (используйте линейную регрессию)</li><li>Экстраполяция за пределы данных</li><li>Очень зашумленные данные</li></ul></div></div></div><div class="block"><h2>🔷 11. Сравнение с Random Forest</h2><pre><code>from sklearn.ensemble import RandomForestRegressor
+
+# Decision Tree
+dt = DecisionTreeRegressor(max_depth=5, random_state=42)
+dt.fit(X_train, y_train)
+dt_score = dt.score(X_test, y_test)
+
+# Random Forest (ансамбль деревьев)
+rf = RandomForestRegressor(n_estimators=100, max_depth=5, random_state=42)
+rf.fit(X_train, y_train)
+rf_score = rf.score(X_test, y_test)
+
+print(f"Decision Tree R²: {dt_score:.3f}")
+print(f"Random Forest R²: {rf_score:.3f}")</code></pre></div><div class="block"><h2>🔷 12. Ступенчатые предсказания</h2><p><strong>Проблема:</strong> дерево решений дает ступенчатые предсказания (среднее в каждом листе)</p><pre><code># Визуализация
+plt.figure(figsize=(10, 6))
+plt.scatter(X_test, y_test, alpha=0.5, label='Истинные')
+plt.scatter(X_test, y_pred, alpha=0.5, label='Предсказания')
+plt.legend()
+plt.title('Ступенчатые предсказания')
+plt.show()</code></pre><p><strong>Решение:</strong> используйте Random Forest или Gradient Boosting для сглаживания</p></div><div class="block"><h2>🔷 13. Обработка выбросов</h2><pre><code># MAE более устойчив к выбросам чем MSE
+model_robust = DecisionTreeRegressor(
+    criterion='absolute_error',  # MAE
+    max_depth=5
+)
+model_robust.fit(X_train, y_train)
+
+# Или ограничить предсказания
+y_pred = model.predict(X_test)
+y_pred_clipped = np.clip(y_pred, 
+                          y_train.min(), 
+                          y_train.max())</code></pre></div><div class="block"><h2>🔷 14. Кросс-валидация</h2><pre><code>from sklearn.model_selection import cross_val_score
+
+scores = cross_val_score(
+    DecisionTreeRegressor(max_depth=5, random_state=42),
+    X, y,
+    cv=5,
+    scoring='r2'
+)
+
+print(f"R² scores: {scores}")
+print(f"Mean R²: {scores.mean():.3f} (+/- {scores.std()*2:.3f})")</code></pre></div><div class="block"><h2>🔷 15. Практические советы</h2><ul><li><strong>Начните с ограничений</strong>: max_depth=5, min_samples_split=20</li><li><strong>Используйте кросс-валидацию</strong>: для выбора гиперпараметров</li><li><strong>Визуализируйте дерево</strong>: для понимания логики</li><li><strong>Сравните с ансамблями</strong>: RF, Gradient Boosting обычно точнее</li><li><strong>MAE для выбросов</strong>: если данные содержат выбросы</li></ul></div><div class="block"><h2>🔷 16. Чек-лист</h2><ul><li>[ ] Подготовить данные (не нужно масштабирование)</li><li>[ ] Установить max_depth для регуляризации</li><li>[ ] Выбрать criterion (MSE или MAE)</li><li>[ ] Обучить модель</li><li>[ ] Оценить на train и test (проверить переобучение)</li><li>[ ] Визуализировать дерево</li><li>[ ] Проверить важность признаков</li><li>[ ] Сравнить с Random Forest</li></ul><blockquote>«Деревья решений для регрессии — интерпретируемый и быстрый метод, но склонны к переобучению. Используйте регуляризацию или переходите к ансамблям для лучшей точности».</blockquote></div><div class="block"><h2>🔗 Полезные ссылки</h2><ul><li><a href="https://scikit-learn.org/stable/modules/tree.html#regression" target="_blank">📚 Scikit-learn: Decision Trees Regression</a></li><li><a href="https://en.wikipedia.org/wiki/Decision_tree_learning" target="_blank">📝 Wikipedia: Decision tree learning</a></li></ul></div></div></body></html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>GRU (Gated Recurrent Unit) Cheatsheet — 3 колонки</title><style>@media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}@media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}.container{column-count:3;column-gap:20px;max-width:100%}.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}p,ul,ol{font-size:0.92em;margin:0.6em 0}ul,ol{padding-left:18px}li{margin-bottom:4px}code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}pre code{padding:0;background:none;white-space:pre-wrap}table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}td{padding:4px 6px;border-bottom:1px solid #f0f4ff}tr:nth-child(even){background-color:#f8fbff}.good-vs-bad{display:flex;flex-direction:column;gap:8px}.good-vs-bad div{flex:1;padding:6px 8px;border-radius:4px}.good{background-color:#f0f9f4;border-left:3px solid #2e8b57}.bad{background-color:#fdf0f2;border-left:3px solid #d32f2f}.good h3,.bad h3{margin:0 0 4px;font-size:1em;font-weight:700}.good ul,.bad ul{padding-left:20px;margin:0}.good li::before{content:"✅ ";font-weight:bold}.bad li::before{content:"❌ ";font-weight:bold}blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}.formula{text-align:center;font-family:'Cambria Math',serif;font-size:1em;margin:10px 0;padding:8px;background:#f8fbff;border-radius:4px}@media print{.container{column-gap:12px}.block{box-shadow:none}code,pre,table{font-size:0.78em}h1{font-size:1.4em}h2{font-size:1em}}</style></head><body><div class="container"><h1>🔄 GRU (Gated Recurrent Unit) Cheatsheet</h1><div class="subtitle">Рекуррентные сети • Временные ряды • Проще чем LSTM<br>📅 3 января 2026</div><div class="block"><h2>🔷 1. Суть</h2><ul><li><strong>Упрощенная версия LSTM</strong>: 2 гейта вместо 3</li><li><strong>Решает проблему исчезающего градиента</strong></li><li><strong>Меньше параметров</strong>: быстрее обучается</li><li><strong>Для последовательностей</strong>: текст, временные ряды, аудио</li></ul><div class="formula">hₜ = (1 - zₜ) ⊙ hₜ₋₁ + zₜ ⊙ h̃ₜ</div></div><div class="block"><h2>🔷 2. Базовый код (PyTorch)</h2><pre><code>import torch
+import torch.nn as nn
+
+# GRU слой
+gru = nn.GRU(
+    input_size=100,      # размерность входа
+    hidden_size=256,     # размерность скрытого состояния
+    num_layers=2,        # число слоев
+    batch_first=True,    # (batch, seq, feature)
+    dropout=0.2          # dropout между слоями
+)
+
+# Данные: (batch_size, seq_length, input_size)
+x = torch.randn(32, 50, 100)
+
+# Прямой проход
+output, hidden = gru(x)
+# output: (32, 50, 256)
+# hidden: (2, 32, 256)</code></pre></div><div class="block"><h2>🔷 3. Базовый код (TensorFlow/Keras)</h2><pre><code>from tensorflow.keras.layers import GRU, Input
+from tensorflow.keras.models import Sequential
+
+model = Sequential([
+    Input(shape=(seq_length, features)),
+    GRU(256, return_sequences=True, dropout=0.2),
+    GRU(128, dropout=0.2),
+    Dense(num_classes, activation='softmax')
+])
+
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+model.fit(X_train, y_train, epochs=10, batch_size=32)</code></pre></div><div class="block"><h2>🔷 4. Два гейта GRU</h2><table><tr><th>Гейт</th><th>Название</th><th>Функция</th></tr><tr><td><code>zₜ</code></td><td>Update gate</td><td>Сколько сохранить из прошлого</td></tr><tr><td><code>rₜ</code></td><td>Reset gate</td><td>Сколько забыть из прошлого</td></tr></table><p><strong>Update gate:</strong> zₜ = σ(Wz·[hₜ₋₁, xₜ])</p><p><strong>Reset gate:</strong> rₜ = σ(Wr·[hₜ₋₁, xₜ])</p></div><div class="block"><h2>🔷 5. GRU vs LSTM</h2><table><tr><th>Аспект</th><th>GRU</th><th>LSTM</th></tr><tr><td>Число гейтов</td><td>2 (reset, update)</td><td>3 (input, forget, output)</td></tr><tr><td>Параметры</td><td>Меньше (~25% меньше)</td><td>Больше</td></tr><tr><td>Скорость</td><td>Быстрее</td><td>Медленнее</td></tr><tr><td>Память</td><td>Одно состояние (h)</td><td>Два состояния (h, c)</td></tr><tr><td>Точность</td><td>Сопоставима</td><td>Сопоставима</td></tr></table></div><div class="block"><h2>🔷 6. Ключевые параметры</h2><table><tr><th>Параметр</th><th>Описание</th><th>Совет</th></tr><tr><td><code>input_size</code></td><td>Размерность входа</td><td>Размер признаков</td></tr><tr><td><code>hidden_size</code></td><td>Размерность скрытого состояния</td><td>128-512 обычно</td></tr><tr><td><code>num_layers</code></td><td>Число слоев GRU</td><td>1-3 обычно достаточно</td></tr><tr><td><code>dropout</code></td><td>Dropout между слоями</td><td>0.2-0.5 для регуляризации</td></tr><tr><td><code>bidirectional</code></td><td>Двунаправленный GRU</td><td>True для лучшей точности</td></tr></table></div><div class="block"><h2>🔷 7. Двунаправленный GRU</h2><pre><code># PyTorch
+gru = nn.GRU(
+    input_size=100,
+    hidden_size=256,
+    num_layers=2,
+    batch_first=True,
+    bidirectional=True  # прямой + обратный
+)
+
+# Выход: (batch, seq, 2*hidden_size)
+output, hidden = gru(x)
+print(output.shape)  # (32, 50, 512)
+
+# Keras
+from tensorflow.keras.layers import Bidirectional, GRU
+model.add(Bidirectional(GRU(256, return_sequences=True)))</code></pre></div><div class="block"><h2>🔷 8. Классификация последовательностей</h2><pre><code>import torch.nn as nn
+
+class GRUClassifier(nn.Module):
+    def __init__(self, vocab_size, embed_dim, hidden_dim, num_classes):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, embed_dim)
+        self.gru = nn.GRU(embed_dim, hidden_dim, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, num_classes)
+    
+    def forward(self, x):
+        # x: (batch, seq_len)
+        x = self.embedding(x)  # (batch, seq_len, embed_dim)
+        output, hidden = self.gru(x)
+        # Берем последнее скрытое состояние
+        last_hidden = hidden[-1]  # (batch, hidden_dim)
+        out = self.fc(last_hidden)
+        return out
+
+model = GRUClassifier(10000, 128, 256, 10)</code></pre></div><div class="block"><h2>🔷 9. Генерация последовательностей</h2><pre><code>class GRUGenerator(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super().__init__()
+        self.gru = nn.GRU(input_size, hidden_size, batch_first=True)
+        self.fc = nn.Linear(hidden_size, output_size)
+    
+    def forward(self, x, hidden=None):
+        output, hidden = self.gru(x, hidden)
+        output = self.fc(output)
+        return output, hidden
+
+# Генерация
+model = GRUGenerator(100, 256, 100)
+x = torch.randn(1, 1, 100)  # начальный вход
+hidden = None
+
+generated = []
+for _ in range(50):  # генерируем 50 шагов
+    x, hidden = model(x, hidden)
+    generated.append(x)
+    # x используется как вход на следующем шаге</code></pre></div><div class="block"><h2>🔷 10. Преимущества и недостатки</h2><div class="good-vs-bad"><div class="good"><h3>✅ Преимущества</h3><ul><li>Проще и быстрее LSTM</li><li>Меньше параметров</li><li>Решает проблему исчезающего градиента</li><li>Хорошая производительность</li><li>Меньше переобучение</li></ul></div><div class="bad"><h3>❌ Недостатки</h3><ul><li>Медленнее Transformer на параллельных вычислениях</li><li>Проблемы с очень длинными последовательностями</li><li>Не параллелизуется по времени</li><li>Забывает давнюю информацию</li></ul></div></div></div><div class="block"><h2>🔷 11. Когда использовать</h2><div class="good-vs-bad"><div class="good"><h3>✅ Хорошо подходит</h3><ul><li>Временные ряды средней длины</li><li>Анализ текста</li><li>Распознавание речи</li><li>Когда LSTM слишком медленный</li><li>Ограниченные ресурсы</li></ul></div><div class="bad"><h3>❌ Плохо подходит</h3><ul><li>Очень длинные последовательности (>1000)</li><li>Нужна параллелизация (используйте Transformer)</li><li>Нужна максимальная точность (пробуйте LSTM)</li></ul></div></div></div><div class="block"><h2>🔷 12. Регуляризация GRU</h2><pre><code># Dropout
+gru = nn.GRU(
+    input_size=100,
+    hidden_size=256,
+    num_layers=2,
+    dropout=0.3,  # dropout между слоями
+    batch_first=True
+)
+
+# Дополнительный dropout
+dropout = nn.Dropout(0.5)
+
+# В forward
+output, hidden = gru(x)
+output = dropout(output)
+
+# Weight decay в оптимизаторе
+optimizer = torch.optim.Adam(
+    model.parameters(),
+    lr=0.001,
+    weight_decay=1e-5
+)</code></pre></div><div class="block"><h2>🔷 13. Gradient Clipping</h2><pre><code># Важно для RNN чтобы избежать взрыва градиентов
+import torch.nn as nn
+
+# Обучение
+for epoch in range(num_epochs):
+    for batch in dataloader:
+        optimizer.zero_grad()
+        output = model(batch)
+        loss = criterion(output, target)
+        loss.backward()
+        
+        # Gradient clipping
+        nn.utils.clip_grad_norm_(
+            model.parameters(),
+            max_norm=5.0  # ограничить норму градиента
+        )
+        
+        optimizer.step()</code></pre></div><div class="block"><h2>🔷 14. Временные ряды с GRU</h2><pre><code>class TimeSeriesGRU(nn.Module):
+    def __init__(self, input_size, hidden_size):
+        super().__init__()
+        self.gru = nn.GRU(input_size, hidden_size, 
+                          num_layers=2, batch_first=True)
+        self.fc = nn.Linear(hidden_size, 1)
+    
+    def forward(self, x):
+        # x: (batch, seq_len, features)
+        output, hidden = self.gru(x)
+        # Берем последний выход
+        last_output = output[:, -1, :]
+        prediction = self.fc(last_output)
+        return prediction
+
+# Использование
+model = TimeSeriesGRU(input_size=5, hidden_size=128)
+# Предсказание следующего значения
+x = torch.randn(32, 50, 5)  # 50 временных шагов
+pred = model(x)  # (32, 1)</code></pre></div><div class="block"><h2>🔷 15. Практические советы</h2><ul><li><strong>Начните с простого</strong>: 1-2 слоя, hidden_size=128-256</li><li><strong>Используйте gradient clipping</strong>: всегда для RNN</li><li><strong>Нормализуйте данные</strong>: особенно для временных рядов</li><li><strong>Dropout</strong>: 0.2-0.5 между слоями</li><li><strong>Bidirectional</strong>: если есть доступ ко всей последовательности</li><li><strong>Сравните с LSTM</strong>: попробуйте оба, выберите лучший</li></ul></div><div class="block"><h2>🔷 16. Чек-лист</h2><ul><li>[ ] Подготовить последовательные данные</li><li>[ ] Выбрать размеры (hidden_size, num_layers)</li><li>[ ] Добавить dropout для регуляризации</li><li>[ ] Настроить gradient clipping</li><li>[ ] Обучить модель</li><li>[ ] Оценить на валидации</li><li>[ ] Сравнить с LSTM/Transformer</li></ul><blockquote>«GRU — отличная альтернатива LSTM: проще, быстрее, меньше параметров, но сопоставимая точность. Идеален когда LSTM избыточен или слишком медленный».</blockquote></div><div class="block"><h2>🔗 Полезные ссылки</h2><ul><li><a href="https://pytorch.org/docs/stable/generated/torch.nn.GRU.html" target="_blank">📚 PyTorch: GRU</a></li><li><a href="https://www.tensorflow.org/api_docs/python/tf/keras/layers/GRU" target="_blank">📚 TensorFlow: GRU</a></li><li><a href="https://arxiv.org/abs/1406.1078" target="_blank">📄 Original GRU Paper</a></li><li><a href="https://colah.github.io/posts/2015-08-Understanding-LSTMs/" target="_blank">📖 Understanding LSTM/GRU</a></li></ul></div></div></body></html>

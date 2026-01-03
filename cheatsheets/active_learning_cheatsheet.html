@@ -1,0 +1,169 @@
+<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>Active Learning Cheatsheet — 3 колонки</title><style>@media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}@media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}.container{column-count:3;column-gap:20px;max-width:100%}.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}p,ul,ol{font-size:0.92em;margin:0.6em 0}ul,ol{padding-left:18px}li{margin-bottom:4px}code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}pre code{padding:0;background:none;white-space:pre-wrap}table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}td{padding:4px 6px;border-bottom:1px solid #f0f4ff}tr:nth-child(even){background-color:#f8fbff}.good-vs-bad{display:flex;flex-direction:column;gap:8px}.good-vs-bad div{flex:1;padding:6px 8px;border-radius:4px}.good{background-color:#f0f9f4;border-left:3px solid #2e8b57}.bad{background-color:#fdf0f2;border-left:3px solid #d32f2f}.good h3,.bad h3{margin:0 0 4px;font-size:1em;font-weight:700}.good ul,.bad ul{padding-left:20px;margin:0}.good li::before{content:"✅ ";font-weight:bold}.bad li::before{content:"❌ ";font-weight:bold}blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}.formula{text-align:center;font-family:'Cambria Math',serif;font-size:1em;margin:10px 0;padding:8px;background:#f8fbff;border-radius:4px}@media print{.container{column-gap:12px}.block{box-shadow:none}code,pre,table{font-size:0.78em}h1{font-size:1.4em}h2{font-size:1em}}</style></head><body><div class="container"><h1>🎯 Active Learning Cheatsheet</h1><div class="subtitle">Минимизация разметки • Умный выбор данных • Экономия ресурсов<br>📅 3 января 2026</div><div class="block"><h2>🔷 1. Суть</h2><ul><li><strong>Цель</strong>: минимизировать объем размеченных данных</li><li><strong>Итеративный процесс</strong>: модель выбирает данные для разметки</li><li><strong>Query strategy</strong>: выбираем самые информативные примеры</li><li><strong>Human-in-the-loop</strong>: человек размечает выбранные данные</li></ul><div class="formula">Выбираем: argmax Информативность(x)</div></div><div class="block"><h2>🔷 2. Базовый процесс</h2><ol><li><strong>Начальная разметка</strong>: небольшой размеченный набор</li><li><strong>Обучить модель</strong>: на текущих данных</li><li><strong>Выбрать примеры</strong>: по query strategy</li><li><strong>Разметить</strong>: человек размечает выбранные</li><li><strong>Повторить</strong>: шаги 2-4 до достижения цели</li></ol></div><div class="block"><h2>🔷 3. Базовый код</h2><pre><code>from modAL.models import ActiveLearner
+from sklearn.ensemble import RandomForestClassifier
+
+# Начальные данные (малый размеченный набор)
+X_labeled = X_train[:100]
+y_labeled = y_train[:100]
+X_unlabeled = X_train[100:]
+
+# Active learner
+learner = ActiveLearner(
+    estimator=RandomForestClassifier(),
+    X_training=X_labeled,
+    y_training=y_labeled
+)
+
+# Итеративное обучение
+n_queries = 10
+batch_size = 20
+
+for i in range(n_queries):
+    # Выбрать данные для разметки
+    query_idx, query_inst = learner.query(
+        X_unlabeled, n_instances=batch_size
+    )
+    
+    # Получить метки (от эксперта)
+    y_new = oracle(X_unlabeled[query_idx])
+    
+    # Обучить на новых данных
+    learner.teach(X_unlabeled[query_idx], y_new)
+    
+    # Удалить из unlabeled
+    X_unlabeled = np.delete(X_unlabeled, query_idx, axis=0)
+    
+    # Оценка
+    score = learner.score(X_test, y_test)
+    print(f"Query {i}: Accuracy = {score:.3f}")</code></pre></div><div class="block"><h2>🔷 4. Стратегии выбора (Query Strategies)</h2><table><tr><th>Стратегия</th><th>Описание</th><th>Когда использовать</th></tr><tr><td><b>Uncertainty Sampling</b></td><td>Выбор наименее уверенных</td><td>По умолчанию, просто</td></tr><tr><td><b>Entropy Sampling</b></td><td>Максимальная энтропия</td><td>Многоклассовая классификация</td></tr><tr><td><b>Margin Sampling</b></td><td>Малая разница топ-2 классов</td><td>Бинарная классификация</td></tr><tr><td><b>Query-by-Committee</b></td><td>Разногласия в ансамбле</td><td>Есть ресурсы для ансамбля</td></tr><tr><td><b>Expected Model Change</b></td><td>Макс. изменение модели</td><td>Медленно, но эффективно</td></tr></table></div><div class="block"><h2>🔷 5. Uncertainty Sampling</h2><pre><code># Выбор примеров с наименьшей уверенностью
+def uncertainty_sampling(model, X_unlabeled, n_instances=10):
+    # Предсказываем вероятности
+    proba = model.predict_proba(X_unlabeled)
+    
+    # Уверенность = макс. вероятность
+    confidence = proba.max(axis=1)
+    
+    # Uncertainty = 1 - confidence
+    uncertainty = 1 - confidence
+    
+    # Выбираем топ-n самых неуверенных
+    query_idx = np.argsort(uncertainty)[-n_instances:]
+    
+    return query_idx
+
+# Использование
+query_idx = uncertainty_sampling(model, X_unlabeled, n_instances=20)
+X_to_label = X_unlabeled[query_idx]</code></pre></div><div class="block"><h2>🔷 6. Entropy Sampling</h2><pre><code>import numpy as np
+
+def entropy_sampling(model, X_unlabeled, n_instances=10):
+    # Предсказываем вероятности
+    proba = model.predict_proba(X_unlabeled)
+    
+    # Энтропия: -Σ p(y) log p(y)
+    entropy = -np.sum(proba * np.log(proba + 1e-10), axis=1)
+    
+    # Выбираем топ-n с максимальной энтропией
+    query_idx = np.argsort(entropy)[-n_instances:]
+    
+    return query_idx
+
+# Использование
+query_idx = entropy_sampling(model, X_unlabeled, n_instances=20)</code></pre></div><div class="block"><h2>🔷 7. Margin Sampling</h2><pre><code>def margin_sampling(model, X_unlabeled, n_instances=10):
+    # Предсказываем вероятности
+    proba = model.predict_proba(X_unlabeled)
+    
+    # Сортируем вероятности
+    proba_sorted = np.sort(proba, axis=1)
+    
+    # Margin = разница топ-2 классов
+    margin = proba_sorted[:, -1] - proba_sorted[:, -2]
+    
+    # Выбираем топ-n с минимальным margin
+    query_idx = np.argsort(margin)[:n_instances]
+    
+    return query_idx</code></pre></div><div class="block"><h2>🔷 8. Query-by-Committee</h2><pre><code>from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+
+# Комитет из разных моделей
+committee = [
+    RandomForestClassifier(),
+    GradientBoostingClassifier(),
+    LogisticRegression()
+]
+
+# Обучаем все модели
+for model in committee:
+    model.fit(X_labeled, y_labeled)
+
+# Выбор по разногласиям
+def query_by_committee(committee, X_unlabeled, n_instances=10):
+    # Предсказания всех моделей
+    predictions = np.array([
+        model.predict(X_unlabeled) for model in committee
+    ])
+    
+    # Разногласия = разнообразие предсказаний
+    # Vote entropy
+    vote_entropy = []
+    for i in range(len(X_unlabeled)):
+        votes = predictions[:, i]
+        unique, counts = np.unique(votes, return_counts=True)
+        proba = counts / len(committee)
+        entropy = -np.sum(proba * np.log(proba + 1e-10))
+        vote_entropy.append(entropy)
+    
+    vote_entropy = np.array(vote_entropy)
+    
+    # Выбираем топ-n с максимальными разногласиями
+    query_idx = np.argsort(vote_entropy)[-n_instances:]
+    return query_idx</code></pre></div><div class="block"><h2>🔷 9. Преимущества и недостатки</h2><div class="good-vs-bad"><div class="good"><h3>✅ Преимущества</h3><ul><li>Меньше разметки (10-50% экономии)</li><li>Фокус на сложных примерах</li><li>Быстрее достигается высокая точность</li><li>Экономия затрат на разметку</li></ul></div><div class="bad"><h3>❌ Недостатки</h3><ul><li>Требует итеративного процесса</li><li>Нужен доступ к эксперту</li><li>Модель может быть смещенной</li><li>Не всегда работает (зависит от данных)</li></ul></div></div></div><div class="block"><h2>🔷 10. Когда использовать</h2><div class="good-vs-bad"><div class="good"><h3>✅ Хорошо подходит</h3><ul><li>Дорогая разметка</li><li>Много неразмеченных данных</li><li>Доступен эксперт для разметки</li><li>Классификация/регрессия</li></ul></div><div class="bad"><h3>❌ Плохо подходит</h3><ul><li>Дешевая разметка</li><li>Мало данных вообще</li><li>Нет доступа к эксперту</li><li>Батчевое обучение</li></ul></div></div></div><div class="block"><h2>🔷 11. Pool-based vs Stream-based</h2><table><tr><th>Подход</th><th>Описание</th><th>Когда использовать</th></tr><tr><td><b>Pool-based</b></td><td>Есть пул неразмеченных данных</td><td>Офлайн, датасет доступен</td></tr><tr><td><b>Stream-based</b></td><td>Данные приходят потоком</td><td>Онлайн, реал-тайм</td></tr></table></div><div class="block"><h2>🔷 12. Использование с scikit-learn</h2><pre><code>from sklearn.ensemble import RandomForestClassifier
+import numpy as np
+
+# Начальные данные
+labeled_idx = np.random.choice(len(X_train), 100, replace=False)
+X_labeled = X_train[labeled_idx]
+y_labeled = y_train[labeled_idx]
+
+unlabeled_idx = np.setdiff1d(range(len(X_train)), labeled_idx)
+X_unlabeled = X_train[unlabeled_idx]
+
+# Модель
+model = RandomForestClassifier()
+model.fit(X_labeled, y_labeled)
+
+# Active learning цикл
+for iteration in range(10):
+    # Query strategy (uncertainty sampling)
+    proba = model.predict_proba(X_unlabeled)
+    uncertainty = 1 - proba.max(axis=1)
+    query_idx = np.argsort(uncertainty)[-20:]  # топ-20
+    
+    # Симуляция разметки (в реальности - человек)
+    X_new = X_unlabeled[query_idx]
+    y_new = y_train[unlabeled_idx[query_idx]]
+    
+    # Обновить данные
+    X_labeled = np.vstack([X_labeled, X_new])
+    y_labeled = np.hstack([y_labeled, y_new])
+    X_unlabeled = np.delete(X_unlabeled, query_idx, axis=0)
+    unlabeled_idx = np.delete(unlabeled_idx, query_idx)
+    
+    # Переобучить
+    model.fit(X_labeled, y_labeled)
+    score = model.score(X_test, y_test)
+    print(f"Iter {iteration}: {len(X_labeled)} samples, Acc={score:.3f}")</code></pre></div><div class="block"><h2>🔷 13. Визуализация процесса</h2><pre><code>import matplotlib.pyplot as plt
+
+# Сохраняем историю
+history = {'n_samples': [], 'accuracy': []}
+
+# В каждой итерации
+history['n_samples'].append(len(X_labeled))
+history['accuracy'].append(model.score(X_test, y_test))
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(history['n_samples'], history['accuracy'], 'o-')
+plt.xlabel('Число размеченных примеров')
+plt.ylabel('Accuracy')
+plt.title('Active Learning Progress')
+plt.grid(True)
+plt.show()</code></pre></div><div class="block"><h2>🔷 14. Практические советы</h2><ul><li><strong>Начните с малого</strong>: 50-100 примеров достаточно</li><li><strong>Batch size</strong>: 10-50 примеров за итерацию</li><li><strong>Diversity</strong>: комбинируйте uncertainty с diversity sampling</li><li><strong>Валидация</strong>: отслеживайте точность на hold-out set</li><li><strong>Стоп-критерий</strong>: когда точность перестает расти</li><li><strong>Стратегия</strong>: начните с uncertainty sampling</li></ul></div><div class="block"><h2>🔷 15. Чек-лист</h2><ul><li>[ ] Подготовить начальный размеченный набор</li><li>[ ] Выбрать query strategy</li><li>[ ] Определить batch size</li><li>[ ] Настроить процесс разметки</li><li>[ ] Реализовать итеративный цикл</li><li>[ ] Мониторить прогресс</li><li>[ ] Определить стоп-критерий</li><li>[ ] Сравнить с random sampling</li></ul><blockquote>«Active Learning — мощная техника для минимизации затрат на разметку данных. Позволяет достичь высокой точности с 10-50% объема размеченных данных по сравнению с random sampling».</blockquote></div><div class="block"><h2>🔗 Полезные ссылки</h2><ul><li><a href="https://modal-python.readthedocs.io/" target="_blank">📚 modAL: Active Learning library</a></li><li><a href="https://burrsettles.com/pub/settles.activelearning.pdf" target="_blank">📄 Active Learning Literature Survey</a></li><li><a href="https://en.wikipedia.org/wiki/Active_learning_(machine_learning)" target="_blank">📝 Wikipedia: Active Learning</a></li></ul></div></div></body></html>
