@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Random Forest для регрессии Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; }}
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🎯 Random Forest для регрессии</h1>
+  <div class="subtitle">Практический фокус • 📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Тип</strong>: ансамбль деревьев решений</li>
+      <li><strong>Bagging</strong>: обучение на bootstrap выборках</li>
+      <li><strong>Случайность</strong>: случайные признаки в каждом узле</li>
+      <li><strong>Предсказание</strong>: среднее по всем деревьям</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый код</h2>
+    <pre><code>from sklearn.ensemble import RandomForestRegressor
+
+rf = RandomForestRegressor(
+    n_estimators=100,
+    max_depth=None,
+    min_samples_split=2,
+    min_samples_leaf=1,
+    max_features='sqrt',
+    random_state=42,
+    n_jobs=-1
+)
+
+rf.fit(X_train, y_train)
+y_pred = rf.predict(X_test)
+
+# Оценка
+from sklearn.metrics import mean_squared_error, r2_score
+print(f"RMSE: {np.sqrt(mean_squared_error(y_test, y_pred)):.3f}")
+print(f"R²: {r2_score(y_test, y_pred):.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Значение</th><th>Эффект</th></tr>
+      <tr><td><code>n_estimators</code></td><td>100-500</td><td>Больше = стабильнее, медленнее</td></tr>
+      <tr><td><code>max_depth</code></td><td>None/10-30</td><td>Ограничение глубины деревьев</td></tr>
+      <tr><td><code>max_features</code></td><td>'sqrt'</td><td>Случайность при split</td></tr>
+      <tr><td><code>min_samples_split</code></td><td>2-20</td><td>Регуляризация</td></tr>
+      <tr><td><code>bootstrap</code></td><td>True</td><td>Использовать bootstrap</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Feature Importance</h2>
+    <pre><code>importances = rf.feature_importances_
+indices = np.argsort(importances)[::-1]
+
+# Топ-10 важных признаков
+for i in range(min(10, len(importances))):
+    print(f"{i+1}. {feature_names[indices[i]]}: {importances[indices[i]]:.4f}")
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.figure(figsize=(10, 6))
+plt.bar(range(len(importances)), importances[indices])
+plt.xlabel('Признак')
+plt.ylabel('Importance')
+plt.title('Feature Importances')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Предсказание доверительных интервалов</h2>
+    <pre><code># Предсказания всех деревьев
+predictions = np.array([tree.predict(X_test) for tree in rf.estimators_])
+
+# Среднее и стд
+mean_pred = predictions.mean(axis=0)
+std_pred = predictions.std(axis=0)
+
+# 95% доверительный интервал
+lower = mean_pred - 1.96 * std_pred
+upper = mean_pred + 1.96 * std_pred
+
+# Визуализация
+plt.figure(figsize=(12, 6))
+plt.plot(y_test, label='True', alpha=0.7)
+plt.plot(mean_pred, label='Predicted', alpha=0.7)
+plt.fill_between(range(len(mean_pred)), lower, upper, alpha=0.3, label='95% CI')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Подбор гиперпараметров</h2>
+    <pre><code>from sklearn.model_selection import RandomizedSearchCV
+
+param_dist = {
+    'n_estimators': [100, 200, 500],
+    'max_depth': [10, 20, 30, None],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'max_features': ['sqrt', 'log2', None]
+}
+
+search = RandomizedSearchCV(
+    RandomForestRegressor(random_state=42),
+    param_dist,
+    n_iter=50,
+    cv=5,
+    scoring='neg_mean_squared_error',
+    n_jobs=-1
+)
+
+search.fit(X_train, y_train)
+print(f"Best params: {search.best_params_}")
+best_rf = search.best_estimator_</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Кросс-валидация</h2>
+    <pre><code>from sklearn.model_selection import cross_val_score
+
+scores = cross_val_score(
+    rf, X, y,
+    cv=5,
+    scoring='neg_mean_squared_error',
+    n_jobs=-1
+)
+
+rmse_scores = np.sqrt(-scores)
+print(f"RMSE: {rmse_scores.mean():.3f} (+/- {rmse_scores.std():.3f})")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Out-of-Bag (OOB) оценка</h2>
+    <pre><code>rf_oob = RandomForestRegressor(
+    n_estimators=100,
+    oob_score=True,
+    random_state=42
+)
+
+rf_oob.fit(X_train, y_train)
+print(f"OOB Score (R²): {rf_oob.oob_score_:.3f}")
+
+# OOB похож на кросс-валидацию, но быстрее
+# Использует не вошедшие в bootstrap данные</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Сравнение с одним деревом</h2>
+    <pre><code>from sklearn.tree import DecisionTreeRegressor
+
+# Одно дерево
+tree = DecisionTreeRegressor(random_state=42)
+tree.fit(X_train, y_train)
+tree_score = r2_score(y_test, tree.predict(X_test))
+
+# Random Forest
+rf_score = r2_score(y_test, rf.predict(X_test))
+
+print(f"Decision Tree R²: {tree_score:.3f}")
+print(f"Random Forest R²: {rf_score:.3f}")
+# RF почти всегда лучше!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Преимущества</h2>
+    <ul>
+      <li>Редко переобучается</li>
+      <li>Не требует масштабирования</li>
+      <li>Работает с пропусками (через surrogates)</li>
+      <li>Feature importance встроен</li>
+      <li>Параллельное обучение</li>
+      <li>Робастность к выбросам</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Недостатки</h2>
+    <ul>
+      <li>Медленное предсказание (много деревьев)</li>
+      <li>Большой размер модели</li>
+      <li>Хуже экстраполирует</li>
+      <li>Сложнее интерпретировать</li>
+      <li>Может быть хуже gradient boosting</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Лучшие практики</h2>
+    <ul>
+      <li><strong>n_estimators</strong>: начните с 100, увеличивайте до стабилизации</li>
+      <li><strong>max_features</strong>: 'sqrt' для регрессии</li>
+      <li><strong>OOB score</strong>: используйте для быстрой оценки</li>
+      <li><strong>Параллелизм</strong>: n_jobs=-1 для ускорения</li>
+      <li><strong>Память</strong>: warm_start=True для инкрементального обучения</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

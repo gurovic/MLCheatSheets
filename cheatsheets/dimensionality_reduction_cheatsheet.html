@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Понижение размерности Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Понижение размерности Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: уменьшить количество признаков</li>
+      <li><strong>Зачем</strong>: ускорение обучения, визуализация, борьба с переобучением</li>
+      <li><strong>Проблема</strong>: проклятие размерности</li>
+      <li><strong>Решение</strong>: сохранить максимум информации в меньшем числе измерений</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Зачем нужно</h2>
+    <ul>
+      <li><strong>Визуализация</strong>: сжатие до 2-3D для графиков</li>
+      <li><strong>Ускорение</strong>: меньше признаков → быстрее обучение</li>
+      <li><strong>Борьба с шумом</strong>: удаление нерелевантных признаков</li>
+      <li><strong>Меньше памяти</strong>: хранение данных</li>
+      <li><strong>Регуляризация</strong>: снижение переобучения</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Проклятие размерности</h2>
+    <p>При увеличении числа признаков:</p>
+    <ul>
+      <li>Данные становятся разреженными</li>
+      <li>Расстояния теряют смысл</li>
+      <li>Нужно экспоненциально больше данных</li>
+      <li>Модели переобучаются</li>
+    </ul>
+    <blockquote>
+      Правило большого пальца: на каждый признак нужно минимум 10 наблюдений
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Линейные методы</h2>
+    <table>
+      <tr><th>Метод</th><th>Описание</th><th>Использование</th></tr>
+      <tr><td><strong>PCA</strong></td><td>Главные компоненты</td><td>Общее сжатие</td></tr>
+      <tr><td><strong>LDA</strong></td><td>Дискриминантный анализ</td><td>С метками классов</td></tr>
+      <tr><td><strong>SVD</strong></td><td>Сингулярное разложение</td><td>Матричная факторизация</td></tr>
+      <tr><td><strong>ICA</strong></td><td>Независимые компоненты</td><td>Разделение сигналов</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Нелинейные методы</h2>
+    <table>
+      <tr><th>Метод</th><th>Описание</th><th>Когда использовать</th></tr>
+      <tr><td><strong>t-SNE</strong></td><td>Стохастическое вложение</td><td>Визуализация</td></tr>
+      <tr><td><strong>UMAP</strong></td><td>Uniform Manifold</td><td>Визуализация + предсказания</td></tr>
+      <tr><td><strong>Kernel PCA</strong></td><td>PCA с ядром</td><td>Нелинейные паттерны</td></tr>
+      <tr><td><strong>Autoencoders</strong></td><td>Нейросети</td><td>Сложные данные</td></tr>
+      <tr><td><strong>Isomap</strong></td><td>Изометрическое отображение</td><td>Многообразия</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. PCA - базовый пример</h2>
+    <pre><code>from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+# Масштабирование обязательно!
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# PCA
+pca = PCA(n_components=2)
+X_reduced = pca.fit_transform(X_scaled)
+
+# Объясненная дисперсия
+print(f"Variance: {pca.explained_variance_ratio_}")
+print(f"Total: {sum(pca.explained_variance_ratio_):.2%}")
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.scatter(X_reduced[:, 0], X_reduced[:, 1], c=y)
+plt.xlabel('PC1')
+plt.ylabel('PC2')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Выбор числа компонент (PCA)</h2>
+    <pre><code># Метод 1: По порогу дисперсии
+pca = PCA(n_components=0.95)  # 95% дисперсии
+X_reduced = pca.fit_transform(X_scaled)
+print(f"Компонент: {pca.n_components_}")
+
+# Метод 2: Scree plot
+pca_full = PCA()
+pca_full.fit(X_scaled)
+
+plt.plot(range(1, len(pca_full.explained_variance_ratio_) + 1),
+         pca_full.explained_variance_ratio_, 'bo-')
+plt.xlabel('Компонента')
+plt.ylabel('Объясненная дисперсия')
+plt.title('Scree Plot')
+plt.grid(True)
+plt.show()
+
+# Метод 3: Кумулятивная дисперсия
+cumsum = np.cumsum(pca_full.explained_variance_ratio_)
+n_components = np.argmax(cumsum >= 0.95) + 1
+print(f"Для 95%: {n_components} компонент")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. t-SNE для визуализации</h2>
+    <pre><code>from sklearn.manifold import TSNE
+
+# t-SNE (только для визуализации!)
+tsne = TSNE(
+    n_components=2,
+    perplexity=30,
+    learning_rate=200,
+    n_iter=1000,
+    random_state=42
+)
+
+X_tsne = tsne.fit_transform(X_scaled)
+
+# Визуализация
+plt.figure(figsize=(10, 8))
+scatter = plt.scatter(
+    X_tsne[:, 0], 
+    X_tsne[:, 1], 
+    c=y, 
+    cmap='viridis',
+    alpha=0.6
+)
+plt.colorbar(scatter)
+plt.title('t-SNE проекция')
+plt.show()</code></pre>
+    <blockquote>
+      ⚠️ t-SNE только для визуализации! Нельзя использовать transform() на новых данных
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. UMAP - современная альтернатива</h2>
+    <pre><code>import umap
+
+# UMAP (быстрее t-SNE + можно transform)
+reducer = umap.UMAP(
+    n_components=2,
+    n_neighbors=15,
+    min_dist=0.1,
+    metric='euclidean',
+    random_state=42
+)
+
+X_umap = reducer.fit_transform(X_scaled)
+
+# Применение к новым данным
+X_new_umap = reducer.transform(X_new_scaled)
+
+# Визуализация
+plt.scatter(X_umap[:, 0], X_umap[:, 1], c=y)
+plt.title('UMAP проекция')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. LDA для классификации</h2>
+    <pre><code>from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+# LDA (с учетом меток классов)
+lda = LinearDiscriminantAnalysis(n_components=2)
+X_lda = lda.fit_transform(X_scaled, y)
+
+# Максимум min(n_classes-1, n_features) компонент
+print(f"LDA компонент: {lda.n_components}")
+
+# Можно использовать для классификации
+y_pred = lda.predict(X_new_scaled)
+
+# Визуализация
+plt.scatter(X_lda[:, 0], X_lda[:, 1], c=y)
+plt.title('LDA проекция')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Автоэнкодер (простой)</h2>
+    <pre><code>from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Input, Dense
+
+# Архитектура
+input_dim = X_train.shape[1]
+encoding_dim = 32
+
+input_layer = Input(shape=(input_dim,))
+encoded = Dense(encoding_dim, activation='relu')(input_layer)
+decoded = Dense(input_dim, activation='sigmoid')(encoded)
+
+autoencoder = Model(input_layer, decoded)
+encoder = Model(input_layer, encoded)
+
+# Обучение
+autoencoder.compile(optimizer='adam', loss='mse')
+autoencoder.fit(
+    X_train, X_train,
+    epochs=50,
+    batch_size=256,
+    validation_split=0.2
+)
+
+# Сжатие
+X_encoded = encoder.predict(X_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сравнение методов</h2>
+    <table>
+      <tr><th>Критерий</th><th>PCA</th><th>t-SNE</th><th>UMAP</th><th>LDA</th></tr>
+      <tr><td>Скорость</td><td>Быстро</td><td>Медленно</td><td>Быстро</td><td>Быстро</td></tr>
+      <tr><td>Нелинейность</td><td>Нет</td><td>Да</td><td>Да</td><td>Нет</td></tr>
+      <tr><td>Transform новых</td><td>Да</td><td>Нет</td><td>Да</td><td>Да</td></tr>
+      <tr><td>Нужны метки</td><td>Нет</td><td>Нет</td><td>Нет</td><td>Да</td></tr>
+      <tr><td>Большие данные</td><td>Да</td><td>Нет</td><td>Да</td><td>Да</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Используйте понижение размерности когда:</h3>
+        <ul>
+          <li>Слишком много признаков (сотни, тысячи)</li>
+          <li>Нужна визуализация данных</li>
+          <li>Модель переобучается</li>
+          <li>Признаки коррелируют</li>
+          <li>Медленное обучение</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не используйте когда:</h3>
+        <ul>
+          <li>Признаков мало (< 50)</li>
+          <li>Важна интерпретируемость</li>
+          <li>Все признаки важны для задачи</li>
+          <li>Данных мало (< 1000 точек)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Выбор метода - схема</h2>
+    <pre><code>if нужна_визуализация:
+    if данных < 10000:
+        используй t-SNE
+    else:
+        используй UMAP
+elif есть_метки_классов:
+    используй LDA
+elif нужна_скорость:
+    используй PCA
+elif нужна_нелинейность:
+    if можешь обучать нейросети:
+        используй Autoencoder
+    else:
+        используй Kernel PCA или UMAP
+else:
+    начни с PCA</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Лучшие практики</h2>
+    <ul>
+      <li><strong>Масштабирование</strong>: всегда используйте StandardScaler перед PCA/LDA</li>
+      <li><strong>Pipeline</strong>: объединяйте в sklearn Pipeline</li>
+      <li><strong>Кросс-валидация</strong>: проверяйте на валидации</li>
+      <li><strong>Объясненная дисперсия</strong>: контролируйте потерю информации</li>
+      <li><strong>Feature selection первым</strong>: сначала удалите явно лишнее</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Pipeline с PCA</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier
+
+# Полный пайплайн
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('pca', PCA(n_components=0.95)),
+    ('classifier', RandomForestClassifier())
+])
+
+# Обучение
+pipeline.fit(X_train, y_train)
+
+# Предсказание (все шаги автоматически)
+y_pred = pipeline.predict(X_test)
+
+# Оценка
+from sklearn.metrics import accuracy_score
+print(f"Accuracy: {accuracy_score(y_test, y_pred):.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Incremental PCA (большие данные)</h2>
+    <pre><code>from sklearn.decomposition import IncrementalPCA
+
+# Для данных, не помещающихся в память
+n_batches = 10
+ipca = IncrementalPCA(n_components=50)
+
+for X_batch in np.array_split(X_large, n_batches):
+    ipca.partial_fit(X_batch)
+
+# Transform
+X_reduced = ipca.transform(X_large)
+
+print(f"Variance: {sum(ipca.explained_variance_ratio_):.2%}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Kernel PCA (нелинейный)</h2>
+    <pre><code>from sklearn.decomposition import KernelPCA
+
+# Различные ядра
+kernels = ['linear', 'poly', 'rbf', 'sigmoid']
+
+for kernel in kernels:
+    kpca = KernelPCA(
+        n_components=2,
+        kernel=kernel,
+        gamma=0.1
+    )
+    X_kpca = kpca.fit_transform(X_scaled)
+    
+    plt.scatter(X_kpca[:, 0], X_kpca[:, 1], c=y)
+    plt.title(f'Kernel PCA ({kernel})')
+    plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Сохранение и загрузка</h2>
+    <pre><code>import joblib
+
+# Сохранение
+joblib.dump(pca, 'pca_model.pkl')
+joblib.dump(scaler, 'scaler.pkl')
+
+# Загрузка
+pca_loaded = joblib.load('pca_model.pkl')
+scaler_loaded = joblib.load('scaler.pkl')
+
+# Использование
+X_new_scaled = scaler_loaded.transform(X_new)
+X_new_reduced = pca_loaded.transform(X_new_scaled)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Частые ошибки</h2>
+    <ul>
+      <li>❌ Не масштабировать данные перед PCA</li>
+      <li>❌ Использовать t-SNE для обучения модели</li>
+      <li>❌ Применять PCA к категориальным признакам</li>
+      <li>❌ Не проверять объясненную дисперсию</li>
+      <li>❌ Делать PCA до train_test_split (утечка данных!)</li>
+      <li>❌ Использовать слишком мало компонент</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 21. Правильный порядок</h2>
+    <pre><code># ✅ ПРАВИЛЬНО
+X_train, X_test, y_train, y_test = train_test_split(...)
+
+# Fit только на train
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+
+pca = PCA(n_components=50)
+X_train_pca = pca.fit_transform(X_train_scaled)
+
+# Transform на test
+X_test_scaled = scaler.transform(X_test)
+X_test_pca = pca.transform(X_test_scaled)
+
+# ❌ НЕПРАВИЛЬНО - fit на всех данных
+# scaler.fit(X)  # утечка данных!
+# pca.fit(X_scaled)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 22. Метрики качества</h2>
+    <pre><code># Reconstruction error (PCA)
+X_reconstructed = pca.inverse_transform(X_reduced)
+mse = np.mean((X_scaled - X_reconstructed) ** 2)
+print(f"MSE: {mse:.4f}")
+
+# Trustworthiness (t-SNE, UMAP)
+from sklearn.manifold import trustworthiness
+trust = trustworthiness(X_scaled, X_tsne, n_neighbors=5)
+print(f"Trustworthiness: {trust:.3f}")
+# Близко к 1.0 - хорошо
+
+# Silhouette score (кластеризация)
+from sklearn.metrics import silhouette_score
+score = silhouette_score(X_reduced, y)
+print(f"Silhouette: {score:.3f}")</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>

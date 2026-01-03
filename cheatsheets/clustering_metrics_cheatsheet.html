@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Метрики оценки кластеризации Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; }}
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🎯 Метрики оценки кластеризации</h1>
+  <div class="subtitle">Практический фокус • 📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 Silhouette Score</h2>
+    <p><strong>Диапазон</strong>: [-1, 1], выше = лучше</p>
+    <pre><code>from sklearn.metrics import silhouette_score
+score = silhouette_score(X, labels)
+# > 0.7: отлично, 0.5-0.7: хорошо, < 0.25: плохо</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 Davies-Bouldin Index</h2>
+    <p><strong>Диапазон</strong>: [0, ∞), ниже = лучше</p>
+    <pre><code>from sklearn.metrics import davies_bouldin_score
+db = davies_bouldin_score(X, labels)
+# < 0.5: отлично, > 1.0: плохо</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 Calinski-Harabasz Index</h2>
+    <p><strong>Диапазон</strong>: [0, ∞), выше = лучше</p>
+    <pre><code>from sklearn.metrics import calinski_harabasz_score
+ch = calinski_harabasz_score(X, labels)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 Adjusted Rand Index (ARI)</h2>
+    <p>Требует истинные метки. Диапазон: [-1, 1]</p>
+    <pre><code>from sklearn.metrics import adjusted_rand_score
+ari = adjusted_rand_score(true_labels, pred_labels)
+# 1.0: идеально, > 0.9: отлично</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 Elbow Method</h2>
+    <pre><code>inertias = []
+for k in range(2, 11):
+    kmeans = KMeans(n_clusters=k)
+    kmeans.fit(X)
+    inertias.append(kmeans.inertia_)
+# Ищем "локоть" на графике</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 Полная оценка</h2>
+    <pre><code>def evaluate_clustering(X, labels):
+    print(f"Silhouette: {silhouette_score(X, labels):.3f}")
+    print(f"Davies-Bouldin: {davies_bouldin_score(X, labels):.3f}")
+    print(f"Calinski-Harabasz: {calinski_harabasz_score(X, labels):.1f}")
+    print(f"Кластеров: {len(set(labels))}")
+    print(f"Шума: {list(labels).count(-1)}")</code></pre>
+  </div>
+
+</div>
+</body>
+</html>
