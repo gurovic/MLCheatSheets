@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Трансформеры Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🤖 Трансформеры Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Революция</strong>: заменили RNN в NLP</li>
+      <li><strong>Attention</strong>: фокус на важных элементах</li>
+      <li><strong>Параллелизм</strong>: быстрее RNN</li>
+      <li><strong>SOTA</strong>: лучшие результаты в NLP, CV</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Ключевые компоненты</h2>
+    <ul>
+      <li><strong>Self-Attention</strong>: связь между всеми токенами</li>
+      <li><strong>Multi-Head Attention</strong>: несколько параллельных attention</li>
+      <li><strong>Positional Encoding</strong>: информация о позиции</li>
+      <li><strong>Feed-Forward</strong>: полносвязные слои</li>
+      <li><strong>Layer Normalization</strong>: стабилизация</li>
+      <li><strong>Residual Connections</strong>: skip connections</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Hugging Face Transformers</h2>
+    <pre><code>from transformers import (
+    AutoTokenizer, 
+    AutoModelForSequenceClassification,
+    Trainer, 
+    TrainingArguments
+)
+
+# Загрузка предобученной модели
+model_name = "bert-base-uncased"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSequenceClassification.from_pretrained(
+    model_name, 
+    num_labels=2
+)
+
+# Токенизация
+texts = ["This is great!", "This is bad."]
+inputs = tokenizer(texts, padding=True, truncation=True, return_tensors="pt")
+
+# Предсказание
+outputs = model(**inputs)
+predictions = outputs.logits.argmax(dim=-1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Self-Attention механизм</h2>
+    <p><strong>Формула:</strong></p>
+    <pre><code>Attention(Q, K, V) = softmax(QK^T / √d_k) V
+
+где:
+Q = Query (запрос)
+K = Key (ключ)
+V = Value (значение)
+d_k = размерность ключа</code></pre>
+
+    <p><strong>Интуиция:</strong></p>
+    <ul>
+      <li>Q спрашивает: "Что мне важно?"</li>
+      <li>K отвечает: "Я содержу это"</li>
+      <li>V дает: "Вот информация"</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Популярные модели</h2>
+    <table>
+      <tr><th>Модель</th><th>Год</th><th>Особенности</th></tr>
+      <tr><td><strong>BERT</strong></td><td>2018</td><td>Bidirectional, понимание</td></tr>
+      <tr><td><strong>GPT-2/3</strong></td><td>2019/2020</td><td>Autoregressive, генерация</td></tr>
+      <tr><td><strong>T5</strong></td><td>2019</td><td>Text-to-text framework</td></tr>
+      <tr><td><strong>RoBERTa</strong></td><td>2019</td><td>Улучшенный BERT</td></tr>
+      <tr><td><strong>ALBERT</strong></td><td>2019</td><td>Легкий BERT</td></tr>
+      <tr><td><strong>DistilBERT</strong></td><td>2019</td><td>60% быстрее, 95% точности</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Fine-tuning BERT</h2>
+    <pre><code>from transformers import Trainer, TrainingArguments
+
+training_args = TrainingArguments(
+    output_dir='./results',
+    num_train_epochs=3,
+    per_device_train_batch_size=16,
+    per_device_eval_batch_size=64,
+    warmup_steps=500,
+    weight_decay=0.01,
+    logging_dir='./logs',
+    learning_rate=2e-5,
+    save_strategy="epoch",
+    evaluation_strategy="epoch"
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset
+)
+
+trainer.train()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Классификация текста</h2>
+    <pre><code>from transformers import pipeline
+
+# Sentiment analysis
+classifier = pipeline("sentiment-analysis")
+result = classifier("I love transformers!")
+print(result)  # [{'label': 'POSITIVE', 'score': 0.99}]
+
+# Custom model
+classifier = pipeline(
+    "text-classification",
+    model="distilbert-base-uncased-finetuned-sst-2-english"
+)
+
+results = classifier([
+    "This is wonderful!",
+    "This is terrible."
+])
+print(results)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Named Entity Recognition</h2>
+    <pre><code># NER pipeline
+ner = pipeline("ner", grouped_entities=True)
+
+text = "Hugging Face is based in New York City"
+entities = ner(text)
+
+for entity in entities:
+    print(f"{entity['word']}: {entity['entity_group']} ({entity['score']:.2f})")
+
+# Output:
+# Hugging Face: ORG (0.99)
+# New York City: LOC (0.99)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Генерация текста</h2>
+    <pre><code># GPT-2 генерация
+generator = pipeline("text-generation", model="gpt2")
+
+result = generator(
+    "Once upon a time",
+    max_length=50,
+    num_return_sequences=1,
+    temperature=0.7
+)
+
+print(result[0]['generated_text'])
+
+# Параметры:
+# max_length: длина текста
+# temperature: креативность (0.7-1.0)
+# num_return_sequences: количество вариантов</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Vision Transformer (ViT)</h2>
+    <pre><code>from transformers import ViTForImageClassification, ViTFeatureExtractor
+
+model = ViTForImageClassification.from_pretrained('google/vit-base-patch16-224')
+feature_extractor = ViTFeatureExtractor.from_pretrained('google/vit-base-patch16-224')
+
+# Обработка изображения
+from PIL import Image
+image = Image.open('cat.jpg')
+
+inputs = feature_extractor(images=image, return_tensors="pt")
+outputs = model(**inputs)
+logits = outputs.logits
+
+predicted_class = logits.argmax(-1).item()
+print(model.config.id2label[predicted_class])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>NLP задачи (классификация, NER, Q&A)</li>
+          <li>Генерация текста</li>
+          <li>Машинный перевод</li>
+          <li>Computer Vision (ViT)</li>
+          <li>Мультимодальные задачи</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Ограничены вычислительные ресурсы</li>
+          <li>Малый датасет без transfer learning</li>
+          <li>Нужна интерпретируемость</li>
+          <li>Real-time inference на CPU</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Чек-лист</h2>
+    <ul>
+      <li>[ ] Использовать предобученные модели (BERT, GPT)</li>
+      <li>[ ] Выбрать правильную модель для задачи</li>
+      <li>[ ] Fine-tune на своих данных</li>
+      <li>[ ] Использовать Hugging Face библиотеку</li>
+      <li>[ ] Настроить learning rate (2e-5 - 5e-5)</li>
+      <li>[ ] Использовать gradient accumulation для больших моделей</li>
+      <li>[ ] Рассмотреть DistilBERT для production</li>
+      <li>[ ] Использовать GPU/TPU</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Трансформер — это как очень внимательный читатель: он одновременно видит всё предложение и понимает, какие слова важны для понимания смысла. В отличие от человека, который читает слева направо, трансформер видит всё сразу».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
