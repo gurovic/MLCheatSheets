@@ -13,7 +13,7 @@
 1. Feature Engineering
 1. [Выбор признаков (Feature Selection)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_selection_cheatsheet.html)
 1. Снижение размерности (Dimensionality Reduction)
-1. Балансировка классов (Imbalanced Data)
+1. [Балансировка классов (Imbalanced Data)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/imbalanced_data_cheatsheet.html)
 
 ### **2. Классификация**
 1. [Логистическая регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/logreg_cheatsheet.html)
@@ -23,7 +23,7 @@
 1. [Деревья решений для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/decision_trees_cheatsheet.html)
 1. [Случайный лес для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/random_forest_cheatsheet.html)
 1. [Градиентный бустинг для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/boosting_cheatsheet.html)
-1. [XGBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/xgboost_cheatsheet.html) / LightGBM / CatBoost
+1. [XGBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/xgboost_cheatsheet.html) / [LightGBM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lightgbm_cheatsheet.html) / [CatBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/catboost_cheatsheet.html)
 1. [Ансамбли методов (Voting, Stacking)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ensemble_methods_cheatsheet.html)
 
 ### **3. Регрессия**
@@ -41,14 +41,14 @@
 1. [Иерархическая кластеризация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hierarchical_clustering_cheatsheet.html)
 1. [DBSCAN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dbscan_cheatsheet.html)
 1. OPTICS
-1. [Gaussian Mixture Models](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gmm_cheatsheet.html)
+1. Gaussian Mixture Models
 1. Метрики оценки кластеризации
 1. Выбор числа кластеров
 
 ### **5. Понижение размерности**
 1. [PCA (Principal Component Analysis)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pca_cheatsheet.html)
-1. t-SNE
-1. UMAP
+1. [t-SNE](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tsne_cheatsheet.html)
+1. [UMAP](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/umap_cheatsheet.html)
 1. [LDA (Linear Discriminant Analysis)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lda_cheatsheet.html)
 1. SVD (Singular Value Decomposition)
 1. Автоэнкодеры (линейные)
@@ -68,14 +68,14 @@
 1. Стратегии поиска гиперпараметров
 
 ### **8. Работа с временными рядами (классические методы)**
-1. ARIMA / SARIMA
+1. [ARIMA / SARIMA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_cheatsheet.html)
 1. Экспоненциальное сглаживание
 1. Методы на основе скользящих средних
 1. Feature Engineering для временных рядов
 1. Валидация временных рядов
 
 ### **9. Обнаружение аномалий**
-1. Isolation Forest
+1. [Isolation Forest](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/isolation_forest_cheatsheet.html)
 1. One-Class SVM
 1. Local Outlier Factor
 1. Elliptic Envelope
@@ -89,8 +89,8 @@
 
 ### **11. Градиентный бустинг**
 1. [XGBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/xgboost_cheatsheet.html)
-1. LightGBM
-1. CatBoost
+1. [LightGBM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lightgbm_cheatsheet.html)
+1. [CatBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/catboost_cheatsheet.html)
 1. Гиперпараметры градиентного бустинга
 1. Особенности и тонкости настройки
 
@@ -116,7 +116,7 @@
 
 ### **15. Интерпретация моделей**
 1. Важность признаков
-1. SHAP значения
+1. [SHAP значения](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/shap_cheatsheet.html)
 1. LIME
 1. Частичные зависимости
 1. Surrogate models
@@ -180,7 +180,7 @@
 1. Современные архитектуры (ResNet, Inception, EfficientNet)
 1. Transfer learning для CNN
 1. Data augmentation для изображений
-1. [Batch Normalization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/batch_normalization_cheatsheet.html)
+1. Batch Normalization
 1. Визуализация CNN
 1. 1D-CNN и 3D-CNN
 
@@ -205,7 +205,7 @@
 
 ### **5. Генеративные модели**
 1. [Автоэнкодеры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/autoencoders_cheatsheet.html)
-1. [Вариационные автоэнкодеры (VAE)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/vae_cheatsheet.html)
+1. Вариационные автоэнкодеры (VAE)
 1. Генеративно-состязательные сети (GAN)
 1. DCGAN, Conditional GAN
 1. StyleGAN
@@ -225,14 +225,14 @@
 1. Векторные представления слов (Word2Vec, GloVe, FastText)
 1. RNN/LSTM для NLP
 1. Transformer для NLP
-1. BERT и его вариации
+1. [BERT и его вариации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bert_finetuning_cheatsheet.html)
 1. GPT-архитектуры
 1. Токенизация (BPE, WordPiece, SentencePiece)
 1. Задачи NLP (NER, классификация, суммаризация)
 
 ### **8. Компьютерное зрение (Computer Vision)**
 1. Классификация изображений
-1. Детекция объектов (YOLO, SSD, Faster R-CNN)
+1. [Детекция объектов (YOLO, SSD, Faster R-CNN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/yolo_cheatsheet.html)
 1. Сегментация (Semantic, Instance, Panoptic)
 1. Детекция ключевых точек
 1. Слежение за объектами
