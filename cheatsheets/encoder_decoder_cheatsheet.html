@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Архитектура Encoder-Decoder Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}
+    @media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}
+    .container{column-count:3;column-gap:20px;max-width:100%}
+    .block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+    h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}
+    .subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}
+    h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}
+    p,ul,ol{font-size:0.92em;margin:0.6em 0}ul,ol{padding-left:18px}li{margin-bottom:4px}
+    code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}
+    pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}
+    pre code{padding:0;background:none;white-space:pre-wrap}
+    table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}
+    th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}
+    td{padding:4px 6px;border-bottom:1px solid #f0f4ff}tr:nth-child(even){background-color:#f8fbff}
+    blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}
+    @media print{.container{column-gap:12px}.block{box-shadow:none}code,pre,table{font-size:0.78em}h1{font-size:1.4em}h2{font-size:1em}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🔄 Архитектура Encoder-Decoder Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Encoder</strong>: сжимает входные данные в представление</li>
+      <li><strong>Decoder</strong>: восстанавливает выход из представления</li>
+      <li><strong>Применение</strong>: перевод, генерация текста, image-to-image</li>
+      <li><strong>Ключевая идея</strong>: sequence-to-sequence моделирование</li>
+    </ul>
+    <blockquote>Encoder-Decoder — это архитектура, где одна сеть сжимает информацию, а другая её разворачивает в нужный формат.</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Компоненты</h2>
+    <table>
+      <tr><th>Компонент</th><th>Функция</th><th>Выход</th></tr>
+      <tr><td><strong>Encoder</strong></td><td>Обработка входа</td><td>Context vector</td></tr>
+      <tr><td><strong>Context</strong></td><td>Сжатое представление</td><td>Фиксированный вектор</td></tr>
+      <tr><td><strong>Decoder</strong></td><td>Генерация выхода</td><td>Целевая последовательность</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код (Keras)</h2>
+    <pre><code>from tensorflow.keras.layers import LSTM, Dense, Input
+from tensorflow.keras.models import Model
+
+# Encoder
+encoder_inputs = Input(shape=(None, num_features))
+encoder = LSTM(256, return_state=True)
+encoder_outputs, state_h, state_c = encoder(encoder_inputs)
+encoder_states = [state_h, state_c]
+
+# Decoder
+decoder_inputs = Input(shape=(None, num_features))
+decoder_lstm = LSTM(256, return_sequences=True, return_state=True)
+decoder_outputs, _, _ = decoder_lstm(
+    decoder_inputs, 
+    initial_state=encoder_states
+)
+decoder_dense = Dense(num_features, activation='softmax')
+decoder_outputs = decoder_dense(decoder_outputs)
+
+# Model
+model = Model([encoder_inputs, decoder_inputs], decoder_outputs)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Применения</h2>
+    <ul>
+      <li><strong>Машинный перевод</strong>: текст → текст (другой язык)</li>
+      <li><strong>Summarization</strong>: длинный текст → короткий</li>
+      <li><strong>Чат-боты</strong>: вопрос → ответ</li>
+      <li><strong>Image Captioning</strong>: изображение → текст</li>
+      <li><strong>Speech Recognition</strong>: аудио → текст</li>
+      <li><strong>Image-to-Image</strong>: изображение → изображение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. С Attention</h2>
+    <pre><code>from tensorflow.keras.layers import Attention
+
+# Encoder с return_sequences=True
+encoder = LSTM(256, return_sequences=True, return_state=True)
+encoder_outputs, state_h, state_c = encoder(encoder_inputs)
+
+# Decoder с attention
+decoder_lstm = LSTM(256, return_sequences=True)
+decoder_outputs = decoder_lstm(
+    decoder_inputs,
+    initial_state=[state_h, state_c]
+)
+
+# Attention layer
+attention = Attention()
+context = attention([decoder_outputs, encoder_outputs])
+
+# Concatenate
+decoder_combined = Concatenate()([context, decoder_outputs])
+output = Dense(num_features, activation='softmax')(decoder_combined)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. PyTorch пример</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class EncoderDecoder(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super().__init__()
+        self.encoder = nn.LSTM(input_dim, hidden_dim, batch_first=True)
+        self.decoder = nn.LSTM(output_dim, hidden_dim, batch_first=True)
+        self.fc = nn.Linear(hidden_dim, output_dim)
+    
+    def forward(self, src, trg):
+        # Encoder
+        _, (hidden, cell) = self.encoder(src)
+        
+        # Decoder
+        outputs, _ = self.decoder(trg, (hidden, cell))
+        
+        # Output layer
+        predictions = self.fc(outputs)
+        return predictions</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Обучение</h2>
+    <pre><code># Teacher forcing
+for epoch in range(epochs):
+    for src, trg in dataloader:
+        # src: входная последовательность
+        # trg: целевая последовательность
+        
+        # Forward pass
+        output = model(src, trg[:-1])  # без последнего токена
+        
+        # Loss
+        loss = criterion(output, trg[1:])  # без первого токена
+        
+        # Backward
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+# Inference (без teacher forcing)
+decoder_input = start_token
+for t in range(max_length):
+    output = model.decode_step(decoder_input, hidden)
+    decoder_input = output.argmax()  # greedy
+    if decoder_input == end_token:
+        break</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Чек-лист</h2>
+    <ul>
+      <li>[ ] Encoder извлекает признаки</li>
+      <li>[ ] Context vector фиксированного размера</li>
+      <li>[ ] Decoder генерирует последовательность</li>
+      <li>[ ] Использовать attention для длинных последовательностей</li>
+      <li>[ ] Teacher forcing при обучении</li>
+      <li>[ ] Beam search при инференсе</li>
+    </ul>
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>«Encoder-Decoder — это как переводчик: encoder понимает исходный текст, а decoder пересказывает его на другом языке, сохраняя смысл».</blockquote>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Теория вероятностей для ML Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}
+    @media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}
+    .container{column-count:3;column-gap:20px;max-width:100%}
+    .block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+    h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}
+    .subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}
+    h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}
+    p,ul,ol{font-size:0.92em;margin:0.6em 0}ul,ol{padding-left:18px}li{margin-bottom:4px}
+    code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}
+    pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}
+    pre code{padding:0;background:none;white-space:pre-wrap}
+    table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}
+    th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}
+    td{padding:4px 6px;border-bottom:1px solid #f0f4ff}tr:nth-child(even){background-color:#f8fbff}
+    blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}
+    @media print{.container{column-gap:12px}.block{box-shadow:none}code,pre,table{font-size:0.78em}h1{font-size:1.4em}h2{font-size:1em}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🎲 Теория вероятностей для ML Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <ul>
+      <li><strong>Вероятность</strong>: P(A) ∈ [0, 1]</li>
+      <li><strong>0</strong>: событие невозможно</li>
+      <li><strong>1</strong>: событие обязательно произойдёт</li>
+      <li><strong>0.5</strong>: событие равновероятно</li>
+    </ul>
+    <blockquote>Вероятность — это мера неопределённости: насколько мы уверены, что событие произойдёт.</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные правила</h2>
+    <table>
+      <tr><th>Правило</th><th>Формула</th><th>Применение</th></tr>
+      <tr><td><strong>Сумма</strong></td><td>P(A или B) = P(A) + P(B) - P(A∩B)</td><td>Вероятность одного из событий</td></tr>
+      <tr><td><strong>Произведение</strong></td><td>P(A и B) = P(A) × P(B|A)</td><td>Вероятность обоих событий</td></tr>
+      <tr><td><strong>Дополнение</strong></td><td>P(¬A) = 1 - P(A)</td><td>Вероятность противоположного</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Условная вероятность</h2>
+    <p><strong>Вероятность A при условии B:</strong></p>
+    <pre><code>P(A|B) = P(A ∩ B) / P(B)
+
+Пример:
+P(болезнь|тест+) = ?
+
+# Дано:
+# P(тест+|болезнь) = 0.99 (чувствительность)
+# P(болезнь) = 0.01 (распространённость)
+# P(тест+|здоров) = 0.05 (ложноположительный)
+
+# Решение через формулу Байеса</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Теорема Байеса</h2>
+    <p><strong>Ключевая формула для ML:</strong></p>
+    <pre><code>P(A|B) = P(B|A) × P(A) / P(B)
+
+где:
+P(A|B) — posterior (апостериорная)
+P(B|A) — likelihood (правдоподобие)
+P(A) — prior (априорная)
+P(B) — evidence (свидетельство)
+
+# Пример в коде
+def bayes_theorem(p_b_given_a, p_a, p_b):
+    return (p_b_given_a * p_a) / p_b
+
+# Наивный Байес основан на этой формуле</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Независимость</h2>
+    <p><strong>События A и B независимы, если:</strong></p>
+    <pre><code>P(A ∩ B) = P(A) × P(B)
+P(A|B) = P(A)
+
+# Пример независимых событий:
+# - Два броска монеты
+# - Погода сегодня и завтра (приблизительно)
+
+# Условная независимость в ML:
+# Признаки независимы при условии класса
+P(x₁, x₂|y) = P(x₁|y) × P(x₂|y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Распределения</h2>
+    <table>
+      <tr><th>Распределение</th><th>Тип</th><th>Применение</th></tr>
+      <tr><td><strong>Bernoulli</strong></td><td>Дискретное</td><td>Бинарные исходы (0/1)</td></tr>
+      <tr><td><strong>Binomial</strong></td><td>Дискретное</td><td>Количество успехов</td></tr>
+      <tr><td><strong>Uniform</strong></td><td>Непрерывное</td><td>Все значения равновероятны</td></tr>
+      <tr><td><strong>Normal (Gaussian)</strong></td><td>Непрерывное</td><td>Большинство реальных данных</td></tr>
+      <tr><td><strong>Exponential</strong></td><td>Непрерывное</td><td>Время между событиями</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Нормальное распределение</h2>
+    <pre><code>import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
+
+# N(μ, σ²)
+mu, sigma = 0, 1
+
+# Генерация данных
+x = np.linspace(-4, 4, 100)
+pdf = stats.norm.pdf(x, mu, sigma)
+
+# Визуализация
+plt.plot(x, pdf)
+plt.title('Normal Distribution N(0,1)')
+plt.xlabel('x')
+plt.ylabel('Probability Density')
+plt.show()
+
+# Свойства:
+# - 68% данных в [μ-σ, μ+σ]
+# - 95% данных в [μ-2σ, μ+2σ]
+# - 99.7% данных в [μ-3σ, μ+3σ]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Применение в ML</h2>
+    <ul>
+      <li><strong>Naive Bayes</strong>: использует теорему Байеса</li>
+      <li><strong>Логистическая регрессия</strong>: моделирует P(y|x)</li>
+      <li><strong>Гауссовские процессы</strong>: распределение функций</li>
+      <li><strong>Вариационный вывод</strong>: приближение распределений</li>
+      <li><strong>Байесовская оптимизация</strong>: поиск гиперпараметров</li>
+      <li><strong>Monte Carlo</strong>: семплирование</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Математическое ожидание</h2>
+    <pre><code># Дискретное
+E[X] = Σ xᵢ × P(X = xᵢ)
+
+# Непрерывное
+E[X] = ∫ x × f(x) dx
+
+# В Python
+import numpy as np
+
+# Среднее == математическое ожидание для выборки
+data = np.random.normal(0, 1, 1000)
+mean = np.mean(data)
+print(f"E[X] ≈ {mean}")
+
+# Свойства:
+# E[aX + b] = a×E[X] + b
+# E[X + Y] = E[X] + E[Y]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Дисперсия</h2>
+    <pre><code># Мера разброса
+Var(X) = E[(X - E[X])²]
+σ² = Var(X)
+σ = стандартное отклонение
+
+# В Python
+variance = np.var(data)
+std_dev = np.std(data)
+
+print(f"Var(X) = {variance:.3f}")
+print(f"σ = {std_dev:.3f}")
+
+# Свойства:
+# Var(aX + b) = a² × Var(X)
+# Var(X + Y) = Var(X) + Var(Y) если независимы</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Чек-лист</h2>
+    <ul>
+      <li>[ ] Понимать P(A|B) vs P(A∩B)</li>
+      <li>[ ] Применять теорему Байеса</li>
+      <li>[ ] Знать основные распределения</li>
+      <li>[ ] Различать дискретное и непрерывное</li>
+      <li>[ ] Вычислять E[X] и Var(X)</li>
+      <li>[ ] Понимать независимость событий</li>
+    </ul>
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>«Теория вероятностей помогает ML-моделям работать с неопределённостью: вместо того, чтобы давать однозначные ответы, модель оценивает вероятность разных исходов».</blockquote>
+  </div>
+
+</div>
+</body>
+</html>

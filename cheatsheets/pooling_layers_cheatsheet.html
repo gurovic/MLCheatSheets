@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Pooling-слои Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}
+    @media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}
+    .container{column-count:3;column-gap:20px;max-width:100%}
+    .block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+    h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}
+    .subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}
+    h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}
+    p,ul,ol{font-size:0.92em;margin:0.6em 0}
+    ul,ol{padding-left:18px}
+    li{margin-bottom:4px}
+    code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}
+    pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}
+    pre code{padding:0;background:none;white-space:pre-wrap}
+    table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}
+    th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}
+    td{padding:4px 6px;border-bottom:1px solid #f0f4ff}
+    tr:nth-child(even){background-color:#f8fbff}
+    .good-vs-bad{display:flex;flex-direction:column;gap:8px}
+    .good-vs-bad div{flex:1;padding:6px 8px;border-radius:4px}
+    .good{background-color:#f0f9f4;border-left:3px solid #2e8b57}
+    .bad{background-color:#fdf0f2;border-left:3px solid #d32f2f}
+    .good h3,.bad h3{margin:0 0 4px;font-size:1em;font-weight:700}
+    .good ul,.bad ul{padding-left:20px;margin:0}
+    .good li::before{content:"✅ ";font-weight:bold}
+    .bad li::before{content:"❌ ";font-weight:bold}
+    blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}
+    @media print{.container{column-gap:12px}.block{box-shadow:none}code,pre,table{font-size:0.78em}h1{font-size:1.4em}h2{font-size:1em}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🔽 Pooling-слои Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: уменьшение пространственной размерности</li>
+      <li><strong>Снижение</strong>: количества параметров и вычислений</li>
+      <li><strong>Инвариантность</strong>: к малым сдвигам и искажениям</li>
+      <li><strong>Применение</strong>: между сверточными слоями в CNN</li>
+    </ul>
+    <blockquote>Pooling агрегирует информацию из соседних пикселей, сохраняя важные признаки и уменьшая размерность.</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Max Pooling</h2>
+    <p><strong>Берет максимальное значение в окне:</strong></p>
+    <pre><code># Keras/TensorFlow
+from tensorflow.keras.layers import MaxPooling2D
+
+model.add(MaxPooling2D(
+    pool_size=(2, 2),  # размер окна
+    strides=(2, 2),     # шаг
+    padding='valid'     # без паддинга
+))
+
+# PyTorch
+import torch.nn as nn
+nn.MaxPool2d(kernel_size=2, stride=2)
+
+# Пример:
+# Вход 4x4:        Max Pool 2x2:
+# 1  3  2  4         3  4
+# 5  6  7  8    →    6  8
+# 9  2  1  3
+# 4  5  6  7</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Average Pooling</h2>
+    <p><strong>Берет среднее значение в окне:</strong></p>
+    <pre><code># Keras
+from tensorflow.keras.layers import AveragePooling2D
+
+model.add(AveragePooling2D(
+    pool_size=(2, 2),
+    strides=(2, 2),
+    padding='valid'
+))
+
+# PyTorch
+nn.AvgPool2d(kernel_size=2, stride=2)
+
+# Пример:
+# Вход 4x4:         Avg Pool 2x2:
+# 1  3  2  4         3.75  5.25
+# 5  6  7  8    →    5.0   4.25
+# 9  2  1  3
+# 4  5  6  7</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Global Pooling</h2>
+    <pre><code># Global Average Pooling
+from tensorflow.keras.layers import GlobalAveragePooling2D
+
+# Преобразует (batch, H, W, channels) → (batch, channels)
+model.add(GlobalAveragePooling2D())
+
+# Global Max Pooling
+from tensorflow.keras.layers import GlobalMaxPooling2D
+model.add(GlobalMaxPooling2D())
+
+# Используется перед выходным слоем вместо Flatten
+model = Sequential([
+    Conv2D(64, (3,3), activation='relu', input_shape=(224, 224, 3)),
+    GlobalAveragePooling2D(),
+    Dense(10, activation='softmax')
+])
+
+# Преимущества:
+# - Меньше параметров
+# - Меньше переобучение
+# - Инвариантность к размеру входа</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Сравнение типов</h2>
+    <table>
+      <tr><th>Тип</th><th>Когда использовать</th><th>Плюсы</th><th>Минусы</th></tr>
+      <tr><td><strong>Max</strong></td><td>Детекция признаков</td><td>Сохраняет сильные сигналы</td><td>Теряет слабые признаки</td></tr>
+      <tr><td><strong>Average</strong></td><td>Сглаживание</td><td>Сохраняет все признаки</td><td>Размывает сильные сигналы</td></tr>
+      <tr><td><strong>Global</strong></td><td>Классификация</td><td>Мало параметров</td><td>Теряет пространственную информацию</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Параметры Pooling</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Типичные значения</th></tr>
+      <tr><td><code>pool_size</code></td><td>Размер окна</td><td>(2,2) или (3,3)</td></tr>
+      <tr><td><code>strides</code></td><td>Шаг скольжения</td><td>обычно = pool_size</td></tr>
+      <tr><td><code>padding</code></td><td>'valid' или 'same'</td><td>'valid' (без паддинга)</td></tr>
+    </table>
+    <p><strong>Расчет выходного размера:</strong></p>
+    <pre><code>output_size = (input_size - pool_size) / stride + 1
+
+# Пример:
+# input: 28x28, pool=2x2, stride=2
+# output: (28-2)/2 + 1 = 14x14</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Типичные архитектуры</h2>
+    <pre><code># Классическая CNN
+model = Sequential([
+    Conv2D(32, (3,3), activation='relu', input_shape=(224,224,3)),
+    MaxPooling2D((2,2)),
+    
+    Conv2D(64, (3,3), activation='relu'),
+    MaxPooling2D((2,2)),
+    
+    Conv2D(128, (3,3), activation='relu'),
+    MaxPooling2D((2,2)),
+    
+    Flatten(),
+    Dense(128, activation='relu'),
+    Dense(10, activation='softmax')
+])
+
+# С Global Pooling
+model = Sequential([
+    Conv2D(32, (3,3), activation='relu', input_shape=(224,224,3)),
+    MaxPooling2D((2,2)),
+    
+    Conv2D(64, (3,3), activation='relu'),
+    GlobalAveragePooling2D(),  # вместо Flatten
+    
+    Dense(10, activation='softmax')
+])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Чек-лист</h2>
+    <ul>
+      <li>[ ] Использовать Max Pooling для детекции признаков</li>
+      <li>[ ] Average Pooling для сглаживания</li>
+      <li>[ ] Global Pooling перед классификацией</li>
+      <li>[ ] Типичный размер окна: 2x2 или 3x3</li>
+      <li>[ ] Stride обычно равен pool_size</li>
+      <li>[ ] Не злоупотреблять pooling (потеря информации)</li>
+    </ul>
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>«Pooling — это как смотреть на изображение с большего расстояния: мы теряем детали, но сохраняем общую картину, что делает распознавание более устойчивым».</blockquote>
+  </div>
+</div>
+</body>
+</html>
