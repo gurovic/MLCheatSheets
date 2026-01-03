@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Метрики регрессии Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Метрики регрессии Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основные метрики</h2>
+    <table>
+      <tr><th>Метрика</th><th>Диапазон</th><th>Лучше</th></tr>
+      <tr><td><strong>MAE</strong></td><td>[0, ∞)</td><td>Меньше</td></tr>
+      <tr><td><strong>MSE</strong></td><td>[0, ∞)</td><td>Меньше</td></tr>
+      <tr><td><strong>RMSE</strong></td><td>[0, ∞)</td><td>Меньше</td></tr>
+      <tr><td><strong>R²</strong></td><td>(-∞, 1]</td><td>Больше (к 1)</td></tr>
+      <tr><td><strong>MAPE</strong></td><td>[0, ∞)</td><td>Меньше</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. MAE (Mean Absolute Error)</h2>
+    <p><strong>Формула:</strong> (1/n) × Σ|y_true - y_pred|</p>
+    <pre><code>from sklearn.metrics import mean_absolute_error
+
+mae = mean_absolute_error(y_test, y_pred)
+print(f"MAE: {mae:.3f}")
+
+# Интерпретация: средняя абсолютная ошибка
+# В тех же единицах, что и целевая переменная</code></pre>
+    <p><strong>Когда использовать:</strong></p>
+    <ul>
+      <li>Все ошибки одинаково важны</li>
+      <li>Нужна устойчивость к выбросам</li>
+      <li>Простая интерпретация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. MSE (Mean Squared Error)</h2>
+    <p><strong>Формула:</strong> (1/n) × Σ(y_true - y_pred)²</p>
+    <pre><code>from sklearn.metrics import mean_squared_error
+
+mse = mean_squared_error(y_test, y_pred)
+print(f"MSE: {mse:.3f}")
+
+# Сильно штрафует большие ошибки
+# В квадратных единицах целевой переменной</code></pre>
+    <p><strong>Когда использовать:</strong></p>
+    <ul>
+      <li>Большие ошибки хуже мелких</li>
+      <li>Функция потерь при обучении</li>
+      <li>Математическая оптимизация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. RMSE (Root Mean Squared Error)</h2>
+    <p><strong>Формула:</strong> √MSE</p>
+    <pre><code>from sklearn.metrics import mean_squared_error
+import numpy as np
+
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+# или
+rmse = mean_squared_error(y_test, y_pred, squared=False)
+print(f"RMSE: {rmse:.3f}")
+
+# В тех же единицах, что и целевая переменная
+# Больше штрафует большие ошибки, чем MAE</code></pre>
+    <p><strong>Когда использовать:</strong></p>
+    <ul>
+      <li>Нужна та же размерность, что у y</li>
+      <li>Большие ошибки критичны</li>
+      <li>Стандарт в соревнованиях</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. R² (R-squared, коэффициент детерминации)</h2>
+    <p><strong>Формула:</strong> 1 - SS_res / SS_tot</p>
+    <pre><code>from sklearn.metrics import r2_score
+
+r2 = r2_score(y_test, y_pred)
+print(f"R²: {r2:.3f}")
+
+# R² = 1: идеальная модель
+# R² = 0: модель как среднее
+# R² < 0: модель хуже среднего!</code></pre>
+    <p><strong>Интерпретация:</strong></p>
+    <ul>
+      <li>Доля объяснённой дисперсии</li>
+      <li>R² = 0.85 → модель объясняет 85% вариации</li>
+      <li>Не зависит от масштаба</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. MAPE (Mean Absolute Percentage Error)</h2>
+    <p><strong>Формула:</strong> (100/n) × Σ|y_true - y_pred| / |y_true|</p>
+    <pre><code>from sklearn.metrics import mean_absolute_percentage_error
+
+mape = mean_absolute_percentage_error(y_test, y_pred)
+print(f"MAPE: {mape:.2%}")
+
+# В процентах от истинного значения
+# ОСТОРОЖНО: не работает, если y_true = 0!</code></pre>
+    <p><strong>Когда использовать:</strong></p>
+    <ul>
+      <li>Нужны проценты для бизнеса</li>
+      <li>Сравнение разномасштабных задач</li>
+      <li>y_true всегда > 0</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сравнение всех метрик</h2>
+    <pre><code>from sklearn.metrics import (
+    mean_absolute_error,
+    mean_squared_error,
+    r2_score,
+    mean_absolute_percentage_error
+)
+import numpy as np
+
+def evaluate_regression(y_true, y_pred):
+    """Полная оценка регрессии"""
+    mae = mean_absolute_error(y_true, y_pred)
+    mse = mean_squared_error(y_true, y_pred)
+    rmse = np.sqrt(mse)
+    r2 = r2_score(y_true, y_pred)
+    
+    # MAPE только если y > 0
+    if (y_true > 0).all():
+        mape = mean_absolute_percentage_error(y_true, y_pred)
+    else:
+        mape = None
+    
+    print(f"MAE:  {mae:.3f}")
+    print(f"MSE:  {mse:.3f}")
+    print(f"RMSE: {rmse:.3f}")
+    print(f"R²:   {r2:.3f}")
+    if mape:
+        print(f"MAPE: {mape:.2%}")
+    
+    return {
+        'mae': mae, 'mse': mse, 
+        'rmse': rmse, 'r2': r2, 'mape': mape
+    }
+
+metrics = evaluate_regression(y_test, y_pred)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Adjusted R²</h2>
+    <p>R² с поправкой на число признаков</p>
+    <pre><code>def adjusted_r2_score(y_true, y_pred, n_features):
+    """Adjusted R²"""
+    n = len(y_true)
+    r2 = r2_score(y_true, y_pred)
+    
+    adjusted_r2 = 1 - (1 - r2) * (n - 1) / (n - n_features - 1)
+    
+    return adjusted_r2
+
+adj_r2 = adjusted_r2_score(y_test, y_pred, X_test.shape[1])
+print(f"Adjusted R²: {adj_r2:.3f}")
+
+# Штрафует за излишнее количество признаков
+# Используется для сравнения моделей с разным числом признаков</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Median Absolute Error</h2>
+    <p>Медиана абсолютных ошибок (устойчива к выбросам)</p>
+    <pre><code>from sklearn.metrics import median_absolute_error
+
+medae = median_absolute_error(y_test, y_pred)
+print(f"Median AE: {medae:.3f}")
+
+# Очень устойчива к выбросам
+# Полезна, когда в данных много аномалий</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Max Error</h2>
+    <p>Максимальная ошибка</p>
+    <pre><code>from sklearn.metrics import max_error
+import numpy as np
+
+max_err = max_error(y_test, y_pred)
+print(f"Max Error: {max_err:.3f}")
+
+# Самая большая ошибка
+# Полезна для worst-case анализа
+
+# Можно также вычислить вручную
+errors = np.abs(y_test - y_pred)
+worst_idx = np.argmax(errors)
+print(f"Худший пример: индекс {worst_idx}")
+print(f"y_true: {y_test[worst_idx]:.3f}")
+print(f"y_pred: {y_pred[worst_idx]:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. SMAPE (Symmetric MAPE)</h2>
+    <p>Симметричная версия MAPE</p>
+    <pre><code>def smape(y_true, y_pred):
+    """Symmetric Mean Absolute Percentage Error"""
+    numerator = np.abs(y_true - y_pred)
+    denominator = (np.abs(y_true) + np.abs(y_pred)) / 2
+    
+    # Избегаем деления на 0
+    mask = denominator != 0
+    
+    return 100 * np.mean(numerator[mask] / denominator[mask])
+
+smape_score = smape(y_test, y_pred)
+print(f"SMAPE: {smape_score:.2f}%")
+
+# Диапазон: [0, 200]
+# Работает лучше MAPE при значениях близких к 0</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. RMSLE (Root Mean Squared Log Error)</h2>
+    <p>RMSE в логарифмической шкале</p>
+    <pre><code>from sklearn.metrics import mean_squared_log_error
+import numpy as np
+
+# Требует y >= 0
+rmsle = np.sqrt(mean_squared_log_error(y_test, y_pred))
+print(f"RMSLE: {rmsle:.3f}")
+
+# Или вручную
+def rmsle_score(y_true, y_pred):
+    return np.sqrt(np.mean((np.log1p(y_pred) - np.log1p(y_true))**2))
+
+# Меньше штрафует недооценку vs переоценку
+# Полезна для экспоненциально растущих величин</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Explained Variance Score</h2>
+    <pre><code>from sklearn.metrics import explained_variance_score
+
+evs = explained_variance_score(y_test, y_pred)
+print(f"Explained Variance: {evs:.3f}")
+
+# Диапазон: (-∞, 1]
+# EVS = 1: идеальная модель
+# Похож на R², но игнорирует систематические смещения</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Выбор метрики</h2>
+    <table>
+      <tr><th>Задача</th><th>Рекомендуемая метрика</th></tr>
+      <tr><td>Общая оценка</td><td>R², RMSE</td></tr>
+      <tr><td>Есть выбросы</td><td>MAE, Median AE</td></tr>
+      <tr><td>Большие ошибки критичны</td><td>MSE, RMSE</td></tr>
+      <tr><td>Нужны проценты</td><td>MAPE, SMAPE</td></tr>
+      <tr><td>Экспоненциальный рост</td><td>RMSLE</td></tr>
+      <tr><td>Worst-case анализ</td><td>Max Error</td></tr>
+      <tr><td>Сравнение моделей</td><td>R², Adjusted R²</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Визуализация ошибок</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Residual plot
+residuals = y_test - y_pred
+
+plt.figure(figsize=(12, 4))
+
+# 1. Predicted vs Actual
+plt.subplot(1, 3, 1)
+plt.scatter(y_test, y_pred, alpha=0.5)
+plt.plot([y_test.min(), y_test.max()], 
+         [y_test.min(), y_test.max()], 
+         'r--', lw=2)
+plt.xlabel('Истинные значения')
+plt.ylabel('Предсказания')
+plt.title('Predicted vs Actual')
+
+# 2. Residuals vs Predicted
+plt.subplot(1, 3, 2)
+plt.scatter(y_pred, residuals, alpha=0.5)
+plt.axhline(y=0, color='r', linestyle='--')
+plt.xlabel('Предсказания')
+plt.ylabel('Остатки')
+plt.title('Residual Plot')
+
+# 3. Distribution of Residuals
+plt.subplot(1, 3, 3)
+plt.hist(residuals, bins=30, edgecolor='black')
+plt.xlabel('Остатки')
+plt.ylabel('Частота')
+plt.title('Распределение остатков')
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Cross-validation с метриками</h2>
+    <pre><code>from sklearn.model_selection import cross_validate
+
+# Несколько метрик одновременно
+scoring = {
+    'mae': 'neg_mean_absolute_error',
+    'mse': 'neg_mean_squared_error',
+    'r2': 'r2'
+}
+
+cv_results = cross_validate(
+    model, X, y,
+    cv=5,
+    scoring=scoring,
+    return_train_score=True
+)
+
+# Результаты
+for metric in ['mae', 'mse', 'r2']:
+    train_scores = cv_results[f'train_{metric}']
+    test_scores = cv_results[f'test_{metric}']
+    
+    # Инвертировать для neg_ метрик
+    if metric != 'r2':
+        train_scores = -train_scores
+        test_scores = -test_scores
+    
+    print(f"{metric.upper()}:")
+    print(f"  Train: {train_scores.mean():.3f} ± {train_scores.std():.3f}")
+    print(f"  Test:  {test_scores.mean():.3f} ± {test_scores.std():.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Интерпретация метрик</h2>
+    <table>
+      <tr><th>Метрика</th><th>Хорошее значение</th><th>Плохое значение</th></tr>
+      <tr><td><strong>MAE</strong></td><td>< 10% от диапазона y</td><td>> 30% от диапазона y</td></tr>
+      <tr><td><strong>RMSE</strong></td><td>< 15% от диапазона y</td><td>> 40% от диапазона y</td></tr>
+      <tr><td><strong>R²</strong></td><td>> 0.7</td><td>< 0.3</td></tr>
+      <tr><td><strong>MAPE</strong></td><td>< 10%</td><td>> 30%</td></tr>
+    </table>
+    <p><em>Примечание: зависит от задачи!</em></p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Ошибки по квантилям</h2>
+    <pre><code>import numpy as np
+import pandas as pd
+
+# Анализ ошибок по квантилям
+errors = np.abs(y_test - y_pred)
+
+percentiles = [10, 25, 50, 75, 90, 95, 99]
+error_percentiles = np.percentile(errors, percentiles)
+
+for p, e in zip(percentiles, error_percentiles):
+    print(f"{p}% ошибок <= {e:.3f}")
+
+# Или через DataFrame
+error_df = pd.DataFrame({
+    'y_true': y_test,
+    'y_pred': y_pred,
+    'error': errors,
+    'pct_error': 100 * errors / np.abs(y_test)
+})
+
+print("\nСтатистика ошибок:")
+print(error_df['error'].describe())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Чек-лист</h2>
+    <ul>
+      <li>[ ] Всегда вычислять несколько метрик</li>
+      <li>[ ] R² для общей оценки</li>
+      <li>[ ] MAE/RMSE для абсолютной ошибки</li>
+      <li>[ ] Проверить распределение остатков</li>
+      <li>[ ] Визуализировать predicted vs actual</li>
+      <li>[ ] Проверить max error (worst case)</li>
+      <li>[ ] Для выбросов: использовать MAE</li>
+      <li>[ ] Использовать кросс-валидацию</li>
+      <li>[ ] Документировать выбор метрики</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Метрики регрессии показывают, насколько точны предсказания модели. MAE — это средняя ошибка в рублях (или других единицах), R² показывает, какой процент вариации объясняет модель, а MAPE — ошибку в процентах».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
