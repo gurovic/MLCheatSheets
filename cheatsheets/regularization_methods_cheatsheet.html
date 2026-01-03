@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Методы регуляризации Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Методы регуляризации Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть регуляризации</h2>
+    <ul>
+      <li><strong>Цель</strong>: предотвратить переобучение</li>
+      <li><strong>Как</strong>: добавление штрафа за сложность модели</li>
+      <li><strong>Результат</strong>: более простые и обобщаемые модели</li>
+      <li><strong>Trade-off</strong>: баланс между точностью и простотой</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Зачем нужна</h2>
+    <ul>
+      <li><strong>Переобучение</strong>: модель слишком сложная</li>
+      <li><strong>Высокая дисперсия</strong>: нестабильные предсказания</li>
+      <li><strong>Много признаков</strong>: высокая размерность</li>
+      <li><strong>Мало данных</strong>: недостаточно обучающих примеров</li>
+      <li><strong>Коллинеарность</strong>: признаки коррелируют</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Типы регуляризации</h2>
+    <table>
+      <tr><th>Тип</th><th>Название</th><th>Применение</th></tr>
+      <tr><td><strong>L1</strong></td><td>Lasso</td><td>Feature selection</td></tr>
+      <tr><td><strong>L2</strong></td><td>Ridge</td><td>Общее сжатие весов</td></tr>
+      <tr><td><strong>L1+L2</strong></td><td>Elastic Net</td><td>Комбинированный</td></tr>
+      <tr><td><strong>Dropout</strong></td><td>-</td><td>Нейронные сети</td></tr>
+      <tr><td><strong>Early Stopping</strong></td><td>-</td><td>Остановка обучения</td></tr>
+      <tr><td><strong>Data Aug</strong></td><td>-</td><td>Увеличение данных</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. L2 регуляризация (Ridge)</h2>
+    <p><strong>Штраф</strong>: сумма квадратов весов</p>
+    <p>Loss = MSE + α * Σ(w²)</p>
+    <ul>
+      <li>Уменьшает веса, но не обнуляет</li>
+      <li>Все признаки сохраняются</li>
+      <li>Хорошо при коллинеарности</li>
+      <li>α (alpha) - сила регуляризации</li>
+    </ul>
+    <pre><code>from sklearn.linear_model import Ridge
+
+ridge = Ridge(alpha=1.0)
+ridge.fit(X_train, y_train)
+
+# Предсказание
+y_pred = ridge.predict(X_test)
+
+# Веса уменьшены, но не 0
+print(ridge.coef_)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. L1 регуляризация (Lasso)</h2>
+    <p><strong>Штраф</strong>: сумма модулей весов</p>
+    <p>Loss = MSE + α * Σ|w|</p>
+    <ul>
+      <li>Обнуляет неважные веса</li>
+      <li>Автоматический feature selection</li>
+      <li>Разреженные модели</li>
+      <li>Хуже при коллинеарности</li>
+    </ul>
+    <pre><code>from sklearn.linear_model import Lasso
+
+lasso = Lasso(alpha=0.1)
+lasso.fit(X_train, y_train)
+
+# Многие веса = 0
+print(f"Non-zero: {np.sum(lasso.coef_ != 0)}")
+print(f"Zero: {np.sum(lasso.coef_ == 0)}")
+
+# Важные признаки
+important = np.where(lasso.coef_ != 0)[0]
+print(f"Important features: {important}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Elastic Net (L1 + L2)</h2>
+    <p><strong>Штраф</strong>: комбинация L1 и L2</p>
+    <p>Loss = MSE + α₁*Σ|w| + α₂*Σ(w²)</p>
+    <ul>
+      <li>Преимущества обоих методов</li>
+      <li>l1_ratio: баланс между L1 и L2</li>
+      <li>l1_ratio=1: чистый Lasso</li>
+      <li>l1_ratio=0: чистый Ridge</li>
+    </ul>
+    <pre><code>from sklearn.linear_model import ElasticNet
+
+elastic = ElasticNet(
+    alpha=0.1,
+    l1_ratio=0.5,  # 50% L1, 50% L2
+    random_state=42
+)
+
+elastic.fit(X_train, y_train)
+y_pred = elastic.predict(X_test)
+
+# Баланс между feature selection и stability
+print(f"Non-zero coef: {np.sum(elastic.coef_ != 0)}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сравнение L1, L2, Elastic Net</h2>
+    <table>
+      <tr><th>Критерий</th><th>L1 (Lasso)</th><th>L2 (Ridge)</th><th>Elastic Net</th></tr>
+      <tr><td>Feature selection</td><td>Да</td><td>Нет</td><td>Да</td></tr>
+      <tr><td>Коллинеарность</td><td>Плохо</td><td>Хорошо</td><td>Хорошо</td></tr>
+      <tr><td>Интерпретация</td><td>Легко</td><td>Средне</td><td>Средне</td></tr>
+      <tr><td>Скорость</td><td>Средняя</td><td>Быстро</td><td>Средняя</td></tr>
+      <tr><td>Разреженность</td><td>Да</td><td>Нет</td><td>Да</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Подбор alpha (Ridge/Lasso)</h2>
+    <pre><code>from sklearn.linear_model import RidgeCV, LassoCV
+
+# Автоматический подбор alpha
+alphas = [0.001, 0.01, 0.1, 1, 10, 100]
+
+# Ridge с кросс-валидацией
+ridge_cv = RidgeCV(alphas=alphas, cv=5)
+ridge_cv.fit(X_train, y_train)
+print(f"Best alpha: {ridge_cv.alpha_}")
+
+# Lasso с кросс-валидацией
+lasso_cv = LassoCV(alphas=alphas, cv=5)
+lasso_cv.fit(X_train, y_train)
+print(f"Best alpha: {lasso_cv.alpha_}")
+
+# Elastic Net
+from sklearn.linear_model import ElasticNetCV
+elastic_cv = ElasticNetCV(
+    alphas=alphas,
+    l1_ratio=[0.1, 0.5, 0.7, 0.9],
+    cv=5
+)
+elastic_cv.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Визуализация регуляризации</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+alphas = np.logspace(-3, 3, 100)
+coefs = []
+
+for alpha in alphas:
+    ridge = Ridge(alpha=alpha)
+    ridge.fit(X_train, y_train)
+    coefs.append(ridge.coef_)
+
+plt.figure(figsize=(10, 6))
+plt.plot(alphas, coefs)
+plt.xscale('log')
+plt.xlabel('Alpha (регуляризация)')
+plt.ylabel('Веса коэффициентов')
+plt.title('Ridge: зависимость весов от alpha')
+plt.grid(True)
+plt.show()
+
+# Чем больше alpha, тем меньше веса</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Dropout (нейронные сети)</h2>
+    <p>Случайное отключение нейронов при обучении</p>
+    <ul>
+      <li>rate: вероятность отключения (0.2-0.5)</li>
+      <li>Только при обучении</li>
+      <li>При предсказании все нейроны активны</li>
+      <li>Предотвращает ко-адаптацию</li>
+    </ul>
+    <pre><code>from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+
+model = Sequential([
+    Dense(128, activation='relu', input_shape=(n_features,)),
+    Dropout(0.3),  # отключаем 30% нейронов
+    
+    Dense(64, activation='relu'),
+    Dropout(0.2),  # отключаем 20%
+    
+    Dense(1, activation='sigmoid')
+])
+
+model.compile(optimizer='adam', loss='binary_crossentropy')
+model.fit(X_train, y_train, epochs=50, validation_split=0.2)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Early Stopping</h2>
+    <p>Остановка обучения при переобучении</p>
+    <pre><code>from tensorflow.keras.callbacks import EarlyStopping
+
+early_stop = EarlyStopping(
+    monitor='val_loss',
+    patience=10,  # ждем 10 эпох
+    restore_best_weights=True,
+    verbose=1
+)
+
+history = model.fit(
+    X_train, y_train,
+    epochs=100,
+    validation_split=0.2,
+    callbacks=[early_stop]
+)
+
+# Остановится когда val_loss перестанет улучшаться
+print(f"Stopped at epoch: {early_stop.stopped_epoch}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Batch Normalization</h2>
+    <p>Нормализация внутри сети</p>
+    <ul>
+      <li>Стабилизирует обучение</li>
+      <li>Позволяет больший learning rate</li>
+      <li>Уменьшает переобучение</li>
+      <li>После каждого слоя</li>
+    </ul>
+    <pre><code>from tensorflow.keras.layers import BatchNormalization
+
+model = Sequential([
+    Dense(128, activation='relu'),
+    BatchNormalization(),
+    
+    Dense(64, activation='relu'),
+    BatchNormalization(),
+    
+    Dense(1, activation='sigmoid')
+])
+
+# Можно комбинировать с Dropout
+model = Sequential([
+    Dense(128, activation='relu'),
+    BatchNormalization(),
+    Dropout(0.3),
+    
+    Dense(64, activation='relu'),
+    BatchNormalization(),
+    Dropout(0.2),
+    
+    Dense(1)
+])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Weight Decay (PyTorch)</h2>
+    <pre><code>import torch.optim as optim
+
+# Weight decay = L2 регуляризация
+optimizer = optim.Adam(
+    model.parameters(),
+    lr=0.001,
+    weight_decay=0.01  # L2 penalty
+)
+
+# Эквивалентно добавлению L2 к loss
+# loss = criterion(y_pred, y_true) + 0.01 * sum(w²)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Data Augmentation</h2>
+    <p>Искусственное увеличение данных</p>
+    <pre><code>from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+# Для изображений
+datagen = ImageDataGenerator(
+    rotation_range=20,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=True,
+    zoom_range=0.2
+)
+
+# Обучение с аугментацией
+model.fit(
+    datagen.flow(X_train, y_train, batch_size=32),
+    epochs=50,
+    validation_data=(X_val, y_val)
+)
+
+# Больше разнообразных данных = меньше переобучения</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Max Norm Constraint</h2>
+    <p>Ограничение максимальной нормы весов</p>
+    <pre><code>from tensorflow.keras.constraints import max_norm
+
+model = Sequential([
+    Dense(
+        128,
+        activation='relu',
+        kernel_constraint=max_norm(3.0)  # ||w|| <= 3
+    ),
+    Dropout(0.3),
+    
+    Dense(
+        64,
+        activation='relu',
+        kernel_constraint=max_norm(3.0)
+    ),
+    
+    Dense(1, activation='sigmoid')
+])
+
+# Веса обрезаются если норма > 3.0</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Gradient Clipping</h2>
+    <p>Обрезка градиентов</p>
+    <pre><code># TensorFlow/Keras
+from tensorflow.keras.optimizers import Adam
+
+optimizer = Adam(clipnorm=1.0)  # clip by norm
+model.compile(optimizer=optimizer, loss='mse')
+
+# или
+optimizer = Adam(clipvalue=0.5)  # clip by value
+
+# PyTorch
+import torch.nn.utils as utils
+
+# В цикле обучения
+optimizer.zero_grad()
+loss.backward()
+utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+optimizer.step()
+
+# Предотвращает взрыв градиентов</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Ensemble Methods</h2>
+    <p>Комбинация моделей как регуляризация</p>
+    <pre><code>from sklearn.ensemble import VotingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+
+# Voting
+ensemble = VotingClassifier([
+    ('lr', LogisticRegression()),
+    ('dt', DecisionTreeClassifier()),
+    ('svm', SVC())
+], voting='soft')
+
+ensemble.fit(X_train, y_train)
+
+# Усреднение уменьшает дисперсию
+# Random Forest, Gradient Boosting тоже</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Выбор метода регуляризации</h2>
+    <pre><code>if тип_модели == "линейная":
+    if нужен_feature_selection:
+        используй Lasso
+    elif признаки_коррелируют:
+        используй Ridge или Elastic Net
+    else:
+        начни с Ridge
+        
+elif тип_модели == "нейросеть":
+    используй Dropout + BatchNorm + EarlyStopping
+    
+elif тип_модели == "дерево":
+    используй max_depth, min_samples_split
+    
+else:
+    попробуй кросс-валидацию с разными параметрами</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Регуляризация деревьев</h2>
+    <pre><code>from sklearn.tree import DecisionTreeClassifier
+
+tree = DecisionTreeClassifier(
+    max_depth=5,           # ограничение глубины
+    min_samples_split=20,  # мин. образцов для split
+    min_samples_leaf=10,   # мин. образцов в листе
+    max_features='sqrt',   # случайные признаки
+    ccp_alpha=0.01        # cost-complexity pruning
+)
+
+tree.fit(X_train, y_train)
+
+# Random Forest
+from sklearn.ensemble import RandomForestClassifier
+
+rf = RandomForestClassifier(
+    n_estimators=100,
+    max_depth=10,
+    min_samples_split=20,
+    max_features='sqrt'
+)
+
+rf.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Регуляризация XGBoost</h2>
+    <pre><code>import xgboost as xgb
+
+params = {
+    'max_depth': 5,
+    'min_child_weight': 3,
+    'gamma': 0.1,           # min loss reduction
+    'lambda': 1.0,          # L2 regularization
+    'alpha': 0.1,           # L1 regularization
+    'subsample': 0.8,       # row sampling
+    'colsample_bytree': 0.8 # column sampling
+}
+
+model = xgb.XGBClassifier(**params)
+model.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 21. Лучшие практики</h2>
+    <ul>
+      <li><strong>Начните с простого</strong>: попробуйте без регуляризации</li>
+      <li><strong>Кросс-валидация</strong>: подбирайте параметры правильно</li>
+      <li><strong>Масштабирование</strong>: важно для L1/L2</li>
+      <li><strong>Комбинируйте</strong>: Dropout + BatchNorm + EarlyStopping</li>
+      <li><strong>Мониторинг</strong>: следите за train/val метриками</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 22. Частые ошибки</h2>
+    <ul>
+      <li>❌ Слишком сильная регуляризация (недообучение)</li>
+      <li>❌ Не масштабировать данные перед L1/L2</li>
+      <li>❌ Использовать Dropout при inference</li>
+      <li>❌ Не проверять на валидации</li>
+      <li>❌ Подбирать параметры на test set</li>
+      <li>❌ Забыть про регуляризацию в деревьях</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 23. Диагностика переобучения</h2>
+    <pre><code># Сравнение train и val
+from sklearn.model_selection import learning_curve
+
+train_sizes, train_scores, val_scores = learning_curve(
+    model, X, y,
+    train_sizes=np.linspace(0.1, 1.0, 10),
+    cv=5
+)
+
+plt.plot(train_sizes, train_scores.mean(axis=1), label='Train')
+plt.plot(train_sizes, val_scores.mean(axis=1), label='Val')
+plt.legend()
+plt.xlabel('Training size')
+plt.ylabel('Score')
+plt.title('Learning Curve')
+plt.show()
+
+# Большой gap = переобучение → нужна регуляризация</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 24. Комбинированный подход</h2>
+    <pre><code># Лучший результат: комбинация методов
+model = Sequential([
+    Dense(256, activation='relu'),
+    BatchNormalization(),
+    Dropout(0.3),
+    
+    Dense(128, activation='relu', kernel_regularizer='l2'),
+    BatchNormalization(),
+    Dropout(0.2),
+    
+    Dense(64, activation='relu', kernel_regularizer='l2'),
+    Dropout(0.1),
+    
+    Dense(1, activation='sigmoid')
+])
+
+early_stop = EarlyStopping(patience=10)
+
+model.fit(
+    X_train, y_train,
+    epochs=100,
+    validation_split=0.2,
+    callbacks=[early_stop]
+)
+
+# + Data augmentation если возможно</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>
