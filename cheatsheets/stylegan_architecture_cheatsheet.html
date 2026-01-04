@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>StyleGAN Architecture Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎨 StyleGAN Architecture Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>�� Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое StyleGAN?</h2>
+    <ul>
+      <li><strong>Цель</strong>: генерация фотореалистичных изображений</li>
+      <li><strong>Особенность</strong>: контроль над стилем на разных уровнях</li>
+      <li><strong>Основа</strong>: Progressive GAN + Style Transfer идеи</li>
+      <li><strong>Версии</strong>: StyleGAN (2018), StyleGAN2 (2019), StyleGAN3 (2021)</li>
+      <li><strong>Применение</strong>: лица, искусство, дизайн, data augmentation</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Ключевые инновации</h2>
+    <table>
+      <tr><th>Компонент</th><th>Описание</th><th>Эффект</th></tr>
+      <tr><td><strong>Mapping Network</strong></td><td>Z → W пространство</td><td>Разделение атрибутов</td></tr>
+      <tr><td><strong>AdaIN</strong></td><td>Adaptive Instance Normalization</td><td>Инжекция стиля</td></tr>
+      <tr><td><strong>Constant Input</strong></td><td>Фиксированный 4×4 тензор</td><td>Стабильность</td></tr>
+      <tr><td><strong>Style Mixing</strong></td><td>Разные W для разных слоев</td><td>Контроль деталей</td></tr>
+      <tr><td><strong>Stochastic Variation</strong></td><td>Добавление шума</td><td>Реализм текстур</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Архитектура: Overview</h2>
+    <p><strong>Поток данных</strong>:</p>
+    <ol>
+      <li><strong>Latent code z</strong> ~ N(0,1), размер 512</li>
+      <li><strong>Mapping Network</strong>: z → w (8-слойный MLP)</li>
+      <li><strong>Synthesis Network</strong>: w → изображение</li>
+      <li>На каждом слое: <strong>AdaIN</strong> + <strong>шум</strong></li>
+    </ol>
+    <pre><code># Псевдокод
+z = torch.randn(1, 512)          # latent code
+w = mapping_network(z)            # style code (512,)
+noise = [torch.randn(...) for each layer]
+image = synthesis_network(w, noise)  # (3, 1024, 1024)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Mapping Network</h2>
+    <p><strong>Цель</strong>: преобразовать Z в более "разделимое" пространство W</p>
+    <pre><code>class MappingNetwork(nn.Module):
+    def __init__(self, z_dim=512, w_dim=512, num_layers=8):
+        super().__init__()
+        layers = []
+        for i in range(num_layers):
+            in_features = z_dim if i == 0 else w_dim
+            layers.append(nn.Linear(in_features, w_dim))
+            layers.append(nn.LeakyReLU(0.2))
+        
+        self.mapping = nn.Sequential(*layers)
+    
+    def forward(self, z):
+        # z: (batch, 512)
+        w = self.mapping(z)  # (batch, 512)
+        return w</code></pre>
+    <ul>
+      <li><strong>8 полносвязных слоёв</strong></li>
+      <li><strong>LeakyReLU</strong> активация</li>
+      <li><strong>Нет нормализации</strong></li>
+      <li>Преобразует <strong>запутанное</strong> Z в <strong>разделимое</strong> W</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. AdaIN (Adaptive Instance Normalization)</h2>
+    <p><strong>Формула</strong>:</p>
+    <pre><code>AdaIN(x, y) = y_s * (x - μ(x)) / σ(x) + y_b
+
+где:
+  x - feature maps
+  y = (y_s, y_b) - style (scale & bias) из w
+  μ(x), σ(x) - среднее и стандартное отклонение x</code></pre>
+    <pre><code>class AdaIN(nn.Module):
+    def __init__(self, channels, w_dim=512):
+        super().__init__()
+        self.norm = nn.InstanceNorm2d(channels, affine=False)
+        self.style = nn.Linear(w_dim, channels * 2)
+    
+    def forward(self, x, w):
+        # x: (batch, channels, H, W)
+        # w: (batch, w_dim)
+        
+        style = self.style(w)  # (batch, channels*2)
+        style = style.view(-1, 2, x.size(1), 1, 1)
+        
+        scale = style[:, 0]  # (batch, channels, 1, 1)
+        bias = style[:, 1]
+        
+        # Нормализация + масштабирование
+        x = self.norm(x)
+        x = scale * x + bias
+        
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Synthesis Network</h2>
+    <pre><code>class SynthesisBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, w_dim=512):
+        super().__init__()
+        self.conv1 = nn.Conv2d(in_channels, out_channels, 3, padding=1)
+        self.conv2 = nn.Conv2d(out_channels, out_channels, 3, padding=1)
+        
+        self.adain1 = AdaIN(out_channels, w_dim)
+        self.adain2 = AdaIN(out_channels, w_dim)
+        
+        self.activation = nn.LeakyReLU(0.2)
+        
+        # Для добавления шума
+        self.noise_strength1 = nn.Parameter(torch.zeros(1))
+        self.noise_strength2 = nn.Parameter(torch.zeros(1))
+    
+    def forward(self, x, w, noise=None):
+        # Conv + noise + AdaIN + activation
+        x = self.conv1(x)
+        if noise is not None:
+            x = x + self.noise_strength1 * noise[0]
+        x = self.activation(self.adain1(x, w))
+        
+        x = self.conv2(x)
+        if noise is not None:
+            x = x + self.noise_strength2 * noise[1]
+        x = self.activation(self.adain2(x, w))
+        
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Полная StyleGAN архитектура</h2>
+    <pre><code>class StyleGAN(nn.Module):
+    def __init__(self, z_dim=512, w_dim=512):
+        super().__init__()
+        self.mapping = MappingNetwork(z_dim, w_dim)
+        
+        # Постоянный вход
+        self.constant = nn.Parameter(torch.randn(1, 512, 4, 4))
+        
+        # Блоки синтеза (упрощенно)
+        self.blocks = nn.ModuleList([
+            SynthesisBlock(512, 512, w_dim),  # 4x4 → 4x4
+            SynthesisBlock(512, 512, w_dim),  # 4x4 → 8x8
+            SynthesisBlock(512, 256, w_dim),  # 8x8 → 16x16
+            SynthesisBlock(256, 128, w_dim),  # 16x16 → 32x32
+            SynthesisBlock(128, 64, w_dim),   # 32x32 → 64x64
+            # ... до 1024x1024
+        ])
+        
+        self.to_rgb = nn.Conv2d(64, 3, 1)
+    
+    def forward(self, z, noise=None):
+        w = self.mapping(z)
+        
+        x = self.constant.repeat(z.size(0), 1, 1, 1)
+        
+        for i, block in enumerate(self.blocks):
+            x = F.interpolate(x, scale_factor=2, mode='bilinear')
+            x = block(x, w, noise)
+        
+        image = self.to_rgb(x)
+        return image</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Style Mixing</h2>
+    <p><strong>Идея</strong>: использовать разные w для разных слоёв</p>
+    <ul>
+      <li><strong>Coarse styles</strong> (4×4 - 8×8): поза, форма, общая структура</li>
+      <li><strong>Middle styles</strong> (16×16 - 32×32): черты лица, прическа</li>
+      <li><strong>Fine styles</strong> (64×64 - 1024×1024): цвет, микротекстуры</li>
+    </ul>
+    <pre><code>def style_mixing(generator, z1, z2, crossover_point=4):
+    """
+    Использовать w1 для первых слоёв, w2 для остальных
+    """
+    w1 = generator.mapping(z1)
+    w2 = generator.mapping(z2)
+    
+    x = generator.constant
+    
+    for i, block in enumerate(generator.blocks):
+        w = w1 if i < crossover_point else w2
+        x = F.interpolate(x, scale_factor=2)
+        x = block(x, w, noise)
+    
+    return generator.to_rgb(x)
+
+# Использование
+z1 = torch.randn(1, 512)  # лицо 1
+z2 = torch.randn(1, 512)  # лицо 2
+mixed = style_mixing(generator, z1, z2, crossover_point=4)
+# Структура от z1, детали от z2</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. StyleGAN2: Улучшения</h2>
+    <ul>
+      <li><strong>Weight Demodulation</strong>: замена AdaIN</li>
+      <li><strong>Path Length Regularization</strong>: более плавное W пространство</li>
+      <li><strong>No Progressive Growing</strong>: фиксированная архитектура</li>
+      <li><strong>Убраны артефакты</strong>: droplet artifacts</li>
+    </ul>
+    <pre><code># Weight Demodulation (упрощенно)
+class ModulatedConv2d(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, w_dim):
+        super().__init__()
+        self.weight = nn.Parameter(
+            torch.randn(out_channels, in_channels, kernel_size, kernel_size)
+        )
+        self.style = nn.Linear(w_dim, in_channels)
+    
+    def forward(self, x, w):
+        batch = x.size(0)
+        
+        # Модуляция весов
+        style = self.style(w).view(batch, 1, -1, 1, 1)
+        weight = self.weight.unsqueeze(0) * style
+        
+        # Деmodуляция
+        demod = torch.rsqrt(weight.pow(2).sum([2, 3, 4]) + 1e-8)
+        weight = weight * demod.view(batch, -1, 1, 1, 1)
+        
+        # Применение свертки (group conv для батча)
+        x = x.view(1, -1, x.size(2), x.size(3))
+        weight = weight.view(-1, *weight.shape[2:])
+        x = F.conv2d(x, weight, padding=1, groups=batch)
+        x = x.view(batch, -1, x.size(2), x.size(3))
+        
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. StyleGAN3: Alias-Free</h2>
+    <p><strong>Проблема</strong>: алиасинг в upsampling → текстуры "прилипают" к пикселям</p>
+    <ul>
+      <li><strong>Решение</strong>: непрерывные операции</li>
+      <li><strong>Filtered operations</strong>: low-pass фильтры</li>
+      <li><strong>Rotation/translation equivariance</strong></li>
+      <li><strong>Результат</strong>: плавная анимация, реалистичные текстуры</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Обучение StyleGAN</h2>
+    <pre><code># Основные компоненты
+generator = StyleGAN()
+discriminator = Discriminator()
+
+g_optimizer = torch.optim.Adam(generator.parameters(), lr=0.002, betas=(0, 0.99))
+d_optimizer = torch.optim.Adam(discriminator.parameters(), lr=0.002, betas=(0, 0.99))
+
+# Обучение
+for epoch in range(num_epochs):
+    for real_images in dataloader:
+        # Обучение дискриминатора
+        z = torch.randn(batch_size, 512)
+        fake_images = generator(z)
+        
+        d_real = discriminator(real_images)
+        d_fake = discriminator(fake_images.detach())
+        
+        d_loss = -torch.mean(d_real) + torch.mean(d_fake)
+        
+        # Gradient penalty (WGAN-GP)
+        gp = gradient_penalty(discriminator, real_images, fake_images)
+        d_loss = d_loss + 10 * gp
+        
+        d_optimizer.zero_grad()
+        d_loss.backward()
+        d_optimizer.step()
+        
+        # Обучение генератора (каждые n_critic шагов)
+        if step % n_critic == 0:
+            z = torch.randn(batch_size, 512)
+            fake_images = generator(z)
+            g_fake = discriminator(fake_images)
+            
+            g_loss = -torch.mean(g_fake)
+            
+            g_optimizer.zero_grad()
+            g_loss.backward()
+            g_optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Практическое использование</h2>
+    <pre><code># Загрузка предобученной модели
+import torch
+import pickle
+
+with open('stylegan2-ffhq-config-f.pkl', 'rb') as f:
+    G = pickle.load(f)['G_ema'].cuda()
+
+# Генерация случайного лица
+z = torch.randn([1, G.z_dim]).cuda()
+img = G(z, None, truncation_psi=0.7)
+
+# Интерполяция между двумя лицами
+z1 = torch.randn([1, G.z_dim]).cuda()
+z2 = torch.randn([1, G.z_dim]).cuda()
+
+alphas = torch.linspace(0, 1, steps=10)
+for alpha in alphas:
+    z_interp = alpha * z1 + (1 - alpha) * z2
+    img = G(z_interp, None, truncation_psi=0.7)
+    save_image(img, f'frame_{alpha:.2f}.png')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Truncation Trick</h2>
+    <p><strong>Идея</strong>: ограничить вариативность для улучшения качества</p>
+    <pre><code>def truncation_trick(w, w_avg, psi=0.7):
+    """
+    Приблизить w к среднему w_avg
+    psi=0: w_avg (средне лицо, высокое качество)
+    psi=1: оригинальное w (разнообразие, возможны артефакты)
+    """
+    return w_avg + psi * (w - w_avg)
+
+# Вычисление среднего w
+w_avg = torch.zeros(512)
+for _ in range(10000):
+    z = torch.randn(1, 512)
+    w = mapping_network(z)
+    w_avg += w.squeeze()
+w_avg /= 10000
+
+# Использование
+z = torch.randn(1, 512)
+w = mapping_network(z)
+w_truncated = truncation_trick(w, w_avg, psi=0.7)
+img = synthesis_network(w_truncated)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Применения StyleGAN</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Генерация лиц</h3>
+        <ul>
+          <li>ThisPersonDoesNotExist.com</li>
+          <li>Синтетические датасеты</li>
+          <li>Аватары, персонажи игр</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>✅ Image Editing</h3>
+        <ul>
+          <li>Изменение возраста, пола, эмоций</li>
+          <li>StyleGAN Encoder + редактирование в W</li>
+          <li>Semantic face editing</li>
+        </ul>
+      </div>
+    </div>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Art & Design</h3>
+        <ul>
+          <li>Генерация художественных работ</li>
+          <li>Дизайн логотипов, паттернов</li>
+          <li>StyleGAN-NADA (text-guided)</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>✅ Data Augmentation</h3>
+        <ul>
+          <li>Расширение training set</li>
+          <li>Синтетические данные для CV</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] <strong>Используйте pretrained модели</strong>: FFHQ, LSUN, MetFaces</li>
+      <li>[ ] <strong>Truncation trick</strong>: psi=0.5-0.7 для качества</li>
+      <li>[ ] <strong>Style mixing</strong> для контроля деталей</li>
+      <li>[ ] <strong>W пространство</strong> лучше Z для редактирования</li>
+      <li>[ ] <strong>StyleGAN2</strong> вместо StyleGAN (меньше артефактов)</li>
+      <li>[ ] <strong>StyleGAN3</strong> для анимации и видео</li>
+      <li>[ ] <strong>Fine-tuning</strong> на своих данных (transfer learning)</li>
+      <li>[ ] Рассмотрите <strong>GAN инверсию</strong> для редактирования реальных изображений</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «StyleGAN — это как художник с невероятным контролем: он может создавать фотореалистичные лица, при этом отдельно управляя общей формой, чертами лица и мелкими деталями вроде текстуры кожи. Каждый уровень детализации контролируется независимо».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
