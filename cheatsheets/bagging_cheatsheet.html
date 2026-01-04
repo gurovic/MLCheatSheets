@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Бэггинг (Bagging) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎒 Бэггинг (Bootstrap Aggregating) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть метода</h2>
+    <p><strong>Bagging</strong> (Bootstrap AGGregatING) — метод ансамблирования, который создаёт несколько версий обучающей выборки с помощью bootstrap-сэмплирования.</p>
+    <ul>
+      <li><strong>Идея</strong>: обучить много моделей на разных подвыборках</li>
+      <li><strong>Bootstrap</strong>: случайная выборка с возвращением</li>
+      <li><strong>Агрегация</strong>: усреднение (регрессия) или голосование (классификация)</li>
+      <li><strong>Цель</strong>: снизить дисперсию и переобучение</li>
+      <li><strong>Эффект</strong>: более стабильные и точные предсказания</li>
+    </ul>
+    <blockquote>
+      Бэггинг особенно эффективен для нестабильных моделей (деревья решений), где небольшое изменение данных сильно меняет результат.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Алгоритм</h2>
+    <ol>
+      <li>Создать B bootstrap-выборок из исходных данных</li>
+      <li>Обучить базовый алгоритм на каждой выборке</li>
+      <li>Для регрессии: усреднить предсказания всех моделей</li>
+      <li>Для классификации: выбрать класс по мажоритарному голосованию</li>
+    </ol>
+    <p><strong>Bootstrap-выборка</strong>: выбираем N объектов из N с возвращением. В среднем 63.2% уникальных объектов попадают в каждую выборку.</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код (Scikit-learn)</h2>
+    <pre><code>from sklearn.ensemble import BaggingClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Разделение данных
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Бэггинг с деревьями решений
+bagging = BaggingClassifier(
+    estimator=DecisionTreeClassifier(),
+    n_estimators=100,           # Количество моделей
+    max_samples=1.0,            # Размер каждой выборки
+    max_features=1.0,           # Доля признаков
+    bootstrap=True,             # Использовать bootstrap
+    bootstrap_features=False,   # Не сэмплировать признаки
+    oob_score=True,            # Out-of-bag оценка
+    random_state=42,
+    n_jobs=-1                  # Параллельность
+)
+
+# Обучение
+bagging.fit(X_train, y_train)
+
+# Предсказание
+y_pred = bagging.predict(X_test)
+print(f"Accuracy: {accuracy_score(y_test, y_pred):.4f}")
+
+# Out-of-bag оценка
+print(f"OOB Score: {bagging.oob_score_:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>n_estimators</code></td><td>Количество базовых моделей</td><td>50-500 (чем больше, тем лучше, но медленнее)</td></tr>
+      <tr><td><code>max_samples</code></td><td>Размер bootstrap-выборки</td><td>0.5-1.0 (1.0 по умолчанию)</td></tr>
+      <tr><td><code>max_features</code></td><td>Доля признаков для каждой модели</td><td>1.0 (все признаки)</td></tr>
+      <tr><td><code>bootstrap</code></td><td>Использовать ли bootstrap</td><td>True (суть метода)</td></tr>
+      <tr><td><code>oob_score</code></td><td>Вычислять OOB-оценку</td><td>True (бесплатная валидация)</td></tr>
+      <tr><td><code>n_jobs</code></td><td>Число ядер CPU</td><td>-1 (все доступные)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Out-of-Bag (OOB) оценка</h2>
+    <p><strong>OOB</strong> — это объекты, которые НЕ попали в bootstrap-выборку для конкретной модели (примерно 36.8%).</p>
+    <ul>
+      <li>Каждый объект оценивается моделями, которые не видели его при обучении</li>
+      <li>Получаем бесплатную кросс-валидацию без отдельной валидационной выборки</li>
+      <li>OOB-оценка близка к оценке на тестовой выборке</li>
+    </ul>
+    <pre><code># OOB оценка автоматически
+bagging = BaggingClassifier(
+    estimator=DecisionTreeClassifier(),
+    n_estimators=100,
+    oob_score=True
+)
+bagging.fit(X_train, y_train)
+
+print(f"OOB Score: {bagging.oob_score_:.4f}")
+
+# OOB предсказания для каждого объекта
+oob_predictions = bagging.oob_decision_function_</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Регрессия с Bagging</h2>
+    <pre><code>from sklearn.ensemble import BaggingRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Бэггинг для регрессии
+bagging_reg = BaggingRegressor(
+    estimator=DecisionTreeRegressor(max_depth=10),
+    n_estimators=100,
+    max_samples=0.8,
+    oob_score=True,
+    random_state=42,
+    n_jobs=-1
+)
+
+# Обучение
+bagging_reg.fit(X_train, y_train)
+
+# Предсказание
+y_pred = bagging_reg.predict(X_test)
+
+# Метрики
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+print(f"MSE: {mse:.4f}")
+print(f"R²: {r2:.4f}")
+print(f"OOB Score (R²): {bagging_reg.oob_score_:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Преимущества и недостатки</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Преимущества</h3>
+        <ul>
+          <li>Снижает дисперсию (переобучение)</li>
+          <li>Работает с любыми базовыми алгоритмами</li>
+          <li>Простой в реализации и понимании</li>
+          <li>Параллелизуется легко</li>
+          <li>OOB-оценка как бесплатная валидация</li>
+          <li>Стабилизирует нестабильные модели</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Недостатки</h3>
+        <ul>
+          <li>Не снижает смещение (bias)</li>
+          <li>Увеличивает вычислительные затраты</li>
+          <li>Теряет интерпретируемость</li>
+          <li>Может быть менее эффективен для стабильных моделей</li>
+          <li>Требует больше памяти</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Выбор базовой модели</h2>
+    <p>Бэггинг эффективен для <strong>нестабильных</strong> (high variance) моделей:</p>
+    <table>
+      <tr><th>Модель</th><th>Эффективность</th><th>Комментарий</th></tr>
+      <tr><td>Деревья решений</td><td>⭐⭐⭐⭐⭐</td><td>Идеально! (Random Forest = Bagging + деревья)</td></tr>
+      <tr><td>Нейронные сети</td><td>⭐⭐⭐⭐</td><td>Хорошо снижает дисперсию</td></tr>
+      <tr><td>kNN</td><td>⭐⭐⭐</td><td>Средний эффект</td></tr>
+      <tr><td>SVM</td><td>⭐⭐</td><td>Небольшой прирост</td></tr>
+      <tr><td>Линейная регрессия</td><td>⭐</td><td>Почти нет эффекта (стабильная модель)</td></tr>
+    </table>
+    <pre><code># Пример с разными базовыми моделями
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+
+# Bagging с kNN
+bagging_knn = BaggingClassifier(
+    estimator=KNeighborsClassifier(n_neighbors=5),
+    n_estimators=50
+)
+
+# Bagging с SVM
+bagging_svm = BaggingClassifier(
+    estimator=SVC(probability=True),
+    n_estimators=50
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Feature Bagging (Случайные подпространства)</h2>
+    <p>Вариант бэггинга, где мы также сэмплируем признаки:</p>
+    <pre><code># Бэггинг по признакам
+feature_bagging = BaggingClassifier(
+    estimator=DecisionTreeClassifier(),
+    n_estimators=100,
+    max_samples=1.0,           # Все объекты
+    max_features=0.5,          # Только 50% признаков
+    bootstrap=True,
+    bootstrap_features=True,   # Сэмплировать признаки!
+    random_state=42
+)
+
+feature_bagging.fit(X_train, y_train)
+
+# Полезно при большом числе признаков
+# или когда признаки коррелированы</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Настройка гиперпараметров</h2>
+    <pre><code>from sklearn.model_selection import GridSearchCV
+
+# Сетка параметров
+param_grid = {
+    'n_estimators': [50, 100, 200],
+    'max_samples': [0.5, 0.7, 1.0],
+    'max_features': [0.5, 0.7, 1.0],
+    'estimator__max_depth': [5, 10, 15, None]  # Параметры базовой модели
+}
+
+# Grid Search
+grid_search = GridSearchCV(
+    BaggingClassifier(
+        estimator=DecisionTreeClassifier(),
+        oob_score=True,
+        random_state=42
+    ),
+    param_grid,
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1,
+    verbose=1
+)
+
+grid_search.fit(X_train, y_train)
+
+print("Лучшие параметры:", grid_search.best_params_)
+print("Лучший score:", grid_search.best_score_)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Сравнение с Random Forest</h2>
+    <p><strong>Random Forest</strong> = Bagging + деревья + случайные признаки на каждом split</p>
+    <table>
+      <tr><th>Аспект</th><th>Bagging</th><th>Random Forest</th></tr>
+      <tr><td>Базовая модель</td><td>Любая</td><td>Только деревья</td></tr>
+      <tr><td>Выбор признаков</td><td>При инициализации</td><td>На каждом split</td></tr>
+      <tr><td>Декорреляция</td><td>Средняя</td><td>Высокая</td></tr>
+      <tr><td>Производительность</td><td>Зависит от базовой модели</td><td>Оптимизирована</td></tr>
+      <tr><td>Гибкость</td><td>Высокая</td><td>Только деревья</td></tr>
+    </table>
+    <pre><code># Сравнение
+from sklearn.ensemble import RandomForestClassifier
+
+# Bagging с деревьями
+bagging = BaggingClassifier(
+    DecisionTreeClassifier(),
+    n_estimators=100
+)
+
+# Random Forest
+rf = RandomForestClassifier(
+    n_estimators=100,
+    max_features='sqrt'  # Дополнительная рандомизация
+)
+
+# Random Forest обычно лучше для деревьев</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать Bagging</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Используйте Bagging</h3>
+        <ul>
+          <li>Модель сильно переобучается</li>
+          <li>Высокая дисперсия предсказаний</li>
+          <li>Нестабильная базовая модель (деревья)</li>
+          <li>Небольшой датасет</li>
+          <li>Нужна простая интерпретация ансамбля</li>
+          <li>Хотите использовать не деревья (kNN, SVM, нейросети)</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не используйте Bagging</h3>
+        <ul>
+          <li>Высокое смещение (underfitting) — используйте Boosting</li>
+          <li>Очень большой датасет — может быть избыточно</li>
+          <li>Стабильная базовая модель (линейная регрессия)</li>
+          <li>Критична скорость inference</li>
+          <li>Ограничены ресурсы памяти</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Практический пример: Wine Dataset</h2>
+    <pre><code>from sklearn.datasets import load_wine
+from sklearn.model_selection import cross_val_score
+import numpy as np
+
+# Загрузка данных
+wine = load_wine()
+X, y = wine.data, wine.target
+
+# Одно дерево
+single_tree = DecisionTreeClassifier(random_state=42)
+scores_single = cross_val_score(
+    single_tree, X, y, cv=5, scoring='accuracy'
+)
+
+# Bagging с деревьями
+bagging = BaggingClassifier(
+    DecisionTreeClassifier(),
+    n_estimators=100,
+    random_state=42
+)
+scores_bagging = cross_val_score(
+    bagging, X, y, cv=5, scoring='accuracy'
+)
+
+print(f"Одно дерево: {scores_single.mean():.4f} ± {scores_single.std():.4f}")
+print(f"Bagging (100 деревьев): {scores_bagging.mean():.4f} ± {scores_bagging.std():.4f}")
+
+# Результат: Bagging обычно стабильнее и точнее!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Важность признаков</h2>
+    <pre><code># Feature importance для деревьев в бэггинге
+import numpy as np
+
+# Обучаем бэггинг с деревьями
+bagging = BaggingClassifier(
+    DecisionTreeClassifier(),
+    n_estimators=100,
+    random_state=42
+)
+bagging.fit(X_train, y_train)
+
+# Усредняем важность по всем деревьям
+feature_importances = np.zeros(X_train.shape[1])
+for estimator in bagging.estimators_:
+    feature_importances += estimator.feature_importances_
+feature_importances /= len(bagging.estimators_)
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.figure(figsize=(10, 6))
+plt.bar(range(len(feature_importances)), feature_importances)
+plt.xlabel('Признак')
+plt.ylabel('Важность')
+plt.title('Feature Importance в Bagging')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать нестабильную базовую модель (деревья, нейросети)</li>
+      <li>[ ] Установить достаточное количество оценщиков (50-200)</li>
+      <li>[ ] Включить <code>oob_score=True</code> для валидации</li>
+      <li>[ ] Использовать <code>n_jobs=-1</code> для параллельности</li>
+      <li>[ ] Настроить <code>max_samples</code> (обычно 0.5-1.0)</li>
+      <li>[ ] Рассмотреть <code>max_features</code> для признаков</li>
+      <li>[ ] Сравнить с одиночной моделью</li>
+      <li>[ ] Проверить стабильность через кросс-валидацию</li>
+      <li>[ ] Для деревьев: сравнить с Random Forest</li>
+      <li>[ ] Настроить параметры базовой модели</li>
+      <li>[ ] Оценить trade-off: точность vs скорость</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Бэггинг — это как опрос нескольких экспертов: каждый эксперт обучался на слегка разных данных, и мы усредняем их мнения. Это даёт более надёжные и стабильные предсказания, чем мнение одного эксперта».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
