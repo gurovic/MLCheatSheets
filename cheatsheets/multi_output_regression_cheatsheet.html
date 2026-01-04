@@ -172,25 +172,37 @@
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Практический пример: multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+# Загрузка и подготовка данных: 3 целевых признака (multi-output)
+X, y = make_regression(
+    n_samples=500,
+    n_features=10,
+    n_targets=3,
+    noise=0.1,
+    random_state=42,
+)
 
-# Применение метода
-from sklearn.model_selection import train_test_split
+# Разбиение на train/test
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42
 )
 
-# Обучение и предсказание
-model = setup_model()
+# Модель multi-output регрессии
+base_model = RandomForestRegressor(random_state=42)
+model = MultiOutputRegressor(base_model)
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+# Оценка качества с помощью регрессионной метрики
+mse = mean_squared_error(y_test, predictions)
+print(f"Mean squared error: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно предсказание нескольких непрерывных целевых переменных одновременно: y = [y1, y2, ..., yk]....
