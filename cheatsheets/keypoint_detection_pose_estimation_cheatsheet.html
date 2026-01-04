@@ -172,41 +172,28 @@
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример: детекция ключевых точек и метрика PCK
+    <pre><code># Детекция ключевых точек
 import torch
-import numpy as np
 from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
 
-# 1. Загружаем предобученную модель для позы человека (COCO Keypoints)
 model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
 model.eval()
 
-# 2. Подготавливаем входное изображение (здесь — случайный тензор 3x224x224)
 image = torch.rand(3, 224, 224)
-
 with torch.no_grad():
     outputs = model([image])
 
-# outputs — список, для каждого человека в кадре есть предсказанные keypoints
-# Возьмём первого человека и первые 2D‑координаты (x, y) ключевых точек
-pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()  # shape: (K, 2)
-
-# 3. Пример "истинных" координат ключевых точек для этого человека
-# (в реальной задаче их даёт разметка датасета)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
 gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
-visible = np.ones(len(gt_keypoints), dtype=bool)  # все точки видимы
 
-def pck(pred, gt, visible, thr=0.05, img_size=224):
-    """
-    Процент корректных ключевых точек (PCK):
-    точка считается корректной, если расстояние &lt; thr * img_size.
-    """
+def pck(pred, gt, thr=0.05, img_size=224):
     dists = np.linalg.norm(pred - gt, axis=1)
-    correct = (dists &lt; thr * img_size) &amp; visible
-    return correct.sum() / max(visible.sum(), 1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
 
-score = pck(pred_keypoints, gt_keypoints, visible, thr=0.05, img_size=224)
-print(f"PCK@0.05: {score:.3f}")</code></pre>
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно обнаружение характерных точек на объектах: суставы человека, углы зданий, черты лица....
@@ -223,25 +210,28 @@ print(f"PCK@0.05: {score:.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно определение позы человека по 2d/3d координатам ключевых точек (скелет)....
@@ -258,25 +248,28 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно top-down: сначала детекция людей, затем keypoints. bottom-up: все keypoints, затем группировка....
@@ -293,25 +286,28 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно bottom-up подход с part affinity fields (pafs) для связывания keypoints....
@@ -328,25 +324,28 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно поддерживает высокое разрешение через все слои, лучше для мелких деталей....
@@ -363,25 +362,28 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно легковесное real-time решение от google для мобильных устройств....
@@ -398,25 +400,28 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно coco keypoints (17 точек), mpii human pose (16 точек), форматы аннотаций....
@@ -433,25 +438,28 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно mse для heatmaps, oks (object keypoint similarity) metric....
@@ -468,25 +476,28 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно восстановление 3d координат из 2d изображений, depth estimation....
@@ -503,25 +514,28 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно обработка сцен с несколькими людьми, non-maximum suppression....
@@ -538,25 +552,28 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно спорт аналитика, ar/vr, фитнес приложения, жестовое управление....
@@ -573,25 +590,28 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно data augmentation для robustness, post-processing heatmaps, temporal smoothing для видео....

@@ -172,37 +172,24 @@
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример: multi-output регрессия
+    <pre><code># Multi-output регрессия
 from sklearn.datasets import make_regression
-from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных: 3 целевых признака (multi-output)
-X, y = make_regression(
-    n_samples=500,
-    n_features=10,
-    n_targets=3,
-    noise=0.1,
-    random_state=42,
-)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Разбиение на train/test
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Модель multi-output регрессии
-base_model = RandomForestRegressor(random_state=42)
-model = MultiOutputRegressor(base_model)
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-# Оценка качества с помощью регрессионной метрики
 mse = mean_squared_error(y_test, predictions)
-print(f"Mean squared error: {mse:.3f}")</code></pre>
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно предсказание нескольких непрерывных целевых переменных одновременно: y = [y1, y2, ..., yk]....
@@ -219,25 +206,24 @@ print(f"Mean squared error: {mse:.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Применение метода
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Обучение и предсказание
-model = setup_model()
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+mse = mean_squared_error(y_test, predictions)
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно single: одна модель для каждого выхода. multi: одна модель для всех выходов, может учитывать корреля...
@@ -254,25 +240,24 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Применение метода
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Обучение и предсказание
-model = setup_model()
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+mse = mean_squared_error(y_test, predictions)
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно sklearn.linear_model.linearregression естественно поддерживает multi-output....
@@ -289,25 +274,24 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Применение метода
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Обучение и предсказание
-model = setup_model()
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+mse = mean_squared_error(y_test, predictions)
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно randomforestregressor, gradientboostingregressor с multi-output support....
@@ -324,25 +308,24 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Применение метода
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Обучение и предсказание
-model = setup_model()
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+mse = mean_squared_error(y_test, predictions)
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно fully-connected с несколькими выходными нейронами, один loss для всех выходов....
@@ -359,25 +342,24 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Применение метода
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Обучение и предсказание
-model = setup_model()
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+mse = mean_squared_error(y_test, predictions)
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно обёртка для моделей без нативной multi-output поддержки....
@@ -394,25 +376,24 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Применение метода
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Обучение и предсказание
-model = setup_model()
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+mse = mean_squared_error(y_test, predictions)
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно mse для каждого выхода, взвешенная сумма, huber loss....
@@ -429,25 +410,24 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Применение метода
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Обучение и предсказание
-model = setup_model()
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+mse = mean_squared_error(y_test, predictions)
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно r² для каждого выхода, средний r², rmse по всем выходам....
@@ -464,25 +444,24 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Применение метода
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Обучение и предсказание
-model = setup_model()
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+mse = mean_squared_error(y_test, predictions)
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно общие признаки для всех выходов, специфичные для каждого....
@@ -499,25 +478,24 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Применение метода
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Обучение и предсказание
-model = setup_model()
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+mse = mean_squared_error(y_test, predictions)
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно chained models: используем предсказания y1 для предсказания y2....
@@ -534,25 +512,24 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Применение метода
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Обучение и предсказание
-model = setup_model()
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+mse = mean_squared_error(y_test, predictions)
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно прогноз погоды (температура, давление, влажность), координаты объектов, временные ряды....
@@ -569,25 +546,24 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Multi-output регрессия
+from sklearn.datasets import make_regression
+from sklearn.multioutput import MultiOutputRegressor
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X, y = make_regression(n_samples=500, n_features=10, n_targets=3, noise=0.1, random_state=42)
 
-# Применение метода
 from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Обучение и предсказание
-model = setup_model()
+model = MultiOutputRegressor(RandomForestRegressor(random_state=42))
 model.fit(X_train, y_train)
 predictions = model.predict(X_test)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+mse = mean_squared_error(y_test, predictions)
+print(f"MSE: {mse:.3f}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно нормализация выходов, учёт корреляций между выходами, ensemble methods....
