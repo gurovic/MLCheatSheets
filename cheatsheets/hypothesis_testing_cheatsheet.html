@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Статистическая проверка гипотез Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 Статистическая проверка гипотез Cheatsheet</h1>
+  <div class="subtitle">Для машинного обучения • Практический фокус • Python<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <p><strong>Статистическая гипотеза</strong> — предположение о свойствах генеральной совокупности.</p>
+    <ul>
+      <li><strong>Нулевая гипотеза (H₀)</strong>: нет различий/эффекта</li>
+      <li><strong>Альтернативная (H₁)</strong>: есть различия/эффект</li>
+      <li><strong>p-value</strong>: вероятность получить такие данные при H₀</li>
+      <li><strong>α (уровень значимости)</strong>: обычно 0.05</li>
+    </ul>
+    <blockquote>
+      Если p-value < α, отвергаем H₀ в пользу H₁
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы ошибок</h2>
+    <table>
+      <tr><th>Ошибка</th><th>Описание</th><th>Последствия</th></tr>
+      <tr><td><strong>Тип I (α)</strong></td><td>Отвергли H₀, когда она верна</td><td>Ложноположительный результат</td></tr>
+      <tr><td><strong>Тип II (β)</strong></td><td>Не отвергли H₀, когда она ложна</td><td>Пропустили реальный эффект</td></tr>
+    </table>
+    <p><strong>Мощность теста</strong> = 1 - β (вероятность обнаружить эффект)</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. T-тест (Student's t-test)</h2>
+    <p>Сравнение средних значений.</p>
+    
+    <h3>Одновыборочный t-тест</h3>
+    <pre><code>from scipy import stats
+
+# Сравнение с известным значением
+t_stat, p_value = stats.ttest_1samp(data, popmean=100)
+
+print(f"t-статистика: {t_stat:.4f}")
+print(f"p-value: {p_value:.4f}")
+
+if p_value < 0.05:
+    print("Отвергаем H₀: среднее ≠ 100")
+else:
+    print("Не отвергаем H₀")</code></pre>
+
+    <h3>Двухвыборочный t-тест</h3>
+    <pre><code># Независимые выборки
+t_stat, p_value = stats.ttest_ind(group1, group2)
+
+# Парные наблюдения
+t_stat, p_value = stats.ttest_rel(before, after)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Сравнение моделей ML</h2>
+    <p>Используется для оценки значимости различий между моделями.</p>
+    
+    <h3>Парный t-тест для кросс-валидации</h3>
+    <pre><code>from sklearn.model_selection import cross_val_score
+
+# Оценки двух моделей на одних фолдах
+scores_model1 = cross_val_score(model1, X, y, cv=10)
+scores_model2 = cross_val_score(model2, X, y, cv=10)
+
+# Парный t-тест
+t_stat, p_value = stats.ttest_rel(scores_model1, scores_model2)
+
+print(f"Модель 1: {scores_model1.mean():.4f}")
+print(f"Модель 2: {scores_model2.mean():.4f}")
+print(f"p-value: {p_value:.4f}")
+
+if p_value < 0.05:
+    if scores_model1.mean() > scores_model2.mean():
+        print("Модель 1 значимо лучше")
+    else:
+        print("Модель 2 значимо лучше")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Тест Манна-Уитни (Mann-Whitney U)</h2>
+    <p>Непараметрический аналог t-теста. Не требует нормальности.</p>
+    <pre><code>from scipy.stats import mannwhitneyu
+
+# Сравнение двух независимых групп
+u_stat, p_value = mannwhitneyu(group1, group2, alternative='two-sided')
+
+print(f"U-статистика: {u_stat}")
+print(f"p-value: {p_value:.4f}")</code></pre>
+    <p><strong>Когда использовать:</strong></p>
+    <ul>
+      <li>Малые выборки</li>
+      <li>Данные не нормально распределены</li>
+      <li>Выбросы в данных</li>
+      <li>Порядковые данные</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Тест Уилкоксона (Wilcoxon)</h2>
+    <p>Непараметрический парный тест.</p>
+    <pre><code>from scipy.stats import wilcoxon
+
+# Парные наблюдения (до/после)
+stat, p_value = wilcoxon(before, after)
+
+print(f"Статистика: {stat}")
+print(f"p-value: {p_value:.4f}")</code></pre>
+    <p>Используется для сравнения связанных выборок без предположения о нормальности.</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Тест хи-квадрат (Chi-square)</h2>
+    <p>Для категориальных данных.</p>
+    
+    <h3>Тест независимости</h3>
+    <pre><code>from scipy.stats import chi2_contingency
+
+# Таблица сопряженности
+contingency_table = pd.crosstab(df['feature1'], df['feature2'])
+
+chi2, p_value, dof, expected = chi2_contingency(contingency_table)
+
+print(f"Chi2: {chi2:.4f}")
+print(f"p-value: {p_value:.4f}")
+print(f"Степени свободы: {dof}")</code></pre>
+
+    <h3>Применение в ML</h3>
+    <ul>
+      <li>Отбор признаков (feature selection)</li>
+      <li>Проверка зависимости признаков от целевой переменной</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. ANOVA (дисперсионный анализ)</h2>
+    <p>Сравнение средних для трёх и более групп.</p>
+    
+    <h3>Односторонняя ANOVA</h3>
+    <pre><code>from scipy.stats import f_oneway
+
+# Сравнение нескольких групп
+f_stat, p_value = f_oneway(group1, group2, group3)
+
+print(f"F-статистика: {f_stat:.4f}")
+print(f"p-value: {p_value:.4f}")</code></pre>
+
+    <h3>Post-hoc тесты</h3>
+    <pre><code>from scipy.stats import tukey_hsd
+
+# Если ANOVA показала различия
+# определяем какие именно группы различаются
+res = tukey_hsd(group1, group2, group3)
+print(res)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Тест Колмогорова-Смирнова</h2>
+    <p>Проверка нормальности распределения.</p>
+    <pre><code>from scipy.stats import kstest, shapiro
+
+# Тест Колмогорова-Смирнова
+ks_stat, p_value = kstest(data, 'norm')
+
+# Тест Шапиро-Уилка (лучше для малых выборок)
+sw_stat, p_value = shapiro(data)
+
+print(f"p-value: {p_value:.4f}")
+
+if p_value > 0.05:
+    print("Данные нормально распределены")
+else:
+    print("Данные НЕ нормально распределены")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. McNemar Test</h2>
+    <p>Сравнение классификаторов на одном датасете.</p>
+    <pre><code>from statsmodels.stats.contingency_tables import mcnemar
+
+# Предсказания двух моделей
+pred1 = model1.predict(X_test)
+pred2 = model2.predict(X_test)
+
+# Таблица сопряженности
+table = [[sum((pred1 == y_test) & (pred2 == y_test)),
+          sum((pred1 == y_test) & (pred2 != y_test))],
+         [sum((pred1 != y_test) & (pred2 == y_test)),
+          sum((pred1 != y_test) & (pred2 != y_test))]]
+
+result = mcnemar(table, exact=False, correction=True)
+print(f"p-value: {result.pvalue:.4f}")
+
+if result.pvalue < 0.05:
+    print("Модели значимо различаются")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Множественное тестирование</h2>
+    <p>При множественных сравнениях увеличивается вероятность ошибки типа I.</p>
+    
+    <h3>Поправка Бонферрони</h3>
+    <pre><code>from statsmodels.stats.multitest import multipletests
+
+# Несколько p-values
+p_values = [0.01, 0.04, 0.03, 0.50, 0.12]
+
+# Поправка
+reject, corrected_p, _, _ = multipletests(
+    p_values, 
+    alpha=0.05, 
+    method='bonferroni'
+)
+
+print("Исходные p-values:", p_values)
+print("Скорректированные:", corrected_p)
+print("Отвергаем H₀:", reject)</code></pre>
+
+    <h3>Другие методы коррекции</h3>
+    <ul>
+      <li><strong>Holm-Bonferroni</strong>: менее консервативный</li>
+      <li><strong>FDR (Benjamini-Hochberg)</strong>: контроль ложных обнаружений</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Проверка предположений</h2>
+    
+    <h3>Нормальность</h3>
+    <pre><code>from scipy.stats import shapiro, normaltest
+import matplotlib.pyplot as plt
+
+# Визуальная проверка
+plt.hist(data, bins=30, density=True)
+plt.show()
+
+# Q-Q plot
+from scipy.stats import probplot
+probplot(data, plot=plt)
+plt.show()
+
+# Тест
+stat, p = shapiro(data)
+print(f"Shapiro-Wilk p-value: {p:.4f}")</code></pre>
+
+    <h3>Однородность дисперсий</h3>
+    <pre><code>from scipy.stats import levene, bartlett
+
+# Тест Левене (устойчив к отклонениям от нормальности)
+stat, p = levene(group1, group2, group3)
+print(f"Levene p-value: {p:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Размер выборки и мощность</h2>
+    <pre><code>from statsmodels.stats.power import ttest_power, tt_solve_power
+
+# Расчёт мощности теста
+effect_size = 0.5  # Cohen's d
+sample_size = 50
+alpha = 0.05
+
+power = ttest_power(effect_size, sample_size, alpha)
+print(f"Мощность теста: {power:.3f}")
+
+# Необходимый размер выборки
+required_n = tt_solve_power(
+    effect_size=0.5,
+    alpha=0.05,
+    power=0.8,  # желаемая мощность
+    alternative='two-sided'
+)
+print(f"Требуемый размер: {required_n:.0f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Практические рекомендации</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Лучшие практики</h3>
+        <ul>
+          <li>Планируйте тесты ДО анализа</li>
+          <li>Проверяйте предположения тестов</li>
+          <li>Используйте коррекцию при множественных сравнениях</li>
+          <li>Указывайте размер эффекта, не только p-value</li>
+          <li>Визуализируйте данные перед тестом</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Избегайте</h3>
+        <ul>
+          <li>P-hacking (подгонка данных под результат)</li>
+          <li>Игнорирование размера эффекта</li>
+          <li>Использование параметрических тестов без проверки</li>
+          <li>HARKing (гипотезы после результатов)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Выбор теста</h2>
+    <table>
+      <tr><th>Задача</th><th>Параметрический</th><th>Непараметрический</th></tr>
+      <tr><td>2 независимые группы</td><td>t-test</td><td>Mann-Whitney U</td></tr>
+      <tr><td>2 связанные группы</td><td>Paired t-test</td><td>Wilcoxon</td></tr>
+      <tr><td>3+ независимые группы</td><td>ANOVA</td><td>Kruskal-Wallis</td></tr>
+      <tr><td>3+ связанные группы</td><td>Repeated ANOVA</td><td>Friedman</td></tr>
+      <tr><td>Категориальные данные</td><td>—</td><td>Chi-square</td></tr>
+      <tr><td>Сравнение классификаторов</td><td>—</td><td>McNemar</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Интерпретация результатов</h2>
+    <p><strong>p-value не говорит о размере эффекта!</strong></p>
+    
+    <h3>Размеры эффекта (Effect Size)</h3>
+    <pre><code>from scipy.stats import cohen_d
+
+# Cohen's d для t-теста
+def cohens_d(group1, group2):
+    n1, n2 = len(group1), len(group2)
+    var1, var2 = group1.var(ddof=1), group2.var(ddof=1)
+    pooled_std = np.sqrt(((n1-1)*var1 + (n2-1)*var2) / (n1+n2-2))
+    return (group1.mean() - group2.mean()) / pooled_std
+
+d = cohens_d(group1, group2)
+print(f"Cohen's d: {d:.3f}")
+
+# Интерпретация:
+# |d| < 0.2: малый эффект
+# |d| ~ 0.5: средний эффект  
+# |d| > 0.8: большой эффект</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Доверительные интервалы</h2>
+    <pre><code>from scipy import stats
+import numpy as np
+
+# Доверительный интервал для среднего
+confidence = 0.95
+data_mean = np.mean(data)
+data_std = np.std(data, ddof=1)
+n = len(data)
+
+margin_error = stats.t.ppf((1 + confidence) / 2, n-1) * (data_std / np.sqrt(n))
+
+ci_lower = data_mean - margin_error
+ci_upper = data_mean + margin_error
+
+print(f"Среднее: {data_mean:.3f}")
+print(f"95% ДИ: [{ci_lower:.3f}, {ci_upper:.3f}]")</code></pre>
+    <p>ДИ более информативны, чем просто p-value!</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист</h2>
+    <ul>
+      <li>[ ] Сформулировать гипотезы H₀ и H₁</li>
+      <li>[ ] Выбрать уровень значимости α</li>
+      <li>[ ] Проверить предположения (нормальность, однородность)</li>
+      <li>[ ] Выбрать подходящий тест</li>
+      <li>[ ] Рассчитать необходимый размер выборки</li>
+      <li>[ ] Провести тест</li>
+      <li>[ ] Рассчитать размер эффекта</li>
+      <li>[ ] Построить доверительные интервалы</li>
+      <li>[ ] Применить коррекцию при множественных сравнениях</li>
+      <li>[ ] Визуализировать результаты</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Статистические тесты помогают понять, являются ли наблюдаемые различия между моделями реальными или могли возникнуть случайно. Это как проверка — действительно ли новая модель лучше, или нам просто повезло на тестовых данных».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
