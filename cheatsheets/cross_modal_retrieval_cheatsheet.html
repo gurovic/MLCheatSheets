@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Cross-modal Retrieval Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔍 Cross-modal Retrieval Cheatsheet</h1>
+  <div class="subtitle">Кросс-модальный поиск • Embedding spaces • Практика<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Задача</strong>: поиск между разными модальностями</li>
+      <li><strong>Примеры</strong>: текст→изображение, аудио→видео, скетч→фото</li>
+      <li><strong>Ключ</strong>: общее embedding пространство</li>
+      <li><strong>Цель</strong>: схожие объекты близки, разные — далеко</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы задач</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Пример</th></tr>
+      <tr><td><strong>Image-Text</strong></td><td>Поиск изображений по тексту</td><td>Google Images</td></tr>
+      <tr><td><strong>Audio-Visual</strong></td><td>Поиск видео по звуку</td><td>Поиск по музыке</td></tr>
+      <tr><td><strong>Sketch-Photo</strong></td><td>Поиск фото по наброску</td><td>Дизайн поиск</td></tr>
+      <tr><td><strong>Text-Video</strong></td><td>Поиск видео по описанию</td><td>YouTube search</td></tr>
+      <tr><td><strong>3D-2D</strong></td><td>Поиск 3D моделей по изображениям</td><td>CAD поиск</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Архитектура</h2>
+    <pre><code>import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class CrossModalRetrieval(nn.Module):
+    def __init__(self, embedding_dim=512):
+        super().__init__()
+        # Encoder для модальности A
+        self.encoder_a = nn.Sequential(
+            nn.Linear(2048, 1024),
+            nn.ReLU(),
+            nn.Linear(1024, embedding_dim)
+        )
+        # Encoder для модальности B
+        self.encoder_b = nn.Sequential(
+            nn.Linear(768, 512),
+            nn.ReLU(),
+            nn.Linear(512, embedding_dim)
+        )
+    
+    def forward(self, modal_a, modal_b):
+        emb_a = F.normalize(self.encoder_a(modal_a))
+        emb_b = F.normalize(self.encoder_b(modal_b))
+        return emb_a, emb_b
+    
+    def similarity(self, emb_a, emb_b):
+        return emb_a @ emb_b.T  # Cosine similarity</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Функции потерь</h2>
+    <p><strong>Contrastive Loss</strong></p>
+    <pre><code>def contrastive_loss(emb_a, emb_b, temperature=0.07):
+    # Нормализация
+    emb_a = F.normalize(emb_a, dim=-1)
+    emb_b = F.normalize(emb_b, dim=-1)
+    
+    # Similarity matrix
+    sim_matrix = (emb_a @ emb_b.T) / temperature
+    
+    # Labels (диагональ - позитивные пары)
+    labels = torch.arange(len(emb_a))
+    
+    # Symmetric loss
+    loss_a2b = F.cross_entropy(sim_matrix, labels)
+    loss_b2a = F.cross_entropy(sim_matrix.T, labels)
+    
+    return (loss_a2b + loss_b2a) / 2</code></pre>
+    <p><strong>Triplet Loss</strong></p>
+    <pre><code>def triplet_loss(anchor, positive, negative, margin=0.2):
+    pos_dist = F.pairwise_distance(anchor, positive)
+    neg_dist = F.pairwise_distance(anchor, negative)
+    loss = F.relu(pos_dist - neg_dist + margin)
+    return loss.mean()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Hard Negative Mining</h2>
+    <p><strong>Проблема</strong>: не все негативные примеры полезны</p>
+    <p><strong>Решение</strong>: выбирать сложные негативы</p>
+    <pre><code>def hard_negative_mining(anchor, positives, negatives, k=5):
+    """Выбор k самых сложных негативов"""
+    # Расстояния до всех негативов
+    neg_dists = torch.cdist(anchor, negatives)
+    
+    # Берем k ближайших (сложных) негативов
+    hard_neg_idx = neg_dists.topk(k, largest=False).indices
+    hard_negatives = negatives[hard_neg_idx]
+    
+    return hard_negatives
+
+# Использование в обучении
+for batch in dataloader:
+    anchor, pos, all_negs = batch
+    hard_negs = hard_negative_mining(anchor, pos, all_negs)
+    loss = triplet_loss(anchor, pos, hard_negs)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Метрики качества</h2>
+    <table>
+      <tr><th>Метрика</th><th>Описание</th></tr>
+      <tr><td><strong>Recall@K</strong></td><td>Доля правильных в топ-K результатов</td></tr>
+      <tr><td><strong>MRR</strong></td><td>Mean Reciprocal Rank (средний обратный ранг)</td></tr>
+      <tr><td><strong>MAP</strong></td><td>Mean Average Precision</td></tr>
+      <tr><td><strong>NDCG@K</strong></td><td>Normalized Discounted Cumulative Gain</td></tr>
+      <tr><td><strong>mAP@R</strong></td><td>Mean Average Precision at R (по всем релевантным)</td></tr>
+    </table>
+    <pre><code>def recall_at_k(similarities, k=5):
+    """Recall@K для batch"""
+    # similarities: [batch, batch] матрица схожести
+    batch_size = similarities.size(0)
+    # Правильные ответы на диагонали
+    correct = torch.arange(batch_size)
+    # Топ-k индексы
+    top_k = similarities.topk(k, dim=1).indices
+    # Проверка наличия правильного ответа
+    hits = (top_k == correct.unsqueeze(1)).any(dim=1)
+    return hits.float().mean().item()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. CLIP-style retrieval</h2>
+    <pre><code>from transformers import CLIPModel, CLIPProcessor
+
+# Загрузка CLIP
+model = CLIPModel.from_pretrained("openai/clip-vit-base-patch32")
+processor = CLIPProcessor.from_pretrained("openai/clip-vit-base-patch32")
+
+# Индексация базы изображений
+def index_images(image_paths):
+    embeddings = []
+    for path in image_paths:
+        image = Image.open(path)
+        inputs = processor(images=image, return_tensors="pt")
+        with torch.no_grad():
+            image_emb = model.get_image_features(**inputs)
+        embeddings.append(image_emb)
+    return torch.cat(embeddings)
+
+# Поиск по текстовому запросу
+def search(query_text, image_embeddings, k=10):
+    inputs = processor(text=[query_text], return_tensors="pt")
+    with torch.no_grad():
+        text_emb = model.get_text_features(**inputs)
+    
+    # Косинусная схожесть
+    similarities = F.cosine_similarity(text_emb, image_embeddings)
+    top_k = similarities.topk(k)
+    
+    return top_k.indices, top_k.values</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Масштабирование поиска</h2>
+    <p><strong>Проблема</strong>: поиск по миллионам объектов медленный</p>
+    <p><strong>Решения</strong>:</p>
+    <ul>
+      <li><strong>FAISS</strong>: библиотека от Facebook для быстрого поиска</li>
+      <li><strong>Annoy</strong>: approximate nearest neighbors</li>
+      <li><strong>ScaNN</strong>: от Google</li>
+      <li><strong>HNSW</strong>: hierarchical navigable small world</li>
+    </ul>
+    <pre><code>import faiss
+import numpy as np
+
+# Создание FAISS индекса
+d = 512  # размерность эмбеддингов
+index = faiss.IndexFlatIP(d)  # Inner Product (cosine для normalized)
+
+# Добавление эмбеддингов
+embeddings_np = embeddings.cpu().numpy()
+embeddings_np = embeddings_np / np.linalg.norm(embeddings_np, axis=1, keepdims=True)
+index.add(embeddings_np)
+
+# Поиск
+query_emb = query_emb.cpu().numpy()
+query_emb = query_emb / np.linalg.norm(query_emb)
+D, I = index.search(query_emb, k=10)  # D - distances, I - indices</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Multi-modal fusion</h2>
+    <p><strong>Объединение нескольких модальностей для запроса</strong></p>
+    <pre><code>class MultiModalRetrieval(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.text_encoder = TextEncoder()
+        self.image_encoder = ImageEncoder()
+        self.audio_encoder = AudioEncoder()
+        # Fusion layer
+        self.fusion = nn.Linear(512*3, 512)
+    
+    def encode_query(self, text=None, image=None, audio=None):
+        embeds = []
+        if text is not None:
+            embeds.append(self.text_encoder(text))
+        if image is not None:
+            embeds.append(self.image_encoder(image))
+        if audio is not None:
+            embeds.append(self.audio_encoder(audio))
+        
+        # Concatenate и проецируем
+        fused = torch.cat(embeds, dim=-1)
+        return self.fusion(fused)
+
+# Поиск с текстом и изображением
+query_emb = model.encode_query(
+    text="red sports car",
+    image=sketch_image
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Query expansion</h2>
+    <p><strong>Улучшение запроса через pseudo-relevance feedback</strong></p>
+    <pre><code>def query_expansion(query_emb, index, alpha=0.5, top_k=5):
+    """
+    Расширение запроса через топ-K результатов
+    """
+    # Первичный поиск
+    D, I = index.search(query_emb, k=top_k)
+    
+    # Получаем эмбеддинги топ-K
+    top_embeddings = index.reconstruct_batch(I[0])
+    
+    # Усредняем с исходным запросом
+    expanded_query = (1-alpha) * query_emb + alpha * top_embeddings.mean(axis=0, keepdims=True)
+    
+    # Нормализуем
+    expanded_query = expanded_query / np.linalg.norm(expanded_query)
+    
+    # Повторный поиск
+    D, I = index.search(expanded_query, k=100)
+    return I</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Рекомендуется</h3>
+        <ul>
+          <li>Pre-trained энкодеры (CLIP, ALIGN)</li>
+          <li>L2 нормализация эмбеддингов</li>
+          <li>Hard negative mining</li>
+          <li>Data augmentation для обеих модальностей</li>
+          <li>FAISS для масштабирования</li>
+          <li>Temperature scaling в contrastive loss</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Избегать</h3>
+        <ul>
+          <li>Обучение без pre-training</li>
+          <li>Маленький batch size (&lt;128)</li>
+          <li>Игнорирование качества пар данных</li>
+          <li>Euclidean distance без нормализации</li>
+          <li>Random negatives в triplet loss</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Датасеты</h2>
+    <table>
+      <tr><th>Датасет</th><th>Модальности</th><th>Размер</th></tr>
+      <tr><td><strong>MSCOCO</strong></td><td>Image-Text</td><td>330K изображений</td></tr>
+      <tr><td><strong>Flickr30K</strong></td><td>Image-Text</td><td>31K изображений</td></tr>
+      <tr><td><strong>Conceptual Captions</strong></td><td>Image-Text</td><td>3.3M пар</td></tr>
+      <tr><td><strong>AudioCaps</strong></td><td>Audio-Text</td><td>50K аудио</td></tr>
+      <tr><td><strong>MSR-VTT</strong></td><td>Video-Text</td><td>10K видео</td></tr>
+      <tr><td><strong>Sketchy</strong></td><td>Sketch-Photo</td><td>75K фото</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Re-ranking стратегии</h2>
+    <p><strong>Улучшение результатов после первичного поиска</strong></p>
+    <ul>
+      <li><strong>Reciprocal Rank Fusion</strong>: объединение результатов нескольких методов</li>
+      <li><strong>Query expansion</strong>: расширение запроса</li>
+      <li><strong>Cross-modal verification</strong>: проверка соответствия</li>
+      <li><strong>Learned re-ranking</strong>: обучаемая модель для пере-ранжирования</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Применения</h2>
+    <ul>
+      <li><strong>E-commerce</strong>: поиск товаров по изображению или описанию</li>
+      <li><strong>Медиа</strong>: поиск видео, музыки, изображений</li>
+      <li><strong>Дизайн</strong>: поиск референсов по наброскам</li>
+      <li><strong>Медицина</strong>: поиск похожих случаев (изображения + текст)</li>
+      <li><strong>Образование</strong>: поиск учебных материалов</li>
+      <li><strong>Безопасность</strong>: поиск подозрительного контента</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Система позволяет искать, используя разные типы запросов. Например, найти фотографии 
+      по текстовому описанию, или найти видео по звуку. Модель учится понимать смысл в разных 
+      форматах и находить похожее, даже если запрос в одном формате, а результаты — в другом».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить пары модальностей</li>
+      <li>[ ] Подготовить aligned датасет</li>
+      <li>[ ] Выбрать pre-trained энкодеры</li>
+      <li>[ ] Настроить contrastive/triplet loss</li>
+      <li>[ ] Реализовать hard negative mining</li>
+      <li>[ ] Настроить метрики (Recall@K, MRR)</li>
+      <li>[ ] Создать FAISS индекс для масштабирования</li>
+      <li>[ ] Оптимизировать inference (batch processing)</li>
+      <li>[ ] Добавить re-ranking стратегии</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

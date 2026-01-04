@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Видео-аудио модели Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎥🔊 Видео-аудио модели Cheatsheet</h1>
+  <div class="subtitle">Мультимодальные модели • Audio-Visual Learning • Практика<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: совместная обработка видео и аудио</li>
+      <li><strong>Синергия</strong>: аудио + визуальная информация</li>
+      <li><strong>Задачи</strong>: распознавание действий, локализация звуков, синхронизация</li>
+      <li><strong>Fusion</strong>: early, late, или intermediate fusion</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные задачи</h2>
+    <table>
+      <tr><th>Задача</th><th>Описание</th></tr>
+      <tr><td><strong>Action Recognition</strong></td><td>Распознавание действий с использованием аудио+видео</td></tr>
+      <tr><td><strong>Audio-Visual Localization</strong></td><td>Определение источника звука на видео</td></tr>
+      <tr><td><strong>Audio-Visual Separation</strong></td><td>Разделение звуков по источникам</td></tr>
+      <tr><td><strong>Lip Sync</strong></td><td>Синхронизация губ и речи</td></tr>
+      <tr><td><strong>Cross-Modal Retrieval</strong></td><td>Поиск видео по аудио и наоборот</td></tr>
+      <tr><td><strong>Video Captioning</strong></td><td>Описание видео с учетом звука</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Архитектуры</h2>
+    <p><strong>Early Fusion</strong></p>
+    <ul>
+      <li>Объединение признаков на входе</li>
+      <li>Простая реализация</li>
+      <li>Может терять специфику модальностей</li>
+    </ul>
+    <p><strong>Late Fusion</strong></p>
+    <ul>
+      <li>Отдельная обработка, объединение на выходе</li>
+      <li>Сохранение особенностей модальностей</li>
+      <li>Гибкость в обучении</li>
+    </ul>
+    <p><strong>Intermediate Fusion</strong></p>
+    <ul>
+      <li>Объединение на промежуточных слоях</li>
+      <li>Cross-attention между модальностями</li>
+      <li>Лучшее качество, но сложнее</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Базовая архитектура</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class AudioVisualModel(nn.Module):
+    def __init__(self, num_classes):
+        super().__init__()
+        # Video encoder (3D CNN)
+        self.video_encoder = nn.Sequential(
+            nn.Conv3d(3, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool3d(kernel_size=(1,2,2))
+        )
+        # Audio encoder (2D CNN на спектрограммах)
+        self.audio_encoder = nn.Sequential(
+            nn.Conv2d(1, 64, kernel_size=3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=2)
+        )
+        # Fusion
+        self.fusion = nn.Linear(128, 256)
+        self.classifier = nn.Linear(256, num_classes)
+    
+    def forward(self, video, audio):
+        v_feat = self.video_encoder(video).mean(dim=(2,3,4))
+        a_feat = self.audio_encoder(audio).mean(dim=(2,3))
+        # Concatenate
+        fused = torch.cat([v_feat, a_feat], dim=1)
+        fused = self.fusion(fused)
+        return self.classifier(fused)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Ключевые модели</h2>
+    <table>
+      <tr><th>Модель</th><th>Особенности</th></tr>
+      <tr><td><strong>AVE-Net</strong></td><td>Audio-Visual Event localization</td></tr>
+      <tr><td><strong>Sound of Pixels</strong></td><td>Локализация звуков на пиксельном уровне</td></tr>
+      <tr><td><strong>Wav2Lip</strong></td><td>Lip-sync генерация</td></tr>
+      <tr><td><strong>AVSpeech</strong></td><td>Разделение речи с использованием видео</td></tr>
+      <tr><td><strong>AVTS</strong></td><td>Audio-Visual Temporal Synchronization</td></tr>
+      <tr><td><strong>ImageBind</strong></td><td>Единое пространство для 6 модальностей (Meta)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Audio-Visual Localization</h2>
+    <pre><code>from torchvision.models import resnet18
+import torchaudio
+
+# Локализация источника звука
+class SoundLocalizer(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.visual_net = resnet18(pretrained=True)
+        self.audio_net = nn.Sequential(
+            nn.Conv2d(1, 64, 3, padding=1),
+            nn.ReLU(),
+            nn.AdaptiveAvgPool2d((1,1))
+        )
+        # Cross-modal attention
+        self.attention = nn.MultiheadAttention(512, 8)
+        
+    def forward(self, frames, spectrogram):
+        # Visual features [B, T, H, W, C]
+        v_feats = [self.visual_net(frame) for frame in frames]
+        v_feats = torch.stack(v_feats, dim=1)  # [B, T, 512]
+        
+        # Audio features
+        a_feat = self.audio_net(spectrogram)  # [B, 64]
+        
+        # Attention: где звук на видео?
+        attn_out, attn_weights = self.attention(
+            a_feat.unsqueeze(1), v_feats, v_feats
+        )
+        return attn_weights  # Карта внимания</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Audio-Visual Separation</h2>
+    <p><strong>Задача</strong>: разделить звуки разных источников на видео</p>
+    <pre><code># Пример: два человека говорят, разделить их голоса
+class AudioVisualSeparation(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.face_encoder = FaceEncoder()  # Энкодер лиц
+        self.audio_encoder = AudioUNet()    # U-Net для аудио
+        
+    def forward(self, video_frames, mixed_audio):
+        # Извлекаем лица из кадров
+        face_embeds = self.face_encoder(video_frames)
+        
+        # Разделяем аудио с использованием визуальной инфо
+        masks = self.audio_encoder(mixed_audio, face_embeds)
+        
+        # Применяем маски
+        separated = [mixed_audio * mask for mask in masks]
+        return separated</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Contrastive Learning</h2>
+    <p><strong>Обучение соответствия аудио-видео</strong></p>
+    <pre><code>def audio_visual_contrastive_loss(video_emb, audio_emb, temp=0.07):
+    # Нормализация
+    video_emb = F.normalize(video_emb, dim=-1)
+    audio_emb = F.normalize(audio_emb, dim=-1)
+    
+    # Similarity matrix
+    logits = (video_emb @ audio_emb.T) / temp
+    
+    # Positive pairs на диагонали
+    labels = torch.arange(len(video_emb))
+    
+    # Symmetric contrastive loss
+    loss_v2a = F.cross_entropy(logits, labels)
+    loss_a2v = F.cross_entropy(logits.T, labels)
+    
+    return (loss_v2a + loss_a2v) / 2
+
+# Использование
+video_features = video_encoder(video_clips)
+audio_features = audio_encoder(audio_clips)
+loss = audio_visual_contrastive_loss(video_features, audio_features)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Temporal Alignment</h2>
+    <p><strong>Синхронизация аудио и видео</strong></p>
+    <ul>
+      <li><strong>Lip-sync detection</strong>: проверка синхронности губ и речи</li>
+      <li><strong>Audio-visual sync</strong>: определение сдвига между аудио и видео</li>
+      <li><strong>Event localization</strong>: когда происходит событие</li>
+    </ul>
+    <pre><code># Определение сдвига между аудио и видео
+class SyncNet(nn.Module):
+    def forward(self, video_seq, audio_seq):
+        v_emb = self.video_encoder(video_seq)  # [B, T, D]
+        a_emb = self.audio_encoder(audio_seq)  # [B, T, D]
+        
+        # Вычисляем корреляцию для разных сдвигов
+        max_shift = 10
+        correlations = []
+        for shift in range(-max_shift, max_shift+1):
+            corr = F.cosine_similarity(
+                v_emb, 
+                torch.roll(a_emb, shift, dims=1),
+                dim=-1
+            ).mean()
+            correlations.append(corr)
+        
+        # Лучший сдвиг
+        best_shift = torch.tensor(correlations).argmax() - max_shift
+        return best_shift</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Предобработка данных</h2>
+    <p><strong>Видео</strong></p>
+    <ul>
+      <li>Извлечение кадров: 1-30 fps в зависимости от задачи</li>
+      <li>Resize: 224x224 или 112x112</li>
+      <li>Нормализация по ImageNet статистике</li>
+    </ul>
+    <p><strong>Аудио</strong></p>
+    <ul>
+      <li>Mel-спектрограммы: 128 mel bins, hop=10ms</li>
+      <li>MFCC для речи</li>
+      <li>Raw waveform для некоторых задач</li>
+    </ul>
+    <pre><code>import torchaudio
+import torchvision.transforms as T
+
+# Видео preprocessing
+video_transform = T.Compose([
+    T.Resize(224),
+    T.CenterCrop(224),
+    T.Normalize(mean=[0.485,0.456,0.406], 
+                std=[0.229,0.224,0.225])
+])
+
+# Аудио preprocessing
+audio_transform = torchaudio.transforms.MelSpectrogram(
+    sample_rate=16000,
+    n_mels=128,
+    hop_length=160
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Рекомендуется</h3>
+        <ul>
+          <li>Pre-trained энкодеры для видео и аудио</li>
+          <li>Data augmentation: tempo shift, time mask</li>
+          <li>Синхронизация временных шкал</li>
+          <li>Cross-modal attention layers</li>
+          <li>Contrastive learning для alignment</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Избегать</h3>
+        <ul>
+          <li>Игнорирование временного выравнивания</li>
+          <li>Обработка всех кадров (слишком затратно)</li>
+          <li>Один batch размер для обеих модальностей</li>
+          <li>Обучение с нуля без pre-training</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Датасеты</h2>
+    <table>
+      <tr><th>Датасет</th><th>Задача</th><th>Размер</th></tr>
+      <tr><td><strong>AVSpeech</strong></td><td>Speech separation</td><td>290K видео</td></tr>
+      <tr><td><strong>VGGSound</strong></td><td>Audio-visual learning</td><td>200K видео</td></tr>
+      <tr><td><strong>AudioSet</strong></td><td>Event classification</td><td>2M видео</td></tr>
+      <tr><td><strong>Kinetics</strong></td><td>Action recognition</td><td>650K видео</td></tr>
+      <tr><td><strong>LRS2/LRS3</strong></td><td>Lip reading</td><td>100K+ видео</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Применения</h2>
+    <ul>
+      <li><strong>Видеоконференции</strong>: шумоподавление, улучшение речи</li>
+      <li><strong>Кинопроизводство</strong>: автоматическая озвучка, синхронизация</li>
+      <li><strong>Доступность</strong>: субтитры, описание звуков</li>
+      <li><strong>Безопасность</strong>: детекция аномальных событий</li>
+      <li><strong>Робототехника</strong>: локализация звуков в пространстве</li>
+      <li><strong>AR/VR</strong>: пространственный звук</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Модель анализирует видео и звук вместе, как человек. Может найти, кто говорит на экране, 
+      разделить голоса разных людей, или определить, что звук гитары идет от человека слева. 
+      Это как наш мозг, который соединяет то, что мы видим и слышим».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Метрики</h2>
+    <table>
+      <tr><th>Метрика</th><th>Применение</th></tr>
+      <tr><td><strong>mAP</strong></td><td>Action recognition, event detection</td></tr>
+      <tr><td><strong>SDR</strong></td><td>Source-to-Distortion Ratio (separation)</td></tr>
+      <tr><td><strong>LSE-D</strong></td><td>Lip Sync Error Distance</td></tr>
+      <tr><td><strong>AUC</strong></td><td>Audio-visual localization</td></tr>
+      <tr><td><strong>IoU</strong></td><td>Spatial localization</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить задачу (localization/separation/retrieval)</li>
+      <li>[ ] Выбрать стратегию fusion (early/late/intermediate)</li>
+      <li>[ ] Подготовить синхронизированные видео-аудио данные</li>
+      <li>[ ] Выбрать энкодеры (3D CNN для видео, 2D для аудио)</li>
+      <li>[ ] Настроить temporal alignment</li>
+      <li>[ ] Применить data augmentation для обеих модальностей</li>
+      <li>[ ] Обучить с contrastive loss для alignment</li>
+      <li>[ ] Оценить качество на валидации</li>
+      <li>[ ] Оптимизировать inference (model pruning)</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
