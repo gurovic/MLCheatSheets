@@ -100,19 +100,18 @@
 1. [Множественная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multiple_regression_cheatsheet.html)
 1. [Дисперсионный анализ (ANOVA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/anova_cheatsheet.html)
 1. [Bootstrap](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bootstrap_methods_cheatsheet.html)
-1. Статистическая проверка гипотез
+1. [Статистическая проверка гипотез](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hypothesis_testing_cheatsheet.html)
 
 ### **13. Проектирование признаков (Feature Engineering)**
 1. [Feature Engineering (основы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_engineering_cheatsheet.html)
 1. [Feature Engineering (подробно)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_engineering_detailed_cheatsheet.html)
-1. Создание полиномиальных признаков
-1. Взаимодействия признаков
+1. [Создание полиномиальных признаков и взаимодействия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_interaction_cheatsheet.html)
 1. Биннинг (дискретизация)
 1. [Target Encoding](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/target_encoding_cheatsheet.html)
 1. Дата-специфичные признаки (временные, текстовые)
 
 ### **14. Работа с несбалансированными данными**
-1. Методы семплирования
+1. [Методы семплирования (SMOTE и др.)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/smote_imbalanced_cheatsheet.html)
 1. Веса классов
 1. Метрики для несбалансированных данных
 1. Алгоритмические подходы
@@ -121,7 +120,7 @@
 1. Важность признаков
 1. [SHAP значения](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/shap_cheatsheet.html)
 1. [LIME](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lime_cheatsheet.html)
-1. Частичные зависимости
+1. [Частичные зависимости (Partial Dependence Plots)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/partial_dependence_cheatsheet.html)
 1. Surrogate models
 
 ### **16. Производственные аспекты**
@@ -219,7 +218,7 @@
 1. Нормализующие потоки (Normalizing Flows)
 
 ### **6. Обучение с подкреплением (Deep RL)**
-1. Deep Q-Networks (DQN)
+1. [Deep Q-Networks (DQN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dqn_cheatsheet.html)
 1. Policy Gradient методы
 1. Actor-Critic методы
 1. PPO (Proximal Policy Optimization)
@@ -228,7 +227,7 @@
 1. Имитационное обучение
 
 ### **7. Обработка естественного языка (NLP)**
-1. Векторные представления слов (Word2Vec, GloVe, FastText)
+1. [Векторные представления слов (Word2Vec, GloVe, FastText)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/word_embeddings_cheatsheet.html)
 1. RNN/LSTM для NLP
 1. Transformer для NLP
 1. [BERT и его вариации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bert_finetuning_cheatsheet.html)
@@ -403,9 +402,8 @@
 ### **3. Ансамбли методов**
 1. Бэггинг (Bagging)
 1. [Бустинг (Boosting) - классические версии (AdaBoost)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adaboost_cheatsheet.html)
-1. Стекинг (Stacking)
+1. [Стекинг и Voting (Stacking, Voting)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/voting_stacking_cheatsheet.html)
 1. Блендинг (Blending)
-1. Voting классификаторы
 1. Ансамбли деревьев (не только случайный лес)
 1. Ансамбли линейных моделей
 1. Диверсификация ансамблей
@@ -488,7 +486,7 @@
 11. Meta-features и meta-learning
 
 ### **13. Онлайн обучение и streaming ML**
-11. Online algorithms (SGD, Perceptron)
+11. [Online Learning (SGD, Perceptron, Concept Drift)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/online_learning_cheatsheet.html)
 11. Concept drift detection
 11. Adaptive windowing
 11. Ensemble methods для streaming
@@ -525,7 +523,7 @@
 21. Feature importance (разные методы)
 
 ### **18. Многозадачное обучение (Multi-task)**
-21. Shared representation learning
+21. [Multi-task Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multi_task_learning_cheatsheet.html)
 21. Task clustering
 21. Multi-output models
 21. Hierarchical multi-task
@@ -564,9 +562,7 @@
 21. Теория решений
 
 ### **24. Промышленное ML и MLOps**
-21. Мониторинг моделей
-21. Концептуальный дрейф
-21. A/B тестирование ML моделей
+21. [Мониторинг моделей и A/B тестирование](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_monitoring_ab_testing_cheatsheet.html)
 21. Модельные реестры
 21. Feature stores
 21. CI/CD для ML
