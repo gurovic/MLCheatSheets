@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Gradient Checkpointing Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>💾 Gradient Checkpointing Cheatsheet</h1>
+  <div class="subtitle">Memory-efficient training • Практический фокус<br>📅 4 января 2026</div>
+  <div class="block">
+    <h2>🔷 1. Суть Gradient Checkpointing</h2>
+    <ul>
+      <li><strong>Проблема</strong>: обратное распространение хранит все активации в памяти</li>
+      <li><strong>Решение</strong>: сохранять только часть активаций, остальные пересчитывать</li>
+      <li><strong>Trade-off</strong>: меньше памяти vs больше вычислений</li>
+      <li><strong>Выгода</strong>: можно обучать большие модели или увеличить batch size</li>
+      <li><strong>Overhead</strong>: ~20-30% больше времени, но можно увеличить батч в 2-4x</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 2. Как работает</h2>
+    <p><strong>Обычный backward:</strong></p>
+    <ol>
+      <li>Forward: вычислить все активации, сохранить их</li>
+      <li>Backward: использовать сохраненные активации для градиентов</li>
+      <li>Память: O(n) для n слоев</li>
+    </ol>
+    <p><strong>С checkpointing:</strong></p>
+    <ol>
+      <li>Forward: сохранить активации только в checkpoints</li>
+      <li>Backward: пересчитать активации между checkpoints</li>
+      <li>Память: O(√n) при оптимальном размещении</li>
+    </ol>
+  </div>
+  <div class="block">
+    <h2>🔷 3. PyTorch базовый код</h2>
+    <pre><code>import torch.utils.checkpoint as checkpoint
+
+class MyModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.layer1 = nn.Linear(100, 100)
+        self.layer2 = nn.Linear(100, 100)
+        self.layer3 = nn.Linear(100, 10)
+    
+    def forward(self, x):
+        # Обычный forward
+        # x = self.layer1(x)
+        
+        # С checkpointing
+        x = checkpoint.checkpoint(self.layer1, x)
+        x = checkpoint.checkpoint(self.layer2, x)
+        x = self.layer3(x)  # последний слой без checkpoint
+        return x</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 4. Для Sequential моделей</h2>
+    <pre><code>from torch.utils.checkpoint import checkpoint_sequential
+
+model = nn.Sequential(
+    nn.Linear(100, 100),
+    nn.ReLU(),
+    nn.Linear(100, 100),
+    nn.ReLU(),
+    nn.Linear(100, 100),
+    nn.ReLU(),
+    nn.Linear(100, 10)
+)
+
+# Разбить на 2 сегмента с checkpoints
+segments = 2
+
+def forward_with_checkpointing(input):
+    return checkpoint_sequential(model, segments, input)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 5. Transformers и Hugging Face</h2>
+    <pre><code>from transformers import GPT2Model, GPT2Config
+
+config = GPT2Config.from_pretrained('gpt2')
+config.gradient_checkpointing = True  # Включить
+
+model = GPT2Model(config)
+
+# Или для уже созданной модели
+model.gradient_checkpointing_enable()
+
+# Отключить
+model.gradient_checkpointing_disable()</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 6. Стратегии размещения checkpoints</h2>
+    <table>
+      <tr><th>Стратегия</th><th>Память</th><th>Время</th></tr>
+      <tr><td><strong>Нет checkpoints</strong></td><td>O(n)</td><td>1x</td></tr>
+      <tr><td><strong>Каждый слой</strong></td><td>O(1)</td><td>2x</td></tr>
+      <tr><td><strong>Каждые k слоев</strong></td><td>O(n/k)</td><td>1 + k</td></tr>
+      <tr><td><strong>Оптимальная (√n)</strong></td><td>O(√n)</td><td>~1.3x</td></tr>
+    </table>
+    <p><strong>Оптимальная стратегия</strong>: ставить checkpoint каждые √n слоев</p>
+  </div>
+  <div class="block">
+    <h2>🔷 7. Для LSTM/RNN</h2>
+    <pre><code>class CheckpointedLSTM(nn.Module):
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+        self.lstm = nn.LSTM(*args, **kwargs)
+    
+    def forward(self, x):
+        # Сохранить только некоторые временные шаги
+        segments = []
+        seq_len = x.size(0)
+        checkpoint_every = seq_len // 4
+        
+        h, c = None, None
+        for i in range(0, seq_len, checkpoint_every):
+            segment = x[i:i+checkpoint_every]
+            if h is None:
+                out, (h, c) = checkpoint.checkpoint(
+                    self.lstm, segment
+                )
+            else:
+                out, (h, c) = checkpoint.checkpoint(
+                    self.lstm, segment, h, c
+                )
+            segments.append(out)
+        
+        return torch.cat(segments, dim=0), (h, c)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 8. DeepSpeed Integration</h2>
+    <pre><code>from deepspeed.runtime.activation_checkpointing import checkpointing
+
+# В конфигурации DeepSpeed
+ds_config = {
+    "activation_checkpointing": {
+        "partition_activations": True,
+        "cpu_checkpointing": True,
+        "contiguous_memory_optimization": True,
+        "number_checkpoints": 4,
+        "synchronize_checkpoint_boundary": True,
+        "profile": False
+    }
+}
+
+# CPU offloading для еще большей экономии
+model, optimizer, _, _ = deepspeed.initialize(
+    model=model,
+    config=ds_config
+)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 9. Практические советы</h2>
+    <ul>
+      <li><strong>Где применять</strong>: на самых "тяжелых" слоях (attention, большие матрицы)</li>
+      <li><strong>Не применять</strong>: на последних слоях (обычно небольшие)</li>
+      <li><strong>Batch size</strong>: можно увеличить в 2-4x</li>
+      <li><strong>Накладные расходы</strong>: 20-30% времени, но общее время может снизиться</li>
+      <li><strong>Dropout</strong>: использовать deterministic dropout с checkpointing</li>
+      <li><strong>BatchNorm</strong>: может вести себя неожиданно, используйте LayerNorm</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 10. Мониторинг памяти</h2>
+    <pre><code>import torch
+
+def print_memory_stats():
+    if torch.cuda.is_available():
+        allocated = torch.cuda.memory_allocated() / 1e9
+        reserved = torch.cuda.memory_reserved() / 1e9
+        print(f"Allocated: {allocated:.2f} GB")
+        print(f"Reserved: {reserved:.2f} GB")
+
+# До checkpointing
+print_memory_stats()
+
+# После включения checkpointing  
+model.gradient_checkpointing_enable()
+print_memory_stats()
+
+# Разница покажет экономию</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 11. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Экономия памяти</th><th>Скорость</th></tr>
+      <tr><td><strong>Gradient Checkpointing</strong></td><td>2-4x</td><td>0.7-0.8x</td></tr>
+      <tr><td><strong>Mixed Precision</strong></td><td>2x</td><td>1.5-2x</td></tr>
+      <tr><td><strong>Gradient Accumulation</strong></td><td>Нет</td><td>~1x</td></tr>
+      <tr><td><strong>Model Parallelism</strong></td><td>Nx (N GPUs)</td><td>0.8x</td></tr>
+      <tr><td><strong>ZeRO (DeepSpeed)</strong></td><td>4-8x</td><td>0.9x</td></tr>
+    </table>
+  </div>
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо для</h3>
+        <ul>
+          <li>Обучение очень глубоких сетей</li>
+          <li>Большие batch sizes</li>
+          <li>Ограниченная GPU память</li>
+          <li>Transformers с длинными последовательностями</li>
+          <li>Высокоразрешающие изображения</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не подходит</h3>
+        <ul>
+          <li>Очень маленькие модели</li>
+          <li>Inference (только training)</li>
+          <li>Когда скорость критична</li>
+          <li>Модели с мутирующим состоянием</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <h2>�� 13. Комбинация с другими техниками</h2>
+    <pre><code># Gradient checkpointing + Mixed precision + Gradient accumulation
+
+from torch.cuda.amp import autocast, GradScaler
+import torch.utils.checkpoint as checkpoint
+
+model.gradient_checkpointing_enable()
+scaler = GradScaler()
+accumulation_steps = 4
+
+for i, batch in enumerate(dataloader):
+    with autocast():
+        output = model(batch)
+        loss = criterion(output, target) / accumulation_steps
+    
+    scaler.scale(loss).backward()
+    
+    if (i + 1) % accumulation_steps == 0:
+        scaler.step(optimizer)
+        scaler.update()
+        optimizer.zero_grad()</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 14. Отладка проблем</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Нестабильность обучения</td><td>Использовать deterministic operations</td></tr>
+      <tr><td>Слишком медленно</td><td>Уменьшить число checkpoints</td></tr>
+      <tr><td>Все еще OOM</td><td>Комбинировать с gradient accumulation</td></tr>
+      <tr><td>Не работает с моделью</td><td>Проверить, что нет in-place операций</td></tr>
+    </table>
+  </div>
+  <div class="block">
+    <h2>🔷 15. Оптимальная конфигурация</h2>
+    <pre><code># Для GPT-like моделей
+config = {
+    'gradient_checkpointing': True,
+    'checkpoint_num_layers': 2,  # каждые 2 слоя
+    'fp16': True,  # комбинировать с mixed precision
+    'batch_size': 32,  # увеличено благодаря checkpointing
+    'gradient_accumulation_steps': 4
+}
+
+# Для Vision Transformers
+vit_config = {
+    'gradient_checkpointing': True,
+    'checkpoint_activations': True,
+    'checkpoint_attention': True,  # особенно важно
+    'batch_size': 256  # увеличено
+}</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Измерить baseline использование памяти</li>
+      <li>[ ] Включить gradient checkpointing</li>
+      <li>[ ] Выбрать стратегию (каждый N-ый слой)</li>
+      <li>[ ] Увеличить batch size</li>
+      <li>[ ] Измерить время обучения (до/после)</li>
+      <li>[ ] Проверить, что обучение стабильно</li>
+      <li>[ ] Комбинировать с mixed precision</li>
+      <li>[ ] Профилировать memory и time</li>
+    </ul>
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Gradient Checkpointing — это как экономить место на диске: не храним все промежуточные файлы, а пересчитываем их при необходимости. Немного медленнее, зато можем работать с гораздо большими моделями на той же hardware».
+    </blockquote>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>LIME для нейросетей Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔍 LIME для нейросетей Cheatsheet</h1>
+  <div class="subtitle">Local Interpretable Model-agnostic Explanations • Практический фокус<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть LIME</h2>
+    <ul>
+      <li><strong>Цель</strong>: объяснить предсказание любой модели (black box)</li>
+      <li><strong>Подход</strong>: локальная аппроксимация интерпретируемой моделью</li>
+      <li><strong>Идея</strong>: создать простую модель в окрестности конкретного примера</li>
+      <li><strong>Model-agnostic</strong>: работает с любыми моделями</li>
+      <li><strong>Локальность</strong>: объясняет конкретное предсказание, а не всю модель</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Как работает LIME</h2>
+    <ol>
+      <li><strong>Генерация</strong>: создать возмущенные версии входа</li>
+      <li><strong>Предсказание</strong>: получить предсказания модели для возмущений</li>
+      <li><strong>Взвешивание</strong>: назначить веса по близости к оригиналу</li>
+      <li><strong>Обучение</strong>: обучить простую модель (линейная регрессия)</li>
+      <li><strong>Объяснение</strong>: веса простой модели = важность признаков</li>
+    </ol>
+    <p><strong>Формула:</strong></p>
+    <p>ξ(x) = argmin<sub>g∈G</sub> L(f, g, π<sub>x</sub>) + Ω(g)</p>
+    <p>где f - черный ящик, g - простая модель, π<sub>x</sub> - близость</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код</h2>
+    <pre><code>import lime
+import lime.lime_tabular
+import numpy as np
+
+# Для табличных данных
+explainer = lime.lime_tabular.LimeTabularExplainer(
+    X_train,
+    feature_names=feature_names,
+    class_names=class_names,
+    mode='classification'
+)
+
+# Объяснить предсказание
+exp = explainer.explain_instance(
+    X_test[0],
+    model.predict_proba,
+    num_features=10
+)
+
+# Показать результат
+exp.show_in_notebook()
+exp.as_list()  # список (признак, вес)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. LIME для изображений</h2>
+    <pre><code>import lime.lime_image
+from skimage.segmentation import mark_boundaries
+
+# Создать explainer
+explainer = lime.lime_image.LimeImageExplainer()
+
+# Объяснить предсказание
+explanation = explainer.explain_instance(
+    image,
+    model.predict,
+    top_labels=5,
+    hide_color=0,
+    num_samples=1000
+)
+
+# Визуализация
+temp, mask = explanation.get_image_and_mask(
+    explanation.top_labels[0],
+    positive_only=True,
+    num_features=5,
+    hide_rest=False
+)
+
+import matplotlib.pyplot as plt
+plt.imshow(mark_boundaries(temp/255, mask))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. LIME для текста</h2>
+    <pre><code>from lime.lime_text import LimeTextExplainer
+
+# Создать explainer
+explainer = LimeTextExplainer(class_names=class_names)
+
+# Функция предсказания
+def predict_proba(texts):
+    return model.predict_proba(
+        vectorizer.transform(texts)
+    )
+
+# Объяснение
+exp = explainer.explain_instance(
+    text_instance,
+    predict_proba,
+    num_features=10
+)
+
+# Визуализация
+exp.show_in_notebook(text=True)
+
+# HTML версия
+exp.as_html()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Параметры настройки</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Совет</th></tr>
+      <tr><td><code>num_features</code></td><td>Сколько признаков показать</td><td>5-15 оптимально</td></tr>
+      <tr><td><code>num_samples</code></td><td>Число возмущенных примеров</td><td>1000-5000</td></tr>
+      <tr><td><code>distance_metric</code></td><td>Метрика расстояния</td><td>'cosine' или 'euclidean'</td></tr>
+      <tr><td><code>kernel_width</code></td><td>Ширина ядра для весов</td><td>По умолчанию √(число признаков)*0.75</td></tr>
+      <tr><td><code>feature_selection</code></td><td>Метод отбора признаков</td><td>'forward_selection', 'lasso_path', 'auto'</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Интерпретация результатов</h2>
+    <p><strong>Положительные веса</strong>: признаки, увеличивающие вероятность класса</p>
+    <p><strong>Отрицательные веса</strong>: признаки, уменьшающие вероятность</p>
+    <p><strong>Для изображений</strong>:</p>
+    <ul>
+      <li>Зеленые области: поддерживают предсказание</li>
+      <li>Красные области: противоречат предсказанию</li>
+    </ul>
+    <p><strong>Для текста</strong>:</p>
+    <ul>
+      <li>Подсвеченные слова: важные для предсказания</li>
+      <li>Цвет показывает направление влияния</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. LIME для PyTorch моделей</h2>
+    <pre><code>import torch
+from lime import lime_image
+from PIL import Image
+
+def predict_fn(images):
+    model.eval()
+    batch = torch.stack([
+        preprocess(Image.fromarray(img.astype('uint8')))
+        for img in images
+    ])
+    
+    with torch.no_grad():
+        outputs = model(batch.to(device))
+        probs = torch.nn.functional.softmax(
+            outputs, dim=1
+        )
+    return probs.cpu().numpy()
+
+explainer = lime_image.LimeImageExplainer()
+explanation = explainer.explain_instance(
+    np.array(image),
+    predict_fn,
+    top_labels=5,
+    hide_color=0,
+    num_samples=100
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Преимущества и ограничения</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Преимущества</h3>
+        <ul>
+          <li>Model-agnostic: работает с любой моделью</li>
+          <li>Интерпретируемые объяснения</li>
+          <li>Локальная точность</li>
+          <li>Применимо к разным типам данных</li>
+          <li>Легко использовать</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Ограничения</h3>
+        <ul>
+          <li>Нестабильность результатов (случайность)</li>
+          <li>Медленно для больших датасетов</li>
+          <li>Только локальные объяснения</li>
+          <li>Чувствительность к параметрам</li>
+          <li>Может давать противоречивые объяснения</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Практические советы</h2>
+    <ul>
+      <li><strong>Для стабильности</strong>: запускайте несколько раз и усредняйте</li>
+      <li><strong>num_samples</strong>: больше = точнее, но медленнее</li>
+      <li><strong>Проверка</strong>: убедитесь, что R² > 0.5 для локальной модели</li>
+      <li><strong>Сегментация изображений</strong>: настройте quickshift или slic параметры</li>
+      <li><strong>Масштаб</strong>: нормализуйте входные данные так же, как при обучении</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Альтернативы и дополнения</h2>
+    <table>
+      <tr><th>Метод</th><th>Особенности</th></tr>
+      <tr><td><strong>SHAP</strong></td><td>Теоретическое обоснование, глобальные объяснения</td></tr>
+      <tr><td><strong>Anchor</strong></td><td>Правила вида "если-то", более стабильно</td></tr>
+      <tr><td><strong>Integrated Gradients</strong></td><td>Для нейросетей, использует градиенты</td></tr>
+      <tr><td><strong>Grad-CAM</strong></td><td>Специально для CNN, визуализация внимания</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать LIME</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо для</h3>
+        <ul>
+          <li>Объяснение отдельных предсказаний</li>
+          <li>Debugging модели</li>
+          <li>Доверие пользователей</li>
+          <li>Соответствие регуляциям (GDPR)</li>
+          <li>Поиск bias в модели</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не подходит для</h3>
+        <ul>
+          <li>Глобальное понимание модели</li>
+          <li>Real-time объяснения</li>
+          <li>Очень большие изображения/тексты</li>
+          <li>Production с высокими SLA</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Оценка качества объяснений</h2>
+    <ul>
+      <li><strong>Fidelity</strong>: насколько хорошо простая модель приближает сложную локально</li>
+      <li><strong>Consistency</strong>: схожие входы → схожие объяснения</li>
+      <li><strong>Stability</strong>: повторные запуски дают близкие результаты</li>
+      <li><strong>Comprehensibility</strong>: понятность для человека</li>
+    </ul>
+    <pre><code># Проверка fidelity
+from sklearn.metrics import r2_score
+
+exp = explainer.explain_instance(x, predict_fn)
+score = exp.score  # R² локальной модели
+print(f"Local model R²: {score:.3f}")
+
+# Должно быть > 0.5, иначе объяснение ненадежно</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист использования</h2>
+    <ul>
+      <li>[ ] Определить тип данных (табличные/изображения/текст)</li>
+      <li>[ ] Создать подходящий explainer</li>
+      <li>[ ] Настроить функцию предсказания (возвращает вероятности)</li>
+      <li>[ ] Выбрать num_samples (баланс скорость/качество)</li>
+      <li>[ ] Проверить R² локальной модели</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Проверить stability (несколько запусков)</li>
+      <li>[ ] Интерпретировать в контексте задачи</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «LIME помогает понять, почему нейросеть приняла конкретное решение. Например, какие слова в отзыве повлияли на классификацию как "позитивный", или какие области изображения привели к определенному диагнозу. Это как спросить у эксперта: "Почему ты так решил?"».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
