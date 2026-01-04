@@ -40,14 +40,14 @@
 1. [Gaussian Mixture Models (GMM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gmm_cheatsheet.html)
 1. [Метрики оценки кластеризации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/clustering_metrics_cheatsheet.html)
 1. [Выбор числа кластеров](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/choosing_clusters_number_cheatsheet.html)
-1. Spectral clustering
-1. Mean shift
-1. Affinity propagation
-1. BIRCH
-1. CURE
-1. CLARANS
-1. HDBSCAN
-1. Subspace clustering
+1. [Spectral clustering](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/spectral_clustering_cheatsheet.html)
+1. [Mean shift](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mean_shift_cheatsheet.html)
+1. [Affinity propagation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/affinity_propagation_cheatsheet.html)
+1. [BIRCH](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/birch_cheatsheet.html)
+1. [CURE](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cure_cheatsheet.html)
+1. [CLARANS](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/clarans_cheatsheet.html)
+1. [HDBSCAN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hdbscan_cheatsheet.html)
+1. [Subspace clustering](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/subspace_clustering_cheatsheet.html)
 
 ### **5. Понижение размерности**
 1. [PCA (Principal Component Analysis)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pca_cheatsheet.html)
@@ -57,8 +57,8 @@
 1. [SVD (Singular Value Decomposition)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/svd_cheatsheet.html)
 1. [Автоэнкодеры (линейные)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/linear_autoencoders_cheatsheet.html)
 1. [Manifold learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/manifold_learning_cheatsheet.html)
-1. Isomap
-1. LLE (Locally Linear Embedding)
+1. [Isomap](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/isomap_cheatsheet.html)
+1. [LLE (Locally Linear Embedding)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lle_cheatsheet.html)
 1. MDS (Multidimensional Scaling)
 1. Spectral embedding
 1. Kernel PCA

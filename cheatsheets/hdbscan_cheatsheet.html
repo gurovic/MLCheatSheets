@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>🔍 HDBSCAN Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🔍 HDBSCAN Cheatsheet</h1>
+  <div class="subtitle">Hierarchical Density-Based Spatial Clustering<br>Плотностная кластеризация • Иерархическая • Авто параметры<br>📅 Январь 2026</div>
+  <div class="block">
+    <h2>🔷 1. Суть метода</h2>
+    <ul>
+      <li><strong>Улучшение DBSCAN</strong>: работает с кластерами разной плотности</li>
+      <li><strong>Иерархия</strong>: строит дерево кластеров по плотности</li>
+      <li><strong>Авто выбор кластеров</strong>: сам определяет оптимальные кластеры</li>
+      <li><strong>Устойчивость</strong>: один параметр (min_cluster_size) вместо двух (eps, min_samples)</li>
+      <li><strong>Обработка шума</strong>: точки с низкой плотностью помечаются как выбросы (-1)</li>
+    </ul>  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый код</h2>
+    <pre><code>import hdbscan
+import numpy as np
+
+# Базовое использование
+clusterer = hdbscan.HDBSCAN(
+    min_cluster_size=5,
+    min_samples=None,
+    metric='euclidean'
+)
+labels = clusterer.fit_predict(X)
+
+# Получить вероятности
+probs = clusterer.probabilities_
+
+# Иерархия
+condensed_tree = clusterer.condensed_tree_
+single_linkage_tree = clusterer.single_linkage_tree_
+
+print(f"Кластеров: {len(set(labels)) - (1 if -1 in labels else 0)}")
+print(f"Шум: {list(labels).count(-1)} точек")</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 3. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Совет</th></tr>
+      <tr><td><code>min_cluster_size</code></td><td>Мин размер кластера</td><td>5-15 обычно</td></tr>
+      <tr><td><code>min_samples</code></td><td>Консервативность</td><td>None = min_cluster_size</td></tr>
+      <tr><td><code>metric</code></td><td>Метрика расстояния</td><td>'euclidean', 'manhattan', 'cosine'</td></tr>
+      <tr><td><code>cluster_selection_epsilon</code></td><td>Порог расстояния</td><td>0.0 (авто) или > 0</td></tr>
+      <tr><td><code>cluster_selection_method</code></td><td>Метод выбора</td><td>'eom' (excess of mass) или 'leaf'</td></tr>
+    </table>  </div>
+
+  <div class="block">
+    <h2>🔷 4. Алгоритм работы</h2>
+    <ol>
+      <li><strong>Mutual reachability distance</strong>: d_mreach(a,b) = max(core_k(a), core_k(b), d(a,b))</li>
+      <li><strong>MST</strong>: построить минимальное остовное дерево</li>
+      <li><strong>Single linkage tree</strong>: иерархическая кластеризация из MST</li>
+      <li><strong>Condensed tree</strong>: убрать кластеры размером < min_cluster_size</li>
+      <li><strong>Извлечение кластеров</strong>: выбрать стабильные кластеры (по persistence)</li>
+    </ol>
+    <p><strong>Стабильность кластера</strong>: Σ(λ_death - λ_birth) для всех точек</p>  </div>
+
+  <div class="block">
+    <h2>🔷 5. Выбор min_cluster_size</h2>
+    <pre><code># Эксперименты с разными размерами
+from sklearn.metrics import silhouette_score
+
+sizes = [5, 10, 15, 20, 30]
+results = []
+
+for size in sizes:
+    clusterer = hdbscan.HDBSCAN(min_cluster_size=size)
+    labels = clusterer.fit_predict(X)
+    
+    # Убрать шум для метрики
+    mask = labels != -1
+    if len(set(labels[mask])) > 1:
+        score = silhouette_score(X[mask], labels[mask])
+        results.append((size, score, len(set(labels)) - 1))
+        print(f"Size={size}: clusters={len(set(labels))-1}, score={score:.3f}")
+
+# Выбрать лучший
+best = max(results, key=lambda x: x[1])</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 6. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Кластеры разной плотности</li>
+          <li>Произвольные формы</li>
+          <li>Много шума и выбросов</li>
+          <li>Неизвестное число кластеров</li>
+          <li>Нужна иерархия</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень большие данные (&gt;1M)</li>
+          <li>Высокая размерность (&gt;50)</li>
+          <li>Все точки в кластере (нет шума)</li>
+          <li>Нужна очень быстрая работа</li>
+        </ul>
+      </div>
+    </div>  </div>
+
+  <div class="block">
+    <h2>🔷 7. Предобработка</h2>
+    <p>✅ <strong>Масштабирование</strong></p>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</code></pre>
+    <p>✅ <strong>Снижение размерности</strong>: UMAP или PCA для &gt;20 признаков</p>
+    <p>✅ <strong>Обработка выбросов не нужна</strong>: HDBSCAN сам их находит</p>  </div>
+
+  <div class="block">
+    <h2>🔷 8. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Все точки — шум</td><td>Уменьшить min_cluster_size, увеличить min_samples</td></tr>
+      <tr><td>Один большой кластер</td><td>Уменьшить min_cluster_size</td></tr>
+      <tr><td>Медленная работа</td><td>Approx nearest neighbors, PCA, подвыборка</td></tr>
+      <tr><td>Слишком много кластеров</td><td>Увеличить min_cluster_size, cluster_selection_epsilon</td></tr>
+    </table>  </div>
+
+  <div class="block">
+    <h2>🔷 9. Визуализация иерархии</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Condensed tree
+clusterer.condensed_tree_.plot(
+    select_clusters=True,
+    selection_palette=sns.color_palette('deep', 8)
+)
+plt.title('Condensed Tree')
+plt.show()
+
+# Single linkage tree (dendrogram)
+clusterer.single_linkage_tree_.plot()
+plt.title('Single Linkage Dendrogram')
+plt.show()
+
+# Minimum spanning tree
+clusterer.minimum_spanning_tree_.plot(
+    edge_cmap='viridis',
+    edge_alpha=0.6,
+    node_size=80
+)
+plt.title('Minimum Spanning Tree')
+plt.show()</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Установить hdbscan: pip install hdbscan</li>
+      <li>[ ] Масштабировать данные</li>
+      <li>[ ] Выбрать min_cluster_size (5-15)</li>
+      <li>[ ] Опционально: подобрать min_samples</li>
+      <li>[ ] Проверить число кластеров и шума</li>
+      <li>[ ] Визуализировать иерархию</li>
+      <li>[ ] Оценить stability scores</li>
+      <li>[ ] Сравнить с DBSCAN</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «HDBSCAN находит группы объектов, которые плотно расположены вместе, автоматически обрабатывая области с разной концентрацией данных. Метод сам определяет количество групп и исключает аномальные точки, не требуя настройки сложных параметров».
+    </blockquote>  </div>
+
+</div>
+</body>
+</html>
