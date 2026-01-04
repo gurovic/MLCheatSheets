@@ -121,6 +121,7 @@
 1. [SHAP значения](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/shap_cheatsheet.html)
 1. [LIME](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lime_cheatsheet.html)
 1. [Частичные зависимости (Partial Dependence Plots)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/partial_dependence_cheatsheet.html)
+1. [Explainable AI (XAI) - Полный обзор](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/explainable_ai_xai_cheatsheet.html)
 1. Surrogate models
 
 ### **16. Производственные аспекты**
@@ -333,10 +334,10 @@
 1. Feature stores
 
 ### **19. Фреймворки и библиотеки**
-1. PyTorch полный гайд
-1. TensorFlow/Keras полный гайд
+1. [PyTorch полный гайд](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pytorch_full_guide_cheatsheet.html)
+1. [TensorFlow/Keras полный гайд](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tensorflow_keras_full_guide_cheatsheet.html)
 1. JAX и Flax
-1. Hugging Face Transformers
+1. [Hugging Face Transformers](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hugging_face_transformers_cheatsheet.html)
 1. PyTorch Lightning
 1. FastAI
 
@@ -383,6 +384,7 @@
 ## III Разные темы машинного обучения
 
 ### **1. Обучение с подкреплением (Reinforcement Learning)**
+1. [Reinforcement Learning Basics (RL основы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/reinforcement_learning_basics_cheatsheet.html)
 1. Классическое RL (табличное, без нейросетей)
 1. Многорукие бандиты (Multi-armed bandits)
 1. Марковские процессы принятия решений
@@ -408,7 +410,7 @@
 1. Байесовские нейронные сети (отдельно от DL)
 
 ### **3. Ансамбли методов**
-1. Бэггинг (Bagging)
+1. [Бэггинг (Bagging)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bagging_cheatsheet.html)
 1. [Бустинг (Boosting) - классические версии (AdaBoost)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adaboost_cheatsheet.html)
 1. [Стекинг и Voting (Stacking, Voting)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/voting_stacking_cheatsheet.html)
 1. [Advanced Model Ensembling](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/advanced_ensembling_cheatsheet.html)
@@ -496,6 +498,7 @@
 
 ### **13. Онлайн обучение и streaming ML**
 1. [Online Learning (SGD, Perceptron, Concept Drift)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/online_learning_cheatsheet.html)
+1. [Incremental Learning (Инкрементное обучение)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/incremental_learning_cheatsheet.html)
 1. Concept drift detection
 1. Adaptive windowing
 1. Ensemble methods для streaming
@@ -571,6 +574,7 @@
 1. Теория решений
 
 ### **24. Промышленное ML и MLOps**
+1. [MLOps Best Practices](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mlops_best_practices_cheatsheet.html)
 1. [Мониторинг моделей и A/B тестирование](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_monitoring_ab_testing_cheatsheet.html)
 1. Модельные реестры
 1. Feature stores
@@ -585,7 +589,8 @@
 1. Computational social science
 
 ### **26. Этика, безопасность и приватность**
-1. Fairness в ML
+1. [Fairness в ML (Справедливость)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fairness_ml_cheatsheet.html)
+1. [Adversarial Attacks (Состязательные атаки)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adversarial_attacks_cheatsheet.html)
 1. Adversarial robustness (классические атаки)
 1. Differential privacy
 1. [Federated Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/federated_learning_cheatsheet.html)
