@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Оценка позы человека (Pose Estimation) Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🤸 Оценка позы человека (Pose Estimation)</h1>
+  <div class="subtitle">Практический фокус • Январь 2026</div>
+  
+  <div class="block">
+    <h2>🔷 1. Суть задачи</h2>
+    <ul>
+      <li><strong>Цель</strong>: найти ключевые точки тела человека на изображении</li>
+      <li><strong>Keypoints</strong>: нос, глаза, плечи, локти, запястья, бедра, колени, лодыжки</li>
+      <li><strong>Применение</strong>: спорт, AR, медицина, анимация</li>
+      <li><strong>2D vs 3D</strong>: 2D — координаты на изображении, 3D — в пространстве</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. OpenPose</h2>
+    <pre><code># OpenPose — популярная библиотека
+# Требует отдельной установки
+
+import cv2
+import numpy as np
+
+# Load model
+net = cv2.dnn.readNetFromCaffe('pose_deploy.prototxt',
+                               'pose_iter.caffemodel')
+
+# Read image
+img = cv2.imread('person.jpg')
+H, W = img.shape[:2]
+
+# Prepare input
+blob = cv2.dnn.blobFromImage(img, 1.0/255, (368, 368),
+                             (0, 0, 0), swapRB=False, crop=False)
+
+net.setInput(blob)
+output = net.forward()
+
+# Extract keypoints
+keypoints = []
+for i in range(18):  # 18 body parts
+    prob_map = output[0, i, :, :]
+    min_val, conf, min_loc, point = cv2.minMaxLoc(prob_map)
+    
+    x = int((W * point[0]) / output.shape[3])
+    y = int((H * point[1]) / output.shape[2])
+    
+    keypoints.append((x, y) if conf > 0.1 else None)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. MediaPipe Pose</h2>
+    <pre><code>import mediapipe as mp
+import cv2
+
+mp_pose = mp.solutions.pose
+mp_drawing = mp.solutions.drawing_utils
+
+pose = mp_pose.Pose(
+    min_detection_confidence=0.5,
+    min_tracking_confidence=0.5
+)
+
+# Process video or webcam
+cap = cv2.VideoCapture('video.mp4')
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+    
+    # Convert to RGB
+    image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    results = pose.process(image)
+    
+    # Draw landmarks
+    if results.pose_landmarks:
+        mp_drawing.draw_landmarks(
+            frame,
+            results.pose_landmarks,
+            mp_pose.POSE_CONNECTIONS
+        )
+    
+    cv2.imshow('Pose', frame)
+    if cv2.waitKey(5) & 0xFF == 27:
+        break
+
+cap.release()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Keypoints структура</h2>
+    <table>
+      <tr><th>ID</th><th>Точка</th><th>ID</th><th>Точка</th></tr>
+      <tr><td>0</td><td>Нос</td><td>9</td><td>Правое бедро</td></tr>
+      <tr><td>1</td><td>Шея</td><td>10</td><td>Правое колено</td></tr>
+      <tr><td>2</td><td>Правое плечо</td><td>11</td><td>Правая лодыжка</td></tr>
+      <tr><td>3</td><td>Правый локоть</td><td>12</td><td>Левое бедро</td></tr>
+      <tr><td>4</td><td>Правое запястье</td><td>13</td><td>Левое колено</td></tr>
+      <tr><td>5</td><td>Левое плечо</td><td>14</td><td>Левая лодыжка</td></tr>
+      <tr><td>6</td><td>Левый локоть</td><td>15</td><td>Правый глаз</td></tr>
+      <tr><td>7</td><td>Левое запястье</td><td>16</td><td>Левый глаз</td></tr>
+      <tr><td>8</td><td>Правый глаз</td><td>17</td><td>Правое ухо</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Вычисление углов</h2>
+    <pre><code>import numpy as np
+
+def calculate_angle(a, b, c):
+    """
+    Вычислить угол между тремя точками
+    b - вершина угла
+    """
+    a = np.array(a)  # First point
+    b = np.array(b)  # Mid point
+    c = np.array(c)  # End point
+    
+    radians = np.arctan2(c[1]-b[1], c[0]-b[0]) -               np.arctan2(a[1]-b[1], a[0]-b[0])
+    angle = np.abs(radians*180.0/np.pi)
+    
+    if angle > 180.0:
+        angle = 360-angle
+    
+    return angle
+
+# Пример: угол в локте
+shoulder = keypoints[2]
+elbow = keypoints[3]
+wrist = keypoints[4]
+
+elbow_angle = calculate_angle(shoulder, elbow, wrist)
+print(f"Elbow angle: {elbow_angle:.1f}°")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Multi-person Pose</h2>
+    <pre><code># OpenPose поддерживает multi-person из коробки
+# MediaPipe требует detection + tracking
+
+import mediapipe as mp
+
+# Multi-person approach: detect each person first
+mp_pose = mp.solutions.pose
+mp_detection = mp.solutions.person_detection
+
+detector = mp_detection.PersonDetection()
+pose = mp_pose.Pose()
+
+# Detect persons
+detections = detector.process(image)
+
+for detection in detections.detections:
+    # Crop person
+    bbox = detection.location_data.relative_bounding_box
+    x, y, w, h = bbox.xmin, bbox.ymin, bbox.width, bbox.height
+    
+    person_img = image[int(y*H):int((y+h)*H),
+                       int(x*W):int((x+w)*W)]
+    
+    # Estimate pose
+    results = pose.process(person_img)
+    # Draw landmarks...</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>�� 7. 3D Pose Estimation</h2>
+    <pre><code># MediaPipe поддерживает 3D landmarks
+pose_3d = mp_pose.Pose(model_complexity=2)
+
+results = pose_3d.process(image)
+
+if results.pose_world_landmarks:
+    # 3D coordinates в метрах
+    for landmark in results.pose_world_landmarks.landmark:
+        print(f"x: {landmark.x:.3f}, "
+              f"y: {landmark.y:.3f}, "
+              f"z: {landmark.z:.3f}")
+
+# Визуализация в 3D
+from mpl_toolkits.mplot3d import Axes3D
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+
+xs = [lm.x for lm in results.pose_world_landmarks.landmark]
+ys = [lm.y for lm in results.pose_world_landmarks.landmark]
+zs = [lm.z for lm in results.pose_world_landmarks.landmark]
+
+ax.scatter(xs, ys, zs)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Применения</h2>
+    <ul>
+      <li><strong>Fitness tracking</strong>: подсчет повторений, проверка формы</li>
+      <li><strong>Спортивная аналитика</strong>: анализ техники</li>
+      <li><strong>AR фильтры</strong>: наложение объектов на тело</li>
+      <li><strong>Анимация</strong>: motion capture для персонажей</li>
+      <li><strong>Медицина</strong>: реабилитация, анализ походки</li>
+      <li><strong>Безопасность</strong>: обнаружение падений</li>
+    </ul>
+    <pre><code># Пример: счетчик приседаний
+squat_count = 0
+stage = None
+
+while True:
+    # Get landmarks
+    hip_angle = calculate_angle(shoulder, hip, knee)
+    
+    if hip_angle > 160:
+        stage = "up"
+    if hip_angle < 90 and stage == "up":
+        stage = "down"
+        squat_count += 1
+        print(f"Squats: {squat_count}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Optimization</h2>
+    <pre><code># Оптимизация для real-time
+pose = mp_pose.Pose(
+    static_image_mode=False,  # Video mode
+    model_complexity=0,  # 0=Lite, 1=Full, 2=Heavy
+    smooth_landmarks=True,  # Temporal smoothing
+    min_detection_confidence=0.5,
+    min_tracking_confidence=0.5
+)
+
+# Resize для speed
+import cv2
+target_width = 640
+scale = target_width / frame.shape[1]
+frame_resized = cv2.resize(frame, None, fx=scale, fy=scale)
+
+# Process меньший frame
+results = pose.process(frame_resized)
+
+# Scale landmarks обратно
+if results.pose_landmarks:
+    for landmark in results.pose_landmarks.landmark:
+        landmark.x /= scale
+        landmark.y /= scale</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать библиотеку (MediaPipe, OpenPose)</li>
+      <li>[ ] Определить нужные keypoints</li>
+      <li>[ ] Настроить confidence thresholds</li>
+      <li>[ ] Реализовать angle calculation</li>
+      <li>[ ] Оптимизировать для real-time</li>
+      <li>[ ] Обработать missing keypoints</li>
+      <li>[ ] Добавить temporal smoothing</li>
+      <li>[ ] Визуализировать skeleton</li>
+      <li>[ ] Тестировать на разных позах</li>
+      <li>[ ] Обработать multi-person случаи</li>
+    </ul>
+    <blockquote>
+      «Pose estimation — это как найти "скелет" человека на фото. Мы определяем, где находятся суставы, и можем анализировать движения, позы, даже эмоции по языку тела».
+    </blockquote>
+  </div>
+
+
+</div>
+</body>
+</html>

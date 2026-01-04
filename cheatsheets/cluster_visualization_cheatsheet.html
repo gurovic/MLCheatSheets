@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Визуализация кластеров Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📊 Визуализация кластеров</h1>
+  <div class="subtitle">Практический фокус • Январь 2026</div>
+  
+  <div class="block">
+    <h2>🔷 1. Scatter Plot кластеров</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import seaborn as sns
+
+plt.figure(figsize=(10,6))
+scatter = plt.scatter(X[:,0], X[:,1], c=labels, 
+                     cmap='viridis', alpha=0.6)
+plt.scatter(centroids[:,0], centroids[:,1],
+           c='red', marker='X', s=200, 
+           edgecolors='black')
+plt.colorbar(scatter)
+plt.title('K-means Clustering')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. PCA для визуализации</h2>
+    <pre><code>from sklearn.decomposition import PCA
+
+# Для данных > 2D
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X)
+
+plt.scatter(X_pca[:,0], X_pca[:,1], c=labels, cmap='tab10')
+plt.title(f'PCA (explained var: {pca.explained_variance_ratio_.sum():.2%})')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. t-SNE визуализация</h2>
+    <pre><code>from sklearn.manifold import TSNE
+
+tsne = TSNE(n_components=2, random_state=42)
+X_tsne = tsne.fit_transform(X)
+
+plt.scatter(X_tsne[:,0], X_tsne[:,1], c=labels)
+plt.title('t-SNE Clustering Visualization')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Dendrogram для иерархической кластеризации</h2>
+    <pre><code>from scipy.cluster.hierarchy import dendrogram, linkage
+
+linkage_matrix = linkage(X, method='ward')
+
+plt.figure(figsize=(12, 6))
+dendrogram(linkage_matrix)
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('Sample index')
+plt.ylabel('Distance')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Silhouette Plot</h2>
+    <pre><code>from sklearn.metrics import silhouette_samples
+import numpy as np
+
+silhouette_vals = silhouette_samples(X, labels)
+
+y_lower = 0
+for i in range(n_clusters):
+    cluster_silhouette_vals = silhouette_vals[labels == i]
+    cluster_silhouette_vals.sort()
+    
+    size = cluster_silhouette_vals.shape[0]
+    y_upper = y_lower + size
+    
+    plt.fill_betweenx(np.arange(y_lower, y_upper),
+                      0, cluster_silhouette_vals,
+                      alpha=0.7)
+    y_lower = y_upper
+
+plt.axvline(x=silhouette_vals.mean(), color="red", linestyle="--")
+plt.title('Silhouette Plot')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. 3D кластеры</h2>
+    <pre><code>from mpl_toolkits.mplot3d import Axes3D
+
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+
+ax.scatter(X[:,0], X[:,1], X[:,2], c=labels, cmap='viridis')
+ax.set_title('3D Clustering')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Heatmap расстояний</h2>
+    <pre><code>from sklearn.metrics import pairwise_distances
+
+distances = pairwise_distances(X[:100])  # Subset for vis
+
+plt.figure(figsize=(10, 8))
+sns.heatmap(distances, cmap='viridis')
+plt.title('Pairwise Distances Heatmap')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Elbow Method визуализация</h2>
+    <pre><code>inertias = []
+K_range = range(1, 11)
+
+for k in K_range:
+    kmeans = KMeans(n_clusters=k)
+    kmeans.fit(X)
+    inertias.append(kmeans.inertia_)
+
+plt.plot(K_range, inertias, 'bx-')
+plt.xlabel('Number of clusters')
+plt.ylabel('Inertia')
+plt.title('Elbow Method')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Размеры кластеров</h2>
+    <pre><code>import pandas as pd
+
+cluster_sizes = pd.Series(labels).value_counts().sort_index()
+
+plt.bar(cluster_sizes.index, cluster_sizes.values)
+plt.xlabel('Cluster')
+plt.ylabel('Size')
+plt.title('Cluster Sizes')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Использовать PCA/t-SNE для высоких размерностей</li>
+      <li>[ ] Показать центроиды</li>
+      <li>[ ] Визуализировать Silhouette Score</li>
+      <li>[ ] Проверить размеры кластеров</li>
+      <li>[ ] Использовать разные цветовые схемы</li>
+      <li>[ ] Добавить легенду и подписи</li>
+      <li>[ ] Сохранить в высоком разрешении</li>
+      <li>[ ] Интерактивные графики (Plotly)</li>
+    </ul>
+  </div>
+
+
+</div>
+</body>
+</html>

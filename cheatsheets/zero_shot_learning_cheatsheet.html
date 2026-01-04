@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Zero-shot Learning Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🎯 Zero-shot Learning</h1>
+  <div class="subtitle">Практический фокус • Январь 2026</div>
+  
+  <div class="block">
+    <h2>🔷 1. Суть концепции</h2>
+    <ul>
+      <li><strong>Задача</strong>: классификация объектов, которые модель никогда не видела</li>
+      <li><strong>Пример</strong>: обучили на кошках/собаках, распознаем зебр</li>
+      <li><strong>Подход</strong>: используем семантические представления классов</li>
+      <li><strong>Применение</strong>: новые категории без переобучения</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. CLIP модель</h2>
+    <pre><code>import torch
+import clip
+from PIL import Image
+
+# Load model
+device = "cuda" if torch.cuda.is_available() else "cpu"
+model, preprocess = clip.load("ViT-B/32", device=device)
+
+# Load image
+image = preprocess(Image.open("photo.jpg")).unsqueeze(0).to(device)
+
+# Define possible classes (zero-shot!)
+text = clip.tokenize([
+    "a photo of a cat",
+    "a photo of a dog",
+    "a photo of a zebra",  # Never seen before!
+    "a photo of an airplane"
+]).to(device)
+
+# Compute features
+with torch.no_grad():
+    image_features = model.encode_image(image)
+    text_features = model.encode_text(text)
+    
+    # Cosine similarity
+    similarity = (100.0 * image_features @ text_features.T).softmax(dim=-1)
+    values, indices = similarity[0].topk(3)
+
+print("Predictions:")
+for value, index in zip(values, indices):
+    print(f"  {text[index]}: {100 * value.item():.2f}%")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Attribute-based Zero-shot</h2>
+    <pre><code># Идея: описать классы через атрибуты
+# Cat: [has_fur, has_tail, small, carnivore]
+# Zebra: [has_fur, has_tail, large, herbivore, striped]
+
+import numpy as np
+
+# Class-attribute matrix
+attributes = {
+    'cat': [1, 1, 1, 1, 0, 0],      # fur, tail, small, carnivore, large, striped
+    'dog': [1, 1, 1, 1, 0, 0],
+    'zebra': [1, 1, 0, 0, 1, 1],    # unseen class
+    'elephant': [0, 1, 0, 0, 1, 0]
+}
+
+# Model predicts attributes from image
+predicted_attributes = attribute_predictor.predict(image)
+# [0.9, 0.8, 0.1, 0.2, 0.9, 0.95]
+
+# Find closest class
+similarities = {}
+for class_name, class_attrs in attributes.items():
+    sim = cosine_similarity([predicted_attributes], [class_attrs])[0][0]
+    similarities[class_name] = sim
+
+best_class = max(similarities, key=similarities.get)
+print(f"Predicted class: {best_class}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Semantic Embeddings</h2>
+    <pre><code>from sentence_transformers import SentenceTransformer
+
+# Encode class names
+model = SentenceTransformer('all-MiniLM-L6-v2')
+
+class_names = ['cat', 'dog', 'zebra', 'elephant']
+class_embeddings = model.encode(class_names)
+
+# Encode image features (from ResNet, etc.)
+image_features = resnet_model.predict(image)
+
+# Project to common space
+from sklearn.metrics.pairwise import cosine_similarity
+
+similarities = cosine_similarity(
+    image_features.reshape(1, -1),
+    class_embeddings
+)
+
+predicted_class = class_names[similarities.argmax()]
+print(f"Zero-shot prediction: {predicted_class}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Word2Vec для ZSL</h2>
+    <pre><code>import gensim.downloader as api
+
+# Load pretrained word vectors
+word_vectors = api.load('word2vec-google-news-300')
+
+# Get class vectors
+seen_classes = ['cat', 'dog']
+unseen_classes = ['zebra', 'tiger']
+
+class_vectors = {
+    cls: word_vectors[cls] 
+    for cls in seen_classes + unseen_classes
+}
+
+# Visual model maps image to semantic space
+visual_features = visual_model.predict(image)
+
+# Find nearest class in semantic space
+min_dist = float('inf')
+predicted_class = None
+
+for class_name, class_vec in class_vectors.items():
+    dist = np.linalg.norm(visual_features - class_vec)
+    if dist < min_dist:
+        min_dist = dist
+        predicted_class = class_name
+
+print(f"Predicted: {predicted_class}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Generative ZSL</h2>
+    <pre><code># Генеративный подход: синтезировать примеры unseen классов
+
+from sklearn.svm import SVC
+
+# 1. Train generator: semantic → visual features
+# Generator learns from seen classes
+generator = train_generator(seen_class_embeddings, seen_visual_features)
+
+# 2. Generate synthetic samples for unseen classes
+unseen_embeddings = get_word_embeddings(unseen_classes)
+synthetic_features = generator.generate(unseen_embeddings)
+
+# 3. Train classifier on seen + synthetic unseen
+X_train = np.vstack([seen_features, synthetic_features])
+y_train = seen_labels + unseen_labels
+
+classifier = SVC()
+classifier.fit(X_train, y_train)
+
+# 4. Classify new image
+prediction = classifier.predict(new_image_features)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Few-shot vs Zero-shot</h2>
+    <table>
+      <tr><th>Метод</th><th>Примеры</th><th>Сложность</th></tr>
+      <tr><td>Zero-shot</td><td>0 примеров</td><td>Высокая</td></tr>
+      <tr><td>One-shot</td><td>1 пример</td><td>Средняя</td></tr>
+      <tr><td>Few-shot</td><td>2-10 примеров</td><td>Низкая</td></tr>
+      <tr><td>Full</td><td>1000+ примеров</td><td>Базовая</td></tr>
+    </table>
+    <pre><code># Few-shot может улучшить zero-shot
+# Дать модели 1-3 примера нового класса
+
+# Zero-shot baseline
+clip_model.classify(image, ["cat", "dog", "zebra"])
+
+# Few-shot improvement  
+examples = load_few_examples("zebra", n=3)
+clip_model.add_examples(examples)
+clip_model.classify(image, ["cat", "dog", "zebra"])
+# Accuracy improves!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Evaluation Metrics</h2>
+    <pre><code># Специальные метрики для ZSL
+
+# 1. Conventional ZSL: только unseen классы
+unseen_accuracy = accuracy_score(y_true_unseen, y_pred_unseen)
+
+# 2. Generalized ZSL: seen + unseen классы
+seen_accuracy = accuracy_score(y_true_seen, y_pred_seen)
+unseen_accuracy = accuracy_score(y_true_unseen, y_pred_unseen)
+
+# Harmonic mean (H-mean)
+H = 2 * (seen_accuracy * unseen_accuracy) /     (seen_accuracy + unseen_accuracy)
+
+print(f"Seen accuracy: {seen_accuracy:.3f}")
+print(f"Unseen accuracy: {unseen_accuracy:.3f}")
+print(f"H-mean: {H:.3f}")
+
+# Area Under Seen-Unseen Curve (AUSUC)
+# Баланс между seen и unseen performance</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Практические применения</h2>
+    <ul>
+      <li><strong>E-commerce</strong>: классификация новых товаров</li>
+      <li><strong>Медицина</strong>: диагностика редких болезней</li>
+      <li><strong>Wildlife</strong>: распознавание редких видов</li>
+      <li><strong>Document classification</strong>: новые категории документов</li>
+      <li><strong>Fashion</strong>: новые стили без переобучения</li>
+    </ul>
+    <pre><code># Пример: новый товар в магазине
+new_product_image = load_image("new_product.jpg")
+possible_categories = [
+    "sports equipment",
+    "kitchen appliance",
+    "electronic device",
+    "furniture",
+    "toy"
+]
+
+# Zero-shot classification
+category = clip_classify(new_product_image, possible_categories)
+print(f"Category: {category}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать модель (CLIP, semantic embeddings)</li>
+      <li>[ ] Определить seen/unseen split</li>
+      <li>[ ] Подготовить semantic descriptions</li>
+      <li>[ ] Обучить на seen классах</li>
+      <li>[ ] Тестировать на unseen классах</li>
+      <li>[ ] Измерить seen/unseen accuracy</li>
+      <li>[ ] Вычислить H-mean для GZSL</li>
+      <li>[ ] Экспериментировать с prompts</li>
+      <li>[ ] Рассмотреть few-shot для улучшения</li>
+      <li>[ ] Валидировать на новых данных</li>
+    </ul>
+    <blockquote>
+      «Zero-shot learning — это как объяснить ребенку, что такое "зебра", не показывая фото: "Это как лошадь, но с черно-белыми полосами". Модель использует знания о похожих объектах для распознавания нового».
+    </blockquote>
+  </div>
+
+
+</div>
+</body>
+</html>

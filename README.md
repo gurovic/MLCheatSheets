@@ -108,13 +108,13 @@
 1. [Создание полиномиальных признаков и взаимодействия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_interaction_cheatsheet.html)
 1. [Биннинг (дискретизация)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/binning_discretization_cheatsheet.html)
 1. [Target Encoding](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/target_encoding_cheatsheet.html)
-1. Дата-специфичные признаки (временные, текстовые)
+1. [Дата-специфичные признаки (временные, текстовые)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/date_time_features_cheatsheet.html)
 
 ### **14. Работа с несбалансированными данными**
 1. [Методы семплирования (SMOTE и др.)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/smote_imbalanced_cheatsheet.html)
 1. [Cost-Sensitive Learning и веса классов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cost_sensitive_learning_cheatsheet.html)
-1. Метрики для несбалансированных данных
-1. Алгоритмические подходы
+1. [Метрики для несбалансированных данных](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/imbalanced_metrics_cheatsheet.html)
+1. [Алгоритмические подходы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/imbalanced_algorithms_cheatsheet.html)
 
 ### **15. Интерпретация моделей**
 1. [Важность признаков (Feature Importance)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_importance_cheatsheet.html)
@@ -122,7 +122,7 @@
 1. [LIME](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lime_cheatsheet.html)
 1. [Частичные зависимости (Partial Dependence Plots)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/partial_dependence_cheatsheet.html)
 1. [Explainable AI (XAI) - Полный обзор](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/explainable_ai_xai_cheatsheet.html)
-1. Surrogate models
+1. [Surrogate models](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/surrogate_models_cheatsheet.html)
 
 ### **16. Производственные аспекты**
 1. [Production ML Best Practices](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/production_ml_best_practices_cheatsheet.html)
@@ -139,9 +139,9 @@
 
 ### **18. Визуализация в ML**
 1. [Визуализация данных](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/data_visualization_ml_cheatsheet.html)
-1. Визуализация кластеров
-1. Визуализация деревьев
-1. Визуализация метрик
+1. [Визуализация кластеров](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cluster_visualization_cheatsheet.html)
+1. [Визуализация деревьев](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tree_visualization_cheatsheet.html)
+1. [Визуализация метрик](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/metrics_visualization_cheatsheet.html)
 
 ### **19. Основы теории**
 1. [Смещение-дисперсия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bias_variance_cheatsheet.html)
@@ -242,13 +242,13 @@
 1. [Задачи NLP (NER, классификация, суммаризация)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/nlp_tasks_ner_classification_summarization_cheatsheet.html)
 
 ### **8. Компьютерное зрение (Computer Vision)**
-1. Классификация изображений
+1. [Классификация изображений](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/image_classification_dl_cheatsheet.html)
 1. [Детекция объектов (YOLO, SSD, Faster R-CNN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/yolo_cheatsheet.html)
 1. [Детекция объектов - Faster R-CNN, SSD, RetinaNet, EfficientDet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/object_detection_cheatsheet.html)
 1. [Сегментация изображений (U-Net, DeepLab, Mask R-CNN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/image_segmentation_cheatsheet.html)
 1. [Детекция ключевых точек и оценка позы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/keypoint_detection_pose_estimation_cheatsheet.html)
 1. Слежение за объектами
-1. Оценка позы человека
+1. [Оценка позы человека](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pose_estimation_cheatsheet.html)
 1. 3D Computer Vision
 
 ### **9. Обработка аудио и речь**
@@ -272,7 +272,7 @@
 1. [Self-Supervised Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/self_supervised_learning_cheatsheet.html)
 1. [Contrastive Learning (SimCLR, MoCo, BYOL)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/contrastive_learning_cheatsheet.html)
 1. [Curriculum Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/curriculum_learning_cheatsheet.html)
-1. Zero-shot learning
+1. [Zero-shot learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/zero_shot_learning_cheatsheet.html)
 1. Transfer learning
 1. Meta-learning (MAML, Prototypical Networks)
 1. Domain adaptation
