@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Transfer Learning для CNN (Pre-trained модели и fine-tuning) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 6px 0;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border: 1px solid #e0e7ff;
+    }
+
+    th {
+      background-color: #1a5fb4;
+      color: white;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Transfer Learning для CNN (Pre-trained модели и fine-tuning) Cheatsheet</h1>
+  <div class="subtitle">Классические трансферного обученияые сети • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. LeNet-5 (1998)</h2>
+    <p><strong>Пионер CNN</strong>: одна из первых трансферного обученияых сетей, разработана Yann LeCun</p>
+    <ul>
+      <li><strong>Архитектура</strong>: Conv(6) → Pool → Conv(16) → Pool → FC(120) → FC(84) → FC(10)</li>
+      <li><strong>Применение</strong>: распознавание рукописных цифр MNIST</li>
+      <li><strong>Особенности</strong>: использует tanh активацию, размер входа 32×32</li>
+      <li><strong>Параметры</strong>: ~60K параметров</li>
+    </ul>
+    <pre><code>import torch.nn as nn
+
+class LeNet5(nn.Module):
+    def __init__(self):
+        super(LeNet5, self).__init__()
+        self.conv1 = nn.Conv2d(1, 6, 5)  # 32x32 -> 28x28
+        self.pool = nn.AvgPool2d(2, 2)   # 28x28 -> 14x14
+        self.conv2 = nn.Conv2d(6, 16, 5) # 14x14 -> 10x10
+        # После pool: 10x10 -> 5x5
+        self.fc1 = nn.Linear(16 * 5 * 5, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
+    
+    def forward(self, x):
+        x = self.pool(torch.tanh(self.conv1(x)))
+        x = self.pool(torch.tanh(self.conv2(x)))
+        x = x.view(-1, 16 * 5 * 5)
+        x = torch.tanh(self.fc1(x))
+        x = torch.tanh(self.fc2(x))
+        x = self.fc3(x)
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. AlexNet (2012)</h2>
+    <p><strong>Революция ImageNet</strong>: победитель ILSVRC 2012, снизил ошибку до 16.4%</p>
+    <ul>
+      <li><strong>Архитектура</strong>: 5 conv + 3 FC слоя, всего ~60M параметров</li>
+      <li><strong>Инновации</strong>:
+        <ul>
+          <li>ReLU активация (вместо tanh/sigmoid)</li>
+          <li>Dropout для регуляризации</li>
+          <li>Data augmentation (перевороты, обрезки)</li>
+          <li>Local Response Normalization (LRN)</li>
+          <li>Обучение на GPU</li>
+        </ul>
+      </li>
+      <li><strong>Вход</strong>: 224×224×3 RGB изображения</li>
+    </ul>
+    <pre><code>class AlexNet(nn.Module):
+    def __init__(self, num_classes=1000):
+        super(AlexNet, self).__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=11, stride=4, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            
+            nn.Conv2d(64, 192, kernel_size=5, padding=2),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+            
+            nn.Conv2d(192, 384, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            
+            nn.Conv2d(384, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            
+            nn.Conv2d(256, 256, kernel_size=3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(kernel_size=3, stride=2),
+        )
+        self.classifier = nn.Sequential(
+            nn.Dropout(0.5),
+            nn.Linear(256 * 6 * 6, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.5),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Linear(4096, num_classes),
+        )
+    
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), 256 * 6 * 6)
+        x = self.classifier(x)
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. VGG (2014)</h2>
+    <p><strong>Глубина и простота</strong>: очень глубокие сети с простой архитектурой</p>
+    <ul>
+      <li><strong>Варианты</strong>: VGG-16 (16 слоёв), VGG-19 (19 слоёв)</li>
+      <li><strong>Принцип</strong>: только 3×3 свёртки, удвоение числа фильтров после каждого pooling</li>
+      <li><strong>Параметры</strong>: VGG-16 ~138M, VGG-19 ~144M</li>
+      <li><strong>Особенности</strong>: несколько 3×3 свёрток дают такое же receptive field как одна большая</li>
+    </ul>
+    <pre><code># VGG-16 архитектура
+class VGG16(nn.Module):
+    def __init__(self, num_classes=1000):
+        super(VGG16, self).__init__()
+        self.features = nn.Sequential(
+            # Block 1
+            nn.Conv2d(3, 64, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(64, 64, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, 2),
+            
+            # Block 2
+            nn.Conv2d(64, 128, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(128, 128, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, 2),
+            
+            # Block 3
+            nn.Conv2d(128, 256, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(256, 256, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, 2),
+            
+            # Block 4
+            nn.Conv2d(256, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, 2),
+            
+            # Block 5
+            nn.Conv2d(512, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 512, 3, padding=1),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(2, 2),
+        )
+        self.classifier = nn.Sequential(
+            nn.Linear(512 * 7 * 7, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.5),
+            nn.Linear(4096, 4096),
+            nn.ReLU(inplace=True),
+            nn.Dropout(0.5),
+            nn.Linear(4096, num_classes),
+        )</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Сравнение архитектур</h2>
+    <table>
+      <tr><th>Архитектура</th><th>Год</th><th>Слои</th><th>Параметры</th><th>Top-5 Error (ImageNet)</th></tr>
+      <tr><td>LeNet-5</td><td>1998</td><td>7</td><td>60K</td><td>N/A (MNIST)</td></tr>
+      <tr><td>AlexNet</td><td>2012</td><td>8</td><td>60M</td><td>16.4%</td></tr>
+      <tr><td>VGG-16</td><td>2014</td><td>16</td><td>138M</td><td>7.3%</td></tr>
+      <tr><td>VGG-19</td><td>2014</td><td>19</td><td>144M</td><td>7.3%</td></tr>
+      <tr><td>GoogLeNet</td><td>2014</td><td>22</td><td>6.8M</td><td>6.7%</td></tr>
+      <tr><td>ResNet-50</td><td>2015</td><td>50</td><td>25.5M</td><td>3.6%</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. GoogLeNet / Inception (2014)</h2>
+    <p><strong>Inception модули</strong>: параллельные свёртки разных размеров</p>
+    <ul>
+      <li><strong>Идея</strong>: вместо выбора размера свёртки, применить все одновременно</li>
+      <li><strong>Модуль Inception</strong>: 1×1, 3×3, 5×5 свёртки + 3×3 pooling параллельно</li>
+      <li><strong>1×1 свёртки</strong>: снижение размерности перед дорогими операциями</li>
+      <li><strong>Auxiliary classifiers</strong>: дополнительные выходы для борьбы с vanishing gradient</li>
+    </ul>
+    <pre><code>class InceptionModule(nn.Module):
+    def __init__(self, in_channels, out_1x1, red_3x3, out_3x3, 
+                 red_5x5, out_5x5, out_pool):
+        super(InceptionModule, self).__init__()
+        
+        # 1x1 conv
+        self.branch1 = nn.Sequential(
+            nn.Conv2d(in_channels, out_1x1, 1),
+            nn.ReLU(inplace=True)
+        )
+        
+        # 1x1 -> 3x3 conv
+        self.branch2 = nn.Sequential(
+            nn.Conv2d(in_channels, red_3x3, 1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(red_3x3, out_3x3, 3, padding=1),
+            nn.ReLU(inplace=True)
+        )
+        
+        # 1x1 -> 5x5 conv
+        self.branch3 = nn.Sequential(
+            nn.Conv2d(in_channels, red_5x5, 1),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(red_5x5, out_5x5, 5, padding=2),
+            nn.ReLU(inplace=True)
+        )
+        
+        # 3x3 pool -> 1x1 conv
+        self.branch4 = nn.Sequential(
+            nn.MaxPool2d(3, stride=1, padding=1),
+            nn.Conv2d(in_channels, out_pool, 1),
+            nn.ReLU(inplace=True)
+        )
+    
+    def forward(self, x):
+        return torch.cat([
+            self.branch1(x),
+            self.branch2(x),
+            self.branch3(x),
+            self.branch4(x)
+        ], dim=1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Использование предобученных моделей</h2>
+    <pre><code># PyTorch
+import torchvision.models as models
+
+# Загрузка предобученных моделей
+alexnet = models.alexnet(pretrained=True)
+vgg16 = models.vgg16(pretrained=True)
+vgg19 = models.vgg19(pretrained=True)
+
+# Перевод в режим inference
+alexnet.eval()
+
+# Предсказание
+import torch
+from PIL import Image
+from torchvision import transforms
+
+# Предобработка изображения
+preprocess = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    )
+])
+
+img = Image.open('image.jpg')
+img_tensor = preprocess(img).unsqueeze(0)
+
+with torch.no_grad():
+    output = alexnet(img_tensor)
+    probabilities = torch.nn.functional.softmax(output[0], dim=0)
+    
+# Top-5 предсказания
+top5_prob, top5_catid = torch.topk(probabilities, 5)
+for i in range(5):
+    print(f"{top5_catid[i]}: {top5_prob[i].item():.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Fine-tuning для своих данных</h2>
+    <pre><code># Заморозка всех слоёв кроме последнего
+vgg16 = models.vgg16(pretrained=True)
+
+# Заморозить параметры
+for param in vgg16.parameters():
+    param.requires_grad = False
+
+# Заменить последний слой
+num_features = vgg16.classifier[6].in_features
+vgg16.classifier[6] = nn.Linear(num_features, 10)  # 10 классов
+
+# Обучение
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(vgg16.classifier[6].parameters(), 
+                             lr=0.001)
+
+# Обучение только последнего слоя
+for epoch in range(10):
+    for inputs, labels in train_loader:
+        optimizer.zero_grad()
+        outputs = vgg16(inputs)
+        loss = criterion(outputs, labels)
+        loss.backward()
+        optimizer.step()
+
+# Разморозка всех слоёв для fine-tuning
+for param in vgg16.parameters():
+    param.requires_grad = True
+
+optimizer = torch.optim.Adam(vgg16.parameters(), lr=0.0001)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Feature extraction</h2>
+    <pre><code># Использование CNN как feature extractor
+vgg16 = models.vgg16(pretrained=True)
+vgg16.eval()
+
+# Удаление classifier
+feature_extractor = nn.Sequential(*list(vgg16.children())[:-1])
+
+# Извлечение признаков
+features_list = []
+with torch.no_grad():
+    for inputs, _ in data_loader:
+        features = feature_extractor(inputs)
+        features = features.view(features.size(0), -1)
+        features_list.append(features.cpu().numpy())
+
+features = np.vstack(features_list)
+print(f"Размерность признаков: {features.shape}")
+
+# Использование признаков для классификации
+from sklearn.svm import SVC
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    features, labels, test_size=0.2, random_state=42
+)
+
+svm = SVC(kernel='rbf')
+svm.fit(X_train, y_train)
+accuracy = svm.score(X_test, y_test)
+print(f"Accuracy: {accuracy:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Keras/TensorFlow реализация</h2>
+    <pre><code>import tensorflow as tf
+from tensorflow.keras.applications import VGG16, AlexNet
+from tensorflow.keras import layers, models
+
+# Загрузка предобученной модели
+base_model = VGG16(
+    weights='imagenet',
+    include_top=False,
+    input_shape=(224, 224, 3)
+)
+
+# Создание своей модели
+model = models.Sequential([
+    base_model,
+    layers.GlobalAveragePooling2D(),
+    layers.Dense(256, activation='relu'),
+    layers.Dropout(0.5),
+    layers.Dense(10, activation='softmax')
+])
+
+# Заморозка базовой модели
+base_model.trainable = False
+
+# Компиляция
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Обучение
+history = model.fit(
+    train_dataset,
+    epochs=10,
+    validation_data=val_dataset
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Эволюция идей</h2>
+    <ul>
+      <li><strong>LeNet → AlexNet</strong>: ReLU, dropout, GPU, data augmentation</li>
+      <li><strong>AlexNet → VGG</strong>: глубже, проще (только 3×3), систематичность</li>
+      <li><strong>VGG → GoogLeNet</strong>: параллельные свёртки, 1×1 для снижения вычислений</li>
+      <li><strong>GoogLeNet → ResNet</strong>: skip connections, сверхглубокие сети (152+ слоя)</li>
+      <li><strong>Далее</strong>: DenseNet, EfficientNet, Vision Transformers</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать каждую архитектуру</h2>
+    <table>
+      <tr><th>Архитектура</th><th>Когда использовать</th></tr>
+      <tr><td>LeNet</td><td>Простые задачи, малые изображения (28×28)</td></tr>
+      <tr><td>AlexNet</td><td>Базовый transfer learning, обучающие примеры</td></tr>
+      <tr><td>VGG</td><td>Feature extraction, визуализация, style transfer</td></tr>
+      <tr><td>GoogLeNet</td><td>Ограниченная память, нужна эффективность</td></tr>
+      <tr><td>ResNet</td><td>Современный выбор, высокая точность</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Оптимизация памяти и скорости</h2>
+    <pre><code># Mixed precision training (PyTorch)
+from torch.cuda.amp import autocast, GradScaler
+
+scaler = GradScaler()
+
+for epoch in range(epochs):
+    for inputs, labels in train_loader:
+        optimizer.zero_grad()
+        
+        # Forward pass с autocast
+        with autocast():
+            outputs = model(inputs)
+            loss = criterion(outputs, labels)
+        
+        # Backward pass
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()
+
+# Gradient checkpointing для экономии памяти
+import torch.utils.checkpoint as checkpoint
+
+class VGGWithCheckpointing(nn.Module):
+    def forward(self, x):
+        x = checkpoint.checkpoint(self.block1, x)
+        x = checkpoint.checkpoint(self.block2, x)
+        # ...
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист использования</h2>
+    <ol>
+      <li>✅ Выбрать архитектуру под задачу и ресурсы</li>
+      <li>✅ Загрузить предобученную модель (ImageNet)</li>
+      <li>✅ Предобработать данные (resize, normalize)</li>
+      <li>✅ Заморозить слои для fine-tuning</li>
+      <li>✅ Заменить последний слой под свои классы</li>
+      <li>✅ Обучить только новые слои</li>
+      <li>✅ Разморозить и дообучить с малым lr</li>
+      <li>✅ Использовать data augmentation</li>
+      <li>✅ Мониторить overfitting</li>
+      <li>✅ Оценить на тестовых данных</li>
+    </ol>
+  </div>
+
+</div>
+
+</body>
+</html>

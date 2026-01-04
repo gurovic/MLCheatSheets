@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Предобработка данных (пропуски и кодирование) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🧹 Предобработка данных: пропуски и кодирование Cheatsheet</h1>
+  <div class="subtitle">Полное руководство • Практические методы • Best practices<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Обзор</h2>
+    <p><strong>Предобработка данных</strong> — критический этап pipeline ML, включающий обработку пропущенных значений и преобразование категориальных переменных.</p>
+    <ul>
+      <li><strong>Цель</strong>: подготовить данные для ML алгоритмов</li>
+      <li><strong>Важность</strong>: 80% времени в ML проектах</li>
+      <li><strong>Влияние</strong>: может улучшить точность на 10-30%</li>
+      <li><strong>Ключевые задачи</strong>:
+        <ul>
+          <li>Обработка пропусков (missing values)</li>
+          <li>Кодирование категориальных признаков</li>
+          <li>Масштабирование и нормализация</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы пропущенных значений</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Пример</th></tr>
+      <tr>
+        <td><strong>MCAR</strong><br>(Missing Completely At Random)</td>
+        <td>Пропуски полностью случайны, не зависят от данных</td>
+        <td>Случайные сбои оборудования</td>
+      </tr>
+      <tr>
+        <td><strong>MAR</strong><br>(Missing At Random)</td>
+        <td>Пропуски зависят от наблюдаемых данных</td>
+        <td>Молодые люди реже указывают доход</td>
+      </tr>
+      <tr>
+        <td><strong>MNAR</strong><br>(Missing Not At Random)</td>
+        <td>Пропуски зависят от самого пропущенного значения</td>
+        <td>Люди с низким доходом не указывают его</td>
+      </tr>
+    </table>
+    <blockquote>💡 Понимание типа пропусков критично для выбора метода обработки!</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Обнаружение пропусков</h2>
+    <pre><code>import pandas as pd
+import numpy as np
+
+# Проверка пропусков
+df.isnull().sum()
+df.isna().sum()  # то же самое
+
+# Процент пропусков
+missing_pct = (df.isnull().sum() / len(df)) * 100
+print(missing_pct.sort_values(ascending=False))
+
+# Визуализация пропусков
+import missingno as msno
+msno.matrix(df)
+msno.heatmap(df)  # корреляция пропусков
+
+# Паттерны пропусков
+msno.dendrogram(df)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Удаление пропусков</h2>
+    <p><strong>Когда использовать</strong>: пропусков < 5%, данных достаточно</p>
+    <pre><code># Удалить строки с пропусками
+df_clean = df.dropna()
+
+# Удалить строки, где все NaN
+df_clean = df.dropna(how='all')
+
+# Удалить строки с NaN в конкретных столбцах
+df_clean = df.dropna(subset=['age', 'income'])
+
+# Удалить столбцы с > 50% пропусков
+threshold = 0.5
+df_clean = df.dropna(
+    thresh=len(df) * threshold, 
+    axis=1
+)</code></pre>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Когда удалять</h3>
+        <ul>
+          <li>Пропусков очень мало (< 5%)</li>
+          <li>MCAR тип пропусков</li>
+          <li>Большой датасет</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Когда не удалять</h3>
+        <ul>
+          <li>Много пропусков (> 10%)</li>
+          <li>Малый датасет</li>
+          <li>MNAR или MAR типы</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Простое заполнение (Imputation)</h2>
+    <p><strong>Базовые методы</strong> заполнения константами и статистиками:</p>
+    <pre><code>from sklearn.impute import SimpleImputer
+
+# Заполнение средним (для числовых)
+imputer = SimpleImputer(strategy='mean')
+df['age'] = imputer.fit_transform(df[['age']])
+
+# Заполнение медианой (устойчиво к выбросам)
+imputer = SimpleImputer(strategy='median')
+df['income'] = imputer.fit_transform(df[['income']])
+
+# Заполнение модой (для категориальных)
+imputer = SimpleImputer(strategy='most_frequent')
+df['category'] = imputer.fit_transform(df[['category']])
+
+# Заполнение константой
+imputer = SimpleImputer(strategy='constant', fill_value=0)
+df['score'] = imputer.fit_transform(df[['score']])
+
+# Pandas методы
+df['age'].fillna(df['age'].mean(), inplace=True)
+df['city'].fillna('Unknown', inplace=True)
+
+# Forward fill (использовать предыдущее значение)
+df['price'].fillna(method='ffill', inplace=True)
+
+# Backward fill
+df['price'].fillna(method='bfill', inplace=True)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Продвинутое заполнение</h2>
+    <p><strong>KNN Imputation</strong>: использует K ближайших соседей</p>
+    <pre><code>from sklearn.impute import KNNImputer
+
+# KNN заполнение
+imputer = KNNImputer(n_neighbors=5)
+df_filled = pd.DataFrame(
+    imputer.fit_transform(df),
+    columns=df.columns
+)</code></pre>
+    
+    <p><strong>Итеративное заполнение</strong> (MICE):</p>
+    <pre><code>from sklearn.experimental import enable_iterative_imputer
+from sklearn.impute import IterativeImputer
+
+# Итеративное заполнение
+imputer = IterativeImputer(
+    max_iter=10,
+    random_state=42
+)
+df_filled = pd.DataFrame(
+    imputer.fit_transform(df),
+    columns=df.columns
+)</code></pre>
+
+    <p><strong>Заполнение на основе модели</strong>:</p>
+    <pre><code>from sklearn.ensemble import RandomForestRegressor
+
+# Обучить модель для предсказания пропусков
+def model_imputation(df, target_col):
+    train = df[df[target_col].notna()]
+    test = df[df[target_col].isna()]
+    
+    features = [c for c in df.columns if c != target_col]
+    
+    model = RandomForestRegressor()
+    model.fit(train[features], train[target_col])
+    
+    df.loc[df[target_col].isna(), target_col] = \
+        model.predict(test[features])
+    
+    return df</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Индикаторы пропусков</h2>
+    <p>Создание дополнительных признаков для отслеживания пропусков:</p>
+    <pre><code># Создать бинарный признак для пропусков
+df['age_was_missing'] = df['age'].isnull().astype(int)
+
+# Затем заполнить пропуски
+df['age'].fillna(df['age'].median(), inplace=True)
+
+# Sklearn метод
+from sklearn.impute import MissingIndicator
+
+indicator = MissingIndicator()
+missing_mask = indicator.fit_transform(df)
+
+# Добавить все индикаторы
+for i, col in enumerate(df.columns):
+    if indicator.features_[i]:
+        df[f'{col}_missing'] = missing_mask[:, i]</code></pre>
+    <blockquote>💡 Индикаторы пропусков могут содержать важную информацию для модели!</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Кодирование категориальных признаков</h2>
+    <p><strong>Типы категориальных переменных</strong>:</p>
+    <ul>
+      <li><strong>Номинальные</strong>: нет порядка (цвет, город)</li>
+      <li><strong>Порядковые</strong>: есть порядок (образование, рейтинг)</li>
+    </ul>
+    
+    <p><strong>Label Encoding</strong> — простое числовое кодирование:</p>
+    <pre><code>from sklearn.preprocessing import LabelEncoder
+
+# Label Encoding (для порядковых)
+le = LabelEncoder()
+df['education'] = le.fit_transform(df['education'])
+
+# Вручную для контроля порядка
+education_map = {
+    'High School': 1,
+    'Bachelor': 2,
+    'Master': 3,
+    'PhD': 4
+}
+df['education'] = df['education'].map(education_map)</code></pre>
+    
+    <blockquote>⚠️ Label Encoding для номинальных создает ложный порядок!</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. One-Hot Encoding</h2>
+    <p><strong>Лучший выбор для номинальных переменных</strong>:</p>
+    <pre><code>import pandas as pd
+from sklearn.preprocessing import OneHotEncoder
+
+# Pandas метод (простой)
+df_encoded = pd.get_dummies(
+    df, 
+    columns=['city', 'color'],
+    drop_first=True  # избежать мультиколлинеарности
+)
+
+# Sklearn метод (для pipeline)
+encoder = OneHotEncoder(
+    drop='first',  # drop first category
+    sparse=False,
+    handle_unknown='ignore'  # игнорировать новые категории
+)
+
+encoded = encoder.fit_transform(df[['city']])
+encoded_df = pd.DataFrame(
+    encoded,
+    columns=encoder.get_feature_names_out(['city'])
+)
+
+# Объединить с исходным датафреймом
+df = pd.concat([df, encoded_df], axis=1)
+df.drop('city', axis=1, inplace=True)</code></pre>
+    
+    <p><strong>Проблемы One-Hot Encoding</strong>:</p>
+    <ul>
+      <li>❌ Большое количество категорий → много колонок</li>
+      <li>❌ Разреженные матрицы (sparse)</li>
+      <li>❌ Проклятие размерности</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Частотное кодирование</h2>
+    <p>Кодирование категорий по их частоте:</p>
+    <pre><code># Подсчет частоты категорий
+frequency = df['city'].value_counts(normalize=True)
+
+# Замена на частоты
+df['city_freq'] = df['city'].map(frequency)
+
+# Альтернативно - счетчик
+count = df['city'].value_counts()
+df['city_count'] = df['city'].map(count)</code></pre>
+    
+    <p><strong>Преимущества</strong>:</p>
+    <ul>
+      <li>✅ Сохраняет размерность (1 колонка)</li>
+      <li>✅ Работает с высокой кардинальностью</li>
+      <li>✅ Быстро и эффективно</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Target Encoding</h2>
+    <p>Кодирование на основе целевой переменной:</p>
+    <pre><code>from category_encoders import TargetEncoder
+
+# Target Encoding
+encoder = TargetEncoder()
+df['city_encoded'] = encoder.fit_transform(
+    df['city'], 
+    df['target']
+)
+
+# Вручную с регуляризацией
+def target_encode(df, category, target, alpha=5):
+    """
+    alpha - параметр сглаживания
+    """
+    # Глобальное среднее
+    global_mean = df[target].mean()
+    
+    # Среднее по категориям
+    agg = df.groupby(category)[target].agg(['mean', 'count'])
+    
+    # Сглаживание
+    encoded = (agg['mean'] * agg['count'] + 
+               global_mean * alpha) / (agg['count'] + alpha)
+    
+    return df[category].map(encoded)</code></pre>
+    
+    <blockquote>⚠️ Риск переобучения! Используйте кросс-валидацию!</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Best Practices</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <ul>
+          <li>Анализировать паттерны пропусков</li>
+          <li>Использовать Pipeline для воспроизводимости</li>
+          <li>Отдельно обрабатывать train/test</li>
+          <li>Документировать решения</li>
+          <li>Проверять результаты визуально</li>
+          <li>Сохранять индикаторы пропусков</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Избегать</h3>
+        <ul>
+          <li>Утечка данных из test в train</li>
+          <li>Label Encoding для номинальных</li>
+          <li>Игнорирование типа пропусков</li>
+          <li>One-Hot для высокой кардинальности</li>
+          <li>Target Encoding без CV</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Полный Pipeline</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+
+# Определить типы признаков
+numeric_features = ['age', 'income']
+categorical_features = ['city', 'education']
+
+# Pipeline для числовых
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler())
+])
+
+# Pipeline для категориальных
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('encoder', OneHotEncoder(drop='first', 
+                             handle_unknown='ignore'))
+])
+
+# Объединить
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numeric_transformer, numeric_features),
+        ('cat', categorical_transformer, categorical_features)
+    ]
+)
+
+# Использование
+X_train_processed = preprocessor.fit_transform(X_train)
+X_test_processed = preprocessor.transform(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Выбор метода заполнения</h2>
+    <table>
+      <tr><th>Ситуация</th><th>Рекомендуемый метод</th></tr>
+      <tr><td>Числовые, нормальное распределение</td><td>Среднее</td></tr>
+      <tr><td>Числовые, с выбросами</td><td>Медиана</td></tr>
+      <tr><td>Категориальные</td><td>Мода или константа</td></tr>
+      <tr><td>Временные ряды</td><td>Forward/backward fill</td></tr>
+      <tr><td>Сложные зависимости</td><td>KNN или MICE</td></tr>
+      <tr><td>Мало данных, MAR</td><td>Множественное заполнение</td></tr>
+      <tr><td>Много пропусков</td><td>Модельное заполнение</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Выбор метода кодирования</h2>
+    <table>
+      <tr><th>Ситуация</th><th>Метод</th></tr>
+      <tr><td>Порядковые (education, rating)</td><td>Label Encoding</td></tr>
+      <tr><td>Номинальные, мало категорий (< 10)</td><td>One-Hot Encoding</td></tr>
+      <tr><td>Номинальные, много категорий</td><td>Frequency/Target Encoding</td></tr>
+      <tr><td>Градиентный бустинг</td><td>Label Encoding часто достаточно</td></tr>
+      <tr><td>Линейные модели</td><td>One-Hot обязательно</td></tr>
+      <tr><td>Деревья</td><td>Label Encoding работает</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Проверка результатов</h2>
+    <pre><code># Проверить отсутствие пропусков
+assert df.isnull().sum().sum() == 0
+
+# Проверить типы данных
+print(df.dtypes)
+
+# Проверить диапазоны значений
+print(df.describe())
+
+# Проверить уникальные значения
+for col in df.select_dtypes(include=['object']).columns:
+    print(f"{col}: {df[col].nunique()} unique values")
+
+# Визуализация распределений
+import matplotlib.pyplot as plt
+df.hist(bins=30, figsize=(15, 10))
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Частые ошибки</h2>
+    <ul>
+      <li>❌ <strong>Data Leakage</strong>: fit на всех данных до split
+        <pre><code># Неправильно
+imputer.fit(df)
+X_train, X_test = train_test_split(df)
+
+# Правильно
+X_train, X_test = train_test_split(df)
+imputer.fit(X_train)
+X_train = imputer.transform(X_train)
+X_test = imputer.transform(X_test)</code></pre>
+      </li>
+      <li>❌ <strong>Потеря информации</strong>: удаление без анализа</li>
+      <li>❌ <strong>Неправильное кодирование</strong>: Label для номинальных</li>
+      <li>❌ <strong>Игнорирование новых категорий</strong> в test</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Продвинутые техники</h2>
+    <p><strong>Хэш-кодирование</strong> для очень высокой кардинальности:</p>
+    <pre><code>from sklearn.feature_extraction import FeatureHasher
+
+hasher = FeatureHasher(
+    n_features=10, 
+    input_type='string'
+)
+hashed = hasher.transform(df['high_cardinality_col'])</code></pre>
+
+    <p><strong>Эмбеддинги для категорий</strong>:</p>
+    <pre><code># Обучить эмбеддинги (нейросетевой подход)
+from tensorflow.keras.layers import Embedding
+
+# Для категории с 1000 уникальных значений
+embedding = Embedding(
+    input_dim=1000,
+    output_dim=50,  # размерность эмбеддинга
+    input_length=1
+)</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>

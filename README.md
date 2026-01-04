@@ -6,7 +6,7 @@
 
 ### **1. Подготовка данных**
 1. [Предобработка данных (Preprocessing)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/preprocessing_cheatsheet.html)
-1. Data Preprocessing (missing values, encoding)
+1. [Data Preprocessing (missing values, encoding)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/data_preprocessing_missing_encoding_cheatsheet.html)
 1. [Обработка выбросов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/outliers_handling_cheatsheet.html)
 1. [Кодирование категориальных признаков](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/categorical_encoding_cheatsheet.html)
 1. [Масштабирование и нормализация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/scaling_normalization_cheatsheet.html)
@@ -148,9 +148,9 @@
 1. [Переобучение и недообучение (Overfitting/Underfitting)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/overfitting_underfitting_cheatsheet.html)
 1. [Градиентный спуск (Gradient Descent)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gradient_descent_cheatsheet.html)
 1. [Теория вероятностей для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/probability_theory_cheatsheet.html)
-1. Регуляризация
-1. Байесовский подход
-1. Теория информации в ML
+1. [Регуляризация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/regularization_cheatsheet.html)
+1. [Байесовский подход](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bayesian_approach_cheatsheet.html)
+1. [Теория информации в ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/information_theory_ml_cheatsheet.html)
 
 ### **20. Инструменты и библиотеки**
 1. [Scikit-learn полный обзор](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/sklearn_overview_cheatsheet.html)
@@ -187,7 +187,7 @@
 1. Современные архитектуры ([ResNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/resnet_cheatsheet.html), Inception, EfficientNet)
 1. [Attention для Computer Vision (CBAM, SENet)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/vision_attention_mechanisms_cheatsheet.html)
 1. [Neural Architecture Design Patterns](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_architecture_patterns_cheatsheet.html)
-1. Transfer learning для CNN
+1. [Transfer learning для CNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transfer_learning_cnn_cheatsheet.html)
 1. [Data augmentation для изображений](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/data_augmentation_cheatsheet.html)
 1. [Batch Normalization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/batch_normalization_cheatsheet.html)
 1. Визуализация CNN
@@ -196,16 +196,16 @@
 ### **3. Рекуррентные нейронные сети (RNN)**
 1. [Основы RNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rnn_basics_cheatsheet.html)
 1. [Temporal Convolutional Networks (TCN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tcn_cheatsheet.html)
-1. Проблема исчезающего градиента
+1. [Проблема исчезающего градиента](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/vanishing_gradient_cheatsheet.html)
 1. [LSTM (Long Short-Term Memory)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lstm_cheatsheet.html)
 1. [GRU (Gated Recurrent Units)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gru_cheatsheet.html)
 1. [Регуляризация RNN (Dropout, Recurrent Dropout, Zoneout)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rnn_regularization_cheatsheet.html)
-1. Двунаправленные RNN
+1. [Двунаправленные RNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bidirectional_rnn_cheatsheet.html)
 1. [Архитектура Encoder-Decoder](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/encoder_decoder_cheatsheet.html)
 
 ### **4. Трансформеры и механизмы внимания**
 1. [Механизм внимания (attention)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/attention_mechanism_cheatsheet.html)
-1. Self-attention
+1. [Self-attention](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/self_attention_cheatsheet.html)
 1. [Multi-head Attention](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multi_head_attention_cheatsheet.html)
 1. [Архитектура Transformer](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transformers_cheatsheet.html)
 1. [Positional Encoding](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/positional_encoding_cheatsheet.html)
@@ -220,13 +220,13 @@
 1. DCGAN, Conditional GAN
 1. StyleGAN
 1. [Diffusion модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/diffusion_models_cheatsheet.html)
-1. Нормализующие потоки (Normalizing Flows)
+1. [Нормализующие потоки (Normalizing Flows)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/normalizing_flows_cheatsheet.html)
 
 ### **6. Обучение с подкреплением (Deep RL)**
 1. [Deep Q-Networks (DQN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dqn_cheatsheet.html)
 1. [Policy Gradient методы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/policy_gradient_cheatsheet.html)
 1. [Actor-Critic методы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/actor_critic_cheatsheet.html)
-1. PPO (Proximal Policy Optimization)
+1. [PPO (Proximal Policy Optimization)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ppo_reinforcement_learning_cheatsheet.html)
 1. Многозадачное RL
 1. Иерархическое RL
 1. Имитационное обучение
