@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Продвинутые оптимизаторы Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⚡ Продвинутые оптимизаторы Cheatsheet</h1>
+  <div class="subtitle">AdaGrad • RMSProp • Adadelta • Nadam • AdamW<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Обзор оптимизаторов</h2>
+    <p><strong>Оптимизаторы</strong> — алгоритмы для обновления весов нейронной сети при обучении.</p>
+    <table>
+      <tr><th>Оптимизатор</th><th>Особенность</th><th>Когда использовать</th></tr>
+      <tr><td><strong>AdaGrad</strong></td><td>Адаптивный learning rate</td><td>Разреженные данные (NLP)</td></tr>
+      <tr><td><strong>RMSProp</strong></td><td>Исправляет AdaGrad</td><td>RNN, нестационарные задачи</td></tr>
+      <tr><td><strong>Adadelta</strong></td><td>Не требует lr</td><td>Когда трудно подобрать lr</td></tr>
+      <tr><td><strong>Nadam</strong></td><td>Adam + Nesterov</td><td>Улучшение Adam</td></tr>
+      <tr><td><strong>AdamW</strong></td><td>Adam + weight decay</td><td>Современный стандарт</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. AdaGrad</h2>
+    <p><strong>Adaptive Gradient Algorithm</strong> — адаптирует learning rate для каждого параметра.</p>
+    <p><strong>Основная идея:</strong> параметры с редкими обновлениями получают большие шаги, часто обновляемые — маленькие.</p>
+    
+    <p><strong>Формула:</strong></p>
+    <pre><code>G_t = G_{t-1} + (∇L_t)²
+θ_{t+1} = θ_t - (η / √(G_t + ε)) · ∇L_t</code></pre>
+    
+    <ul>
+      <li><code>G_t</code> — накопленная сумма квадратов градиентов</li>
+      <li><code>η</code> — начальный learning rate</li>
+      <li><code>ε</code> — малая константа (1e-8) для стабильности</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. AdaGrad в коде</h2>
+    <pre><code>import torch.optim as optim
+
+# PyTorch
+optimizer = optim.Adagrad(
+    model.parameters(),
+    lr=0.01,
+    lr_decay=0,
+    weight_decay=0,
+    eps=1e-10
+)
+
+# TensorFlow/Keras
+from tensorflow.keras.optimizers import Adagrad
+
+optimizer = Adagrad(
+    learning_rate=0.01,
+    initial_accumulator_value=0.1,
+    epsilon=1e-07
+)</code></pre>
+    
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Хорош для разреженных данных</li>
+      <li>Автоматическая адаптация lr</li>
+      <li>Не требует ручной настройки lr</li>
+    </ul>
+    
+    <p><strong>Недостатки:</strong></p>
+    <ul>
+      <li>Learning rate монотонно убывает</li>
+      <li>Может остановиться слишком рано</li>
+      <li>Накопление G_t может привести к очень малым обновлениям</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. RMSProp</h2>
+    <p><strong>Root Mean Square Propagation</strong> — решает проблему агрессивного уменьшения lr в AdaGrad.</p>
+    
+    <p><strong>Основная идея:</strong> использовать экспоненциальное скользящее среднее вместо простой суммы.</p>
+    
+    <p><strong>Формула:</strong></p>
+    <pre><code>E[g²]_t = β · E[g²]_{t-1} + (1-β) · (∇L_t)²
+θ_{t+1} = θ_t - (η / √(E[g²]_t + ε)) · ∇L_t</code></pre>
+    
+    <ul>
+      <li><code>β</code> — коэффициент забывания (обычно 0.9)</li>
+      <li><code>E[g²]_t</code> — экспоненциальное среднее квадратов градиентов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. RMSProp в коде</h2>
+    <pre><code># PyTorch
+optimizer = optim.RMSprop(
+    model.parameters(),
+    lr=0.01,
+    alpha=0.99,      # decay rate
+    eps=1e-08,
+    weight_decay=0,
+    momentum=0,
+    centered=False
+)
+
+# TensorFlow/Keras
+from tensorflow.keras.optimizers import RMSprop
+
+optimizer = RMSprop(
+    learning_rate=0.001,
+    rho=0.9,
+    momentum=0.0,
+    epsilon=1e-07,
+    centered=False
+)</code></pre>
+    
+    <p><strong>Рекомендации:</strong></p>
+    <ul>
+      <li>Начальный lr: 0.001</li>
+      <li>Хорош для RNN и LSTM</li>
+      <li>Может помочь при нестационарных целевых функциях</li>
+      <li>Используется в обучении с подкреплением</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Adadelta</h2>
+    <p><strong>Адаптивное расширение AdaGrad</strong> — не требует задания начального learning rate.</p>
+    
+    <p><strong>Основная идея:</strong> использовать информацию о предыдущих обновлениях параметров.</p>
+    
+    <p><strong>Формулы:</strong></p>
+    <pre><code>E[g²]_t = ρ · E[g²]_{t-1} + (1-ρ) · (∇L_t)²
+Δθ_t = -(√(E[Δθ²]_{t-1} + ε) / √(E[g²]_t + ε)) · ∇L_t
+E[Δθ²]_t = ρ · E[Δθ²]_{t-1} + (1-ρ) · (Δθ_t)²
+θ_{t+1} = θ_t + Δθ_t</code></pre>
+    
+    <ul>
+      <li><code>ρ</code> — коэффициент сглаживания (0.95)</li>
+      <li>Не требует задания lr!</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Adadelta в коде</h2>
+    <pre><code># PyTorch
+optimizer = optim.Adadelta(
+    model.parameters(),
+    lr=1.0,          # scale factor
+    rho=0.9,
+    eps=1e-06,
+    weight_decay=0
+)
+
+# TensorFlow/Keras
+from tensorflow.keras.optimizers import Adadelta
+
+optimizer = Adadelta(
+    learning_rate=0.001,
+    rho=0.95,
+    epsilon=1e-07
+)</code></pre>
+    
+    <p><strong>Когда использовать:</strong></p>
+    <ul>
+      <li>Трудно подобрать learning rate</li>
+      <li>Нужна робастность к гиперпараметрам</li>
+      <li>Альтернатива RMSProp</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Nadam</h2>
+    <p><strong>Nesterov-accelerated Adaptive Moment Estimation</strong> — комбинация Adam и Nesterov momentum.</p>
+    
+    <p><strong>Основная идея:</strong> использовать Nesterov momentum вместо обычного в Adam.</p>
+    
+    <p><strong>Формулы:</strong></p>
+    <pre><code>m_t = β₁ · m_{t-1} + (1-β₁) · ∇L_t
+v_t = β₂ · v_{t-1} + (1-β₂) · (∇L_t)²
+
+m̂_t = m_t / (1-β₁ᵗ)
+v̂_t = v_t / (1-β₂ᵗ)
+
+θ_{t+1} = θ_t - η · (β₁·m̂_t + (1-β₁)·∇L_t/(1-β₁ᵗ)) / (√v̂_t + ε)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Nadam в коде</h2>
+    <pre><code># PyTorch (нет встроенного, используйте torch-optimizer)
+# pip install torch-optimizer
+import torch_optimizer as toptim
+
+optimizer = toptim.Nadam(
+    model.parameters(),
+    lr=2e-3,
+    betas=(0.9, 0.999),
+    eps=1e-8,
+    weight_decay=0
+)
+
+# TensorFlow/Keras
+from tensorflow.keras.optimizers import Nadam
+
+optimizer = Nadam(
+    learning_rate=0.001,
+    beta_1=0.9,
+    beta_2=0.999,
+    epsilon=1e-07
+)</code></pre>
+    
+    <p><strong>Преимущества над Adam:</strong></p>
+    <ul>
+      <li>Быстрее сходимость</li>
+      <li>Лучше для задач с шумными градиентами</li>
+      <li>Улучшенная генерализация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. AdamW</h2>
+    <p><strong>Adam with decoupled Weight decay</strong> — исправление проблемы weight decay в Adam.</p>
+    
+    <p><strong>Проблема Adam:</strong> L2-регуляризация не работает правильно с адаптивным lr.</p>
+    
+    <p><strong>Решение AdamW:</strong> разделить weight decay и градиентные обновления.</p>
+    
+    <p><strong>Формулы:</strong></p>
+    <pre><code>m_t = β₁ · m_{t-1} + (1-β₁) · ∇L_t
+v_t = β₂ · v_{t-1} + (1-β₂) · (∇L_t)²
+
+θ_{t+1} = θ_t - η · (m_t/√v_t + ε + λ·θ_t)</code></pre>
+    
+    <ul>
+      <li><code>λ</code> — коэффициент weight decay (0.01)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. AdamW в коде</h2>
+    <pre><code># PyTorch
+optimizer = optim.AdamW(
+    model.parameters(),
+    lr=1e-3,
+    betas=(0.9, 0.999),
+    eps=1e-08,
+    weight_decay=0.01,  # decoupled!
+    amsgrad=False
+)
+
+# TensorFlow/Keras (addons)
+import tensorflow_addons as tfa
+
+optimizer = tfa.optimizers.AdamW(
+    learning_rate=0.001,
+    weight_decay=0.01,
+    beta_1=0.9,
+    beta_2=0.999,
+    epsilon=1e-07
+)</code></pre>
+    
+    <p><strong>Современный стандарт:</strong></p>
+    <ul>
+      <li>Используется в BERT, GPT, ViT</li>
+      <li>Лучшая генерализация чем Adam</li>
+      <li>Правильная регуляризация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сравнение оптимизаторов</h2>
+    <table>
+      <tr><th>Оптимизатор</th><th>Скорость</th><th>Стабильность</th><th>Применение</th></tr>
+      <tr><td><strong>SGD</strong></td><td>Медленная</td><td>Высокая</td><td>CV с momentum</td></tr>
+      <tr><td><strong>Adam</strong></td><td>Быстрая</td><td>Средняя</td><td>Универсальный</td></tr>
+      <tr><td><strong>AdamW</strong></td><td>Быстрая</td><td>Высокая</td><td>NLP, Transformers</td></tr>
+      <tr><td><strong>RMSProp</strong></td><td>Быстрая</td><td>Средняя</td><td>RNN, RL</td></tr>
+      <tr><td><strong>Nadam</strong></td><td>Очень быстрая</td><td>Средняя</td><td>Эксперименты</td></tr>
+      <tr><td><strong>AdaGrad</strong></td><td>Средняя</td><td>Низкая</td><td>Разреженные данные</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Рекомендации по выбору</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Начните с этого</h3>
+        <ul>
+          <li><strong>AdamW</strong> — для большинства задач</li>
+          <li>lr=1e-3, weight_decay=0.01</li>
+          <li>Особенно для Transformers</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>⚠️ Специальные случаи</h3>
+        <ul>
+          <li><strong>RMSProp</strong> — для RNN/LSTM</li>
+          <li><strong>SGD + momentum</strong> — для CNN (ResNet)</li>
+          <li><strong>AdaGrad</strong> — для разреженных данных</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Настройка гиперпараметров</h2>
+    <p><strong>AdamW (рекомендуемые значения):</strong></p>
+    <ul>
+      <li>Learning rate: <code>1e-3</code> до <code>5e-4</code></li>
+      <li>β₁ (beta_1): <code>0.9</code></li>
+      <li>β₂ (beta_2): <code>0.999</code></li>
+      <li>Weight decay: <code>0.01</code> до <code>0.1</code></li>
+      <li>ε (epsilon): <code>1e-8</code></li>
+    </ul>
+    
+    <p><strong>RMSProp:</strong></p>
+    <ul>
+      <li>Learning rate: <code>1e-3</code></li>
+      <li>α (alpha/rho): <code>0.99</code></li>
+      <li>Momentum: <code>0</code> или <code>0.9</code></li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Градиентный клиппинг</h2>
+    <p>Часто используется с продвинутыми оптимизаторами для стабильности:</p>
+    <pre><code># PyTorch - clip by norm
+torch.nn.utils.clip_grad_norm_(
+    model.parameters(),
+    max_norm=1.0
+)
+
+# PyTorch - clip by value
+torch.nn.utils.clip_grad_value_(
+    model.parameters(),
+    clip_value=0.5
+)
+
+# TensorFlow
+optimizer = tf.keras.optimizers.AdamW(
+    learning_rate=0.001,
+    clipnorm=1.0,     # clip by norm
+    clipvalue=0.5     # clip by value
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Lookahead Optimizer</h2>
+    <p>Обертка над любым оптимизатором для улучшения сходимости:</p>
+    <pre><code># Требует torch-optimizer
+import torch_optimizer as toptim
+
+base_optimizer = optim.AdamW(
+    model.parameters(),
+    lr=1e-3
+)
+
+optimizer = toptim.Lookahead(
+    base_optimizer,
+    k=5,        # update every k steps
+    alpha=0.5   # slow weights step size
+)
+
+# Обучение как обычно
+for batch in dataloader:
+    optimizer.zero_grad()
+    loss = model(batch)
+    loss.backward()
+    optimizer.step()</code></pre>
+    
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Улучшает сходимость любого оптимизатора</li>
+      <li>Более стабильное обучение</li>
+      <li>Лучшая генерализация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Практический workflow</h2>
+    <ol>
+      <li><strong>Базовая настройка:</strong>
+        <ul>
+          <li>Начните с AdamW</li>
+          <li>lr=1e-3, weight_decay=0.01</li>
+        </ul>
+      </li>
+      <li><strong>Если нестабильно:</strong>
+        <ul>
+          <li>Уменьшите lr (до 1e-4)</li>
+          <li>Добавьте gradient clipping</li>
+          <li>Попробуйте RMSProp</li>
+        </ul>
+      </li>
+      <li><strong>Для RNN:</strong>
+        <ul>
+          <li>Используйте RMSProp</li>
+          <li>Обязательно gradient clipping</li>
+        </ul>
+      </li>
+      <li><strong>Для больших моделей:</strong>
+        <ul>
+          <li>AdamW с weight decay</li>
+          <li>Learning rate warmup</li>
+          <li>Cosine annealing</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрали адекватный оптимизатор для задачи</li>
+      <li>[ ] Настроили learning rate (обычно 1e-3 для Adam/AdamW)</li>
+      <li>[ ] Добавили weight decay для регуляризации</li>
+      <li>[ ] Настроили gradient clipping для RNN</li>
+      <li>[ ] Используете learning rate scheduler</li>
+      <li>[ ] Мониторите loss и градиенты (TensorBoard)</li>
+      <li>[ ] Сравнили несколько оптимизаторов</li>
+      <li>[ ] Проверили влияние гиперпараметров</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Оптимизаторы — это "умные" способы обучения нейросети. AdamW — самый современный и универсальный, он автоматически подстраивает скорость обучения для каждого параметра модели, что делает обучение быстрее и стабильнее».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

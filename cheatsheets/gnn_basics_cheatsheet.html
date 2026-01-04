@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Graph Neural Networks Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    .container { column-count: 3; column-gap: 20px; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    code { font-family: 'Consolas', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🕸️ Graph Neural Networks Cheatsheet</h1>
+  <div class="subtitle">GCN • GAT • GraphSAGE • Message Passing<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое GNN?</h2>
+    <p><strong>Graph Neural Networks</strong> — нейросети для графов.</p>
+    <ul>
+      <li>Социальные сети</li>
+      <li>Молекулы (атомы и связи)</li>
+      <li>Дорожные сети</li>
+      <li>Knowledge graphs</li>
+    </ul>
+    <table>
+      <tr><th>Задача</th><th>Пример</th></tr>
+      <tr><td>Node classification</td><td>Категория пользователя</td></tr>
+      <tr><td>Link prediction</td><td>Рекомендация друзей</td></tr>
+      <tr><td>Graph classification</td><td>Свойства молекулы</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Представление графа</h2>
+    <pre><code>import torch
+from torch_geometric.data import Data
+
+# Граф: узлы + ребра
+edge_index = torch.tensor([
+    [0, 1, 1, 2],
+    [1, 0, 2, 1]
+], dtype=torch.long)
+
+# Признаки узлов
+x = torch.tensor([
+    [1.0, 0.0],
+    [0.0, 1.0],
+    [0.5, 0.5]
+], dtype=torch.float)
+
+data = Data(x=x, edge_index=edge_index)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Message Passing</h2>
+    <p><strong>Основная идея</strong> — обмен информацией:</p>
+    <pre><code>h_v^(k+1) = UPDATE(
+    h_v^(k), 
+    AGGREGATE({h_u^(k) : u ∈ N(v)})
+)</code></pre>
+    <p><strong>Шаги:</strong></p>
+    <ol>
+      <li>Собрать сообщения от соседей</li>
+      <li>Агрегировать (sum/mean/max)</li>
+      <li>Обновить состояние</li>
+      <li>Повторить K раз</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. GCN Layer</h2>
+    <pre><code>from torch_geometric.nn import GCNConv
+
+class GCN(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv1 = GCNConv(16, 32)
+        self.conv2 = GCNConv(32, 7)
+    
+    def forward(self, x, edge_index):
+        x = self.conv1(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, training=self.training)
+        x = self.conv2(x, edge_index)
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. GAT (Attention)</h2>
+    <pre><code>from torch_geometric.nn import GATConv
+
+self.conv = GATConv(
+    in_channels=16,
+    out_channels=8,
+    heads=8,
+    dropout=0.6
+)
+
+# Multi-head attention
+x = self.conv(x, edge_index)</code></pre>
+    <p>Attention: разные соседи = разный вес</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. GraphSAGE</h2>
+    <pre><code>from torch_geometric.nn import SAGEConv
+
+self.conv = SAGEConv(in_ch, out_ch)
+
+# Sampling соседей
+# Масштабируется на большие графы
+# Inductive learning</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>�� 7. Обучение</h2>
+    <pre><code>model = GCN()
+optimizer = optim.Adam(model.parameters(), lr=0.01)
+
+for epoch in range(200):
+    model.train()
+    optimizer.zero_grad()
+    out = model(data.x, data.edge_index)
+    loss = F.cross_entropy(
+        out[data.train_mask],
+        data.y[data.train_mask]
+    )
+    loss.backward()
+    optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Датасеты</h2>
+    <table>
+      <tr><th>Датасет</th><th>Узлы</th><th>Задача</th></tr>
+      <tr><td>Cora</td><td>2,708</td><td>Node class</td></tr>
+      <tr><td>PubMed</td><td>19,717</td><td>Citation</td></tr>
+      <tr><td>QM9</td><td>134k</td><td>Molecules</td></tr>
+    </table>
+    <pre><code>from torch_geometric.datasets import Planetoid
+
+dataset = Planetoid(root='/tmp/Cora', name='Cora')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Best Practices</h2>
+    <ul>
+      <li>BatchNorm/LayerNorm</li>
+      <li>Dropout 0.5-0.6</li>
+      <li>Residual connections</li>
+      <li>GAT для attention</li>
+      <li>GraphSAGE для больших графов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применения</h2>
+    <ul>
+      <li>Drug discovery (молекулы)</li>
+      <li>Social networks (рекомендации)</li>
+      <li>Traffic prediction</li>
+      <li>Knowledge graphs</li>
+      <li>Protein structure</li>
+    </ul>
+    <blockquote>
+«GNN — как распространение информации по графу: каждый узел собирает данные от соседей и передаёт дальше».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

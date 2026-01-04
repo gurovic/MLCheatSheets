@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Регуляризация RNN Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔄 Регуляризация RNN Cheatsheet</h1>
+  <div class="subtitle">Dropout • Recurrent Dropout • Zoneout • Weight Tying<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Проблемы RNN</h2>
+    <p><strong>RNN склонны к переобучению</strong> из-за:</p>
+    <ul>
+      <li>Большого количества параметров</li>
+      <li>Повторного использования весов на каждом шаге</li>
+      <li>Длинных последовательностей</li>
+      <li>Малых датасетов</li>
+    </ul>
+    
+    <p><strong>Стандартный Dropout не работает</strong> в RNN:</p>
+    <ul>
+      <li>Применение между временными шагами разрушает информацию</li>
+      <li>Нарушается передача состояния</li>
+      <li>Теряется долговременная зависимость</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Виды Dropout для RNN</h2>
+    <table>
+      <tr><th>Тип</th><th>Где применяется</th><th>Цель</th></tr>
+      <tr><td><strong>Input Dropout</strong></td><td>На входе</td><td>Регуляризация входов</td></tr>
+      <tr><td><strong>Output Dropout</strong></td><td>На выходе</td><td>Регуляризация выходов</td></tr>
+      <tr><td><strong>Recurrent Dropout</strong></td><td>На скрытом состоянии</td><td>Регуляризация памяти</td></tr>
+      <tr><td><strong>Variational Dropout</strong></td><td>Одна маска на всю последовательность</td><td>Сохранение информации</td></tr>
+      <tr><td><strong>Zoneout</strong></td><td>Случайное сохранение состояния</td><td>Стохастическое обновление</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Стандартный Dropout (НЕПРАВИЛЬНО)</h2>
+    <p>❌ <strong>НЕ ДЕЛАЙТЕ ТАК:</strong></p>
+    <pre><code># НЕПРАВИЛЬНО - dropout между временными шагами
+for t in range(seq_length):
+    h_t = rnn_cell(x_t, h_{t-1})
+    h_t = dropout(h_t)  # ❌ Разрушает информацию!
+    
+# Проблемы:
+# - Разная маска на каждом шаге
+# - Нарушается передача градиентов
+# - Теряется долговременная память</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Variational Dropout (ПРАВИЛЬНО)</h2>
+    <p>✅ <strong>Правильный подход</strong> — одна маска на всю последовательность:</p>
+    <pre><code># ПРАВИЛЬНО - одна маска dropout на последовательность
+dropout_mask = create_mask(dropout_prob)
+
+for t in range(seq_length):
+    h_t = rnn_cell(x_t, h_{t-1})
+    h_t = apply_mask(h_t, dropout_mask)  # ✅ Та же маска
+    
+# Преимущества:
+# - Сохраняется информация во времени
+# - Стабильные градиенты
+# - Лучшая регуляризация</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Dropout в PyTorch LSTM</h2>
+    <pre><code>import torch.nn as nn
+
+# Правильная настройка LSTM с dropout
+lstm = nn.LSTM(
+    input_size=100,
+    hidden_size=256,
+    num_layers=2,
+    dropout=0.5,      # recurrent dropout между слоями
+    batch_first=True
+)
+
+# Для одного слоя - dropout вручную
+lstm_single = nn.LSTM(
+    input_size=100,
+    hidden_size=256,
+    num_layers=1,
+    batch_first=True
+)
+
+# Input dropout
+input_dropout = nn.Dropout(0.3)
+
+# Output dropout
+output_dropout = nn.Dropout(0.3)
+
+# Forward pass
+x = input_dropout(x)
+output, (h_n, c_n) = lstm_single(x)
+output = output_dropout(output)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Dropout в Keras/TensorFlow</h2>
+    <pre><code>from tensorflow.keras.layers import LSTM, Dropout
+
+model = Sequential([
+    # Input dropout
+    Dropout(0.2, input_shape=(seq_length, features)),
+    
+    # LSTM с recurrent dropout
+    LSTM(
+        units=128,
+        dropout=0.2,           # input dropout
+        recurrent_dropout=0.2, # recurrent dropout
+        return_sequences=True
+    ),
+    
+    # Output dropout
+    Dropout(0.3),
+    
+    LSTM(
+        units=64,
+        dropout=0.2,
+        recurrent_dropout=0.2
+    ),
+    
+    Dense(num_classes, activation='softmax')
+])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Recurrent Dropout</h2>
+    <p><strong>Применяется к скрытому состоянию</strong> между временными шагами:</p>
+    <pre><code># Псевдокод
+for t in range(seq_length):
+    # Dropout на входе в рекуррентную связь
+    h_masked = dropout_mask * h_{t-1}
+    
+    # Обновление состояния
+    h_t = tanh(W_x @ x_t + W_h @ h_masked + b)
+    
+    # h_t передается дальше БЕЗ dropout</code></pre>
+    
+    <p><strong>Важно:</strong></p>
+    <ul>
+      <li>Маска одинакова для всех временных шагов</li>
+      <li>Dropout только на рекуррентной связи</li>
+      <li>Не влияет на выход h_t</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Zoneout</h2>
+    <p><strong>Zoneout</strong> — стохастическое сохранение предыдущего состояния:</p>
+    <pre><code># Обычное обновление LSTM
+c_t = f_t * c_{t-1} + i_t * c̃_t
+h_t = o_t * tanh(c_t)
+
+# С Zoneout
+c_t = d_c * c_{t-1} + (1 - d_c) * c_t_new
+h_t = d_h * h_{t-1} + (1 - d_h) * h_t_new
+
+# где d_c, d_h - бинарные маски Bernoulli</code></pre>
+    
+    <p><strong>Реализация в PyTorch:</strong></p>
+    <pre><code># pip install zoneout-pytorch
+from zoneout import ZoneoutLSTM
+
+lstm = ZoneoutLSTM(
+    input_size=100,
+    hidden_size=256,
+    zoneout_h=0.1,  # zoneout для h
+    zoneout_c=0.05  # zoneout для c
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Layer Normalization</h2>
+    <p><strong>Нормализация слоев</strong> — эффективная регуляризация для RNN:</p>
+    <pre><code>import torch.nn as nn
+
+class LSTMWithLayerNorm(nn.Module):
+    def __init__(self, input_size, hidden_size):
+        super().__init__()
+        self.lstm = nn.LSTM(input_size, hidden_size)
+        self.ln = nn.LayerNorm(hidden_size)
+    
+    def forward(self, x):
+        output, (h, c) = self.lstm(x)
+        # Нормализация выхода
+        output = self.ln(output)
+        return output, (h, c)
+
+# Keras
+from tensorflow.keras.layers import LayerNormalization
+
+model = Sequential([
+    LSTM(128, return_sequences=True),
+    LayerNormalization(),
+    LSTM(64),
+    Dense(num_classes)
+])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Weight Decay (L2)</h2>
+    <p><strong>L2-регуляризация</strong> весов RNN:</p>
+    <pre><code># PyTorch - через оптимизатор
+optimizer = torch.optim.AdamW(
+    model.parameters(),
+    lr=0.001,
+    weight_decay=0.01  # L2 регуляризация
+)
+
+# Или явно в loss
+l2_lambda = 0.01
+l2_reg = sum(p.pow(2.0).sum() for p in model.parameters())
+loss = criterion(output, target) + l2_lambda * l2_reg
+
+# Keras - через kernel_regularizer
+from tensorflow.keras.regularizers import l2
+
+lstm = LSTM(
+    128,
+    kernel_regularizer=l2(0.01),
+    recurrent_regularizer=l2(0.01),
+    bias_regularizer=l2(0.01)
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Gradient Clipping</h2>
+    <p><strong>Обязательно</strong> для RNN — предотвращает взрыв градиентов:</p>
+    <pre><code># PyTorch - clip by norm
+torch.nn.utils.clip_grad_norm_(
+    model.parameters(),
+    max_norm=5.0
+)
+
+# PyTorch - clip by value
+torch.nn.utils.clip_grad_value_(
+    model.parameters(),
+    clip_value=1.0
+)
+
+# В цикле обучения
+for epoch in range(num_epochs):
+    for batch in dataloader:
+        optimizer.zero_grad()
+        loss = model(batch)
+        loss.backward()
+        
+        # Clip градиенты
+        torch.nn.utils.clip_grad_norm_(
+            model.parameters(), 
+            max_norm=1.0
+        )
+        
+        optimizer.step()
+
+# Keras
+from tensorflow.keras.optimizers import Adam
+
+optimizer = Adam(
+    learning_rate=0.001,
+    clipnorm=1.0,     # clip by norm
+    clipvalue=0.5     # clip by value
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Weight Tying</h2>
+    <p><strong>Связывание весов</strong> входного embedding и выходного слоя (для языковых моделей):</p>
+    <pre><code>class LanguageModel(nn.Module):
+    def __init__(self, vocab_size, emb_dim, hidden_dim):
+        super().__init__()
+        
+        # Embedding слой
+        self.embedding = nn.Embedding(vocab_size, emb_dim)
+        
+        # LSTM
+        self.lstm = nn.LSTM(emb_dim, hidden_dim)
+        
+        # Output слой
+        self.fc = nn.Linear(hidden_dim, vocab_size)
+        
+        # Weight tying - используем веса embedding
+        self.fc.weight = self.embedding.weight
+        
+    def forward(self, x):
+        emb = self.embedding(x)
+        output, _ = self.lstm(emb)
+        logits = self.fc(output)
+        return logits</code></pre>
+    
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Сокращение параметров на ~30-50%</li>
+      <li>Лучшая генерализация</li>
+      <li>Меньше переобучение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Embedding Dropout</h2>
+    <p><strong>Dropout на embedding слое</strong> для текстовых данных:</p>
+    <pre><code>class EmbeddingDropout(nn.Module):
+    def __init__(self, embedding, dropout=0.1):
+        super().__init__()
+        self.embedding = embedding
+        self.dropout = dropout
+        
+    def forward(self, x):
+        if not self.training:
+            return self.embedding(x)
+        
+        # Dropout по целым словам
+        mask = x.new_ones(x.size(0), 1).bernoulli_(1 - self.dropout)
+        mask = mask.expand_as(x) / (1 - self.dropout)
+        
+        # Применяем маску
+        embedded = self.embedding(x)
+        return embedded * mask.unsqueeze(-1)
+
+# Использование
+emb_dropout = EmbeddingDropout(
+    nn.Embedding(vocab_size, emb_dim),
+    dropout=0.2
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Teacher Forcing с шумом</h2>
+    <p><strong>Scheduled Sampling</strong> — добавление шума в обучение:</p>
+    <pre><code>import random
+
+def train_with_scheduled_sampling(
+    model, input_seq, target_seq, epoch, max_epochs
+):
+    # Вероятность использования teacher forcing
+    teacher_forcing_ratio = 1 - (epoch / max_epochs)
+    
+    output_seq = []
+    hidden = model.init_hidden()
+    
+    # Первый вход - начало последовательности
+    input = input_seq[0]
+    
+    for t in range(1, len(target_seq)):
+        output, hidden = model(input, hidden)
+        output_seq.append(output)
+        
+        # С вероятностью используем ground truth
+        use_teacher_forcing = random.random() < teacher_forcing_ratio
+        
+        if use_teacher_forcing:
+            input = target_seq[t]  # ground truth
+        else:
+            input = output.argmax(-1)  # предсказание
+    
+    return torch.stack(output_seq)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Temporal Dropout</h2>
+    <p><strong>Пропуск временных шагов</strong>:</p>
+    <pre><code>class TemporalDropout(nn.Module):
+    def __init__(self, dropout_prob=0.1):
+        super().__init__()
+        self.dropout = dropout_prob
+        
+    def forward(self, x):
+        # x shape: (batch, seq_len, features)
+        if not self.training:
+            return x
+        
+        # Создаем маску для временных шагов
+        mask = x.new_empty(x.size(0), x.size(1), 1).bernoulli_(1 - self.dropout)
+        mask = mask / (1 - self.dropout)
+        
+        return x * mask
+
+# Использование
+model = nn.Sequential(
+    TemporalDropout(0.1),
+    nn.LSTM(input_size, hidden_size),
+    TemporalDropout(0.1)
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Рекомендуемые значения</h2>
+    <table>
+      <tr><th>Тип Dropout</th><th>Рекомендуемое значение</th><th>Когда увеличить</th></tr>
+      <tr><td><strong>Input Dropout</strong></td><td>0.2 - 0.3</td><td>Большой словарь</td></tr>
+      <tr><td><strong>Output Dropout</strong></td><td>0.3 - 0.5</td><td>Много классов</td></tr>
+      <tr><td><strong>Recurrent Dropout</strong></td><td>0.1 - 0.3</td><td>Переобучение</td></tr>
+      <tr><td><strong>Embedding Dropout</strong></td><td>0.1 - 0.2</td><td>Малый датасет</td></tr>
+      <tr><td><strong>Zoneout</strong></td><td>0.05 - 0.15</td><td>Глубокие RNN</td></tr>
+    </table>
+    
+    <p><strong>⚠️ Внимание:</strong> Не используйте все методы одновременно! Начните с малых значений.</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Полный пример</h2>
+    <pre><code>import torch.nn as nn
+
+class RegularizedLSTM(nn.Module):
+    def __init__(self, vocab_size, emb_dim, hidden_dim, num_classes):
+        super().__init__()
+        
+        # Embedding с dropout
+        self.embedding = nn.Embedding(vocab_size, emb_dim)
+        self.emb_dropout = nn.Dropout(0.2)
+        
+        # LSTM с dropout
+        self.lstm = nn.LSTM(
+            input_size=emb_dim,
+            hidden_size=hidden_dim,
+            num_layers=2,
+            dropout=0.3,        # между слоями
+            batch_first=True
+        )
+        
+        # Layer normalization
+        self.ln = nn.LayerNorm(hidden_dim)
+        
+        # Output dropout
+        self.output_dropout = nn.Dropout(0.5)
+        
+        # Classifier
+        self.fc = nn.Linear(hidden_dim, num_classes)
+    
+    def forward(self, x):
+        # Embedding + dropout
+        emb = self.embedding(x)
+        emb = self.emb_dropout(emb)
+        
+        # LSTM
+        output, (h_n, c_n) = self.lstm(emb)
+        
+        # Layer norm
+        output = self.ln(output)
+        
+        # Берем последний выход
+        last_output = output[:, -1, :]
+        
+        # Output dropout + classifier
+        last_output = self.output_dropout(last_output)
+        logits = self.fc(last_output)
+        
+        return logits
+
+# Обучение с gradient clipping
+model = RegularizedLSTM(10000, 300, 512, 10)
+optimizer = torch.optim.AdamW(
+    model.parameters(),
+    lr=0.001,
+    weight_decay=0.01
+)
+
+for batch in dataloader:
+    optimizer.zero_grad()
+    loss = criterion(model(batch.x), batch.y)
+    loss.backward()
+    
+    # Gradient clipping
+    torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+    
+    optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист регуляризации</h2>
+    <ul>
+      <li>[ ] Input dropout: 0.2-0.3</li>
+      <li>[ ] Output dropout: 0.3-0.5</li>
+      <li>[ ] Recurrent dropout: 0.1-0.3 (только между слоями!)</li>
+      <li>[ ] Gradient clipping: max_norm=1.0</li>
+      <li>[ ] Weight decay: 0.01</li>
+      <li>[ ] Layer normalization</li>
+      <li>[ ] Early stopping с patience=5-10</li>
+      <li>[ ] Learning rate: 0.001 с scheduler</li>
+      <li>[ ] Мониторинг validation loss</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Регуляризация RNN — это набор техник, которые предотвращают "запоминание" моделью тренировочных данных. Это как учить студента понимать принципы, а не зубрить конкретные примеры — так модель лучше работает на новых данных».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

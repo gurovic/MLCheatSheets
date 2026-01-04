@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Few-Shot Learning Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    .container { column-count: 3; column-gap: 20px; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    code { font-family: 'Consolas', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🎯 Few-Shot Learning Cheatsheet</h1>
+  <div class="subtitle">Обучение на малых данных • Meta-Learning<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Проблема</h2>
+    <p><strong>Few-shot</strong> — обучение на малом количестве примеров.</p>
+    <table>
+      <tr><th>Тип</th><th>Данных/класс</th></tr>
+      <tr><td>Standard</td><td>1000+</td></tr>
+      <tr><td>Few-shot</td><td>1-10</td></tr>
+      <tr><td>Zero-shot</td><td>0</td></tr>
+    </table>
+    <p><strong>Сценарии:</strong></p>
+    <ul>
+      <li>1-shot: 1 пример/класс</li>
+      <li>5-shot: 5 примеров/класс</li>
+      <li>N-way K-shot</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Siamese Networks</h2>
+    <pre><code>class SiameseNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv = nn.Sequential(
+            nn.Conv2d(1, 64, 10),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(64, 128, 7),
+            nn.ReLU()
+        )
+        self.fc = nn.Linear(128*6*6, 4096)
+    
+    def forward_once(self, x):
+        x = self.conv(x)
+        x = x.view(x.size(0), -1)
+        return self.fc(x)
+    
+    def forward(self, x1, x2):
+        out1 = self.forward_once(x1)
+        out2 = self.forward_once(x2)
+        return out1, out2</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Contrastive Loss</h2>
+    <pre><code>class ContrastiveLoss(nn.Module):
+    def __init__(self, margin=2.0):
+        super().__init__()
+        self.margin = margin
+    
+    def forward(self, out1, out2, label):
+        dist = F.pairwise_distance(out1, out2)
+        loss = (1-label) * dist.pow(2) + 
+               label * F.relu(self.margin - dist).pow(2)
+        return loss.mean()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Triplet Loss</h2>
+    <pre><code>class TripletLoss(nn.Module):
+    def __init__(self, margin=1.0):
+        super().__init__()
+        self.margin = margin
+    
+    def forward(self, anchor, pos, neg):
+        dist_pos = (anchor - pos).pow(2).sum(1)
+        dist_neg = (anchor - neg).pow(2).sum(1)
+        
+        loss = F.relu(dist_pos - dist_neg + self.margin)
+        return loss.mean()
+
+# anchor, positive, negative
+loss = criterion(emb_a, emb_p, emb_n)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Prototypical Networks</h2>
+    <pre><code># Протот��п = среднее класса
+def compute_prototypes(embeddings, labels, n_way):
+    prototypes = []
+    for c in range(n_way):
+        mask = (labels == c)
+        proto = embeddings[mask].mean(0)
+        prototypes.append(proto)
+    return torch.stack(prototypes)
+
+# Классификация по расстоянию
+distances = torch.cdist(query_emb, prototypes)
+predictions = (-distances).softmax(dim=1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. MAML</h2>
+    <p><strong>Model-Agnostic Meta-Learning</strong></p>
+    <pre><code>import learn2learn as l2l
+
+maml = l2l.algorithms.MAML(model, lr=0.01)
+
+for task in tasks:
+    # Clone model
+    learner = maml.clone()
+    
+    # Inner loop: adapt to task
+    for _ in range(5):
+        loss = compute_loss(learner, support)
+        learner.adapt(loss)
+    
+    # Outer loop: meta-loss
+    loss = compute_loss(learner, query)
+    loss.backward()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Zero-Shot с CLIP</h2>
+    <pre><code>import clip
+
+model, preprocess = clip.load("ViT-B/32")
+
+# Текстовые описания классов
+classes = ["cat", "dog", "bird"]
+text = clip.tokenize([f"a photo of a {c}" for c in classes])
+
+with torch.no_grad():
+    text_features = model.encode_text(text)
+    image_features = model.encode_image(image)
+    
+    # Cosine similarity
+    similarity = (image_features @ text_features.T)
+    pred = similarity.argmax()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Датасеты</h2>
+    <table>
+      <tr><th>Датасет</th><th>Классов</th></tr>
+      <tr><td>Omniglot</td><td>1623</td></tr>
+      <tr><td>Mini-ImageNet</td><td>100</td></tr>
+      <tr><td>CUB-200</td><td>200</td></tr>
+      <tr><td>CIFAR-FS</td><td>100</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Evaluation Protocol</h2>
+    <pre><code># N-way K-shot
+N = 5  # классов
+K = 1  # примеров на класс
+Q = 15 # query примеров
+
+# Sample task
+support, query = sample_task(dataset, N, K, Q)
+
+# Evaluate
+accuracies = []
+for _ in range(600):  # 600 tasks
+    acc = eval_task(model, support, query)
+    accuracies.append(acc)
+
+print(f"Accuracy: {np.mean(accuracies)}±{np.std(accuracies)}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Best Practices</h2>
+    <ul>
+      <li>Metric learning для начала</li>
+      <li>Prototypical Networks — простые</li>
+      <li>MAML — лучшая точность</li>
+      <li>CLIP для zero-shot</li>
+      <li>Augmentation критична</li>
+      <li>Pre-training обязателен</li>
+    </ul>
+    <blockquote>
+«Few-shot — способность учиться на малом количестве примеров, как человек узнаёт новое животное после одного-двух показов».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

@@ -173,6 +173,8 @@
 1. [Функции потерь для классификации и регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/loss_functions_cheatsheet.html)
 1. [Обратное распространение ошибки (Backpropagation)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/backpropagation_cheatsheet.html)
 1. [Оптимизаторы (SGD, Momentum, Adam, RMSProp)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/optimizers_cheatsheet.html)
+1. [Продвинутые оптимизаторы (AdaGrad, RMSProp, AdamW, Nadam)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/optimizers_advanced_cheatsheet.html)
+1. [Learning Rate Scheduling](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/learning_rate_scheduling_cheatsheet.html)
 1. [Инициализация весов (Weight Initialization)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/weight_initialization_cheatsheet.html)
 1. [Ранняя остановка и кривые обучения (Early Stopping)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/early_stopping_cheatsheet.html)
 1. [Регуляризация нейронных сетей (Dropout и др.)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dropout_regularization_cheatsheet.html)
@@ -193,8 +195,8 @@
 1. Проблема исчезающего градиента
 1. [LSTM (Long Short-Term Memory)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lstm_cheatsheet.html)
 1. [GRU (Gated Recurrent Units)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gru_cheatsheet.html)
+1. [Регуляризация RNN (Dropout, Recurrent Dropout, Zoneout)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rnn_regularization_cheatsheet.html)
 1. Двунаправленные RNN
-1. Рекуррентная регуляризация
 1. [Архитектура Encoder-Decoder](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/encoder_decoder_cheatsheet.html)
 
 ### **4. Трансформеры и механизмы внимания**
@@ -231,13 +233,15 @@
 1. Transformer для NLP
 1. [BERT и его вариации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bert_finetuning_cheatsheet.html)
 1. GPT-архитектуры
+1. [Prompt Engineering для LLM (ChatGPT, GPT-4, Claude)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/prompt_engineering_cheatsheet.html)
 1. Токенизация (BPE, WordPiece, SentencePiece)
 1. Задачи NLP (NER, классификация, суммаризация)
 
 ### **8. Компьютерное зрение (Computer Vision)**
 1. Классификация изображений
 1. [Детекция объектов (YOLO, SSD, Faster R-CNN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/yolo_cheatsheet.html)
-1. Сегментация (Semantic, Instance, Panoptic)
+1. [Детекция объектов - Faster R-CNN, SSD, RetinaNet, EfficientDet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/object_detection_cheatsheet.html)
+1. [Сегментация изображений (U-Net, DeepLab, Mask R-CNN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/image_segmentation_cheatsheet.html)
 1. Детекция ключевых точек
 1. Слежение за объектами
 1. Оценка позы человека
@@ -259,7 +263,7 @@
 11. Мультимодальные трансформеры
 
 ### **11. Малоресурсное обучение**
-11. Few-shot learning
+11. [Few-shot Learning (Siamese, Prototypical Networks, MAML)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/few_shot_learning_cheatsheet.html)
 11. Zero-shot learning
 11. Transfer learning
 11. Meta-learning (MAML, Prototypical Networks)
@@ -274,17 +278,14 @@
 11. Concept activation vectors
 
 ### **13. Оптимизация и ускорение**
-11. Learning Rate Scheduling
+11. [Сжатие моделей (Квантизация, Прунинг, Knowledge Distillation)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_compression_cheatsheet.html)
 11. Mixed precision training
 11. Gradient checkpointing
 11. Distributed training
-11. Квантизация (quantization)
-11. Прунинг (pruning)
-11. Дистилляция знаний (knowledge distillation)
-11. Neural Architecture Search (NAS)
+11. [Neural Architecture Search (NAS)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/nas_cheatsheet.html)
 
 ### **14. Графовые нейронные сети (GNN)**
-11. Основы GNN
+11. [Graph Neural Networks Basics (GCN, GAT, GraphSAGE)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gnn_basics_cheatsheet.html)
 11. Graph Convolutional Networks (GCN)
 11. Graph Attention Networks (GAT)
 11. Message Passing Networks
