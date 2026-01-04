@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Voting и Stacking ансамбли Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Voting и Stacking ансамбли Cheatsheet</h1>
+  <div class="subtitle">Комбинирование моделей • Ансамбли • Meta-learning<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы ансамблей</h2>
+    <p><strong>Ансамбль</strong> — комбинирование нескольких моделей для улучшения предсказаний.</p>
+    <ul>
+      <li><strong>Цель</strong>: снижение дисперсии и смещения</li>
+      <li><strong>Принцип</strong>: мудрость толпы</li>
+      <li><strong>Типы</strong>: Voting, Stacking, Bagging, Boosting</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 2. Hard Voting</h2>
+    <p>Голосование большинством для классификации.</p>
+    <pre><code>from sklearn.ensemble import VotingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.svm import SVC
+
+# Базовые модели
+lr = LogisticRegression(random_state=42)
+dt = DecisionTreeClassifier(random_state=42)
+svm = SVC(random_state=42)
+
+# Hard voting
+voting_clf = VotingClassifier(
+    estimators=[('lr', lr), ('dt', dt), ('svm', svm)],
+    voting='hard'
+)
+
+voting_clf.fit(X_train, y_train)
+print(f"Accuracy: {voting_clf.score(X_test, y_test):.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 3. Soft Voting</h2>
+    <p>Усреднение вероятностей классов.</p>
+    <pre><code># Soft voting (требует predict_proba)
+voting_soft = VotingClassifier(
+    estimators=[
+        ('lr', LogisticRegression()),
+        ('rf', RandomForestClassifier()),
+        ('svm', SVC(probability=True))
+    ],
+    voting='soft',
+    weights=[1, 2, 1]  # Веса моделей
+)
+
+voting_soft.fit(X_train, y_train)
+
+# Сравнение с отдельными моделями
+for name, model in voting_soft.named_estimators_.items():
+    score = model.score(X_test, y_test)
+    print(f"{name}: {score:.3f}")
+    
+ensemble_score = voting_soft.score(X_test, y_test)
+print(f"Ensemble: {ensemble_score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 4. Voting для регрессии</h2>
+    <pre><code>from sklearn.ensemble import VotingRegressor
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.tree import DecisionTreeRegressor
+
+# Регрессионные модели
+lr = LinearRegression()
+ridge = Ridge(alpha=1.0)
+dt = DecisionTreeRegressor(random_state=42)
+
+# Voting regressor
+voting_reg = VotingRegressor(
+    estimators=[('lr', lr), ('ridge', ridge), ('dt', dt)],
+    weights=[1, 1, 2]  # Больший вес дереву
+)
+
+voting_reg.fit(X_train, y_train)
+
+# R² score
+from sklearn.metrics import r2_score
+y_pred = voting_reg.predict(X_test)
+print(f"R²: {r2_score(y_test, y_pred):.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 5. Stacking — основы</h2>
+    <p><strong>Stacking</strong> — использование мета-модели для комбинирования базовых моделей.</p>
+    <ul>
+      <li>Уровень 0: базовые модели</li>
+      <li>Уровень 1: мета-модель (обучается на предсказаниях базовых)</li>
+      <li>Более мощный, чем voting</li>
+      <li>Риск переобучения выше</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 6. Stacking Classifier</h2>
+    <pre><code>from sklearn.ensemble import StackingClassifier
+
+# Базовые модели (level 0)
+estimators = [
+    ('rf', RandomForestClassifier(n_estimators=100, random_state=42)),
+    ('svm', SVC(probability=True, random_state=42)),
+    ('knn', KNeighborsClassifier(n_neighbors=5))
+]
+
+# Мета-модель (level 1)
+meta_model = LogisticRegression()
+
+# Stacking
+stacking_clf = StackingClassifier(
+    estimators=estimators,
+    final_estimator=meta_model,
+    cv=5  # Кросс-валидация для избежания переобучения
+)
+
+stacking_clf.fit(X_train, y_train)
+print(f"Stacking Accuracy: {stacking_clf.score(X_test, y_test):.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 7. Stacking Regressor</h2>
+    <pre><code>from sklearn.ensemble import StackingRegressor
+
+# Базовые регрессоры
+estimators = [
+    ('lr', LinearRegression()),
+    ('ridge', Ridge(alpha=1.0)),
+    ('lasso', Lasso(alpha=0.1)),
+    ('rf', RandomForestRegressor(n_estimators=100, random_state=42))
+]
+
+# Мета-регрессор
+final_estimator = Ridge(alpha=1.0)
+
+stacking_reg = StackingRegressor(
+    estimators=estimators,
+    final_estimator=final_estimator,
+    cv=5
+)
+
+stacking_reg.fit(X_train, y_train)
+score = stacking_reg.score(X_test, y_test)
+print(f"Stacking R²: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 8. Параметры Stacking</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>estimators</code></td><td>Список базовых моделей</td><td>3-5 разнообразных моделей</td></tr>
+      <tr><td><code>final_estimator</code></td><td>Мета-модель</td><td>Простая (LR, Ridge)</td></tr>
+      <tr><td><code>cv</code></td><td>Кросс-валидация</td><td>5-10 фолдов</td></tr>
+      <tr><td><code>passthrough</code></td><td>Передать исходные признаки</td><td>False обычно</td></tr>
+    </table>
+    
+    <pre><code># С passthrough=True мета-модель видит и исходные признаки
+stacking = StackingClassifier(
+    estimators=estimators,
+    final_estimator=LogisticRegression(),
+    cv=5,
+    passthrough=True  # Добавить исходные X к предсказаниям
+)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 9. Разнообразие моделей</h2>
+    <p>Ключ к успеху ансамблей — разнообразие базовых моделей.</p>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошие комбинации</h3>
+        <ul>
+          <li>Линейные + нелинейные модели</li>
+          <li>Параметрические + непараметрические</li>
+          <li>Быстрые + медленные</li>
+          <li>Простые + сложные</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохие комбинации</h3>
+        <ul>
+          <li>Очень похожие модели</li>
+          <li>Все переобучаются</li>
+          <li>Все недообучаются</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <h2>🔷 10. Пример: полный пайплайн</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import cross_val_score
+
+# Базовые модели с пайплайнами
+estimators = [
+    ('rf', RandomForestClassifier(n_estimators=100)),
+    ('gbm', GradientBoostingClassifier(n_estimators=100)),
+    ('svm', Pipeline([
+        ('scaler', StandardScaler()),
+        ('svm', SVC(probability=True))
+    ]))
+]
+
+# Stacking с кросс-валидацией
+stacking = StackingClassifier(
+    estimators=estimators,
+    final_estimator=LogisticRegression(),
+    cv=5
+)
+
+# Оценка
+scores = cross_val_score(stacking, X, y, cv=5, scoring='accuracy')
+print(f"Mean accuracy: {scores.mean():.3f} ± {scores.std():.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 11. Сравнение методов</h2>
+    <pre><code>import pandas as pd
+from sklearn.model_selection import cross_val_score
+
+models = {
+    'RandomForest': RandomForestClassifier(n_estimators=100, random_state=42),
+    'GradientBoosting': GradientBoostingClassifier(n_estimators=100, random_state=42),
+    'SVM': SVC(probability=True, random_state=42),
+    'Voting(hard)': VotingClassifier(estimators=estimators, voting='hard'),
+    'Voting(soft)': VotingClassifier(estimators=estimators, voting='soft'),
+    'Stacking': StackingClassifier(estimators=estimators, final_estimator=LogisticRegression(), cv=5)
+}
+
+results = {}
+for name, model in models.items():
+    scores = cross_val_score(model, X_train, y_train, cv=5, scoring='accuracy')
+    results[name] = {'mean': scores.mean(), 'std': scores.std()}
+
+df_results = pd.DataFrame(results).T
+print(df_results.sort_values('mean', ascending=False))</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 12. Чек-лист</h2>
+    <ul>
+      <li>[ ] Использовать разнообразные базовые модели</li>
+      <li>[ ] Начать с Voting (проще)</li>
+      <li>[ ] Stacking для лучшей производительности</li>
+      <li>[ ] Использовать кросс-валидацию в Stacking</li>
+      <li>[ ] Настроить веса в Voting</li>
+      <li>[ ] Простая мета-модель в Stacking</li>
+      <li>[ ] Проверить на валидации</li>
+      <li>[ ] Сравнить с базовыми моделями</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Ансамбли — это когда мы спрашиваем мнение нескольких экспертов и принимаем решение на основе их голосов. Voting просто подсчитывает голоса, а Stacking учит специального "судью", который знает, когда какому эксперту лучше доверять».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

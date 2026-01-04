@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Feature Interaction и Polynomial Features Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔗 Feature Interaction и Polynomial Features Cheatsheet</h1>
+  <div class="subtitle">Feature Engineering • Нелинейные зависимости • Python<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое взаимодействие признаков</h2>
+    <p><strong>Взаимодействие признаков (Feature Interaction)</strong> — создание новых признаков путём комбинирования существующих.</p>
+    <ul>
+      <li><strong>Цель</strong>: захватить нелинейные зависимости</li>
+      <li><strong>Пример</strong>: цена = площадь × район</li>
+      <li><strong>Применение</strong>: улучшение линейных моделей</li>
+      <li><strong>Риск</strong>: переобучение при большом числе признаков</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Простые взаимодействия</h2>
+    <p>Создание произведений признаков вручную.</p>
+    <pre><code>import pandas as pd
+import numpy as np
+
+# Данные
+df = pd.DataFrame({
+    'age': [25, 30, 35, 40],
+    'income': [50000, 60000, 70000, 80000],
+    'education_years': [16, 18, 20, 22]
+})
+
+# Произведение двух признаков
+df['age_income'] = df['age'] * df['income']
+
+# Отношение признаков
+df['income_per_edu'] = df['income'] / df['education_years']
+
+# Разность
+df['income_age_diff'] = df['income'] - df['age'] * 1000
+
+print(df.head())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Polynomial Features</h2>
+    <p>Автоматическое создание полиномиальных признаков.</p>
+    <pre><code>from sklearn.preprocessing import PolynomialFeatures
+
+# Исходные признаки: [x1, x2]
+X = np.array([[2, 3],
+              [3, 4],
+              [4, 5]])
+
+# degree=2: [1, x1, x2, x1², x1·x2, x2²]
+poly = PolynomialFeatures(degree=2, include_bias=True)
+X_poly = poly.fit_transform(X)
+
+print("Исходные признаки:", X.shape)
+print("После полинома:", X_poly.shape)
+print("\nНазвания признаков:")
+print(poly.get_feature_names_out(['x1', 'x2']))</code></pre>
+    
+    <p><strong>Результат для [2, 3]:</strong></p>
+    <code>[1, 2, 3, 4, 6, 9]</code>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Параметры PolynomialFeatures</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендация</th></tr>
+      <tr><td><code>degree</code></td><td>Степень полинома</td><td>2-3 (редко больше)</td></tr>
+      <tr><td><code>interaction_only</code></td><td>Только взаимодействия, без степеней</td><td>True для меньшего числа признаков</td></tr>
+      <tr><td><code>include_bias</code></td><td>Добавить константу (1)</td><td>False с большинством моделей</td></tr>
+    </table>
+
+    <pre><code># Только взаимодействия (без x1², x2²)
+poly = PolynomialFeatures(
+    degree=2, 
+    interaction_only=True,
+    include_bias=False
+)
+X_interact = poly.fit_transform(X)
+
+# Результат: [x1, x2, x1·x2]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Пример: линейная регрессия</h2>
+    <pre><code>from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import Pipeline
+from sklearn.model_selection import train_test_split
+
+# Разделение данных
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Пайплайн с полиномиальными признаками
+model = Pipeline([
+    ('poly', PolynomialFeatures(degree=2, include_bias=False)),
+    ('linear', LinearRegression())
+])
+
+# Обучение
+model.fit(X_train, y_train)
+
+# Оценка
+train_score = model.score(X_train, y_train)
+test_score = model.score(X_test, y_test)
+
+print(f"Train R²: {train_score:.4f}")
+print(f"Test R²: {test_score:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Рост размерности</h2>
+    <p>Количество признаков растёт комбинаторно!</p>
+    
+    <table>
+      <tr><th>Исходно</th><th>degree=2</th><th>degree=3</th><th>degree=4</th></tr>
+      <tr><td>2</td><td>6</td><td>10</td><td>15</td></tr>
+      <tr><td>5</td><td>21</td><td>56</td><td>126</td></tr>
+      <tr><td>10</td><td>66</td><td>286</td><td>1001</td></tr>
+      <tr><td>20</td><td>231</td><td>1771</td><td>10626</td></tr>
+    </table>
+
+    <p><strong>Формула:</strong> C(n+d, d), где n — число признаков, d — степень.</p>
+    
+    <blockquote>
+      ⚠️ При большом числе признаков используйте регуляризацию (Ridge, Lasso)!
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Регуляризация с полиномами</h2>
+    <pre><code>from sklearn.linear_model import Ridge, Lasso
+
+# Ridge регрессия с полиномиальными признаками
+model_ridge = Pipeline([
+    ('poly', PolynomialFeatures(degree=3)),
+    ('scaler', StandardScaler()),
+    ('ridge', Ridge(alpha=1.0))
+])
+
+model_ridge.fit(X_train, y_train)
+
+# Lasso для отбора признаков
+model_lasso = Pipeline([
+    ('poly', PolynomialFeatures(degree=3)),
+    ('scaler', StandardScaler()),
+    ('lasso', Lasso(alpha=0.1))
+])
+
+model_lasso.fit(X_train, y_train)
+
+# Lasso обнулит некоторые коэффициенты
+print("Ненулевых признаков:", np.sum(model_lasso.named_steps['lasso'].coef_ != 0))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Доменные взаимодействия</h2>
+    <p>Создание осмысленных взаимодействий на основе знания предметной области.</p>
+    
+    <h3>Пример: недвижимость</h3>
+    <pre><code># Цена за квадратный метр
+df['price_per_sqm'] = df['price'] / df['area']
+
+# Возраст здания
+df['building_age'] = 2024 - df['year_built']
+
+# Взаимодействие района и площади
+df['location_area'] = df['location_score'] * df['area']
+
+# Отношение комнат к площади
+df['rooms_per_sqm'] = df['rooms'] / df['area']</code></pre>
+
+    <h3>Пример: клиенты банка</h3>
+    <pre><code># Соотношение долга к доходу
+df['debt_to_income'] = df['debt'] / df['income']
+
+# Взаимодействие возраста и кредитной истории
+df['age_credit_history'] = df['age'] * df['credit_history_years']
+
+# Доход на члена семьи
+df['income_per_family_member'] = df['income'] / df['family_size']</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Поиск важных взаимодействий</h2>
+    <p>Автоматический поиск полезных взаимодействий.</p>
+    
+    <h3>Метод 1: Перебор с оценкой</h3>
+    <pre><code>from sklearn.feature_selection import mutual_info_regression
+from itertools import combinations
+
+def find_best_interactions(X, y, top_n=5):
+    """Найти топ-N лучших взаимодействий"""
+    interactions = {}
+    
+    # Все пары признаков
+    for feat1, feat2 in combinations(X.columns, 2):
+        interaction = X[feat1] * X[feat2]
+        score = mutual_info_regression(
+            interaction.values.reshape(-1, 1), y
+        )[0]
+        interactions[f"{feat1}*{feat2}"] = score
+    
+    # Сортировка по важности
+    sorted_int = sorted(interactions.items(), 
+                       key=lambda x: x[1], 
+                       reverse=True)
+    
+    return sorted_int[:top_n]
+
+top_interactions = find_best_interactions(X_train, y_train)
+print("Топ-5 взаимодействий:")
+for name, score in top_interactions:
+    print(f"{name}: {score:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Feature crosses (категориальные)</h2>
+    <p>Комбинирование категориальных признаков.</p>
+    <pre><code>import pandas as pd
+
+df = pd.DataFrame({
+    'city': ['Moscow', 'SPB', 'Moscow', 'Kazan'],
+    'property_type': ['flat', 'flat', 'house', 'flat'],
+    'price': [100, 80, 150, 60]
+})
+
+# Создание кросс-признака
+df['city_type'] = df['city'] + '_' + df['property_type']
+
+# One-hot encoding
+df_encoded = pd.get_dummies(df, columns=['city_type'])
+print(df_encoded)</code></pre>
+
+    <p><strong>Результат:</strong> признаки <code>Moscow_flat</code>, <code>Moscow_house</code>, <code>SPB_flat</code>, etc.</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Биннинг + взаимодействия</h2>
+    <p>Дискретизация непрерывных признаков с последующим созданием взаимодействий.</p>
+    <pre><code>from sklearn.preprocessing import KBinsDiscretizer
+
+# Биннинг возраста
+discretizer = KBinsDiscretizer(
+    n_bins=5, 
+    encode='ordinal', 
+    strategy='quantile'
+)
+df['age_binned'] = discretizer.fit_transform(
+    df[['age']]
+)
+
+# Взаимодействие binned возраста с доходом
+df['age_bin_income'] = df['age_binned'] * df['income']
+
+# Или категориальное взаимодействие
+df['age_bin_str'] = df['age_binned'].astype(str)
+df['age_location'] = df['age_bin_str'] + '_' + df['location']</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Взаимодействия в дереьях</h2>
+    <p>Деревья решений автоматически учитывают взаимодействия!</p>
+    <ul>
+      <li>Разбиения учитывают комбинации признаков</li>
+      <li>Не нужно создавать вручную для RF, XGBoost, etc.</li>
+      <li>Но можно добавить для улучшения</li>
+    </ul>
+    
+    <pre><code>from sklearn.ensemble import RandomForestRegressor
+
+# Случайный лес БЕЗ явных взаимодействий
+rf = RandomForestRegressor(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+score_base = rf.score(X_test, y_test)
+
+# С добавлением взаимодействий
+poly = PolynomialFeatures(degree=2, interaction_only=True)
+X_train_poly = poly.fit_transform(X_train)
+X_test_poly = poly.transform(X_test)
+
+rf_poly = RandomForestRegressor(n_estimators=100, random_state=42)
+rf_poly.fit(X_train_poly, y_train)
+score_poly = rf_poly.score(X_test_poly, y_test)
+
+print(f"Без взаимодействий: {score_base:.4f}")
+print(f"С взаимодействиями: {score_poly:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Пример с реальными данными</h2>
+    <pre><code>import pandas as pd
+from sklearn.datasets import fetch_california_housing
+from sklearn.model_selection import cross_val_score
+
+# Загрузка данных
+housing = fetch_california_housing()
+X = pd.DataFrame(housing.data, columns=housing.feature_names)
+y = housing.target
+
+# Базовая модель
+lr_base = LinearRegression()
+scores_base = cross_val_score(lr_base, X, y, cv=5, scoring='r2')
+
+# С полиномиальными признаками
+pipeline_poly = Pipeline([
+    ('poly', PolynomialFeatures(degree=2, include_bias=False)),
+    ('scaler', StandardScaler()),
+    ('ridge', Ridge(alpha=10.0))
+])
+scores_poly = cross_val_score(pipeline_poly, X, y, cv=5, scoring='r2')
+
+print(f"Базовая модель: {scores_base.mean():.4f} ± {scores_base.std():.4f}")
+print(f"С полиномами: {scores_poly.mean():.4f} ± {scores_poly.std():.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Отбор взаимодействий</h2>
+    <p>После создания множества взаимодействий нужен отбор признаков.</p>
+    
+    <h3>Метод 1: Lasso</h3>
+    <pre><code>from sklearn.linear_model import LassoCV
+
+# Создание взаимодействий
+poly = PolynomialFeatures(degree=2)
+X_poly = poly.fit_transform(X)
+
+# Lasso с кросс-валидацией
+lasso = LassoCV(cv=5, random_state=42)
+lasso.fit(X_poly, y)
+
+# Важные признаки
+feature_names = poly.get_feature_names_out(X.columns)
+important_features = feature_names[lasso.coef_ != 0]
+
+print(f"Отобрано признаков: {len(important_features)} из {len(feature_names)}")
+print("Важные взаимодействия:")
+for feat in important_features:
+    if ' ' in feat:  # взаимодействия содержат пробел
+        print(f"  {feat}")</code></pre>
+
+    <h3>Метод 2: SelectFromModel</h3>
+    <pre><code>from sklearn.feature_selection import SelectFromModel
+from sklearn.ensemble import RandomForestRegressor
+
+# Создание взаимодействий
+X_poly = poly.fit_transform(X)
+
+# Отбор на основе важности признаков
+rf = RandomForestRegressor(n_estimators=100, random_state=42)
+selector = SelectFromModel(rf, threshold='median')
+selector.fit(X_poly, y)
+
+X_selected = selector.transform(X_poly)
+print(f"Отобрано: {X_selected.shape[1]} из {X_poly.shape[1]}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо работает</h3>
+        <ul>
+          <li>Линейные модели (LR, Ridge, Lasso)</li>
+          <li>SVM с линейным ядром</li>
+          <li>Логистическая регрессия</li>
+          <li>Малое число исходных признаков (< 20)</li>
+          <li>Есть регуляризация</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Осторожно</h3>
+        <ul>
+          <li>Деревья (могут и без этого)</li>
+          <li>Много исходных признаков (> 50)</li>
+          <li>Малый объём данных</li>
+          <li>Нет регуляризации</li>
+          <li>Высокая степень полинома (> 3)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Практические советы</h2>
+    <ul>
+      <li><strong>Масштабирование обязательно</strong> после создания взаимодействий</li>
+      <li><strong>Начните с degree=2</strong>, редко нужно больше</li>
+      <li><strong>Используйте регуляризацию</strong> (Ridge/Lasso)</li>
+      <li><strong>Проверяйте на валидации</strong>, легко переобучиться</li>
+      <li><strong>Доменные знания важнее</strong> автоматического перебора</li>
+      <li><strong>Отбор признаков</strong> после создания взаимодействий</li>
+      <li><strong>Визуализируйте</strong> важные взаимодействия</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Визуализация взаимодействий</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Тепловая карта взаимодействий
+interactions = pd.DataFrame()
+for i, col1 in enumerate(X.columns):
+    for col2 in X.columns[i+1:]:
+        interactions[f"{col1}*{col2}"] = X[col1] * X[col2]
+
+# Корреляция с целевой переменной
+corr_with_target = interactions.corrwith(y).sort_values(ascending=False)
+
+plt.figure(figsize=(10, 6))
+corr_with_target.head(20).plot(kind='barh')
+plt.xlabel('Корреляция с целевой переменной')
+plt.title('Топ-20 взаимодействий')
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист</h2>
+    <ul>
+      <li>[ ] Начать с простых взаимодействий (x1 * x2)</li>
+      <li>[ ] Использовать доменные знания</li>
+      <li>[ ] Попробовать PolynomialFeatures с degree=2</li>
+      <li>[ ] Применить масштабирование</li>
+      <li>[ ] Добавить регуляризацию</li>
+      <li>[ ] Проверить на кросс-валидации</li>
+      <li>[ ] Отобрать важные признаки</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Сравнить с базовой моделью</li>
+      <li>[ ] Следить за переобучением</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Взаимодействия признаков — это когда мы учитываем не только отдельные факторы, но и их комбинации. Например, цена квартиры зависит не только от площади и района по отдельности, но и от их сочетания — большая квартира в хорошем районе стоит непропорционально дороже».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
