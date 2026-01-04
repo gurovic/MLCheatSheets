@@ -109,6 +109,29 @@
       font-size: 0.88em;
     }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 6px 0;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border: 1px solid #e0e7ff;
+    }
+
+    th {
+      background-color: #1a5fb4;
+      color: white;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
     @media print {
       .container { column-gap: 12px; }
       .block { box-shadow: none; }
@@ -126,18 +149,425 @@
   <div class="subtitle">Обучение с подкреплением • Практический фокус<br>📅 Январь 2026</div>
 
   <div class="block">
-    <h2>🔷 1. Q-learning</h2>
-    <p>Off-policy алгоритм. Обновление: Q(s,a) ← Q(s,a) + α[r + γ max Q(s',a') - Q(s,a)]. Учится на оптимальной политике, независимо от поведенческой политики.</p>
+    <h2>🔷 1. Основы обучения с подкреплением</h2>
+    <p><strong>Reinforcement Learning (RL)</strong>: агент учится принимать решения, взаимодействуя со средой</p>
+    <ul>
+      <li><strong>Agent</strong>: тот, кто принимает решения</li>
+      <li><strong>Environment</strong>: мир, в котором действует агент</li>
+      <li><strong>State (s)</strong>: текущая ситуация</li>
+      <li><strong>Action (a)</strong>: выбор агента</li>
+      <li><strong>Reward (r)</strong>: обратная связь от среды</li>
+      <li><strong>Policy (π)</strong>: стратегия выбора действий</li>
+      <li><strong>Value function (V/Q)</strong>: ожидаемая награда</li>
+    </ul>
+    <blockquote>
+      💡 Цель: максимизировать суммарную награду во времени
+    </blockquote>
   </div>
 
   <div class="block">
-    <h2>🔷 2. SARSA</h2>
-    <p>On-policy алгоритм. Обновление: Q(s,a) ← Q(s,a) + α[r + γ Q(s',a') - Q(s,a)]. Учится на текущей политике. Более консервативен, чем Q-learning.</p>
+    <h2>🔷 2. Q-learning (Off-Policy)</h2>
+    <p><strong>Идея</strong>: учится на оптимальной политике, независимо от поведенческой</p>
+    <p><strong>Формула обновления</strong>:</p>
+    <pre><code>Q(s,a) ← Q(s,a) + α[r + γ max_a' Q(s',a') - Q(s,a)]
+
+где:
+α - learning rate (скорость обучения)
+γ - discount factor (коэффициент дисконтирования)
+r - reward (награда)
+s' - next state (следующее состояние)
+max_a' Q(s',a') - максимальная Q-value в следующем состоянии</code></pre>
+    <ul>
+      <li><strong>Off-policy</strong>: обновление использует max Q(s',a'), не зависит от выбранного действия</li>
+      <li><strong>Оптимистичный</strong>: всегда выбирает наилучшее действие для обновления</li>
+      <li><strong>Exploration</strong>: использует ε-greedy или другие стратегии</li>
+    </ul>
   </div>
 
   <div class="block">
-    <h2>🔷 3. Разница</h2>
-    <p>Q-learning: использует max Q(s',a') — жадный выбор. SARSA: использует Q(s',a') следующего действия — действительно выполненное действие.</p>
+    <h2>🔷 3. Реализация Q-learning</h2>
+    <pre><code>import numpy as np
+
+class QLearningAgent:
+    def __init__(self, n_states, n_actions, 
+                 alpha=0.1, gamma=0.99, epsilon=0.1):
+        self.n_states = n_states
+        self.n_actions = n_actions
+        self.alpha = alpha  # learning rate
+        self.gamma = gamma  # discount factor
+        self.epsilon = epsilon  # exploration rate
+        
+        # Инициализация Q-table
+        self.Q = np.zeros((n_states, n_actions))
+    
+    def choose_action(self, state):
+        # ε-greedy policy
+        if np.random.rand() < self.epsilon:
+            return np.random.randint(self.n_actions)  # explore
+        else:
+            return np.argmax(self.Q[state])  # exploit
+    
+    def update(self, state, action, reward, next_state):
+        # Q-learning update
+        best_next_action = np.argmax(self.Q[next_state])
+        td_target = reward + self.gamma * self.Q[next_state, best_next_action]
+        td_error = td_target - self.Q[state, action]
+        self.Q[state, action] += self.alpha * td_error
+    
+    def train(self, env, episodes=1000):
+        rewards_history = []
+        
+        for episode in range(episodes):
+            state = env.reset()
+            total_reward = 0
+            done = False
+            
+            while not done:
+                action = self.choose_action(state)
+                next_state, reward, done, _ = env.step(action)
+                self.update(state, action, reward, next_state)
+                
+                state = next_state
+                total_reward += reward
+            
+            rewards_history.append(total_reward)
+            
+            # Decay epsilon
+            self.epsilon = max(0.01, self.epsilon * 0.995)
+        
+        return rewards_history</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. SARSA (On-Policy)</h2>
+    <p><strong>Идея</strong>: учится на реальной политике поведения агента</p>
+    <p><strong>Формула обновления</strong>:</p>
+    <pre><code>Q(s,a) ← Q(s,a) + α[r + γ Q(s',a') - Q(s,a)]
+
+где:
+a' - реально выбранное следующее действие
+    (не обязательно максимальное!)</code></pre>
+    <ul>
+      <li><strong>On-policy</strong>: обновление учитывает реально выбранное действие a'</li>
+      <li><strong>Консервативный</strong>: более осторожен в рискованных ситуациях</li>
+      <li><strong>SARSA</strong> = State-Action-Reward-State-Action</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Реализация SARSA</h2>
+    <pre><code>class SARSAAgent:
+    def __init__(self, n_states, n_actions,
+                alpha=0.1, gamma=0.99, epsilon=0.1):
+        self.n_states = n_states
+        self.n_actions = n_actions
+        self.alpha = alpha
+        self.gamma = gamma
+        self.epsilon = epsilon
+        self.Q = np.zeros((n_states, n_actions))
+    
+    def choose_action(self, state):
+        # ε-greedy policy
+        if np.random.rand() < self.epsilon:
+            return np.random.randint(self.n_actions)
+        else:
+            return np.argmax(self.Q[state])
+    
+    def update(self, state, action, reward, 
+              next_state, next_action):
+        # SARSA update (использует next_action, не max!)
+        td_target = reward + self.gamma * self.Q[next_state, next_action]
+        td_error = td_target - self.Q[state, action]
+        self.Q[state, action] += self.alpha * td_error
+    
+    def train(self, env, episodes=1000):
+        rewards_history = []
+        
+        for episode in range(episodes):
+            state = env.reset()
+            action = self.choose_action(state)  # Выбираем первое действие
+            total_reward = 0
+            done = False
+            
+            while not done:
+                next_state, reward, done, _ = env.step(action)
+                next_action = self.choose_action(next_state)  # Следующее действие
+                
+                self.update(state, action, reward, 
+                          next_state, next_action)
+                
+                state = next_state
+                action = next_action  # Важно: используем выбранное действие
+                total_reward += reward
+            
+            rewards_history.append(total_reward)
+            self.epsilon = max(0.01, self.epsilon * 0.995)
+        
+        return rewards_history</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Ключевые различия Q-learning vs SARSA</h2>
+    <table>
+      <tr><th>Аспект</th><th>Q-learning</th><th>SARSA</th></tr>
+      <tr><td>Тип</td><td>Off-policy</td><td>On-policy</td></tr>
+      <tr><td>Обновление</td><td>max Q(s',a')</td><td>Q(s',a') реального действия</td></tr>
+      <tr><td>Поведение</td><td>Оптимистичное</td><td>Консервативное</td></tr>
+      <tr><td>Риск</td><td>Более рискованный</td><td>Более осторожный</td></tr>
+      <tr><td>Скорость</td><td>Может быстрее</td><td>Может медленнее</td></tr>
+      <tr><td>Стабильность</td><td>Менее стабилен</td><td>Более стабилен</td></tr>
+      <tr><td>Cliff Walking</td><td>Идёт близко к обрыву</td><td>Идёт безопасным путем</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Пример: Cliff Walking</h2>
+    <pre><code>import gym
+
+# Создание среды
+env = gym.make('CliffWalking-v0')
+
+# Q-learning агент
+q_agent = QLearningAgent(
+    n_states=env.observation_space.n,
+    n_actions=env.action_space.n,
+    alpha=0.5,
+    gamma=0.99,
+    epsilon=0.1
+)
+
+# SARSA агент
+sarsa_agent = SARSAAgent(
+    n_states=env.observation_space.n,
+    n_actions=env.action_space.n,
+    alpha=0.5,
+    gamma=0.99,
+    epsilon=0.1
+)
+
+# Обучение
+q_rewards = q_agent.train(env, episodes=500)
+sarsa_rewards = sarsa_agent.train(env, episodes=500)
+
+# Визуализация
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+plt.plot(q_rewards, label='Q-learning', alpha=0.7)
+plt.plot(sarsa_rewards, label='SARSA', alpha=0.7)
+plt.xlabel('Episode')
+plt.ylabel('Total Reward')
+plt.title('Training Performance')
+plt.legend()
+plt.grid(alpha=0.3)
+
+# Сглаженные кривые
+window = 20
+q_smooth = np.convolve(q_rewards, np.ones(window)/window, mode='valid')
+sarsa_smooth = np.convolve(sarsa_rewards, np.ones(window)/window, mode='valid')
+
+plt.subplot(1, 2, 2)
+plt.plot(q_smooth, label='Q-learning (smoothed)', linewidth=2)
+plt.plot(sarsa_smooth, label='SARSA (smoothed)', linewidth=2)
+plt.xlabel('Episode')
+plt.ylabel('Average Reward')
+plt.title(f'Smoothed Performance (window={window})')
+plt.legend()
+plt.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Параметры и их влияние</h2>
+    <ul>
+      <li><strong>Learning rate (α)</strong>:
+        <ul>
+          <li>Высокий (0.5-1.0): быстрое обучение, может быть нестабильным</li>
+          <li>Низкий (0.01-0.1): медленное, но стабильное обучение</li>
+          <li>Рекомендация: 0.1-0.5, decay со временем</li>
+        </ul>
+      </li>
+      <li><strong>Discount factor (γ)</strong>:
+        <ul>
+          <li>Близко к 1 (0.95-0.99): учитывает долгосрочные награды</li>
+          <li>Близко к 0: фокус на немедленных наградах</li>
+          <li>Рекомендация: 0.95-0.99</li>
+        </ul>
+      </li>
+      <li><strong>Exploration rate (ε)</strong>:
+        <ul>
+          <li>Начало: 0.5-1.0 (много исследования)</li>
+          <li>Конец: 0.01-0.05 (эксплуатация)</li>
+          <li>Стратегия: экспоненциальный decay</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Стратегии exploration</h2>
+    <pre><code># 1. ε-greedy (основная)
+def epsilon_greedy(Q, state, epsilon):
+    if np.random.rand() < epsilon:
+        return np.random.randint(len(Q[state]))
+    return np.argmax(Q[state])
+
+# 2. Softmax (Boltzmann)
+def softmax_action(Q, state, temperature=1.0):
+    q_values = Q[state]
+    exp_q = np.exp(q_values / temperature)
+    probs = exp_q / np.sum(exp_q)
+    return np.random.choice(len(q_values), p=probs)
+
+# 3. UCB (Upper Confidence Bound)
+def ucb_action(Q, state, counts, total_count, c=2.0):
+    q_values = Q[state]
+    counts_state = counts[state]
+    
+    ucb_values = q_values + c * np.sqrt(
+        np.log(total_count + 1) / (counts_state + 1)
+    )
+    return np.argmax(ucb_values)
+
+# 4. Decay epsilon
+def decay_epsilon(epsilon, episode, decay_rate=0.995, 
+                 min_epsilon=0.01):
+    return max(min_epsilon, epsilon * decay_rate)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Оценка и визуализация Q-table</h2>
+    <pre><code># Визуализация Q-table
+def visualize_q_table(Q, env_shape=(4, 12)):
+    """Визуализация Q-table для grid world"""
+    fig, axes = plt.subplots(1, 4, figsize=(16, 4))
+    actions = ['Up', 'Right', 'Down', 'Left']
+    
+    for action in range(4):
+        q_grid = Q[:, action].reshape(env_shape)
+        im = axes[action].imshow(q_grid, cmap='RdYlGn')
+        axes[action].set_title(f'Q-values: {actions[action]}')
+        plt.colorbar(im, ax=axes[action])
+    
+    plt.tight_layout()
+    plt.show()
+
+# Визуализация оптимальной политики
+def visualize_policy(Q, env_shape=(4, 12)):
+    """Визуализация оптимальной политики"""
+    policy = np.argmax(Q, axis=1).reshape(env_shape)
+    
+    arrows = ['↑', '→', '↓', '←']
+    fig, ax = plt.subplots(figsize=(12, 4))
+    
+    for i in range(env_shape[0]):
+        for j in range(env_shape[1]):
+            state = i * env_shape[1] + j
+            action = policy[i, j]
+            ax.text(j, i, arrows[action],
+                   ha='center', va='center', fontsize=20)
+    
+    ax.set_xlim(-0.5, env_shape[1]-0.5)
+    ax.set_ylim(-0.5, env_shape[0]-0.5)
+    ax.set_xticks(range(env_shape[1]))
+    ax.set_yticks(range(env_shape[0]))
+    ax.grid(True)
+    ax.set_title('Optimal Policy')
+    ax.invert_yaxis()
+    plt.show()
+
+# Оценка производительности
+def evaluate_agent(agent, env, n_episodes=100):
+    total_rewards = []
+    
+    for _ in range(n_episodes):
+        state = env.reset()
+        total_reward = 0
+        done = False
+        
+        while not done:
+            # Жадная политика (без exploration)
+            action = np.argmax(agent.Q[state])
+            state, reward, done, _ = env.step(action)
+            total_reward += reward
+        
+        total_rewards.append(total_reward)
+    
+    return {
+        'mean': np.mean(total_rewards),
+        'std': np.std(total_rewards),
+        'min': np.min(total_rewards),
+        'max': np.max(total_rewards)
+    }</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать Q-learning vs SARSA</h2>
+    <blockquote>
+      <strong>Используйте Q-learning когда:</strong>
+      <ul>
+        <li>Нужна оптимальная политика</li>
+        <li>Можете позволить рискованные действия</li>
+        <li>Среда детерминирована</li>
+        <li>Быстрая сходимость важнее стабильности</li>
+      </ul>
+      <strong>Используйте SARSA когда:</strong>
+      <ul>
+        <li>Безопасность критична (cliff walking, робототехника)</li>
+        <li>Среда стохастична</li>
+        <li>Нужна стабильная политика</li>
+        <li>Важно избегать рискованных ситуаций</li>
+      </ul>
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Расширения и улучшения</h2>
+    <ul>
+      <li><strong>Expected SARSA</strong>: использует ожидаемое значение Q(s',a') вместо конкретного</li>
+      <li><strong>Double Q-learning</strong>: две Q-table для уменьшения переоценки</li>
+      <li><strong>N-step SARSA/Q-learning</strong>: учитывает N шагов вперед</li>
+      <li><strong>Eligibility Traces</strong>: SARSA(λ), Q(λ)</li>
+      <li><strong>Deep Q-Network (DQN)</strong>: нейросеть вместо Q-table</li>
+    </ul>
+    <pre><code># Expected SARSA
+def expected_sarsa_update(Q, state, action, reward, 
+                         next_state, epsilon, alpha, gamma):
+    # Вычисление ожидаемого Q-value
+    n_actions = len(Q[next_state])
+    expected_q = 0
+    
+    # Вероятность для каждого действия
+    for a in range(n_actions):
+        if a == np.argmax(Q[next_state]):
+            prob = 1 - epsilon + epsilon / n_actions
+        else:
+            prob = epsilon / n_actions
+        expected_q += prob * Q[next_state, a]
+    
+    # Обновление
+    td_target = reward + gamma * expected_q
+    Q[state, action] += alpha * (td_target - Q[state, action])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ol>
+      <li>✅ Определить пространство состояний и действий</li>
+      <li>✅ Выбрать алгоритм (Q-learning или SARSA)</li>
+      <li>✅ Установить гиперпараметры (α, γ, ε)</li>
+      <li>✅ Инициализировать Q-table</li>
+      <li>✅ Выбрать стратегию exploration</li>
+      <li>✅ Обучить агента достаточное число эпизодов</li>
+      <li>✅ Визуализировать Q-values и политику</li>
+      <li>✅ Оценить производительность</li>
+      <li>✅ Настроить параметры при необходимости</li>
+      <li>✅ Рассмотреть расширения для улучшения</li>
+    </ol>
   </div>
 
 </div>

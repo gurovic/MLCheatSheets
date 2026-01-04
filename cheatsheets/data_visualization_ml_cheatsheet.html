@@ -109,6 +109,29 @@
       font-size: 0.88em;
     }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 6px 0;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border: 1px solid #e0e7ff;
+    }
+
+    th {
+      background-color: #1a5fb4;
+      color: white;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
     @media print {
       .container { column-gap: 12px; }
       .block { box-shadow: none; }
@@ -126,30 +149,582 @@
   <div class="subtitle">EDA и визуализация результатов • Практический фокус<br>📅 Январь 2026</div>
 
   <div class="block">
-    <h2>🔷 1. Распределения</h2>
+    <h2>🔷 1. Распределения признаков</h2>
     <pre><code>import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
 
-sns.histplot(data=df, x='feature')
+# Гистограмма
+sns.histplot(data=df, x='feature', bins=30, kde=True)
+plt.title('Распределение признака')
+plt.show()
+
+# Boxplot для нескольких категорий
 sns.boxplot(data=df, x='category', y='value')
-sns.violinplot(data=df, x='category', y='value')</code></pre>
+plt.title('Boxplot по категориям')
+plt.show()
+
+# Violin plot (комбинация box + density)
+sns.violinplot(data=df, x='category', y='value')
+plt.title('Violin plot')
+plt.show()
+
+# Несколько распределений на одном графике
+fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+for idx, col in enumerate(df.select_dtypes(include='number').columns[:4]):
+    sns.histplot(df[col], kde=True, ax=axes[idx//2, idx%2])
+    axes[idx//2, idx%2].set_title(f'Распределение {col}')
+plt.tight_layout()
+plt.show()</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 2. Корреляции</h2>
-    <pre><code>corr = df.corr()
-sns.heatmap(corr, annot=True, cmap='coolwarm')
+    <h2>🔷 2. Корреляционный анализ</h2>
+    <pre><code># Heatmap корреляций
+corr_matrix = df.corr()
+plt.figure(figsize=(10, 8))
+sns.heatmap(corr_matrix, annot=True, cmap='coolwarm',
+           center=0, vmin=-1, vmax=1,
+           square=True, linewidths=0.5)
+plt.title('Матрица корреляций')
+plt.show()
 
-pd.plotting.scatter_matrix(df, figsize=(12, 12))</code></pre>
+# Scatter matrix (pairplot)
+sns.pairplot(df, hue='target', diag_kind='kde')
+plt.show()
+
+# Pandas scatter matrix
+from pandas.plotting import scatter_matrix
+scatter_matrix(df, alpha=0.5, figsize=(15, 15), 
+              diagonal='kde')
+plt.show()
+
+# Топ коррелирующих признаков
+def plot_top_correlations(df, target, n=10):
+    corr = df.corr()[target].sort_values(ascending=False)
+    top_corr = corr.head(n+1)[1:]  # Исключаем сам target
+    
+    plt.figure(figsize=(10, 6))
+    top_corr.plot(kind='barh')
+    plt.title(f'Топ {n} признаков по корреляции с {target}')
+    plt.xlabel('Корреляция')
+    plt.tight_layout()
+    plt.show()
+
+plot_top_correlations(df, 'price', n=10)</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 3. Результаты модели</h2>
+    <h2>🔷 3. Матрица ошибок и метрики классификации</h2>
     <pre><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import classification_report
+import numpy as np
 
+# Confusion Matrix
 cm = confusion_matrix(y_test, y_pred)
-disp = ConfusionMatrixDisplay(cm)
-disp.plot()</code></pre>
+disp = ConfusionMatrixDisplay(confusion_matrix=cm,
+                              display_labels=['Class 0', 'Class 1'])
+disp.plot(cmap='Blues', values_format='d')
+plt.title('Confusion Matrix')
+plt.show()
+
+# Нормализованная Confusion Matrix
+cm_norm = confusion_matrix(y_test, y_pred, normalize='true')
+disp_norm = ConfusionMatrixDisplay(confusion_matrix=cm_norm,
+                                   display_labels=['Class 0', 'Class 1'])
+disp_norm.plot(cmap='Blues', values_format='.2f')
+plt.title('Normalized Confusion Matrix')
+plt.show()
+
+# Multiclass confusion matrix
+from sklearn.datasets import load_iris
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+
+iris = load_iris()
+X_train, X_test, y_train, y_test = train_test_split(
+    iris.data, iris.target, test_size=0.3, random_state=42
+)
+
+clf = RandomForestClassifier()
+clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)
+
+cm_multi = confusion_matrix(y_test, y_pred)
+disp_multi = ConfusionMatrixDisplay(
+    confusion_matrix=cm_multi,
+    display_labels=iris.target_names
+)
+disp_multi.plot(cmap='viridis')
+plt.title('Multiclass Confusion Matrix')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. ROC и PR кривые</h2>
+    <pre><code>from sklearn.metrics import roc_curve, auc, precision_recall_curve
+from sklearn.metrics import average_precision_score
+
+# ROC Curve
+y_proba = clf.predict_proba(X_test)[:, 1]
+fpr, tpr, thresholds = roc_curve(y_test, y_proba)
+roc_auc = auc(fpr, tpr)
+
+plt.figure(figsize=(10, 5))
+
+# ROC
+plt.subplot(1, 2, 1)
+plt.plot(fpr, tpr, color='darkorange', lw=2,
+        label=f'ROC curve (AUC = {roc_auc:.2f})')
+plt.plot([0, 1], [0, 1], color='navy', lw=2, 
+        linestyle='--', label='Random')
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.legend(loc="lower right")
+plt.grid(alpha=0.3)
+
+# Precision-Recall Curve
+precision, recall, _ = precision_recall_curve(y_test, y_proba)
+avg_precision = average_precision_score(y_test, y_proba)
+
+plt.subplot(1, 2, 2)
+plt.plot(recall, precision, color='blue', lw=2,
+        label=f'PR curve (AP = {avg_precision:.2f})')
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall Curve')
+plt.legend(loc="lower left")
+plt.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Важность признаков</h2>
+    <pre><code># Feature importance для tree-based моделей
+from sklearn.ensemble import RandomForestClassifier
+
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+
+# Получение важностей
+importances = rf.feature_importances_
+feature_names = X_train.columns  # если DataFrame
+indices = np.argsort(importances)[::-1]
+
+# Визуализация
+plt.figure(figsize=(12, 6))
+plt.title('Feature Importances')
+plt.bar(range(len(importances)), importances[indices])
+plt.xticks(range(len(importances)), 
+          [feature_names[i] for i in indices], 
+          rotation=45, ha='right')
+plt.xlabel('Features')
+plt.ylabel('Importance')
+plt.tight_layout()
+plt.show()
+
+# Horizontal bar chart (для многих признаков)
+top_n = 15
+top_indices = indices[:top_n]
+plt.figure(figsize=(10, 8))
+plt.barh(range(top_n), importances[top_indices])
+plt.yticks(range(top_n), [feature_names[i] for i in top_indices])
+plt.xlabel('Importance')
+plt.title(f'Top {top_n} Feature Importances')
+plt.gca().invert_yaxis()
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Кривые обучения</h2>
+    <pre><code>from sklearn.model_selection import learning_curve
+
+# Вычисление learning curve
+train_sizes, train_scores, val_scores = learning_curve(
+    estimator=clf,
+    X=X_train,
+    y=y_train,
+    train_sizes=np.linspace(0.1, 1.0, 10),
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1
+)
+
+# Вычисление средних и std
+train_mean = np.mean(train_scores, axis=1)
+train_std = np.std(train_scores, axis=1)
+val_mean = np.mean(val_scores, axis=1)
+val_std = np.std(val_scores, axis=1)
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(train_sizes, train_mean, label='Training score',
+        color='blue', marker='o')
+plt.fill_between(train_sizes, 
+                train_mean - train_std,
+                train_mean + train_std,
+                alpha=0.15, color='blue')
+
+plt.plot(train_sizes, val_mean, label='Validation score',
+        color='green', marker='s')
+plt.fill_between(train_sizes,
+                val_mean - val_std,
+                val_mean + val_std,
+                alpha=0.15, color='green')
+
+plt.xlabel('Training Set Size')
+plt.ylabel('Accuracy Score')
+plt.title('Learning Curves')
+plt.legend(loc='lower right')
+plt.grid(alpha=0.3)
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Визуализация кластеризации</h2>
+    <pre><code>from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+
+# Кластеризация
+kmeans = KMeans(n_clusters=3, random_state=42)
+clusters = kmeans.fit_predict(X)
+
+# PCA для визуализации
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X)
+
+# Scatter plot с кластерами
+plt.figure(figsize=(10, 6))
+scatter = plt.scatter(X_pca[:, 0], X_pca[:, 1],
+                     c=clusters, cmap='viridis',
+                     alpha=0.6, edgecolors='k')
+plt.scatter(kmeans.cluster_centers_[:, 0],
+           kmeans.cluster_centers_[:, 1],
+           c='red', marker='X', s=200,
+           edgecolors='black', linewidths=2,
+           label='Centroids')
+plt.xlabel('First Principal Component')
+plt.ylabel('Second Principal Component')
+plt.title('K-Means Clustering Visualization')
+plt.colorbar(scatter, label='Cluster')
+plt.legend()
+plt.grid(alpha=0.3)
+plt.show()
+
+# Dendrogram для иерархической кластеризации
+from scipy.cluster.hierarchy import dendrogram, linkage
+
+linkage_matrix = linkage(X, method='ward')
+
+plt.figure(figsize=(12, 6))
+dendrogram(linkage_matrix)
+plt.title('Hierarchical Clustering Dendrogram')
+plt.xlabel('Sample Index')
+plt.ylabel('Distance')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Снижение размерности (PCA, t-SNE)</h2>
+    <pre><code>from sklearn.manifold import TSNE
+from sklearn.preprocessing import StandardScaler
+
+# Стандартизация
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# PCA
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+# t-SNE
+tsne = TSNE(n_components=2, random_state=42, perplexity=30)
+X_tsne = tsne.fit_transform(X_scaled)
+
+# Визуализация
+fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+
+# PCA
+axes[0].scatter(X_pca[:, 0], X_pca[:, 1], 
+               c=y, cmap='tab10', alpha=0.6)
+axes[0].set_title(f'PCA (Explained Var: {pca.explained_variance_ratio_.sum():.2%})')
+axes[0].set_xlabel('PC1')
+axes[0].set_ylabel('PC2')
+axes[0].grid(alpha=0.3)
+
+# t-SNE
+axes[1].scatter(X_tsne[:, 0], X_tsne[:, 1],
+               c=y, cmap='tab10', alpha=0.6)
+axes[1].set_title('t-SNE')
+axes[1].set_xlabel('Dimension 1')
+axes[1].set_ylabel('Dimension 2')
+axes[1].grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+# Scree plot (объясненная дисперсия)
+pca_full = PCA()
+pca_full.fit(X_scaled)
+
+plt.figure(figsize=(10, 6))
+plt.plot(range(1, len(pca_full.explained_variance_ratio_)+1),
+        np.cumsum(pca_full.explained_variance_ratio_),
+        marker='o')
+plt.xlabel('Number of Components')
+plt.ylabel('Cumulative Explained Variance')
+plt.title('PCA Scree Plot')
+plt.grid(alpha=0.3)
+plt.axhline(y=0.95, color='r', linestyle='--', 
+           label='95% threshold')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Residual plots для регрессии</h2>
+    <pre><code>from sklearn.linear_model import LinearRegression
+
+# Обучение модели
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+y_pred = lr.predict(X_test)
+
+# Residuals
+residuals = y_test - y_pred
+
+# Residual plot
+fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+
+# 1. Residuals vs Predicted
+axes[0, 0].scatter(y_pred, residuals, alpha=0.5)
+axes[0, 0].axhline(y=0, color='r', linestyle='--')
+axes[0, 0].set_xlabel('Predicted Values')
+axes[0, 0].set_ylabel('Residuals')
+axes[0, 0].set_title('Residuals vs Predicted')
+axes[0, 0].grid(alpha=0.3)
+
+# 2. Histogram of residuals
+axes[0, 1].hist(residuals, bins=30, edgecolor='black')
+axes[0, 1].set_xlabel('Residuals')
+axes[0, 1].set_ylabel('Frequency')
+axes[0, 1].set_title('Distribution of Residuals')
+axes[0, 1].grid(alpha=0.3)
+
+# 3. Q-Q plot
+from scipy import stats
+stats.probplot(residuals, dist="norm", plot=axes[1, 0])
+axes[1, 0].set_title('Q-Q Plot')
+axes[1, 0].grid(alpha=0.3)
+
+# 4. Predicted vs Actual
+axes[1, 1].scatter(y_test, y_pred, alpha=0.5)
+axes[1, 1].plot([y_test.min(), y_test.max()],
+               [y_test.min(), y_test.max()],
+               'r--', lw=2)
+axes[1, 1].set_xlabel('Actual Values')
+axes[1, 1].set_ylabel('Predicted Values')
+axes[1, 1].set_title('Predicted vs Actual')
+axes[1, 1].grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Сравнение моделей</h2>
+    <pre><code>from sklearn.model_selection import cross_val_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.linear_model import LogisticRegression
+
+# Список моделей
+models = {
+    'Logistic Regression': LogisticRegression(),
+    'Random Forest': RandomForestClassifier(),
+    'SVM': SVC(probability=True)
+}
+
+# Cross-validation scores
+results = {}
+for name, model in models.items():
+    scores = cross_val_score(model, X_train, y_train, 
+                            cv=5, scoring='accuracy')
+    results[name] = scores
+
+# Box plot сравнения
+plt.figure(figsize=(12, 6))
+plt.boxplot(results.values(), labels=results.keys())
+plt.ylabel('Accuracy Score')
+plt.title('Model Comparison (5-Fold CV)')
+plt.grid(axis='y', alpha=0.3)
+plt.xticks(rotation=15)
+plt.tight_layout()
+plt.show()
+
+# Bar plot со средними значениями
+means = {name: np.mean(scores) for name, scores in results.items()}
+stds = {name: np.std(scores) for name, scores in results.items()}
+
+plt.figure(figsize=(10, 6))
+x = range(len(means))
+plt.bar(x, means.values(), yerr=stds.values(), capsize=5,
+       alpha=0.7, color='skyblue', edgecolor='black')
+plt.xticks(x, means.keys(), rotation=15)
+plt.ylabel('Mean Accuracy')
+plt.title('Mean Accuracy with Standard Deviation')
+plt.grid(axis='y', alpha=0.3)
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Временные ряды</h2>
+    <pre><code>import pandas as pd
+import matplotlib.dates as mdates
+
+# Временной ряд
+dates = pd.date_range('2020-01-01', periods=365)
+values = np.cumsum(np.random.randn(365)) + 100
+
+ts_df = pd.DataFrame({'date': dates, 'value': values})
+ts_df.set_index('date', inplace=True)
+
+# Основной график
+fig, axes = plt.subplots(3, 1, figsize=(14, 10))
+
+# 1. Line plot
+axes[0].plot(ts_df.index, ts_df['value'])
+axes[0].set_title('Time Series Data')
+axes[0].set_ylabel('Value')
+axes[0].grid(alpha=0.3)
+
+# 2. Скользящее среднее
+ts_df['MA_7'] = ts_df['value'].rolling(window=7).mean()
+ts_df['MA_30'] = ts_df['value'].rolling(window=30).mean()
+
+axes[1].plot(ts_df.index, ts_df['value'], 
+            label='Original', alpha=0.5)
+axes[1].plot(ts_df.index, ts_df['MA_7'],
+            label='7-day MA', linewidth=2)
+axes[1].plot(ts_df.index, ts_df['MA_30'],
+            label='30-day MA', linewidth=2)
+axes[1].set_title('Moving Averages')
+axes[1].set_ylabel('Value')
+axes[1].legend()
+axes[1].grid(alpha=0.3)
+
+# 3. Seasonal decomposition
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+decomposition = seasonal_decompose(ts_df['value'], 
+                                  model='additive', 
+                                  period=30)
+axes[2].plot(ts_df.index, decomposition.trend)
+axes[2].set_title('Trend Component')
+axes[2].set_xlabel('Date')
+axes[2].set_ylabel('Value')
+axes[2].grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Интерактивная визуализация (Plotly)</h2>
+    <pre><code>import plotly.express as px
+import plotly.graph_objects as go
+
+# Scatter plot с hover
+fig = px.scatter(df, x='feature1', y='feature2',
+                color='target', size='feature3',
+                hover_data=['feature4', 'feature5'],
+                title='Interactive Scatter Plot')
+fig.show()
+
+# Interactive confusion matrix
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(y_test, y_pred)
+
+fig = go.Figure(data=go.Heatmap(
+    z=cm,
+    x=['Predicted 0', 'Predicted 1'],
+    y=['Actual 0', 'Actual 1'],
+    colorscale='Blues',
+    text=cm,
+    texttemplate='%{text}',
+    textfont={"size": 16}
+))
+fig.update_layout(title='Interactive Confusion Matrix',
+                 xaxis_title='Predicted',
+                 yaxis_title='Actual')
+fig.show()
+
+# 3D scatter plot
+fig = px.scatter_3d(df, x='feature1', y='feature2', z='feature3',
+                   color='target',
+                   title='3D Scatter Plot')
+fig.show()
+
+# Интерактивная корреляционная матрица
+corr = df.corr()
+fig = go.Figure(data=go.Heatmap(
+    z=corr.values,
+    x=corr.columns,
+    y=corr.columns,
+    colorscale='RdBu',
+    zmid=0
+))
+fig.update_layout(title='Interactive Correlation Matrix')
+fig.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Best Practices</h2>
+    <ul>
+      <li><strong>Выбор цветов</strong>: используйте colorblind-friendly палитры</li>
+      <li><strong>Размер графика</strong>: достаточно большой для читаемости (10-14 inches)</li>
+      <li><strong>Подписи</strong>: всегда добавляйте title, xlabel, ylabel</li>
+      <li><strong>Легенда</strong>: размещайте так, чтобы не загораживала данные</li>
+      <li><strong>Gridlines</strong>: используйте с alpha=0.3 для удобства</li>
+      <li><strong>DPI</strong>: для сохранения используйте dpi=300</li>
+      <li><strong>Стиль</strong>: используйте seaborn стили для согласованности</li>
+    </ul>
+    <pre><code># Настройка стиля
+sns.set_style("whitegrid")
+sns.set_context("notebook", font_scale=1.2)
+sns.set_palette("husl")
+
+# Сохранение с высоким разрешением
+plt.savefig('plot.png', dpi=300, bbox_inches='tight')
+
+# Цветовые палитры
+# Categorical: 'tab10', 'Set1', 'Set2', 'Set3'
+# Sequential: 'Blues', 'Greens', 'Reds', 'viridis'
+# Diverging: 'coolwarm', 'RdBu', 'RdYlGn'</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист визуализации</h2>
+    <ol>
+      <li>✅ Выбрать подходящий тип графика для данных</li>
+      <li>✅ Установить размер фигуры (figsize)</li>
+      <li>✅ Добавить заголовок (title)</li>
+      <li>✅ Подписать оси (xlabel, ylabel)</li>
+      <li>✅ Добавить легенду при необходимости</li>
+      <li>✅ Использовать подходящую цветовую схему</li>
+      <li>✅ Добавить grid для удобства чтения</li>
+      <li>✅ Проверить читаемость шрифтов</li>
+      <li>✅ Сохранить с высоким DPI</li>
+      <li>✅ Проверить на разных размерах экрана</li>
+    </ol>
   </div>
 
 </div>

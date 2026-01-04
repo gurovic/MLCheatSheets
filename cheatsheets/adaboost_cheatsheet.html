@@ -109,6 +109,29 @@
       font-size: 0.88em;
     }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 6px 0;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border: 1px solid #e0e7ff;
+    }
+
+    th {
+      background-color: #1a5fb4;
+      color: white;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
     @media print {
       .container { column-gap: 12px; }
       .block { box-shadow: none; }
@@ -126,27 +149,395 @@
   <div class="subtitle">Adaptive Boosting • Практический фокус<br>📅 Январь 2026</div>
 
   <div class="block">
-    <h2>🔷 1. Суть</h2>
-    <p>Последовательно обучает слабые классификаторы. Каждый следующий фокусируется на ошибках предыдущих. Взвешивает примеры: больший вес для ошибочно классифицированных. Финальное предсказание — взвешенное голосование.</p>
+    <h2>🔷 1. Суть AdaBoost</h2>
+    <p><strong>Adaptive Boosting</strong>: последовательное обучение слабых классификаторов</p>
+    <ul>
+      <li><strong>Идея</strong>: каждый следующий классификатор фокусируется на ошибках предыдущих</li>
+      <li><strong>Веса примеров</strong>: увеличиваются для неправильно классифицированных</li>
+      <li><strong>Веса классификаторов</strong>: зависят от точности</li>
+      <li><strong>Финальное предсказание</strong>: взвешенное голосование всех классификаторов</li>
+      <li><strong>Слабые классификаторы</strong>: обычно decision stumps (деревья глубины 1)</li>
+    </ul>
+    <blockquote>
+      💡 AdaBoost превращает множество слабых классификаторов в один сильный
+    </blockquote>
   </div>
 
   <div class="block">
-    <h2>🔷 2. Код</h2>
+    <h2>🔷 2. Алгоритм AdaBoost</h2>
+    <pre><code><strong>Шаги:</strong>
+1. Инициализация: w_i = 1/N для всех примеров
+2. Для t = 1 до T:
+   a. Обучить слабый классификатор h_t на взвешенных данных
+   b. Вычислить ошибку: ε_t = Σ(w_i * I(y_i ≠ h_t(x_i)))
+   c. Вычислить вес классификатора:
+      α_t = 0.5 * ln((1 - ε_t) / ε_t)
+   d. Обновить веса примеров:
+      w_i = w_i * exp(-α_t * y_i * h_t(x_i))
+   e. Нормализовать веса: w_i = w_i / Σw_i
+3. Финальный классификатор:
+   H(x) = sign(Σ α_t * h_t(x))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый пример (Классификация)</h2>
     <pre><code>from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
+# Генерация данных
+X, y = make_classification(n_samples=1000, n_features=20,
+                          n_classes=2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Создание модели
 ada = AdaBoostClassifier(
     base_estimator=DecisionTreeClassifier(max_depth=1),
     n_estimators=50,
-    learning_rate=1.0
+    learning_rate=1.0,
+    random_state=42
 )
+
+# Обучение
 ada.fit(X_train, y_train)
-y_pred = ada.predict(X_test)</code></pre>
+
+# Предсказание
+y_pred = ada.predict(X_test)
+y_proba = ada.predict_proba(X_test)
+
+# Оценка
+accuracy = accuracy_score(y_test, y_pred)
+print(f"Accuracy: {accuracy:.3f}")</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 3. Параметры</h2>
-    <p>n_estimators: число слабых классификаторов. learning_rate: вес каждого классификатора. base_estimator: базовый классификатор (обычно decision stump).</p>
+    <h2>🔷 4. Параметры AdaBoost</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>n_estimators</code></td><td>Число слабых классификаторов</td><td>50-500</td></tr>
+      <tr><td><code>learning_rate</code></td><td>Вес каждого классификатора</td><td>0.1-1.0</td></tr>
+      <tr><td><code>base_estimator</code></td><td>Базовый классификатор</td><td>DecisionTreeClassifier(max_depth=1)</td></tr>
+      <tr><td><code>algorithm</code></td><td>'SAMME' или 'SAMME.R'</td><td>'SAMME.R' (для вероятностей)</td></tr>
+      <tr><td><code>random_state</code></td><td>Seed для воспроизводимости</td><td>Любое целое</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Регрессия с AdaBoost</h2>
+    <pre><code>from sklearn.ensemble import AdaBoostRegressor
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error
+import numpy as np
+
+# Создание данных
+X, y = make_regression(n_samples=1000, n_features=10,
+                      noise=10, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Модель
+ada_reg = AdaBoostRegressor(
+    base_estimator=DecisionTreeRegressor(max_depth=4),
+    n_estimators=100,
+    learning_rate=1.0,
+    loss='linear',  # 'linear', 'square', 'exponential'
+    random_state=42
+)
+
+# Обучение
+ada_reg.fit(X_train, y_train)
+
+# Предсказание
+y_pred = ada_reg.predict(X_test)
+
+# Оценка
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+print(f"RMSE: {rmse:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Подбор гиперпараметров</h2>
+    <pre><code>from sklearn.model_selection import GridSearchCV
+
+# Сетка параметров
+param_grid = {
+    'n_estimators': [50, 100, 200],
+    'learning_rate': [0.01, 0.1, 0.5, 1.0],
+    'base_estimator__max_depth': [1, 2, 3]
+}
+
+# Grid Search
+ada = AdaBoostClassifier(
+    base_estimator=DecisionTreeClassifier(),
+    random_state=42
+)
+
+grid_search = GridSearchCV(
+    ada, param_grid,
+    cv=5, scoring='accuracy',
+    n_jobs=-1, verbose=1
+)
+
+grid_search.fit(X_train, y_train)
+
+print(f"Best parameters: {grid_search.best_params_}")
+print(f"Best CV score: {grid_search.best_score_:.3f}")
+
+# Лучшая модель
+best_ada = grid_search.best_estimator_
+test_score = best_ada.score(X_test, y_test)
+print(f"Test score: {test_score:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Важность признаков</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Обучение модели
+ada = AdaBoostClassifier(n_estimators=100, random_state=42)
+ada.fit(X_train, y_train)
+
+# Важность признаков
+importances = ada.feature_importances_
+indices = np.argsort(importances)[::-1]
+
+# Визуализация
+plt.figure(figsize=(12, 6))
+plt.title('Feature Importances (AdaBoost)')
+plt.bar(range(X_train.shape[1]), importances[indices])
+plt.xticks(range(X_train.shape[1]), indices)
+plt.xlabel('Feature Index')
+plt.ylabel('Importance')
+plt.grid(axis='y', alpha=0.3)
+plt.show()
+
+# Топ-N признаков
+top_n = 10
+top_features = indices[:top_n]
+print(f"Top {top_n} features: {top_features}")
+print(f"Importances: {importances[top_features]}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Staged predictions</h2>
+    <pre><code># Staged predictions для анализа
+import matplotlib.pyplot as plt
+
+ada = AdaBoostClassifier(n_estimators=100, random_state=42)
+ada.fit(X_train, y_train)
+
+# Оценка на каждом этапе
+train_scores = []
+test_scores = []
+
+for y_train_pred in ada.staged_predict(X_train):
+    train_scores.append(accuracy_score(y_train, y_train_pred))
+
+for y_test_pred in ada.staged_predict(X_test):
+    test_scores.append(accuracy_score(y_test, y_test_pred))
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(train_scores, label='Training Accuracy', linewidth=2)
+plt.plot(test_scores, label='Test Accuracy', linewidth=2)
+plt.xlabel('Number of Estimators')
+plt.ylabel('Accuracy')
+plt.title('AdaBoost: Training vs Test Accuracy')
+plt.legend()
+plt.grid(alpha=0.3)
+plt.show()
+
+# Определение оптимального числа классификаторов
+optimal_n = np.argmax(test_scores) + 1
+print(f"Optimal n_estimators: {optimal_n}")
+print(f"Best test accuracy: {test_scores[optimal_n-1]:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Сравнение с другими методами</h2>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.tree import DecisionTreeClassifier
+
+# Модели
+models = {
+    'Decision Tree': DecisionTreeClassifier(max_depth=5),
+    'Random Forest': RandomForestClassifier(n_estimators=100),
+    'AdaBoost': AdaBoostClassifier(n_estimators=100),
+    'Gradient Boosting': GradientBoostingClassifier(n_estimators=100)
+}
+
+# Сравнение
+results = {}
+for name, model in models.items():
+    model.fit(X_train, y_train)
+    train_score = model.score(X_train, y_train)
+    test_score = model.score(X_test, y_test)
+    results[name] = {'train': train_score, 'test': test_score}
+
+# Визуализация
+import pandas as pd
+
+df_results = pd.DataFrame(results).T
+df_results.plot(kind='bar', figsize=(10, 6))
+plt.title('Model Comparison')
+plt.ylabel('Accuracy')
+plt.xlabel('Model')
+plt.xticks(rotation=15)
+plt.legend(['Train', 'Test'])
+plt.grid(axis='y', alpha=0.3)
+plt.tight_layout()
+plt.show()
+
+print(df_results)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Преимущества и недостатки</h2>
+    <ul>
+      <li><strong>✅ Преимущества:</strong>
+        <ul>
+          <li>Высокая точность для многих задач</li>
+          <li>Мало гиперпараметров для настройки</li>
+          <li>Автоматический feature selection</li>
+          <li>Не требует масштабирования признаков</li>
+          <li>Работает с категориальными и числовыми данными</li>
+        </ul>
+      </li>
+      <li><strong>❌ Недостатки:</strong>
+        <ul>
+          <li>Чувствителен к шуму и выбросам</li>
+          <li>Склонен к переобучению</li>
+          <li>Медленнее Random Forest (последовательное обучение)</li>
+          <li>Плохо работает с несбалансированными данными</li>
+          <li>Требует тщательного подбора n_estimators</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Работа с несбалансированными данными</h2>
+    <pre><code>from sklearn.utils import class_weight
+
+# Вычисление весов классов
+class_weights = class_weight.compute_class_weight(
+    'balanced',
+    classes=np.unique(y_train),
+    y=y_train
+)
+class_weight_dict = dict(enumerate(class_weights))
+
+# AdaBoost с весами
+from sklearn.tree import DecisionTreeClassifier
+
+base_clf = DecisionTreeClassifier(
+    max_depth=1,
+    class_weight=class_weight_dict
+)
+
+ada = AdaBoostClassifier(
+    base_estimator=base_clf,
+    n_estimators=100,
+    random_state=42
+)
+
+ada.fit(X_train, y_train)
+
+# SMOTE для балансировки
+from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline as ImbPipeline
+
+smote = SMOTE(random_state=42)
+pipeline = ImbPipeline([
+    ('smote', smote),
+    ('adaboost', AdaBoostClassifier(n_estimators=100))
+])
+
+pipeline.fit(X_train, y_train)
+y_pred = pipeline.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Early Stopping</h2>
+    <pre><code>from sklearn.model_selection import train_test_split
+
+# Разделение на train и validation
+X_tr, X_val, y_tr, y_val = train_test_split(
+    X_train, y_train, test_size=0.2, random_state=42
+)
+
+# Обучение с ранней остановкой
+best_score = 0
+best_n = 0
+patience = 10
+no_improvement = 0
+
+for n in range(10, 501, 10):
+    ada = AdaBoostClassifier(n_estimators=n, random_state=42)
+    ada.fit(X_tr, y_tr)
+    val_score = ada.score(X_val, y_val)
+    
+    if val_score > best_score:
+        best_score = val_score
+        best_n = n
+        no_improvement = 0
+    else:
+        no_improvement += 1
+    
+    if no_improvement >= patience:
+        print(f"Early stopping at {n} estimators")
+        break
+
+print(f"Best n_estimators: {best_n}")
+print(f"Best validation score: {best_score:.3f}")
+
+# Обучение финальной модели
+final_ada = AdaBoostClassifier(n_estimators=best_n, 
+                               random_state=42)
+final_ada.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Когда использовать AdaBoost</h2>
+    <blockquote>
+      <strong>Используйте AdaBoost когда:</strong>
+      <ul>
+        <li>Данные с небольшим шумом</li>
+        <li>Нужна высокая точность</li>
+        <li>Важна интерпретируемость (с decision stumps)</li>
+        <li>Есть время на подбор параметров</li>
+        <li>Данные достаточно сбалансированы</li>
+      </ul>
+      <strong>НЕ используйте когда:</strong>
+      <ul>
+        <li>Много шума и выбросов в данных</li>
+        <li>Данные сильно несбалансированы</li>
+        <li>Нужна высокая скорость обучения</li>
+        <li>Данные высокоразмерны с большим числом признаков</li>
+      </ul>
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист использования</h2>
+    <ol>
+      <li>✅ Проверить данные на выбросы и шум</li>
+      <li>✅ Выбрать базовый классификатор (обычно decision stump)</li>
+      <li>✅ Начать с n_estimators=50-100</li>
+      <li>✅ Подобрать learning_rate (0.1-1.0)</li>
+      <li>✅ Использовать cross-validation для оценки</li>
+      <li>✅ Проверить на переобучение (staged predictions)</li>
+      <li>✅ Настроить n_estimators с early stopping</li>
+      <li>✅ Оценить важность признаков</li>
+      <li>✅ Сравнить с другими ансамблями</li>
+      <li>✅ Финальная оценка на тестовой выборке</li>
+    </ol>
   </div>
 
 </div>
