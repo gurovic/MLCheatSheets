@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Иерархическое RL (Hierarchical Reinforcement Learning) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📘 Иерархическое RL (Hierarchical Reinforcement Learning) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без математики • Полный охват идей<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: разбить сложную задачу на иерархию подзадач</li>
+      <li><strong>Идея</strong>: агент на верхнем уровне выбирает подцели, на нижнем — действия</li>
+      <li><strong>Преимущества</strong>: решение долгосрочных задач, переиспользование навыков</li>
+      <li><strong>Пример</strong>: робот сначала решает «дойти до кухни», затем «открыть холодильник»</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные подходы</h2>
+    <ul>
+      <li><strong>Options framework</strong>: опции = временно расширенные действия</li>
+      <li><strong>Feudal RL</strong>: менеджеры задают подцели, рабочие их выполняют</li>
+      <li><strong>HAM/MAXQ</strong>: иерархия абстрактных машин</li>
+      <li><strong>Goal-conditioned RL</strong>: обучение достигать разные цели</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Options Framework</h2>
+    <ul>
+      <li><strong>Опция</strong> (o): политика πₒ + условие завершения βₒ + условие начала Iₒ</li>
+      <li><strong>Обучение</strong>: Q(s, o) вместо Q(s, a)</li>
+      <li><strong>Пример</strong>: опция "подойти к двери" может использоваться в разных комнатах</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Препроцессинг</h2>
+    <ul>
+      <li><strong>State normalization</strong>: нормализация наблюдений</li>
+      <li><strong>Reward shaping</strong>: модификация наград для ускорения обучения</li>
+      <li><strong>Goal encoding</strong>: кодирование подцелей</li>
+      <li><strong>Hindsight Experience Replay</strong>: переинтерпретация целей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Библиотеки и фреймворки</h2>
+    <ul>
+      <li><code>gym</code> / <code>gymnasium</code> — RL окружения</li>
+      <li><code>stable-baselines3</code> — готовые алгоритмы</li>
+      <li><code>ray[rllib]</code> — distributed RL</li>
+      <li><code>pytorch</code> / <code>tensorflow</code> — для кастомных моделей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Метрики</h2>
+    <ul>
+      <li><strong>Cumulative reward</strong>: сумма наград за эпизод</li>
+      <li><strong>Success rate</strong>: доля успешных эпизодов</li>
+      <li><strong>Episode length</strong>: количество шагов до завершения</li>
+      <li><strong>Sample efficiency</strong>: качество на единицу данных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Применения</h2>
+    <ul>
+      <li>✅ Сложные долгосрочные задачи</li>
+      <li>✅ Робототехника с множеством подзадач</li>
+      <li>✅ Multi-goal environments</li>
+      <li>❌ Простые задачи (достаточно flat RL)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Окружения и бенчмарки</h2>
+    <ul>
+      <li><strong>Atari</strong> — классические игры</li>
+      <li><strong>MuJoCo</strong> — физические симуляции</li>
+      <li><strong>Meta-World</strong> — робототехнические задачи</li>
+      <li><strong>Fetch/Shadow Hand</strong> — манипуляция объектами</li>
+    </ul>
+  </div>
+
+
+</div>
+
+</body>
+</html>

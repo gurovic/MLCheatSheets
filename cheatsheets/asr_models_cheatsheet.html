@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Модели для распознавания речи (ASR) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📘 Модели для распознавания речи (ASR) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без математики • Полный охват идей<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть ASR</h2>
+    <ul>
+      <li><strong>Цель</strong>: преобразовать аудио в текст</li>
+      <li><strong>Входные данные</strong>: wav-файлы или спектрограммы</li>
+      <li><strong>Выходные данные</strong>: последовательность слов/символов</li>
+      <li><strong>Метрики</strong>: WER (Word Error Rate), CER (Character Error Rate)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Классические подходы</h2>
+    <ul>
+      <li><strong>HMM-GMM</strong>: скрытые марковские модели + гауссовы смеси</li>
+      <li><strong>Kaldi</strong>: open-source toolkit для классического ASR</li>
+      <li><strong>Проблемы</strong>: требуют feature engineering, фонетических словарей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Deep Learning подходы</h2>
+    <ul>
+      <li><strong>DeepSpeech</strong>: end-to-end RNN + CTC loss</li>
+      <li><strong>Listen, Attend and Spell</strong>: encoder-decoder с attention</li>
+      <li><strong>Conformer</strong>: convolution + transformer</li>
+      <li><strong>Wav2Vec 2.0</strong>: self-supervised предобучение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Препроцессинг данных</h2>
+    <ul>
+      <li>Нормализация амплитуды</li>
+      <li>Ресемплирование (обычно 16кГц или 22кГц)</li>
+      <li>Удаление тишины в начале/конце</li>
+      <li>Аугментация: pitch shift, time stretch, добавление шума</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Базовый код (библиотека)</h2>
+    <ul>
+      <li><code>import librosa</code> — обработка аудио</li>
+      <li><code>torchaudio</code> — PyTorch для аудио</li>
+      <li><code>tensorflow_io</code> — TensorFlow аудио</li>
+      <li>Работа с форматами: WAV, MP3, FLAC</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Метрики качества</h2>
+    <ul>
+      <li><strong>WER</strong> (Word Error Rate) — процент ошибок слов</li>
+      <li><strong>CER</strong> (Character Error Rate) — процент ошибок символов</li>
+      <li><strong>BLEU</strong> — для оценки точности транскрипции</li>
+      <li><strong>Real-time factor</strong> — скорость распознавания</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Когда использовать</h2>
+    <ul>
+      <li>✅ Транскрипция речи в текст</li>
+      <li>✅ Голосовые ассистенты</li>
+      <li>✅ Субтитры для видео</li>
+      <li>❌ Нужна генерация речи (→ TTS)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Популярные датасеты</h2>
+    <ul>
+      <li><strong>LibriSpeech</strong> — аудиокниги, чистая речь</li>
+      <li><strong>Common Voice</strong> — краудсорсинг, многоязычный</li>
+      <li><strong>TIMIT</strong> — фонетически размеченная речь</li>
+      <li><strong>Switchboard</strong> — разговорная телефонная речь</li>
+    </ul>
+  </div>
+
+
+</div>
+
+</body>
+</html>
