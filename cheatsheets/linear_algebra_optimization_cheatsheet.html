@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Линейная алгебра и оптимизация Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88em; margin: 6px 0; }
+    th, td { padding: 6px 8px; text-align: left; border: 1px solid #e0e7ff; }
+    th { background-color: #1a5fb4; color: white; font-weight: 700; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🔢 Линейная алгебра и оптимизация Cheatsheet</h1>
+  <div class="subtitle">Linear Algebra & Optimization • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы линейной алгебры для ML</h2>
+    <p><strong>Ключевые концепции</strong>:</p>
+    <ul>
+      <li><strong>Векторы</strong>: представление данных и параметров</li>
+      <li><strong>Матрицы</strong>: линейные преобразования, веса</li>
+      <li><strong>Умножение</strong>: dot product, matrix multiplication</li>
+      <li><strong>Нормы</strong>: L1, L2, Frobenius для регуляризации</li>
+      <li><strong>Собственные векторы</strong>: PCA, spectral methods</li>
+    </ul>
+    <blockquote>💡 Линейная алгебра - язык машинного обучения</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные операции в NumPy</h2>
+    <pre><code>import numpy as np
+
+# Векторные операции
+a = np.array([1, 2, 3])
+b = np.array([4, 5, 6])
+
+dot_product = np.dot(a, b)  # 32
+cross_product = np.cross(a, b)
+
+# Матричные операции
+A = np.array([[1, 2], [3, 4]])
+B = np.array([[5, 6], [7, 8]])
+
+# Умножение матриц
+C = A @ B  # или np.matmul(A, B)
+
+# Транспонирование
+A_T = A.T
+
+# Инверсия
+A_inv = np.linalg.inv(A)
+
+# Определитель
+det = np.linalg.det(A)
+
+# Trace
+trace = np.trace(A)
+
+# Нормы
+l1_norm = np.linalg.norm(a, ord=1)
+l2_norm = np.linalg.norm(a, ord=2)
+frobenius = np.linalg.norm(A, 'fro')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Разложения матриц</h2>
+    <pre><code># SVD (Singular Value Decomposition)
+U, s, Vt = np.linalg.svd(A)
+# A = U @ np.diag(s) @ Vt
+
+# Eigendecomposition
+eigenvalues, eigenvectors = np.linalg.eig(A)
+# A @ v = λ @ v
+
+# QR decomposition
+Q, R = np.linalg.qr(A)
+# A = Q @ R
+
+# Cholesky decomposition (для симметричных положительных)
+L = np.linalg.cholesky(A)
+# A = L @ L.T
+
+# Применение SVD для PCA
+from sklearn.decomposition import PCA
+
+pca = PCA(n_components=2)
+X_reduced = pca.fit_transform(X)
+
+# Ручная реализация PCA через SVD
+X_centered = X - X.mean(axis=0)
+U, s, Vt = np.linalg.svd(X_centered, full_matrices=False)
+X_pca = U @ np.diag(s)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Градиентный спуск</h2>
+    <pre><code>def gradient_descent(f, grad_f, x0, lr=0.01, max_iter=1000):
+    """
+    Градиентный спуск
+    f: целевая функция
+    grad_f: градиент функции
+    x0: начальная точка
+    lr: learning rate
+    """
+    x = x0.copy()
+    history = [x.copy()]
+    
+    for i in range(max_iter):
+        grad = grad_f(x)
+        x = x - lr * grad
+        history.append(x.copy())
+        
+        # Проверка сходимости
+        if np.linalg.norm(grad) < 1e-6:
+            break
+    
+    return x, history
+
+# Пример: минимизация f(x) = x^2 + 2x + 1
+def f(x):
+    return x**2 + 2*x + 1
+
+def grad_f(x):
+    return 2*x + 2
+
+x_opt, history = gradient_descent(f, grad_f, np.array([5.0]), lr=0.1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Стохастический градиентный спуск</h2>
+    <pre><code>def sgd(X, y, w_init, lr=0.01, batch_size=32, epochs=100):
+    """
+    Stochastic Gradient Descent для линейной регрессии
+    """
+    w = w_init.copy()
+    n_samples = len(X)
+    
+    for epoch in range(epochs):
+        # Перемешать данные
+        indices = np.random.permutation(n_samples)
+        X_shuffled = X[indices]
+        y_shuffled = y[indices]
+        
+        # Mini-batch SGD
+        for i in range(0, n_samples, batch_size):
+            X_batch = X_shuffled[i:i+batch_size]
+            y_batch = y_shuffled[i:i+batch_size]
+            
+            # Предсказание
+            y_pred = X_batch @ w
+            
+            # Градиент
+            grad = (2/len(X_batch)) * X_batch.T @ (y_pred - y_batch)
+            
+            # Обновление
+            w = w - lr * grad
+    
+    return w
+
+# Использование
+w = sgd(X_train, y_train, w_init=np.zeros(X_train.shape[1]))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Продвинутые оптимизаторы</h2>
+    <pre><code># Momentum
+class MomentumOptimizer:
+    def __init__(self, lr=0.01, momentum=0.9):
+        self.lr = lr
+        self.momentum = momentum
+        self.velocity = None
+    
+    def update(self, params, grads):
+        if self.velocity is None:
+            self.velocity = np.zeros_like(params)
+        
+        self.velocity = self.momentum * self.velocity - self.lr * grads
+        params += self.velocity
+        return params
+
+# Adam
+class AdamOptimizer:
+    def __init__(self, lr=0.001, beta1=0.9, beta2=0.999, eps=1e-8):
+        self.lr = lr
+        self.beta1 = beta1
+        self.beta2 = beta2
+        self.eps = eps
+        self.m = None  # 1st moment
+        self.v = None  # 2nd moment
+        self.t = 0
+    
+    def update(self, params, grads):
+        if self.m is None:
+            self.m = np.zeros_like(params)
+            self.v = np.zeros_like(params)
+        
+        self.t += 1
+        
+        # Update biased moments
+        self.m = self.beta1 * self.m + (1 - self.beta1) * grads
+        self.v = self.beta2 * self.v + (1 - self.beta2) * (grads ** 2)
+        
+        # Bias correction
+        m_hat = self.m / (1 - self.beta1 ** self.t)
+        v_hat = self.v / (1 - self.beta2 ** self.t)
+        
+        # Update parameters
+        params -= self.lr * m_hat / (np.sqrt(v_hat) + self.eps)
+        return params</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Выпуклая оптимизация</h2>
+    <pre><code># Проверка выпуклости
+def is_convex(f, x1, x2, alpha=0.5):
+    """
+    Проверка выпуклости: f(αx + (1-α)y) ≤ αf(x) + (1-α)f(y)
+    """
+    x_mid = alpha * x1 + (1 - alpha) * x2
+    return f(x_mid) <= alpha * f(x1) + (1 - alpha) * f(x2)
+
+# Субградиентный метод (для невыпуклых функций)
+def subgradient_method(f, subgrad_f, x0, lr=0.01, max_iter=1000):
+    x = x0.copy()
+    
+    for i in range(max_iter):
+        subgrad = subgrad_f(x)
+        x = x - lr * subgrad / np.sqrt(i + 1)  # Уменьшающийся lr
+    
+    return x
+
+# Projected gradient descent (с ограничениями)
+def projected_gd(f, grad_f, project, x0, lr=0.01, max_iter=1000):
+    """
+    project: функция проекции на допустимое множество
+    """
+    x = x0.copy()
+    
+    for i in range(max_iter):
+        grad = grad_f(x)
+        x = x - lr * grad
+        x = project(x)  # Проекция на допустимое множество
+    
+    return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Методы второго порядка</h2>
+    <pre><code># Метод Ньютона
+def newton_method(f, grad_f, hessian_f, x0, max_iter=100):
+    """
+    Метод Ньютона: x_{k+1} = x_k - H^{-1} ∇f
+    """
+    x = x0.copy()
+    
+    for i in range(max_iter):
+        grad = grad_f(x)
+        H = hessian_f(x)
+        
+        # Решить H * delta = -grad
+        delta = np.linalg.solve(H, -grad)
+        x = x + delta
+        
+        if np.linalg.norm(grad) < 1e-6:
+            break
+    
+    return x
+
+# BFGS (Quasi-Newton)
+from scipy.optimize import minimize
+
+result = minimize(
+    f,
+    x0,
+    method='BFGS',
+    jac=grad_f,
+    options={'disp': True}
+)
+
+# L-BFGS (для больших задач)
+result = minimize(
+    f,
+    x0,
+    method='L-BFGS-B',
+    jac=grad_f,
+    bounds=bounds
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Констрейнированная оптимизация</h2>
+    <pre><code># Метод множителей Лагранжа
+def lagrangian(x, lambda_):
+    """
+    L(x, λ) = f(x) + λ^T g(x)
+    где g(x) ≤ 0 - ограничения неравенства
+    """
+    return f(x) + np.dot(lambda_, g(x))
+
+# KKT условия
+# 1. Стационарность: ∇f(x*) + Σλᵢ∇gᵢ(x*) = 0
+# 2. Прямая допустимость: gᵢ(x*) ≤ 0
+# 3. Двойственная допустимость: λᵢ ≥ 0
+# 4. Комплементарность: λᵢgᵢ(x*) = 0
+
+# SLSQP (Sequential Least Squares Programming)
+from scipy.optimize import minimize
+
+constraints = [
+    {'type': 'ineq', 'fun': lambda x: x[0] - 1},
+    {'type': 'eq', 'fun': lambda x: x[0] + x[1] - 5}
+]
+
+result = minimize(
+    f,
+    x0,
+    method='SLSQP',
+    constraints=constraints
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Численная стабильность</h2>
+    <ul>
+      <li><strong>Condition number</strong>: κ(A) = ||A|| ||A⁻¹||</li>
+      <li><strong>Избегать инверсии</strong>: используйте solve(A, b) вместо inv(A) @ b</li>
+      <li><strong>QR вместо нормальных уравнений</strong>: A^T A может быть плохо обусловлена</li>
+      <li><strong>SVD для псевдоинверсии</strong>: устойчива к сингулярности</li>
+      <li><strong>Регуляризация</strong>: добавить λI для стабильности</li>
+    </ul>
+    <pre><code># Плохо: нормальные уравнения
+A_T_A = A.T @ A
+A_T_b = A.T @ b
+x = np.linalg.solve(A_T_A, A_T_b)
+
+# Хорошо: QR decomposition
+Q, R = np.linalg.qr(A)
+x = np.linalg.solve(R, Q.T @ b)
+
+# Псевдоинверсия через SVD
+U, s, Vt = np.linalg.svd(A, full_matrices=False)
+s_inv = 1 / s
+x = Vt.T @ np.diag(s_inv) @ U.T @ b</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Оптимизация в PyTorch</h2>
+    <pre><code>import torch
+import torch.optim as optim
+
+# Параметры модели
+params = torch.randn(10, requires_grad=True)
+
+# Различные оптимизаторы
+optimizer = optim.SGD([params], lr=0.01, momentum=0.9)
+# optimizer = optim.Adam([params], lr=0.001)
+# optimizer = optim.RMSprop([params], lr=0.01)
+# optimizer = optim.Adagrad([params], lr=0.01)
+
+# Обучение
+for epoch in range(100):
+    optimizer.zero_grad()
+    
+    # Forward pass
+    loss = compute_loss(params)
+    
+    # Backward pass
+    loss.backward()
+    
+    # Update
+    optimizer.step()
+
+# Learning rate scheduling
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=30, gamma=0.1)
+
+for epoch in range(100):
+    train(...)
+    scheduler.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Применение в ML</h2>
+    <table>
+      <tr><th>Задача</th><th>Линейная алгебра</th><th>Оптимизация</th></tr>
+      <tr><td>Линейная регрессия</td><td>Нормальные уравнения</td><td>GD, SGD</td></tr>
+      <tr><td>PCA</td><td>SVD, eigendecomposition</td><td>-</td></tr>
+      <tr><td>Neural Networks</td><td>Matrix multiplication</td><td>Adam, SGD</td></tr>
+      <tr><td>SVM</td><td>Kernel trick</td><td>Quadratic programming</td></tr>
+      <tr><td>Logistic Regression</td><td>Dot product</td><td>GD, L-BFGS</td></tr>
+      <tr><td>Collaborative Filtering</td><td>Matrix factorization</td><td>ALS, SGD</td></tr>
+    </table>
+    <blockquote>💡 Эффективная реализация ML алгоритмов требует понимания линейной алгебры и оптимизации</blockquote>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Теория графов для ML Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88em; margin: 6px 0; }
+    th, td { padding: 6px 8px; text-align: left; border: 1px solid #e0e7ff; }
+    th { background-color: #1a5fb4; color: white; font-weight: 700; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🌐 Теория графов для ML Cheatsheet</h1>
+  <div class="subtitle">Graph Theory for ML • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы теории графов</h2>
+    <p><strong>Графы в ML</strong>: структуры данных для моделирования связей</p>
+    <ul>
+      <li><strong>Узлы (nodes/vertices)</strong>: объекты, сущности</li>
+      <li><strong>Рёбра (edges)</strong>: связи, отношения</li>
+      <li><strong>Направленные</strong>: с направлением (digraph)</li>
+      <li><strong>Взвешенные</strong>: с весами на рёбрах</li>
+      <li><strong>Атрибутивные</strong>: с признаками на узлах/рёбрах</li>
+    </ul>
+    <blockquote>💡 Графы моделируют сложные взаимодействия в данных</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Представление графов</h2>
+    <pre><code>import networkx as nx
+import numpy as np
+
+# Создание графа
+G = nx.Graph()
+
+# Добавление узлов
+G.add_nodes_from([1, 2, 3, 4, 5])
+
+# Добавление рёбер
+G.add_edges_from([(1, 2), (2, 3), (3, 4), (4, 5), (5, 1)])
+
+# Матрица смежности
+A = nx.adjacency_matrix(G).todense()
+# A[i,j] = 1 if edge (i,j) exists
+
+# Список смежности
+adj_list = {node: list(G.neighbors(node)) for node in G.nodes()}
+
+# Матрица инцидентности
+I = nx.incidence_matrix(G).todense()
+
+# Взвешенный граф
+G_weighted = nx.Graph()
+G_weighted.add_weighted_edges_from([
+    (1, 2, 0.5),
+    (2, 3, 0.8),
+    (3, 4, 0.3)
+])
+
+# Направленный граф
+D = nx.DiGraph()
+D.add_edges_from([(1, 2), (2, 3), (3, 1)])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Основные алгоритмы</h2>
+    <pre><code># BFS (Breadth-First Search)
+bfs_tree = nx.bfs_tree(G, source=1)
+bfs_edges = list(bfs_tree.edges())
+
+# DFS (Depth-First Search)
+dfs_tree = nx.dfs_tree(G, source=1)
+
+# Кратчайший путь (Dijkstra)
+path = nx.shortest_path(G, source=1, target=5, weight='weight')
+path_length = nx.shortest_path_length(G, source=1, target=5)
+
+# Все кратчайшие пути (Floyd-Warshall)
+all_paths = dict(nx.all_pairs_shortest_path_length(G))
+
+# Минимальное остовное дерево
+mst = nx.minimum_spanning_tree(G)
+
+# Максимальный поток
+flow_value, flow_dict = nx.maximum_flow(G, 1, 5)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Характеристики графов</h2>
+    <pre><code># Степени узлов
+degrees = dict(G.degree())
+in_degrees = dict(D.in_degree())  # для направленных
+out_degrees = dict(D.out_degree())
+
+# Центральности
+betweenness = nx.betweenness_centrality(G)
+closeness = nx.closeness_centrality(G)
+eigenvector = nx.eigenvector_centrality(G)
+pagerank = nx.pagerank(G)
+
+# Коэффициент кластеризации
+clustering = nx.clustering(G)
+avg_clustering = nx.average_clustering(G)
+
+# Связность
+is_connected = nx.is_connected(G)
+num_components = nx.number_connected_components(G)
+components = list(nx.connected_components(G))
+
+# Diameter и radius
+diameter = nx.diameter(G)
+radius = nx.radius(G)
+
+# Transitivity (global clustering coefficient)
+transitivity = nx.transitivity(G)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Graph Embeddings</h2>
+    <pre><code># Node2Vec
+from node2vec import Node2Vec
+
+# Создать модель
+node2vec = Node2Vec(
+    G,
+    dimensions=64,
+    walk_length=30,
+    num_walks=200,
+    workers=4
+)
+
+# Обучить embeddings
+model = node2vec.fit(window=10, min_count=1, batch_words=4)
+
+# Получить embeddings
+node_embeddings = {
+    str(node): model.wv[str(node)]
+    for node in G.nodes()
+}
+
+# DeepWalk (похож на Node2Vec с p=1, q=1)
+from karateclub import DeepWalk
+
+deepwalk = DeepWalk(dimensions=64)
+deepwalk.fit(G)
+embeddings = deepwalk.get_embedding()
+
+# Struc2Vec (структурное сходство)
+from karateclub import Struc2Vec
+
+struc2vec = Struc2Vec(dimensions=64)
+struc2vec.fit(G)
+embeddings = struc2vec.get_embedding()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Community Detection</h2>
+    <pre><code># Louvain algorithm
+from community import community_louvain
+
+communities = community_louvain.best_partition(G)
+
+# Girvan-Newman algorithm
+from networkx.algorithms import community as nx_comm
+
+communities_gn = nx_comm.girvan_newman(G)
+top_level = next(communities_gn)
+
+# Label propagation
+communities_lp = nx_comm.label_propagation_communities(G)
+
+# Modularity
+modularity = nx_comm.modularity(G, communities_lp)
+
+# K-clique communities
+k_cliques = list(nx_comm.k_clique_communities(G, 3))
+
+# Асинхронная label propagation
+communities_async = nx_comm.asyn_lpa_communities(G)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Graph Neural Networks (GNN)</h2>
+    <pre><code>import torch
+import torch.nn.functional as F
+from torch_geometric.nn import GCNConv
+
+class GCN(torch.nn.Module):
+    def __init__(self, num_features, hidden_dim, num_classes):
+        super().__init__()
+        self.conv1 = GCNConv(num_features, hidden_dim)
+        self.conv2 = GCNConv(hidden_dim, num_classes)
+    
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        
+        # First layer
+        x = self.conv1(x, edge_index)
+        x = F.relu(x)
+        x = F.dropout(x, training=self.training)
+        
+        # Second layer
+        x = self.conv2(x, edge_index)
+        
+        return F.log_softmax(x, dim=1)
+
+# Использование
+from torch_geometric.data import Data
+
+# Подготовка данных
+edge_index = torch.tensor([[0, 1, 1, 2],
+                           [1, 0, 2, 1]], dtype=torch.long)
+x = torch.tensor([[-1], [0], [1]], dtype=torch.float)
+data = Data(x=x, edge_index=edge_index)
+
+# Обучение
+model = GCN(num_features=1, hidden_dim=16, num_classes=2)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+
+model.train()
+optimizer.zero_grad()
+out = model(data)
+loss = F.nll_loss(out, data.y)
+loss.backward()
+optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Graph Attention Networks</h2>
+    <pre><code>from torch_geometric.nn import GATConv
+
+class GAT(torch.nn.Module):
+    def __init__(self, num_features, hidden_dim, num_classes, heads=8):
+        super().__init__()
+        self.conv1 = GATConv(
+            num_features,
+            hidden_dim,
+            heads=heads,
+            dropout=0.6
+        )
+        self.conv2 = GATConv(
+            hidden_dim * heads,
+            num_classes,
+            heads=1,
+            concat=False,
+            dropout=0.6
+        )
+    
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        
+        x = F.dropout(x, p=0.6, training=self.training)
+        x = self.conv1(x, edge_index)
+        x = F.elu(x)
+        x = F.dropout(x, p=0.6, training=self.training)
+        x = self.conv2(x, edge_index)
+        
+        return F.log_softmax(x, dim=1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Link Prediction</h2>
+    <pre><code># Heuristic methods
+def jaccard_coefficient(G, u, v):
+    """Jaccard coefficient"""
+    neighbors_u = set(G.neighbors(u))
+    neighbors_v = set(G.neighbors(v))
+    
+    intersection = len(neighbors_u & neighbors_v)
+    union = len(neighbors_u | neighbors_v)
+    
+    return intersection / union if union > 0 else 0
+
+# Adamic-Adar index
+aa_scores = nx.adamic_adar_index(G, [(u, v) for u in G.nodes() for v in G.nodes() if u != v])
+
+# Preferential attachment
+pa_scores = nx.preferential_attachment(G, [(u, v) for u in G.nodes() for v in G.nodes() if u != v])
+
+# Common neighbors
+def common_neighbors(G, u, v):
+    return len(set(G.neighbors(u)) & set(G.neighbors(v)))
+
+# Node2Vec для link prediction
+from sklearn.ensemble import RandomForestClassifier
+
+# Train embeddings
+node2vec = Node2Vec(G, dimensions=64)
+model = node2vec.fit()
+
+# Generate edge features
+def edge_embedding(u, v):
+    emb_u = model.wv[str(u)]
+    emb_v = model.wv[str(v)]
+    # Hadamard product
+    return emb_u * emb_v
+
+# Train classifier
+X_train = [edge_embedding(u, v) for u, v in train_edges]
+clf = RandomForestClassifier()
+clf.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Spectral Graph Theory</h2>
+    <pre><code># Laplacian matrix
+L = nx.laplacian_matrix(G).todense()
+# L = D - A, где D - diagonal degree matrix
+
+# Normalized Laplacian
+L_norm = nx.normalized_laplacian_matrix(G).todense()
+# L_norm = D^{-1/2} L D^{-1/2}
+
+# Eigenvalues и eigenvectors
+eigenvalues, eigenvectors = np.linalg.eigh(L)
+
+# Spectral clustering
+from sklearn.cluster import SpectralClustering
+
+clustering = SpectralClustering(
+    n_clusters=3,
+    affinity='precomputed',
+    assign_labels='discretize'
+)
+labels = clustering.fit_predict(A)
+
+# Graph cut
+from networkx.algorithms import cuts
+
+min_cut_value = cuts.minimum_cut(G, 1, 5)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Graph Classification</h2>
+    <pre><code># Graph-level features
+def graph_features(G):
+    return {
+        'num_nodes': G.number_of_nodes(),
+        'num_edges': G.number_of_edges(),
+        'density': nx.density(G),
+        'avg_degree': np.mean([d for n, d in G.degree()]),
+        'avg_clustering': nx.average_clustering(G),
+        'diameter': nx.diameter(G) if nx.is_connected(G) else 0
+    }
+
+# Graph kernels
+from grakel import GraphKernel
+
+# Weisfeiler-Lehman kernel
+wl_kernel = GraphKernel(kernel={"name": "weisfeiler_lehman", "n_iter": 5})
+
+# Random walk kernel
+rw_kernel = GraphKernel(kernel={"name": "random_walk"})
+
+# GNN для graph classification
+from torch_geometric.nn import global_mean_pool
+
+class GraphClassifier(torch.nn.Module):
+    def __init__(self, num_features, hidden_dim, num_classes):
+        super().__init__()
+        self.conv1 = GCNConv(num_features, hidden_dim)
+        self.conv2 = GCNConv(hidden_dim, hidden_dim)
+        self.fc = torch.nn.Linear(hidden_dim, num_classes)
+    
+    def forward(self, data):
+        x, edge_index, batch = data.x, data.edge_index, data.batch
+        
+        x = F.relu(self.conv1(x, edge_index))
+        x = F.relu(self.conv2(x, edge_index))
+        
+        # Global pooling
+        x = global_mean_pool(x, batch)
+        
+        x = self.fc(x)
+        return F.log_softmax(x, dim=1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Применение в ML</h2>
+    <table>
+      <tr><th>Область</th><th>Задача</th><th>Подход</th></tr>
+      <tr><td>Social Networks</td><td>Community detection</td><td>Louvain, GNN</td></tr>
+      <tr><td>Recommendation</td><td>Link prediction</td><td>Node2Vec, GNN</td></tr>
+      <tr><td>Chemistry</td><td>Molecule property</td><td>GNN, Graph kernels</td></tr>
+      <tr><td>Biology</td><td>Protein interaction</td><td>GCN, GAT</td></tr>
+      <tr><td>Computer Vision</td><td>Scene graph</td><td>GNN</td></tr>
+      <tr><td>NLP</td><td>Knowledge graphs</td><td>TransE, GNN</td></tr>
+      <tr><td>Traffic</td><td>Route optimization</td><td>Dijkstra, GNN</td></tr>
+      <tr><td>Fraud Detection</td><td>Anomaly detection</td><td>GNN, Centrality</td></tr>
+    </table>
+    <blockquote>💡 Графы универсальны для моделирования структурированных данных</blockquote>
+  </div>
+
+</div>
+</body>
+</html>
