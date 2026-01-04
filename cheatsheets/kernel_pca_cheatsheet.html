@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Kernel PCA Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔮 Kernel PCA Cheatsheet</h1>
+  <div class="subtitle">Ядерный метод главных компонент • Нелинейное снижение размерности<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Расширение PCA</strong>: нелинейная версия обычного PCA</li>
+      <li><strong>Kernel Trick</strong>: проецирование в высокомерное пространство</li>
+      <li><strong>Нелинейные структуры</strong>: находит сложные паттерны</li>
+      <li><strong>Без явного отображения</strong>: работает через ядра</li>
+      <li><strong>Применение</strong>: деноизинг, визуализация, предобработка</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый код</h2>
+    <pre><code>from sklearn.decomposition import KernelPCA
+
+# Создание модели
+kpca = KernelPCA(
+    n_components=2,
+    kernel='rbf',
+    gamma=0.1,
+    fit_inverse_transform=True,
+    random_state=42
+)
+
+# Трансформация данных
+X_transformed = kpca.fit_transform(X)
+
+# Обратное преобразование
+X_reconstructed = kpca.inverse_transform(X_transformed)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендация</th></tr>
+      <tr><td><code>n_components</code></td><td>Число компонент</td><td>2-10 для визуализации</td></tr>
+      <tr><td><code>kernel</code></td><td>Тип ядра</td><td>'rbf', 'poly', 'sigmoid', 'linear'</td></tr>
+      <tr><td><code>gamma</code></td><td>Коэфф. для RBF/poly</td><td>1/n_features или подбор</td></tr>
+      <tr><td><code>degree</code></td><td>Степень для poly</td><td>2-4</td></tr>
+      <tr><td><code>fit_inverse_transform</code></td><td>Обратное преобразование</td><td>True для деноизинга</td></tr>
+      <tr><td><code>eigen_solver</code></td><td>Метод решения</td><td>'auto', 'dense', 'arpack'</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Типы ядер</h2>
+    <p><strong>1. RBF (Gaussian)</strong>:</p>
+    <pre><code>kpca = KernelPCA(kernel='rbf', gamma=0.1)
+# K(x, y) = exp(-gamma * ||x - y||²)</code></pre>
+    <ul>
+      <li>Универсальное ядро</li>
+      <li>Хорошо для общих случаев</li>
+    </ul>
+    <p><strong>2. Polynomial</strong>:</p>
+    <pre><code>kpca = KernelPCA(kernel='poly', 
+                 degree=3, gamma=0.1, coef0=1)
+# K(x, y) = (gamma*⟨x,y⟩ + coef0)^degree</code></pre>
+    <ul>
+      <li>Для полиномиальных зависимостей</li>
+    </ul>
+    <p><strong>3. Sigmoid</strong>:</p>
+    <pre><code>kpca = KernelPCA(kernel='sigmoid', 
+                 gamma=0.1, coef0=0)
+# K(x, y) = tanh(gamma*⟨x,y⟩ + coef0)</code></pre>
+    <ul>
+      <li>Похоже на нейронные сети</li>
+    </ul>
+    <p><strong>4. Linear</strong>:</p>
+    <pre><code>kpca = KernelPCA(kernel='linear')
+# Эквивалентно обычному PCA</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Предобработка данных</h2>
+    <p>✅ <strong>Центрирование автоматическое</strong>:</p>
+    <pre><code># Kernel PCA автоматически центрирует данные
+# в пространстве признаков</code></pre>
+    <p>✅ <strong>Масштабирование рекомендуется</strong>:</p>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+kpca = KernelPCA(n_components=2, kernel='rbf')
+X_transformed = kpca.fit_transform(X_scaled)</code></pre>
+    <p>✅ <strong>Обработка выбросов</strong>:</p>
+    <ul>
+      <li>Kernel PCA чувствителен к выбросам</li>
+      <li>Использовать RobustScaler или удалить выбросы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Подбор гиперпараметров</h2>
+    <pre><code>from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import LogisticRegression
+from sklearn.pipeline import Pipeline
+
+# Pipeline: Kernel PCA + Classifier
+pipe = Pipeline([
+    ('kpca', KernelPCA(n_components=10)),
+    ('lr', LogisticRegression())
+])
+
+# Сетка параметров
+params = {
+    'kpca__kernel': ['rbf', 'poly'],
+    'kpca__gamma': [0.01, 0.1, 1.0],
+    'kpca__n_components': [5, 10, 20]
+}
+
+grid = GridSearchCV(pipe, params, cv=5)
+grid.fit(X_train, y_train)
+
+print(f"Best params: {grid.best_params_}")
+print(f"Best score: {grid.best_score_:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сравнение с обычным PCA</h2>
+    <table>
+      <tr><th>Аспект</th><th>PCA</th><th>Kernel PCA</th></tr>
+      <tr><td>Линейность</td><td>Линейный</td><td>Нелинейный</td></tr>
+      <tr><td>Скорость</td><td>Быстро</td><td>Медленнее</td></tr>
+      <tr><td>Память</td><td>O(n*d)</td><td>O(n²)</td></tr>
+      <tr><td>Интерпретация</td><td>Легко</td><td>Сложно</td></tr>
+      <tr><td>Новые данные</td><td>transform()</td><td>Нужен fit_inverse</td></tr>
+      <tr><td>Структуры</td><td>Простые</td><td>Сложные</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Визуализация результатов</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+# Обычный PCA
+from sklearn.decomposition import PCA
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X)
+axes[0].scatter(X_pca[:, 0], X_pca[:, 1], 
+                c=y, cmap='viridis')
+axes[0].set_title('Linear PCA')
+
+# Kernel PCA (RBF)
+kpca_rbf = KernelPCA(n_components=2, kernel='rbf')
+X_kpca_rbf = kpca_rbf.fit_transform(X)
+axes[1].scatter(X_kpca_rbf[:, 0], X_kpca_rbf[:, 1],
+                c=y, cmap='viridis')
+axes[1].set_title('Kernel PCA (RBF)')
+
+# Kernel PCA (poly)
+kpca_poly = KernelPCA(n_components=2, kernel='poly')
+X_kpca_poly = kpca_poly.fit_transform(X)
+axes[2].scatter(X_kpca_poly[:, 0], X_kpca_poly[:, 1],
+                c=y, cmap='viridis')
+axes[2].set_title('Kernel PCA (Poly)')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Деноизинг с Kernel PCA</h2>
+    <pre><code># Добавляем шум к данным
+import numpy as np
+X_noisy = X + 0.5 * np.random.randn(*X.shape)
+
+# Kernel PCA для деноизинга
+kpca = KernelPCA(
+    n_components=50,
+    kernel='rbf',
+    gamma=0.1,
+    fit_inverse_transform=True
+)
+
+# Проецируем и восстанавливаем
+X_kpca = kpca.fit_transform(X_noisy)
+X_denoised = kpca.inverse_transform(X_kpca)
+
+# Сравнение
+import matplotlib.pyplot as plt
+fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+axes[0].imshow(X[0].reshape(28, 28), cmap='gray')
+axes[0].set_title('Original')
+axes[1].imshow(X_noisy[0].reshape(28, 28), cmap='gray')
+axes[1].set_title('Noisy')
+axes[2].imshow(X_denoised[0].reshape(28, 28), cmap='gray')
+axes[2].set_title('Denoised')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применения</h2>
+    <ul>
+      <li><strong>Визуализация</strong>: нелинейные данные в 2D/3D</li>
+      <li><strong>Деноизинг</strong>: удаление шума из изображений</li>
+      <li><strong>Предобработка</strong>: для классификации/регрессии</li>
+      <li><strong>Детекция аномалий</strong>: через реконструкцию</li>
+      <li><strong>Feature extraction</strong>: нелинейные признаки</li>
+      <li><strong>Компрессия</strong>: нелинейное сжатие данных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Нелинейные структуры в данных</li>
+          <li>PCA не справляется</li>
+          <li>Средний размер данных (&lt;20K)</li>
+          <li>Нужна визуализация или деноизинг</li>
+          <li>Можно настроить ядро</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень большие данные (&gt;50K)</li>
+          <li>Линейные структуры (лучше PCA)</li>
+          <li>Нужна интерпретация компонент</li>
+          <li>Частое применение к новым данным</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Медленно работает</td><td>Уменьшить размер данных, использовать 'arpack'</td></tr>
+      <tr><td>Высокое потребление памяти</td><td>Использовать MiniBatchKernelPCA или sampling</td></tr>
+      <tr><td>Плохое качество</td><td>Подобрать gamma и kernel через CV</td></tr>
+      <tr><td>Переобучение</td><td>Уменьшить n_components, регуляризация</td></tr>
+      <tr><td>Не работает для новых данных</td><td>Использовать fit_inverse_transform=True</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Выбор числа компонент</h2>
+    <pre><code># Подбор через cross-validation
+from sklearn.model_selection import cross_val_score
+
+n_components_range = [5, 10, 20, 50, 100]
+scores = []
+
+for n_comp in n_components_range:
+    kpca = KernelPCA(n_components=n_comp, 
+                     kernel='rbf', gamma=0.1)
+    X_kpca = kpca.fit_transform(X_train)
+    
+    # Оценка через классификатор
+    from sklearn.linear_model import LogisticRegression
+    lr = LogisticRegression()
+    score = cross_val_score(lr, X_kpca, y_train, 
+                            cv=5).mean()
+    scores.append(score)
+
+# Выбираем оптимальное
+best_n = n_components_range[np.argmax(scores)]
+print(f"Best n_components: {best_n}")
+
+# График
+plt.plot(n_components_range, scores, 'o-')
+plt.xlabel('n_components')
+plt.ylabel('CV Score')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Детекция аномалий</h2>
+    <pre><code># Использование ошибки реконструкции
+kpca = KernelPCA(
+    n_components=10,
+    kernel='rbf',
+    gamma=0.1,
+    fit_inverse_transform=True
+)
+
+X_kpca = kpca.fit_transform(X)
+X_reconstructed = kpca.inverse_transform(X_kpca)
+
+# Ошибка реконструкции
+reconstruction_error = np.sum(
+    (X - X_reconstructed) ** 2, axis=1
+)
+
+# Аномалии = высокая ошибка
+threshold = np.percentile(reconstruction_error, 95)
+anomalies = reconstruction_error > threshold
+
+print(f"Found {anomalies.sum()} anomalies")
+
+# Визуализация
+plt.hist(reconstruction_error, bins=50)
+plt.axvline(threshold, color='r', 
+            linestyle='--', label='Threshold')
+plt.xlabel('Reconstruction Error')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Масштабировать данные (StandardScaler)</li>
+      <li>[ ] Выбрать тип ядра (начать с 'rbf')</li>
+      <li>[ ] Подобрать gamma через GridSearchCV</li>
+      <li>[ ] Выбрать n_components (начать с 10-50)</li>
+      <li>[ ] Для деноизинга: fit_inverse_transform=True</li>
+      <li>[ ] Сравнить с обычным PCA</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Проверить качество на downstream задаче</li>
+      <li>[ ] Оценить вычислительную сложность</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Kernel PCA — это умная версия обычного PCA, которая находит сложные, нелинейные 
+      паттерны в данных. Представьте, что данные лежат на изогнутой поверхности — 
+      обычный PCA увидит только плоскую проекцию, а Kernel PCA учтет изгибы и 
+      найдет более точное представление».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
