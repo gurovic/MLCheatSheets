@@ -97,7 +97,7 @@
 ### **12. Статистические методы**
 1. [Статистические методы для ML (Bootstrap, тесты)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/statistical_methods_cheatsheet.html)
 1. [Линейные модели (GLM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/glm_cheatsheet.html)
-1. Множественная регрессия
+1. [Множественная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multiple_regression_cheatsheet.html)
 1. [Дисперсионный анализ (ANOVA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/anova_cheatsheet.html)
 1. [Bootstrap](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bootstrap_methods_cheatsheet.html)
 1. Статистическая проверка гипотез
