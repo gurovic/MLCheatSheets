@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Attention для Computer Vision Cheatsheet — 3 колонки</title>
+  <meta charset="UTF-8">
+  <title>Важность признаков (Feature Importance) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+
+</head>
+<body>
+
+<div class="container">
+
+  <h1>👁️ Attention для Computer Vision Cheatsheet</h1>
+  <div class="subtitle">Self-Attention в CV • CBAM, SENet • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Attention в Computer Vision</h2>
+    <ul>
+      <li><strong>Channel Attention</strong>: SE-Net, ECA-Net</li>
+      <li><strong>Spatial Attention</strong>: фокус на областях изображения</li>
+      <li><strong>Self-Attention</strong>: Vision Transformer</li>
+      <li><strong>Hybrid</strong>: CBAM, BAM</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Squeeze-and-Excitation (SE)</h2>
+    <pre><code>import torch.nn as nn
+
+class SEBlock(nn.Module):
+    def __init__(self, channels, reduction=16):
+        super().__init__()
+        self.squeeze = nn.AdaptiveAvgPool2d(1)
+        self.excitation = nn.Sequential(
+            nn.Linear(channels, channels // reduction),
+            nn.ReLU(),
+            nn.Linear(channels // reduction, channels),
+            nn.Sigmoid()
+        )
+    
+    def forward(self, x):
+        b, c, _, _ = x.size()
+        y = self.squeeze(x).view(b, c)
+        y = self.excitation(y).view(b, c, 1, 1)
+        return x * y</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Spatial Attention</h2>
+    <pre><code>class SpatialAttention(nn.Module):
+    def __init__(self, kernel_size=7):
+        super().__init__()
+        self.conv = nn.Conv2d(
+            2, 1, kernel_size, 
+            padding=kernel_size//2
+        )
+        self.sigmoid = nn.Sigmoid()
+    
+    def forward(self, x):
+        # Aggregate по каналам
+        avg_out = torch.mean(x, dim=1, keepdim=True)
+        max_out, _ = torch.max(x, dim=1, keepdim=True)
+        
+        # Concatenate
+        y = torch.cat([avg_out, max_out], dim=1)
+        y = self.conv(y)
+        return x * self.sigmoid(y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. CBAM (Convolutional Block Attention Module)</h2>
+    <pre><code>class CBAM(nn.Module):
+    """Channel + Spatial Attention"""
+    def __init__(self, channels, reduction=16):
+        super().__init__()
+        self.channel_att = SEBlock(channels, reduction)
+        self.spatial_att = SpatialAttention()
+    
+    def forward(self, x):
+        x = self.channel_att(x)
+        x = self.spatial_att(x)
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Self-Attention для Vision</h2>
+    <pre><code>class SelfAttention2D(nn.Module):
+    def __init__(self, in_channels):
+        super().__init__()
+        self.query = nn.Conv2d(in_channels, in_channels // 8, 1)
+        self.key = nn.Conv2d(in_channels, in_channels // 8, 1)
+        self.value = nn.Conv2d(in_channels, in_channels, 1)
+        self.gamma = nn.Parameter(torch.zeros(1))
+    
+    def forward(self, x):
+        B, C, H, W = x.size()
+        
+        # Q, K, V
+        Q = self.query(x).view(B, -1, H*W).permute(0, 2, 1)
+        K = self.key(x).view(B, -1, H*W)
+        V = self.value(x).view(B, -1, H*W)
+        
+        # Attention weights
+        attention = torch.softmax(torch.bmm(Q, K), dim=-1)
+        
+        # Apply attention
+        out = torch.bmm(V, attention.permute(0, 2, 1))
+        out = out.view(B, C, H, W)
+        
+        # Residual
+        return self.gamma * out + x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Non-Local Block</h2>
+    <pre><code>class NonLocalBlock(nn.Module):
+    def __init__(self, in_channels):
+        super().__init__()
+        self.inter_channels = in_channels // 2
+        
+        self.g = nn.Conv2d(in_channels, self.inter_channels, 1)
+        self.theta = nn.Conv2d(in_channels, self.inter_channels, 1)
+        self.phi = nn.Conv2d(in_channels, self.inter_channels, 1)
+        self.W = nn.Conv2d(self.inter_channels, in_channels, 1)
+    
+    def forward(self, x):
+        batch_size, C, H, W = x.size()
+        
+        g_x = self.g(x).view(batch_size, self.inter_channels, -1)
+        g_x = g_x.permute(0, 2, 1)
+        
+        theta_x = self.theta(x).view(batch_size, self.inter_channels, -1)
+        theta_x = theta_x.permute(0, 2, 1)
+        
+        phi_x = self.phi(x).view(batch_size, self.inter_channels, -1)
+        
+        f = torch.matmul(theta_x, phi_x)
+        f_div_C = F.softmax(f, dim=-1)
+        
+        y = torch.matmul(f_div_C, g_x)
+        y = y.permute(0, 2, 1).contiguous()
+        y = y.view(batch_size, self.inter_channels, H, W)
+        
+        W_y = self.W(y)
+        return W_y + x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. ECA-Net (Efficient Channel Attention)</h2>
+    <pre><code>class ECABlock(nn.Module):
+    """Более efficient чем SE"""
+    def __init__(self, channels, gamma=2, b=1):
+        super().__init__()
+        # Adaptive kernel size
+        t = int(abs((math.log(channels, 2) + b) / gamma))
+        k_size = t if t % 2 else t + 1
+        
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.conv = nn.Conv1d(
+            1, 1, kernel_size=k_size,
+            padding=(k_size - 1) // 2,
+            bias=False
+        )
+        self.sigmoid = nn.Sigmoid()
+    
+    def forward(self, x):
+        y = self.avg_pool(x)
+        y = self.conv(y.squeeze(-1).transpose(-1, -2))
+        y = y.transpose(-1, -2).unsqueeze(-1)
+        y = self.sigmoid(y)
+        return x * y.expand_as(x)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Тип</th><th>Параметры</th><th>FLOPs</th></tr>
+      <tr><td><strong>SE-Net</strong></td><td>Channel</td><td>+</td><td>Низкие</td></tr>
+      <tr><td><strong>ECA-Net</strong></td><td>Channel</td><td>++</td><td>Очень низкие</td></tr>
+      <tr><td><strong>Spatial Att</strong></td><td>Spatial</td><td>+</td><td>Средние</td></tr>
+      <tr><td><strong>CBAM</strong></td><td>Hybrid</td><td>++</td><td>Средние</td></tr>
+      <tr><td><strong>Self-Attention</strong></td><td>Global</td><td>+++</td><td>Высокие</td></tr>
+      <tr><td><strong>Non-Local</strong></td><td>Global</td><td>+++</td><td>Высокие</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Когда использовать</h2>
+    <ul>
+      <li><strong>SE/ECA</strong>: легковесные сети, mobile</li>
+      <li><strong>CBAM</strong>: универсальный выбор</li>
+      <li><strong>Self-Attention</strong>: когда нужны long-range dependencies</li>
+      <li><strong>Non-Local</strong>: video understanding</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Добавить attention после conv blocks</li>
+      <li>[ ] Начать с легковесного (SE, ECA)</li>
+      <li>[ ] Measure overhead (parameters, FLOPs)</li>
+      <li>[ ] Визуализировать attention maps</li>
+      <li>[ ] Ablation study для проверки пользы</li>
+      <li>[ ] Комбинировать channel + spatial</li>
+      <li>[ ] Self-attention для глобального контекста</li>
+    </ul>
+    <blockquote>
+      «Attention механизмы помогают модели фокусироваться на важных областях изображения и каналах признаков, улучшая quality с минимальным overhead».
+    </blockquote>
+  </div>
+
+
+</div>
+
+</body>
+</html>

@@ -117,13 +117,14 @@
 1. Алгоритмические подходы
 
 ### **15. Интерпретация моделей**
-1. Важность признаков
+1. [Важность признаков (Feature Importance)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_importance_cheatsheet.html)
 1. [SHAP значения](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/shap_cheatsheet.html)
 1. [LIME](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lime_cheatsheet.html)
 1. [Частичные зависимости (Partial Dependence Plots)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/partial_dependence_cheatsheet.html)
 1. Surrogate models
 
 ### **16. Производственные аспекты**
+1. [Production ML Best Practices](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/production_ml_best_practices_cheatsheet.html)
 1. [Сериализация моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_serialization_cheatsheet.html)
 1. [Дрейф данных и концептуальный дрейф](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/concept_drift_cheatsheet.html)
 1. [Пайплайны ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ml_pipelines_cheatsheet.html)
@@ -183,6 +184,8 @@
 1. [Пулинг-слои (Max, Average, Global Pooling)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pooling_layers_cheatsheet.html)
 1. [Архитектуры CNN (LeNet, AlexNet, VGG)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_architectures_cheatsheet.html)
 1. Современные архитектуры ([ResNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/resnet_cheatsheet.html), Inception, EfficientNet)
+1. [Attention для Computer Vision (CBAM, SENet)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/vision_attention_mechanisms_cheatsheet.html)
+1. [Neural Architecture Design Patterns](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_architecture_patterns_cheatsheet.html)
 1. Transfer learning для CNN
 1. [Data augmentation для изображений](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/data_augmentation_cheatsheet.html)
 1. [Batch Normalization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/batch_normalization_cheatsheet.html)
@@ -191,6 +194,7 @@
 
 ### **3. Рекуррентные нейронные сети (RNN)**
 1. [Основы RNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rnn_basics_cheatsheet.html)
+1. [Temporal Convolutional Networks (TCN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tcn_cheatsheet.html)
 1. Проблема исчезающего градиента
 1. [LSTM (Long Short-Term Memory)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lstm_cheatsheet.html)
 1. [GRU (Gated Recurrent Units)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gru_cheatsheet.html)
@@ -263,6 +267,10 @@
 
 ### **11. Малоресурсное обучение**
 1. [Few-shot Learning (Siamese, Prototypical Networks, MAML)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/few_shot_learning_cheatsheet.html)
+1. [Metric Learning (Triplet Loss, ArcFace)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/metric_learning_cheatsheet.html)
+1. [Self-Supervised Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/self_supervised_learning_cheatsheet.html)
+1. [Contrastive Learning (SimCLR, MoCo, BYOL)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/contrastive_learning_cheatsheet.html)
+1. [Curriculum Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/curriculum_learning_cheatsheet.html)
 1. Zero-shot learning
 1. Transfer learning
 1. Meta-learning (MAML, Prototypical Networks)
@@ -403,6 +411,7 @@
 1. Бэггинг (Bagging)
 1. [Бустинг (Boosting) - классические версии (AdaBoost)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adaboost_cheatsheet.html)
 1. [Стекинг и Voting (Stacking, Voting)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/voting_stacking_cheatsheet.html)
+1. [Advanced Model Ensembling](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/advanced_ensembling_cheatsheet.html)
 1. Блендинг (Blending)
 1. Ансамбли деревьев (не только случайный лес)
 1. Ансамбли линейных моделей

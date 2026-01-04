@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Curriculum Learning Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📚 Curriculum Learning Cheatsheet</h1>
+  <div class="subtitle">Обучение от простого к сложному • Стратегии упорядочивания • Практический фокус<br>📅 Январь 2026</div>
+
+
+  <div class="block">
+    <h2>🔷 1. Что такое Curriculum Learning</h2>
+    <ul>
+      <li><strong>Цель</strong>: обучать модель от простых примеров к сложным</li>
+      <li><strong>Идея</strong>: имитация человеческого обучения</li>
+      <li><strong>Результат</strong>: быстрая сходимость, лучшее качество</li>
+      <li><strong>Применение</strong>: CV, NLP, RL</li>
+      <li><strong>Ключевые аспекты</strong>: определение сложности, расписание</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные стратегии</h2>
+    <p><strong>1. Predefined Curriculum</strong>:</p>
+    <ul>
+      <li>Заранее определенный порядок</li>
+      <li>Основан на экспертных знаниях</li>
+      <li>Простой в реализации</li>
+    </ul>
+    <p><strong>2. Self-Paced Learning</strong>:</p>
+    <ul>
+      <li>Модель сама выбирает примеры</li>
+      <li>На основе loss или confidence</li>
+      <li>Адаптивный подход</li>
+    </ul>
+    <p><strong>3. Transfer Teacher</strong>:</p>
+    <ul>
+      <li>Учительская модель выбирает примеры</li>
+      <li>На основе предсказаний</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Определение сложности</h2>
+    <pre><code>import torch
+import numpy as np
+
+class CurriculumDataset(torch.utils.data.Dataset):
+    def __init__(self, X, y, difficulty_fn):
+        self.X = X
+        self.y = y
+        
+        # Вычисляем сложность для каждого примера
+        self.difficulties = difficulty_fn(X, y)
+        
+        # Сортируем по сложности
+        self.sorted_indices = np.argsort(self.difficulties)
+        
+        self.current_size = len(X) // 10  # Начинаем с 10%
+    
+    def set_curriculum_stage(self, stage):
+        """Увеличиваем размер датасета"""
+        max_size = len(self.X)
+        self.current_size = min(
+            int(max_size * (stage + 1) / 10), 
+            max_size
+        )
+    
+    def __len__(self):
+        return self.current_size
+    
+    def __getitem__(self, idx):
+        real_idx = self.sorted_indices[idx]
+        return self.X[real_idx], self.y[real_idx]
+
+
+# Примеры функций сложности
+def difficulty_by_label_noise(X, y):
+    """Сложность на основе шума в метках"""
+    # Больше шума = выше сложность
+    return np.random.rand(len(X))
+
+def difficulty_by_feature_variance(X, y):
+    """Сложность на основе вариации признаков"""
+    return np.var(X, axis=1)
+
+def difficulty_by_class_rarity(X, y):
+    """Сложность на основе редкости класса"""
+    unique, counts = np.unique(y, return_counts=True)
+    class_difficulty = {
+        cls: 1.0 / count 
+        for cls, count in zip(unique, counts)
+    }
+    return np.array([class_difficulty[label] for label in y])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Baby Step Curriculum</h2>
+    <pre><code>class BabyStepCurriculum:
+    def __init__(self, model, train_loader, epochs_per_stage=10):
+        self.model = model
+        self.train_loader = train_loader
+        self.epochs_per_stage = epochs_per_stage
+        self.num_stages = 10
+    
+    def train(self):
+        optimizer = torch.optim.Adam(
+            self.model.parameters(), 
+            lr=0.001
+        )
+        criterion = torch.nn.CrossEntropyLoss()
+        
+        for stage in range(self.num_stages):
+            # Обновляем размер датасета
+            self.train_loader.dataset.set_curriculum_stage(stage)
+            
+            print(f"Stage {stage+1}/{self.num_stages}")
+            print(f"Training on {len(self.train_loader.dataset)} samples")
+            
+            # Обучаем на текущем этапе
+            for epoch in range(self.epochs_per_stage):
+                self.model.train()
+                total_loss = 0
+                
+                for batch_X, batch_y in self.train_loader:
+                    optimizer.zero_grad()
+                    outputs = self.model(batch_X)
+                    loss = criterion(outputs, batch_y)
+                    loss.backward()
+                    optimizer.step()
+                    
+                    total_loss += loss.item()
+                
+                avg_loss = total_loss / len(self.train_loader)
+                print(f"  Epoch {epoch+1}, Loss: {avg_loss:.4f}")
+
+
+# Использование
+dataset = CurriculumDataset(
+    X_train, y_train, 
+    difficulty_fn=difficulty_by_feature_variance
+)
+dataloader = torch.utils.data.DataLoader(
+    dataset, batch_size=32, shuffle=True
+)
+
+curriculum = BabyStepCurriculum(model, dataloader)
+curriculum.train()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Self-Paced Learning</h2>
+    <pre><code>class SelfPacedLearning:
+    def __init__(self, model, train_data, lambda_init=1.0):
+        self.model = model
+        self.X, self.y = train_data
+        self.lambda_param = lambda_init
+        self.weights = np.ones(len(self.X))
+    
+    def update_weights(self, losses):
+        """Обновляем веса примеров на основе loss"""
+        # Веса больше для простых примеров (малый loss)
+        self.weights = (losses < self.lambda_param).astype(float)
+        
+        # Постепенно увеличиваем lambda
+        # (включаем более сложные примеры)
+        self.lambda_param *= 1.1
+    
+    def train_epoch(self):
+        optimizer = torch.optim.Adam(
+            self.model.parameters(), 
+            lr=0.001
+        )
+        criterion = torch.nn.CrossEntropyLoss(reduction='none')
+        
+        self.model.train()
+        losses = []
+        
+        for i in range(len(self.X)):
+            if self.weights[i] > 0:  # Используем только выбранные
+                x = torch.FloatTensor(self.X[i]).unsqueeze(0)
+                y = torch.LongTensor([self.y[i]])
+                
+                optimizer.zero_grad()
+                output = self.model(x)
+                loss = criterion(output, y)
+                
+                # Взвешенный loss
+                weighted_loss = loss * self.weights[i]
+                weighted_loss.backward()
+                optimizer.step()
+                
+                losses.append(loss.item())
+        
+        # Обновляем веса для следующей эпохи
+        self.update_weights(np.array(losses))
+        
+        return np.mean(losses)
+    
+    def train(self, num_epochs=50):
+        for epoch in range(num_epochs):
+            avg_loss = self.train_epoch()
+            num_selected = np.sum(self.weights > 0)
+            
+            print(f"Epoch {epoch+1}: Loss={avg_loss:.4f}, "
+                  f"Selected={num_selected}/{len(self.X)}, "
+                  f"Lambda={self.lambda_param:.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Curriculum для NLP</h2>
+    <pre><code># Сложность по длине предложения
+def text_difficulty_by_length(texts):
+    return np.array([len(text.split()) for text in texts])
+
+# Сложность по редкости слов
+def text_difficulty_by_vocabulary(texts, vocab_freq):
+    difficulties = []
+    for text in texts:
+        words = text.split()
+        # Среднее кол-во редких слов
+        rare_count = sum(
+            1 for w in words if vocab_freq.get(w, 0) < 100
+        )
+        difficulties.append(rare_count / len(words))
+    return np.array(difficulties)
+
+# Сложность по синтаксической структуре
+def text_difficulty_by_syntax(texts):
+    """Используем spacy для анализа"""
+    import spacy
+    nlp = spacy.load('en_core_web_sm')
+    
+    difficulties = []
+    for text in texts:
+        doc = nlp(text)
+        # Глубина дерева зависимостей
+        max_depth = max(
+            len(list(token.ancestors)) for token in doc
+        )
+        difficulties.append(max_depth)
+    
+    return np.array(difficulties)
+
+
+# Curriculum для текстовой классификации
+class TextCurriculumDataset(torch.utils.data.Dataset):
+    def __init__(self, texts, labels, tokenizer, difficulty='length'):
+        self.texts = texts
+        self.labels = labels
+        self.tokenizer = tokenizer
+        
+        # Выбираем метрику сложности
+        if difficulty == 'length':
+            self.difficulties = text_difficulty_by_length(texts)
+        # ... другие метрики
+        
+        self.sorted_indices = np.argsort(self.difficulties)
+        self.current_size = len(texts) // 5
+    
+    def set_stage(self, stage):
+        self.current_size = min(
+            len(self.texts) * (stage + 1) // 5,
+            len(self.texts)
+        )
+    
+    def __getitem__(self, idx):
+        real_idx = self.sorted_indices[idx]
+        text = self.texts[real_idx]
+        label = self.labels[real_idx]
+        
+        encoding = self.tokenizer(
+            text,
+            truncation=True,
+            padding='max_length',
+            max_length=128,
+            return_tensors='pt'
+        )
+        
+        return {
+            'input_ids': encoding['input_ids'].squeeze(),
+            'attention_mask': encoding['attention_mask'].squeeze(),
+            'labels': torch.tensor(label)
+        }</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Curriculum для Computer Vision</h2>
+    <pre><code>from PIL import Image, ImageFilter
+
+# Сложность по размытости
+def image_difficulty_by_blur(images):
+    difficulties = []
+    for img in images:
+        # Вариация лапласиана (размытость)
+        gray = img.convert('L')
+        laplacian_var = np.array(
+            gray.filter(ImageFilter.FIND_EDGES)
+        ).var()
+        difficulties.append(1.0 / (laplacian_var + 1))
+    return np.array(difficulties)
+
+# Сложность по количеству объектов
+def image_difficulty_by_object_count(images, detector):
+    """Используем object detector для подсчета объектов"""
+    difficulties = []
+    for img in images:
+        detections = detector(img)
+        num_objects = len(detections)
+        difficulties.append(num_objects)
+    return np.array(difficulties)
+
+# Сложность по размеру объектов
+def image_difficulty_by_object_size(images, bboxes):
+    """Меньший объект = выше сложность"""
+    difficulties = []
+    for bbox_list in bboxes:
+        if len(bbox_list) == 0:
+            difficulties.append(0)
+        else:
+            min_size = min(
+                (x2-x1) * (y2-y1) 
+                for x1, y1, x2, y2 in bbox_list
+            )
+            difficulties.append(1.0 / (min_size + 1))
+    return np.array(difficulties)
+
+
+# Progressive resizing - популярная техника
+class ProgressiveResizeCurriculum:
+    def __init__(self, model, start_size=64, end_size=224, stages=4):
+        self.model = model
+        self.sizes = np.linspace(start_size, end_size, stages).astype(int)
+        self.current_stage = 0
+    
+    def get_transform(self):
+        size = self.sizes[self.current_stage]
+        return transforms.Compose([
+            transforms.Resize(size),
+            transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            )
+        ])
+    
+    def next_stage(self):
+        self.current_stage = min(
+            self.current_stage + 1,
+            len(self.sizes) - 1
+        )
+        print(f"Moving to stage {self.current_stage+1}, "
+              f"size={self.sizes[self.current_stage]}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Curriculum для RL</h2>
+    <pre><code>class CurriculumRL:
+    """Curriculum для Reinforcement Learning"""
+    
+    def __init__(self, env, agent, stages):
+        self.env = env
+        self.agent = agent
+        self.stages = stages  # Список настроек среды
+        self.current_stage = 0
+    
+    def get_stage_env(self):
+        """Возвращает среду текущей сложности"""
+        stage_config = self.stages[self.current_stage]
+        
+        # Пример: изменение параметров среды
+        self.env.set_difficulty(stage_config['difficulty'])
+        self.env.set_reward_shaping(stage_config['reward_scale'])
+        
+        return self.env
+    
+    def should_advance(self, performance_history):
+        """Проверка готовности к следующему этапу"""
+        if len(performance_history) < 100:
+            return False
+        
+        recent_performance = np.mean(performance_history[-100:])
+        threshold = self.stages[self.current_stage]['threshold']
+        
+        return recent_performance >= threshold
+    
+    def train(self, num_episodes=10000):
+        episode_rewards = []
+        
+        for episode in range(num_episodes):
+            env = self.get_stage_env()
+            state = env.reset()
+            episode_reward = 0
+            done = False
+            
+            while not done:
+                action = self.agent.select_action(state)
+                next_state, reward, done, _ = env.step(action)
+                
+                self.agent.update(state, action, reward, next_state, done)
+                
+                state = next_state
+                episode_reward += reward
+            
+            episode_rewards.append(episode_reward)
+            
+            # Проверяем готовность к следующему этапу
+            if self.should_advance(episode_rewards):
+                if self.current_stage < len(self.stages) - 1:
+                    self.current_stage += 1
+                    print(f"Advanced to stage {self.current_stage+1}")
+            
+            if episode % 100 == 0:
+                avg_reward = np.mean(episode_rewards[-100:])
+                print(f"Episode {episode}, "
+                      f"Avg Reward: {avg_reward:.2f}, "
+                      f"Stage: {self.current_stage+1}")
+
+
+# Пример конфигурации для игры
+stages = [
+    {'difficulty': 0.2, 'reward_scale': 1.5, 'threshold': 100},
+    {'difficulty': 0.4, 'reward_scale': 1.2, 'threshold': 200},
+    {'difficulty': 0.6, 'reward_scale': 1.0, 'threshold': 300},
+    {'difficulty': 0.8, 'reward_scale': 1.0, 'threshold': 400},
+    {'difficulty': 1.0, 'reward_scale': 1.0, 'threshold': 500}
+]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Teacher-Student Curriculum</h2>
+    <pre><code>class TeacherStudentCurriculum:
+    """Учитель выбирает примеры для ученика"""
+    
+    def __init__(self, teacher_model, student_model, train_data):
+        self.teacher = teacher_model
+        self.student = student_model
+        self.X, self.y = train_data
+        
+        # Учитель предобучен на полных данных
+        self.teacher.eval()
+    
+    def select_samples(self, batch_size, difficulty_threshold):
+        """Учитель выбирает подходящие примеры"""
+        with torch.no_grad():
+            # Получаем предсказания учителя
+            X_tensor = torch.FloatTensor(self.X)
+            teacher_logits = self.teacher(X_tensor)
+            teacher_probs = torch.softmax(teacher_logits, dim=1)
+            
+            # Confidence учителя
+            confidences, _ = teacher_probs.max(dim=1)
+            
+            # Выбираем примеры с подходящей сложностью
+            # Высокий confidence = простой пример
+            mask = (confidences >= difficulty_threshold) &                    (confidences <= difficulty_threshold + 0.2)
+            
+            selected_indices = torch.where(mask)[0]
+            
+            if len(selected_indices) < batch_size:
+                selected_indices = torch.randperm(len(self.X))[:batch_size]
+            else:
+                selected_indices = selected_indices[
+                    torch.randperm(len(selected_indices))[:batch_size]
+                ]
+        
+        return self.X[selected_indices], self.y[selected_indices]
+    
+    def train_student(self, num_epochs=50):
+        optimizer = torch.optim.Adam(
+            self.student.parameters(),
+            lr=0.001
+        )
+        criterion = torch.nn.CrossEntropyLoss()
+        
+        # Начинаем с высокого порога (простые примеры)
+        difficulty_threshold = 0.8
+        
+        for epoch in range(num_epochs):
+            # Постепенно снижаем порог (добавляем сложные)
+            difficulty_threshold = max(0.3, 0.8 - epoch * 0.01)
+            
+            batch_X, batch_y = self.select_samples(
+                batch_size=32,
+                difficulty_threshold=difficulty_threshold
+            )
+            
+            self.student.train()
+            optimizer.zero_grad()
+            
+            outputs = self.student(torch.FloatTensor(batch_X))
+            loss = criterion(outputs, torch.LongTensor(batch_y))
+            
+            loss.backward()
+            optimizer.step()
+            
+            if epoch % 10 == 0:
+                print(f"Epoch {epoch}, Loss: {loss.item():.4f}, "
+                      f"Difficulty: {difficulty_threshold:.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Практические советы</h2>
+    <ul>
+      <li><strong>Определение сложности</strong>: domain-specific метрики</li>
+      <li><strong>Скорость прогресса</strong>: не слишком быстро/медленно</li>
+      <li><strong>Мониторинг</strong>: отслеживать качество на каждом этапе</li>
+      <li><strong>Адаптивность</strong>: self-paced лучше fixed curriculum</li>
+      <li><strong>Transfer</strong>: curriculum помогает transfer learning</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Сравнение подходов</h2>
+    <table>
+      <tr><th>Метод</th><th>Автоматизация</th><th>Сложность</th><th>Эффективность</th></tr>
+      <tr><td><strong>Predefined</strong></td><td>❌</td><td>Низкая</td><td>Средняя</td></tr>
+      <tr><td><strong>Self-Paced</strong></td><td>✅</td><td>Средняя</td><td>Высокая</td></tr>
+      <tr><td><strong>Teacher-Student</strong></td><td>✅</td><td>Высокая</td><td>Очень высокая</td></tr>
+      <tr><td><strong>RL Curriculum</strong></td><td>⚠️</td><td>Высокая</td><td>Высокая</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Применения</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо работает</h3>
+        <ul>
+          <li>Сложные задачи с четкой градацией</li>
+          <li>Reinforcement Learning</li>
+          <li>Few-shot learning</li>
+          <li>Domain adaptation</li>
+          <li>Noisy labels</li>
+          <li>Imbalanced datasets</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Ограничения</h3>
+        <ul>
+          <li>Сложно определить метрику сложности</li>
+          <li>Дополнительные гиперпараметры</li>
+          <li>Может замедлить обучение</li>
+          <li>Требует экспериментов</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить метрику сложности примеров</li>
+      <li>[ ] Выбрать стратегию curriculum (predefined/self-paced)</li>
+      <li>[ ] Настроить расписание изменения сложности</li>
+      <li>[ ] Мониторить качество на каждом этапе</li>
+      <li>[ ] Экспериментировать с скоростью прогресса</li>
+      <li>[ ] Сравнить с baseline без curriculum</li>
+      <li>[ ] Проверить на validation set</li>
+      <li>[ ] Визуализировать прогресс обучения</li>
+      <li>[ ] Документировать выбранную стратегию</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Curriculum Learning — это как обучение в школе: сначала изучаем простые примеры, потом переходим к более сложным. Это помогает модели быстрее учиться и достигать лучших результатов».
+    </blockquote>
+  </div>
+
+
+</div>
+
+</body>
+</html>
