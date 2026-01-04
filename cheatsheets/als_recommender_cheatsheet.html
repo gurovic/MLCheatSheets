@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>ALS (Alternating Least Squares) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>⚡ ALS (Alternating Least Squares) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы ALS</h2>
+    <ul>
+      <li><strong>Цель</strong>: матричная факторизация для рекомендаций</li>
+      <li><strong>Идея</strong>: чередующаяся оптимизация двух матриц</li>
+      <li><strong>Преимущество</strong>: параллелизация, хорошо для больших данных</li>
+      <li><strong>Применение</strong>: коллаборативная фильтрация</li>
+      <li><strong>R ≈ U × V^T</strong>: user factors × item factors</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Алгоритм</h2>
+    <p><strong>Итеративный процесс:</strong></p>
+    <ol>
+      <li>Инициализировать U и V случайно</li>
+      <li><strong>Зафиксировать V</strong>, оптимизировать U</li>
+      <li><strong>Зафиксировать U</strong>, оптимизировать V</li>
+      <li>Повторять шаги 2-3 до сходимости</li>
+    </ol>
+    <p><strong>Функция потерь:</strong></p>
+    <p>L = Σ(r_ij - u_i^T v_j)² + λ(||U||² + ||V||²)</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Реализация с нуля</h2>
+    <pre><code>import numpy as np
+
+class ALS:
+    def __init__(self, n_factors=10, n_iterations=10, 
+                 reg_param=0.01):
+        self.n_factors = n_factors
+        self.n_iterations = n_iterations
+        self.reg_param = reg_param
+        
+    def fit(self, R):
+        self.n_users, self.n_items = R.shape
+        
+        # Инициализация
+        self.U = np.random.rand(self.n_users, 
+                               self.n_factors)
+        self.V = np.random.rand(self.n_items, 
+                               self.n_factors)
+        
+        # Маска известных рейтингов
+        self.mask = (R > 0).astype(float)
+        
+        for iteration in range(self.n_iterations):
+            # Фиксируем V, обновляем U
+            for i in range(self.n_users):
+                # Известные рейтинги пользователя i
+                items_rated = np.where(R[i] > 0)[0]
+                if len(items_rated) == 0:
+                    continue
+                    
+                V_i = self.V[items_rated]
+                R_i = R[i, items_rated]
+                
+                # Closed-form solution
+                A = V_i.T @ V_i + \
+                    self.reg_param * np.eye(self.n_factors)
+                b = V_i.T @ R_i
+                self.U[i] = np.linalg.solve(A, b)
+            
+            # Фиксируем U, обновляем V
+            for j in range(self.n_items):
+                # Пользователи, оценившие товар j
+                users_rated = np.where(R[:, j] > 0)[0]
+                if len(users_rated) == 0:
+                    continue
+                    
+                U_j = self.U[users_rated]
+                R_j = R[users_rated, j]
+                
+                A = U_j.T @ U_j + \
+                    self.reg_param * np.eye(self.n_factors)
+                b = U_j.T @ R_j
+                self.V[j] = np.linalg.solve(A, b)
+            
+            # RMSE
+            if iteration % 2 == 0:
+                rmse = self.compute_rmse(R)
+                print(f"Iteration {iteration}: RMSE = {rmse:.4f}")
+        
+        return self
+    
+    def predict(self, user, item):
+        return np.dot(self.U[user], self.V[item])
+    
+    def compute_rmse(self, R):
+        predictions = self.U @ self.V.T
+        errors = (R - predictions) * self.mask
+        return np.sqrt(np.sum(errors ** 2) / np.sum(self.mask))
+
+# Использование
+R = np.array([
+    [5, 3, 0, 1],
+    [4, 0, 0, 1],
+    [1, 1, 0, 5],
+    [1, 0, 0, 4],
+    [0, 1, 5, 4],
+])
+
+als = ALS(n_factors=2, n_iterations=10, reg_param=0.1)
+als.fit(R)
+
+# Предсказание
+print(f"Predicted rating: {als.predict(0, 2):.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Implicit ratings</h2>
+    <pre><code>import implicit
+from scipy.sparse import csr_matrix
+
+# Данные: user-item interactions
+# 0 = не взаимодействовал, положительное = взаимодействовал
+data = csr_matrix([
+    [1, 1, 0, 0, 1],
+    [1, 0, 0, 1, 0],
+    [0, 1, 1, 1, 0],
+    [0, 0, 1, 1, 1]
+])
+
+# ALS модель
+model = implicit.als.AlternatingLeastSquares(
+    factors=50,
+    iterations=10,
+    regularization=0.01,
+    use_gpu=False
+)
+
+# Обучение (транспонируем для item-user)
+model.fit(data.T)
+
+# Рекомендации для пользователя 0
+user_id = 0
+recommendations = model.recommend(
+    user_id, 
+    data[user_id], 
+    N=10
+)
+
+print("Recommendations:")
+for item_id, score in recommendations:
+    print(f"  Item {item_id}: {score:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. PySpark ALS</h2>
+    <pre><code>from pyspark.ml.recommendation import ALS
+from pyspark.sql import SparkSession
+
+# Spark session
+spark = SparkSession.builder.appName("ALS").getOrCreate()
+
+# Данные
+data = spark.createDataFrame([
+    (0, 0, 5.0),
+    (0, 1, 3.0),
+    (1, 0, 4.0),
+    (1, 3, 1.0),
+], ["userId", "itemId", "rating"])
+
+# ALS модель
+als = ALS(
+    maxIter=10,
+    regParam=0.01,
+    userCol="userId",
+    itemCol="itemId",
+    ratingCol="rating",
+    coldStartStrategy="drop",
+    nonnegative=True
+)
+
+# Обучение
+model = als.fit(data)
+
+# Предсказания
+predictions = model.transform(data)
+predictions.show()
+
+# Рекомендации для всех пользователей
+user_recs = model.recommendForAllUsers(10)
+user_recs.show(truncate=False)
+
+# Рекомендации для всех товаров
+item_recs = model.recommendForAllItems(10)
+item_recs.show(truncate=False)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Weighted ALS</h2>
+    <p>Для неявных отзывов с весами уверенности:</p>
+    <pre><code># Weighted ALS
+def weighted_als(R, C, n_factors=10, n_iter=10, 
+                lambda_reg=0.01):
+    """
+    R: матрица предпочтений (0/1)
+    C: матрица уверенности (веса)
+    """
+    n_users, n_items = R.shape
+    
+    # Инициализация
+    U = np.random.rand(n_users, n_factors) * 0.01
+    V = np.random.rand(n_items, n_factors) * 0.01
+    
+    for _ in range(n_iter):
+        # Update U
+        for u in range(n_users):
+            Cu = np.diag(C[u])
+            A = V.T @ Cu @ V + \
+                lambda_reg * np.eye(n_factors)
+            b = V.T @ Cu @ R[u]
+            U[u] = np.linalg.solve(A, b)
+        
+        # Update V
+        for i in range(n_items):
+            Ci = np.diag(C[:, i])
+            A = U.T @ Ci @ U + \
+                lambda_reg * np.eye(n_factors)
+            b = U.T @ Ci @ R[:, i]
+            V[i] = np.linalg.solve(A, b)
+    
+    return U, V
+
+# Пример
+R_implicit = (R > 0).astype(float)  # бинарные
+C_implicit = 1 + 40 * R_implicit    # веса уверенности
+
+U, V = weighted_als(R_implicit, C_implicit)
+predictions = U @ V.T</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>factors</code></td><td>Число латентных факторов</td><td>10-100</td></tr>
+      <tr><td><code>iterations</code></td><td>Число итераций</td><td>10-20</td></tr>
+      <tr><td><code>regularization</code></td><td>L2 регуляризация</td><td>0.01-0.1</td></tr>
+      <tr><td><code>alpha</code></td><td>Вес уверенности (implicit)</td><td>40</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Оценка качества</h2>
+    <pre><code>from sklearn.model_selection import train_test_split
+
+# Разбивка данных
+train_data, test_data = train_test_split(
+    ratings_df, test_size=0.2, random_state=42
+)
+
+# Обучение
+als = ALS(n_factors=50)
+als.fit(train_data)
+
+# Оценка на тесте
+def evaluate(model, test_data):
+    predictions = []
+    actuals = []
+    
+    for _, row in test_data.iterrows():
+        user = row['userId']
+        item = row['itemId']
+        rating = row['rating']
+        
+        pred = model.predict(user, item)
+        predictions.append(pred)
+        actuals.append(rating)
+    
+    rmse = np.sqrt(np.mean(
+        (np.array(predictions) - np.array(actuals))**2
+    ))
+    return rmse
+
+rmse = evaluate(als, test_data)
+print(f"Test RMSE: {rmse:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Bias terms</h2>
+    <pre><code># ALS с bias
+class BiasedALS(ALS):
+    def fit(self, R):
+        # Глобальное среднее
+        self.global_mean = np.mean(R[R > 0])
+        
+        # User biases
+        self.user_bias = np.zeros(self.n_users)
+        for i in range(self.n_users):
+            ratings = R[i][R[i] > 0]
+            if len(ratings) > 0:
+                self.user_bias[i] = np.mean(ratings) - \
+                                   self.global_mean
+        
+        # Item biases
+        self.item_bias = np.zeros(self.n_items)
+        for j in range(self.n_items):
+            ratings = R[:, j][R[:, j] > 0]
+            if len(ratings) > 0:
+                self.item_bias[j] = np.mean(ratings) - \
+                                   self.global_mean
+        
+        # Вычитаем biases из рейтингов
+        R_centered = R.copy()
+        for i in range(self.n_users):
+            for j in range(self.n_items):
+                if R[i, j] > 0:
+                    R_centered[i, j] -= (self.global_mean +  
+                                        self.user_bias[i] + 
+                                        self.item_bias[j])
+        
+        # Стандартный ALS на центрированных данных
+        super().fit(R_centered)
+        
+        return self
+    
+    def predict(self, user, item):
+        base_pred = super().predict(user, item)
+        return (base_pred + self.global_mean + 
+                self.user_bias[user] + 
+                self.item_bias[item])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Параллелизация</h2>
+    <pre><code>from joblib import Parallel, delayed
+
+class ParallelALS(ALS):
+    def __init__(self, n_jobs=-1, **kwargs):
+        super().__init__(**kwargs)
+        self.n_jobs = n_jobs
+    
+    def _update_user(self, u, R):
+        items_rated = np.where(R[u] > 0)[0]
+        if len(items_rated) == 0:
+            return self.U[u]
+        
+        V_u = self.V[items_rated]
+        R_u = R[u, items_rated]
+        
+        A = V_u.T @ V_u + \
+            self.reg_param * np.eye(self.n_factors)
+        b = V_u.T @ R_u
+        return np.linalg.solve(A, b)
+    
+    def fit(self, R):
+        # ... инициализация ...
+        
+        for iteration in range(self.n_iterations):
+            # Параллельное обновление U
+            self.U = np.array(
+                Parallel(n_jobs=self.n_jobs)(
+                    delayed(self._update_user)(u, R) 
+                    for u in range(self.n_users)
+                )
+            )
+            
+            # Параллельное обновление V (аналогично)
+            # ...</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Сравнение: ALS vs SGD</h2>
+    <table>
+      <tr><th>Аспект</th><th>ALS</th><th>SGD</th></tr>
+      <tr><td>Скорость</td><td>Параллелизуется</td><td>Последовательный</td></tr>
+      <tr><td>Память</td><td>Больше</td><td>Меньше</td></tr>
+      <tr><td>Сходимость</td><td>Медленнее</td><td>Быстрее</td></tr>
+      <tr><td>Implicit data</td><td>Отлично</td><td>Хорошо</td></tr>
+      <tr><td>Большие данные</td><td>Отлично (Spark)</td><td>Сложнее</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Большие датасеты</li>
+          <li>Неявные отзывы (implicit feedback)</li>
+          <li>Нужна параллелизация</li>
+          <li>Spark/распределенные вычисления</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Малые данные (SGD быстрее)</li>
+          <li>Онлайн-обучение (нужна перетренировка)</li>
+          <li>Нужны bias terms (сложнее в ALS)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Подготовить user-item матрицу</li>
+      <li>[ ] Выбрать число факторов</li>
+      <li>[ ] Настроить регуляризацию</li>
+      <li>[ ] Определить implicit/explicit</li>
+      <li>[ ] Установить веса уверенности (implicit)</li>
+      <li>[ ] Выбрать число итераций</li>
+      <li>[ ] Оценить RMSE на валидации</li>
+      <li>[ ] Рассмотреть параллелизацию</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «ALS — это эффективный алгоритм для рекомендаций, который чередует оптимизацию факторов пользователей и товаров. Его главное преимущество — возможность быстро обрабатывать миллионы пользователей и товаров на кластере компьютеров. Идеально подходит для крупных e-commerce платформ».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

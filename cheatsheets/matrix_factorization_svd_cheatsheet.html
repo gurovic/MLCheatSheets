@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Матричная факторизация (SVD) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🎬 Матричная факторизация (SVD) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <ul>
+      <li><strong>Цель</strong>: разложить матрицу на произведение более простых матриц</li>
+      <li><strong>SVD</strong>: A = U Σ V^T</li>
+      <li><strong>Применение</strong>: рекомендательные системы, снижение размерности</li>
+      <li><strong>Идея</strong>: найти латентные факторы пользователей и товаров</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Математика SVD</h2>
+    <p><strong>Сингулярное разложение:</strong></p>
+    <p>A (m×n) = U (m×k) × Σ (k×k) × V^T (k×n)</p>
+    <ul>
+      <li><strong>U</strong>: левые сингулярные векторы (пользователи)</li>
+      <li><strong>Σ</strong>: диагональная матрица сингулярных чисел</li>
+      <li><strong>V</strong>: правые сингулярные векторы (товары)</li>
+      <li><strong>k</strong>: число латентных факторов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовая реализация</h2>
+    <pre><code>import numpy as np
+from scipy.sparse.linalg import svds
+
+# Матрица рейтингов (users × items)
+R = np.array([
+    [5, 3, 0, 1],
+    [4, 0, 0, 1],
+    [1, 1, 0, 5],
+    [1, 0, 0, 4],
+    [0, 1, 5, 4],
+])
+
+# Заполняем пропуски средними
+R_mean = np.mean(R[R > 0])
+R_filled = np.where(R > 0, R, R_mean)
+
+# SVD
+k = 2  # число факторов
+U, sigma, Vt = svds(R_filled, k=k)
+
+# Сингулярные числа как диагональ
+sigma = np.diag(sigma)
+
+# Предсказания
+R_pred = np.dot(np.dot(U, sigma), Vt)
+
+print("Исходная матрица:")
+print(R)
+print("\nПредсказанная:")
+print(R_pred.round(2))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. С sklearn</h2>
+    <pre><code>from sklearn.decomposition import TruncatedSVD
+from sklearn.preprocessing import StandardScaler
+
+# Стандартизация
+scaler = StandardScaler()
+R_scaled = scaler.fit_transform(R_filled)
+
+# TruncatedSVD
+svd = TruncatedSVD(n_components=2, random_state=42)
+U_reduced = svd.fit_transform(R_scaled)
+Vt_reduced = svd.components_
+
+# Восстановление
+R_reconstructed = np.dot(U_reduced, Vt_reduced)
+R_reconstructed = scaler.inverse_transform(R_reconstructed)
+
+print("Объясненная дисперсия:", 
+      svd.explained_variance_ratio_)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Surprise library</h2>
+    <pre><code>from surprise import SVD, Dataset, Reader
+from surprise.model_selection import cross_validate
+
+# Подготовка данных
+reader = Reader(rating_scale=(1, 5))
+data = Dataset.load_from_df(
+    df[['userId', 'itemId', 'rating']], 
+    reader
+)
+
+# SVD модель
+algo = SVD(n_factors=50, n_epochs=20, 
+           lr_all=0.005, reg_all=0.02)
+
+# Кросс-валидация
+results = cross_validate(algo, data, 
+                        measures=['RMSE', 'MAE'], 
+                        cv=5, verbose=True)
+
+# Обучение
+trainset = data.build_full_trainset()
+algo.fit(trainset)
+
+# Предсказание
+pred = algo.predict(uid='user1', iid='item42')
+print(f"Predicted rating: {pred.est:.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Оптимизация</h2>
+    <pre><code># Выбор числа факторов
+from sklearn.model_selection import train_test_split
+
+def evaluate_k(R, k_values):
+    results = {}
+    
+    for k in k_values:
+        U, sigma, Vt = svds(R_filled, k=k)
+        sigma = np.diag(sigma)
+        R_pred = np.dot(np.dot(U, sigma), Vt)
+        
+        # RMSE
+        mask = R > 0
+        rmse = np.sqrt(np.mean((R[mask] - R_pred[mask])**2))
+        results[k] = rmse
+    
+    return results
+
+k_values = [2, 5, 10, 20, 50]
+results = evaluate_k(R, k_values)
+
+for k, rmse in results.items():
+    print(f"k={k}: RMSE={rmse:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Обработка разреженности</h2>
+    <pre><code># Weighted SVD
+def weighted_svd(R, k, alpha=40, iterations=20):
+    m, n = R.shape
+    U = np.random.rand(m, k)
+    V = np.random.rand(n, k)
+    
+    # Веса (1 для известных, малое для пропусков)
+    W = np.where(R > 0, 1, 0.01)
+    
+    for _ in range(iterations):
+        # Update U
+        for i in range(m):
+            U[i] = np.linalg.solve(
+                V.T @ np.diag(W[i]) @ V + alpha * np.eye(k),
+                V.T @ np.diag(W[i]) @ R[i]
+            )
+        
+        # Update V
+        for j in range(n):
+            V[j] = np.linalg.solve(
+                U.T @ np.diag(W[:, j]) @ U + alpha * np.eye(k),
+                U.T @ np.diag(W[:, j]) @ R[:, j]
+            )
+    
+    return U, V
+
+U, V = weighted_svd(R, k=2)
+R_pred = np.dot(U, V.T)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Регуляризация</h2>
+    <pre><code># SVD с L2 регуляризацией
+from surprise import SVD
+
+algo = SVD(
+    n_factors=100,      # число факторов
+    n_epochs=20,        # итераций
+    biased=True,        # bias terms
+    lr_all=0.005,       # learning rate
+    reg_all=0.02,       # регуляризация
+    random_state=42
+)
+
+# Разные регуляризации для разных компонент
+algo = SVD(
+    n_factors=50,
+    lr_bu=0.005,  # user bias learning rate
+    lr_bi=0.005,  # item bias learning rate
+    lr_pu=0.005,  # user factors learning rate
+    lr_qi=0.005,  # item factors learning rate
+    reg_bu=0.02,  # user bias regularization
+    reg_bi=0.02,  # item bias regularization
+    reg_pu=0.02,  # user factors regularization
+    reg_qi=0.02   # item factors regularization
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Холодный старт</h2>
+    <pre><code># Гибридный подход
+class HybridSVD:
+    def __init__(self, svd_model, content_features):
+        self.svd = svd_model
+        self.content_features = content_features
+    
+    def predict(self, user_id, item_id):
+        try:
+            # Попытка SVD
+            return self.svd.predict(user_id, item_id).est
+        except:
+            # Fallback: content-based
+            if item_id in self.content_features:
+                # Среднее по похожим товарам
+                similar_items = self.find_similar(item_id)
+                ratings = [
+                    self.svd.predict(user_id, i).est 
+                    for i in similar_items
+                ]
+                return np.mean(ratings)
+            else:
+                # Global average
+                return self.svd.trainset.global_mean
+    
+    def find_similar(self, item_id, top_n=5):
+        # Поиск похожих по признакам
+        # ...
+        return similar_items</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Метрики качества</h2>
+    <pre><code>from sklearn.metrics import mean_squared_error,     mean_absolute_error
+
+# RMSE
+def rmse(y_true, y_pred):
+    return np.sqrt(mean_squared_error(y_true, y_pred))
+
+# MAE
+def mae(y_true, y_pred):
+    return mean_absolute_error(y_true, y_pred)
+
+# Только известные рейтинги
+mask = R > 0
+y_true = R[mask]
+y_pred = R_reconstructed[mask]
+
+print(f"RMSE: {rmse(y_true, y_pred):.4f}")
+print(f"MAE: {mae(y_true, y_pred):.4f}")
+
+# Top-N метрики
+from surprise import accuracy
+
+predictions = algo.test(testset)
+accuracy.rmse(predictions)
+accuracy.mae(predictions)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Визуализация</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Heatmap оригинала vs предсказания
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+sns.heatmap(R, annot=True, fmt='.0f', 
+           cmap='YlOrRd', ax=axes[0])
+axes[0].set_title('Исходная матрица')
+
+sns.heatmap(R_pred, annot=True, fmt='.1f', 
+           cmap='YlOrRd', ax=axes[1])
+axes[1].set_title('Предсказанная матрица')
+
+plt.tight_layout()
+plt.show()
+
+# Сингулярные числа
+plt.figure(figsize=(10, 5))
+plt.plot(sigma, 'bo-')
+plt.xlabel('Индекс')
+plt.ylabel('Сингулярное число')
+plt.title('Спектр сингулярных чисел')
+plt.grid(True)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Большие разреженные матрицы</li>
+          <li>Коллаборативная фильтрация</li>
+          <li>Много пользователей и товаров</li>
+          <li>Стабильные предпочтения</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Холодный старт (новые пользователи/товары)</li>
+          <li>Очень разреженные данные (&gt;99%)</li>
+          <li>Быстро меняющиеся тренды</li>
+          <li>Нужна интерпретируемость</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Подготовить матрицу user-item</li>
+      <li>[ ] Обработать пропущенные значения</li>
+      <li>[ ] Выбрать число факторов k</li>
+      <li>[ ] Настроить регуляризацию</li>
+      <li>[ ] Оценить RMSE/MAE</li>
+      <li>[ ] Решить проблему холодного старта</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Сравнить с baseline</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «SVD находит скрытые "факторы вкуса" для пользователей и "факторы качества" для товаров. Например, для фильмов это могут быть жанры, настроение, бюджет и т.д. Перемножая эти факторы, мы можем предсказать, понравится ли фильм пользователю, даже если он его еще не видел».
+    </blockquote>
+  </div>
+</div>
+</body>
+</html>
