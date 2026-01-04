@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Статистические методы обнаружения аномалий Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🚨 Статистические методы обнаружения аномалий Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <ul>
+      <li><strong>Цель</strong>: найти необычные наблюдения в данных</li>
+      <li><strong>Аномалия</strong>: значение, существенно отличающееся от других</li>
+      <li><strong>Типы</strong>: точечные, контекстные, коллективные</li>
+      <li><strong>Методы</strong>: параметрические и непараметрические</li>
+      <li><strong>Порог</strong>: критерий отнесения к аномалии</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Z-score метод</h2>
+    <p><strong>Формула:</strong> z = (x - μ) / σ</p>
+    <p>Аномалия если |z| > 3 (правило 3-сигм)</p>
+    <pre><code>import numpy as np
+import pandas as pd
+
+def z_score_anomalies(data, threshold=3):
+    mean = np.mean(data)
+    std = np.std(data)
+    z_scores = np.abs((data - mean) / std)
+    return z_scores > threshold
+
+# Пример
+data = np.random.normal(100, 15, 1000)
+data[50] = 200  # аномалия
+
+anomalies = z_score_anomalies(data)
+print(f"Аномалий: {anomalies.sum()}")
+
+# С pandas
+df = pd.DataFrame({'value': data})
+df['z_score'] = np.abs(
+    (df['value'] - df['value'].mean()) / df['value'].std()
+)
+df['is_anomaly'] = df['z_score'] > 3</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Modified Z-score (MAD)</h2>
+    <p>Устойчив к выбросам, использует медиану:</p>
+    <p><strong>Формула:</strong> M_i = 0.6745 * (x_i - median(x)) / MAD</p>
+    <p>где MAD = median(|x_i - median(x)|)</p>
+    <pre><code>def modified_z_score_anomalies(data, threshold=3.5):
+    median = np.median(data)
+    mad = np.median(np.abs(data - median))
+    modified_z_scores = 0.6745 * (data - median) / mad
+    return np.abs(modified_z_scores) > threshold
+
+# Использование
+anomalies = modified_z_score_anomalies(data)
+print(f"Аномалий (MAD): {anomalies.sum()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. IQR метод</h2>
+    <p>Межквартильный размах (Interquartile Range):</p>
+    <pre><code>def iqr_anomalies(data, factor=1.5):
+    Q1 = np.percentile(data, 25)
+    Q3 = np.percentile(data, 75)
+    IQR = Q3 - Q1
+    
+    lower_bound = Q1 - factor * IQR
+    upper_bound = Q3 + factor * IQR
+    
+    return (data < lower_bound) | (data > upper_bound)
+
+# Использование
+anomalies = iqr_anomalies(data, factor=1.5)
+print(f"Аномалий (IQR): {anomalies.sum()}")
+
+# Визуализация
+import matplotlib.pyplot as plt
+
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.boxplot(data, vert=False)
+ax.set_xlabel('Значение')
+ax.set_title('Boxplot с выбросами')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Grubbs тест</h2>
+    <p>Параметрический тест для обнаружения одного выброса:</p>
+    <pre><code>from scipy import stats
+
+def grubbs_test(data, alpha=0.05):
+    n = len(data)
+    mean = np.mean(data)
+    std = np.std(data)
+    
+    # G-статистика
+    G = np.max(np.abs(data - mean)) / std
+    
+    # Критическое значение
+    t_dist = stats.t.ppf(1 - alpha / (2 * n), n - 2)
+    G_critical = ((n - 1) / np.sqrt(n)) *                  np.sqrt(t_dist**2 / (n - 2 + t_dist**2))
+    
+    return G > G_critical, G, G_critical
+
+is_outlier, G, G_crit = grubbs_test(data)
+print(f"Outlier detected: {is_outlier}")
+print(f"G: {G:.4f}, Critical: {G_crit:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Dixon Q-тест</h2>
+    <p>Для малых выборок (n < 30):</p>
+    <pre><code>def dixon_test(data, alpha=0.05):
+    n = len(data)
+    data_sorted = np.sort(data)
+    
+    # Q-статистика
+    if n <= 7:
+        Q = (data_sorted[1] - data_sorted[0]) /             (data_sorted[-1] - data_sorted[0])
+    elif n <= 10:
+        Q = (data_sorted[1] - data_sorted[0]) /             (data_sorted[-2] - data_sorted[0])
+    else:
+        Q = (data_sorted[2] - data_sorted[0]) /             (data_sorted[-2] - data_sorted[0])
+    
+    # Критические значения (для alpha=0.05)
+    critical_values = {
+        7: 0.507, 8: 0.554, 9: 0.512, 10: 0.477
+    }
+    
+    Q_critical = critical_values.get(n, 0.5)
+    return Q > Q_critical, Q, Q_critical
+
+# Пример на малой выборке
+small_data = np.array([1.2, 1.5, 1.4, 1.3, 1.6, 5.0])
+is_outlier, Q, Q_crit = dixon_test(small_data)
+print(f"Outlier: {is_outlier}, Q: {Q:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Многомерные методы</h2>
+    <p><strong>Расстояние Махаланобиса:</strong></p>
+    <pre><code>from scipy.spatial.distance import mahalanobis
+from scipy.stats import chi2
+
+def mahalanobis_anomalies(data, threshold_p=0.95):
+    mean = np.mean(data, axis=0)
+    cov = np.cov(data.T)
+    inv_cov = np.linalg.inv(cov)
+    
+    distances = []
+    for x in data:
+        d = mahalanobis(x, mean, inv_cov)
+        distances.append(d)
+    
+    distances = np.array(distances)
+    
+    # Chi-squared порог
+    threshold = chi2.ppf(threshold_p, df=data.shape[1])
+    
+    return distances**2 > threshold, distances
+
+# Пример
+from sklearn.datasets import make_classification
+X, _ = make_classification(
+    n_samples=1000, 
+    n_features=5,
+    n_redundant=0,
+    random_state=42
+)
+
+anomalies, distances = mahalanobis_anomalies(X)
+print(f"Аномалий: {anomalies.sum()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Временные ряды</h2>
+    <p>Обнаружение аномалий во временных рядах:</p>
+    <pre><code># 1. Скользящее среднее + std
+def ts_anomalies(data, window=20, n_std=3):
+    rolling_mean = pd.Series(data).rolling(
+        window=window
+    ).mean()
+    rolling_std = pd.Series(data).rolling(
+        window=window
+    ).std()
+    
+    upper_bound = rolling_mean + n_std * rolling_std
+    lower_bound = rolling_mean - n_std * rolling_std
+    
+    return (data > upper_bound) | (data < lower_bound)
+
+# 2. Seasonal ESD (S-ESD)
+# Учитывает сезонность
+def seasonal_esd(data, period=7, max_anomalies=10):
+    from statsmodels.tsa.seasonal import seasonal_decompose
+    
+    # Декомпозиция
+    decomp = seasonal_decompose(
+        pd.Series(data),
+        model='additive',
+        period=period
+    )
+    
+    # Применяем ESD к остаткам
+    residuals = decomp.resid.dropna()
+    return iqr_anomalies(residuals, factor=2.5)
+
+ts_data = np.sin(np.arange(100) * 0.1) +           np.random.normal(0, 0.1, 100)
+ts_data[50] = 5  # аномалия
+
+anomalies = ts_anomalies(ts_data)
+print(f"TS аномалий: {anomalies.sum()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. GESD (Generalized ESD)</h2>
+    <p>Обнаружение множественных выбросов:</p>
+    <pre><code>def generalized_esd(data, max_outliers=10, 
+                   alpha=0.05):
+    outliers = []
+    data_copy = data.copy()
+    
+    for i in range(max_outliers):
+        n = len(data_copy)
+        mean = np.mean(data_copy)
+        std = np.std(data_copy, ddof=1)
+        
+        # Test statistic
+        R = np.max(np.abs(data_copy - mean)) / std
+        
+        # Critical value
+        p = 1 - alpha / (2 * (n - i))
+        t = stats.t.ppf(p, n - i - 2)
+        lambda_critical = (n - i - 1) * t /             np.sqrt((n - i - 2 + t**2) * (n - i))
+        
+        if R > lambda_critical:
+            max_idx = np.argmax(np.abs(data_copy - mean))
+            outliers.append(data_copy[max_idx])
+            data_copy = np.delete(data_copy, max_idx)
+        else:
+            break
+    
+    return outliers
+
+outliers = generalized_esd(data, max_outliers=5)
+print(f"GESD выбросы: {len(outliers)}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Histogram-based</h2>
+    <pre><code>def histogram_anomalies(data, bins=50, 
+                        threshold_percentile=1):
+    hist, bin_edges = np.histogram(data, bins=bins)
+    
+    # Найти bins с малой частотой
+    threshold = np.percentile(hist, threshold_percentile)
+    
+    anomalies = np.zeros(len(data), dtype=bool)
+    for i, value in enumerate(data):
+        bin_idx = np.searchsorted(bin_edges[:-1], value)
+        if bin_idx < len(hist) and hist[bin_idx] < threshold:
+            anomalies[i] = True
+    
+    return anomalies
+
+anomalies = histogram_anomalies(data)
+print(f"Histogram аномалий: {anomalies.sum()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Kernel Density Estimation</h2>
+    <pre><code>from scipy.stats import gaussian_kde
+
+def kde_anomalies(data, threshold_percentile=5):
+    # KDE
+    kde = gaussian_kde(data)
+    densities = kde(data)
+    
+    # Порог
+    threshold = np.percentile(densities, 
+                            threshold_percentile)
+    
+    return densities < threshold
+
+anomalies = kde_anomalies(data)
+print(f"KDE аномалий: {anomalies.sum()}")
+
+# Визуализация
+x_range = np.linspace(data.min(), data.max(), 1000)
+kde = gaussian_kde(data)
+densities = kde(x_range)
+
+plt.figure(figsize=(10, 6))
+plt.plot(x_range, densities, label='KDE')
+plt.scatter(data[anomalies], 
+           kde(data[anomalies]),
+           c='red', s=50, label='Аномалии')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Типы данных</th><th>Преимущества</th><th>Недостатки</th></tr>
+      <tr><td><strong>Z-score</strong></td><td>Нормальные</td><td>Простой, быстрый</td><td>Чувствителен к выбросам</td></tr>
+      <tr><td><strong>IQR</strong></td><td>Любые</td><td>Устойчивый</td><td>Грубый</td></tr>
+      <tr><td><strong>MAD</strong></td><td>Любые</td><td>Очень устойчивый</td><td>Сложнее Z-score</td></tr>
+      <tr><td><strong>Grubbs</strong></td><td>Нормальные</td><td>Статистический тест</td><td>Только 1 выброс</td></tr>
+      <tr><td><strong>GESD</strong></td><td>Нормальные</td><td>Множество выбросов</td><td>Вычислительно дороже</td></tr>
+      <tr><td><strong>Mahalanobis</strong></td><td>Многомерные</td><td>Учитывает корреляции</td><td>Требует обратимой ковариации</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Оценка качества</h2>
+    <pre><code>from sklearn.metrics import precision_score,     recall_score, f1_score, confusion_matrix
+
+# Синтетические данные с известными аномалиями
+np.random.seed(42)
+normal_data = np.random.normal(100, 15, 950)
+anomalies_data = np.random.uniform(150, 200, 50)
+data = np.concatenate([normal_data, anomalies_data])
+true_labels = np.concatenate([
+    np.zeros(950), 
+    np.ones(50)
+])
+
+# Применяем методы
+pred_z = z_score_anomalies(data, threshold=3)
+pred_iqr = iqr_anomalies(data, factor=1.5)
+pred_mad = modified_z_score_anomalies(data)
+
+# Оценка
+methods = {
+    'Z-score': pred_z,
+    'IQR': pred_iqr,
+    'MAD': pred_mad
+}
+
+for name, predictions in methods.items():
+    precision = precision_score(true_labels, predictions)
+    recall = recall_score(true_labels, predictions)
+    f1 = f1_score(true_labels, predictions)
+    print(f"{name}: P={precision:.3f}, " +           f"R={recall:.3f}, F1={f1:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Одномерные данные</li>
+          <li>Нормальное распределение (для параметрических)</li>
+          <li>Быстрая работа важна</li>
+          <li>Интерпретируемость критична</li>
+          <li>Небольшие датасеты</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Сложные паттерны аномалий</li>
+          <li>Высокая размерность (используйте ML)</li>
+          <li>Контекстные аномалии</li>
+          <li>Нелинейные зависимости</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Проверить распределение данных</li>
+      <li>[ ] Выбрать подходящий метод</li>
+      <li>[ ] Определить порог чувствительности</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Проверить на известных аномалиях</li>
+      <li>[ ] Рассмотреть несколько методов</li>
+      <li>[ ] Оценить false positives/negatives</li>
+      <li>[ ] Учесть бизнес-контекст</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Статистические методы обнаружения аномалий ищут значения, которые сильно отличаются от "нормального" поведения данных. Например, если обычная транзакция составляет $50-100, а вдруг появляется транзакция на $10,000 — это подозрительно. Статистика помогает автоматически найти такие необычные случаи».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

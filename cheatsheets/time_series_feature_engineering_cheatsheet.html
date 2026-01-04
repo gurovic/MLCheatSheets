@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Feature Engineering для временных рядов Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⏰ Feature Engineering для временных рядов Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <ul>
+      <li><strong>Цель</strong>: извлечение полезной информации из временных данных</li>
+      <li><strong>Время как признак</strong>: дата, день недели, месяц, сезон</li>
+      <li><strong>Лаговые признаки</strong>: прошлые значения как предикторы</li>
+      <li><strong>Скользящие статистики</strong>: тренды и паттерны</li>
+      <li><strong>Домен-специфичные</strong>: особенности задачи</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Временные признаки</h2>
+    <pre><code>import pandas as pd
+import numpy as np
+
+# Создание датафрейма
+df = pd.DataFrame({
+    'date': pd.date_range('2023-01-01', periods=365, 
+                         freq='D'),
+    'value': np.random.randn(365)
+})
+
+# Временные признаки
+df['year'] = df['date'].dt.year
+df['month'] = df['date'].dt.month
+df['day'] = df['date'].dt.day
+df['dayofweek'] = df['date'].dt.dayofweek  # 0=Пн
+df['dayofyear'] = df['date'].dt.dayofyear
+df['week'] = df['date'].dt.isocalendar().week
+df['quarter'] = df['date'].dt.quarter
+
+# Булевы признаки
+df['is_weekend'] = df['dayofweek'].isin([5, 6])
+df['is_month_start'] = df['date'].dt.is_month_start
+df['is_month_end'] = df['date'].dt.is_month_end
+df['is_quarter_start'] = df['date'].dt.is_quarter_start
+df['is_year_start'] = df['date'].dt.is_year_start
+
+# Время суток (если есть время)
+df['hour'] = df['date'].dt.hour
+df['is_business_hours'] = df['hour'].between(9, 17)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Циклические признаки</h2>
+    <p>Кодирование циклических переменных (день недели, месяц):</p>
+    <pre><code># Проблема: январь=1, декабрь=12 
+# но они рядом по времени!
+
+# Решение: sin/cos преобразование
+def encode_cyclical(df, col, max_val):
+    df[col + '_sin'] = np.sin(
+        2 * np.pi * df[col] / max_val
+    )
+    df[col + '_cos'] = np.cos(
+        2 * np.pi * df[col] / max_val
+    )
+    return df
+
+# Месяц (12 месяцев)
+df = encode_cyclical(df, 'month', 12)
+
+# День недели (7 дней)
+df = encode_cyclical(df, 'dayofweek', 7)
+
+# Час дня (24 часа)
+df = encode_cyclical(df, 'hour', 24)
+
+# День года (365/366 дней)
+df = encode_cyclical(df, 'dayofyear', 365)
+
+print(df[['month', 'month_sin', 
+         'month_cos']].head())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Лаговые признаки</h2>
+    <p>Прошлые значения целевой переменной:</p>
+    <pre><code># Создание лагов
+def create_lags(df, column, lags):
+    for lag in lags:
+        df[f'{column}_lag_{lag}'] = df[column].shift(lag)
+    return df
+
+# Лаги на 1, 7, 14, 30 дней
+df = create_lags(df, 'value', [1, 7, 14, 30])
+
+# Лаги для недельной сезонности
+df = create_lags(df, 'value', 
+                range(1, 8))  # lag_1 до lag_7
+
+# Процентное изменение
+df['value_pct_change_1'] = df['value'].pct_change(1)
+df['value_pct_change_7'] = df['value'].pct_change(7)
+
+# Разность
+df['value_diff_1'] = df['value'].diff(1)
+df['value_diff_7'] = df['value'].diff(7)
+
+print(df[['value', 'value_lag_1', 
+         'value_lag_7']].head(10))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Скользящие статистики</h2>
+    <pre><code># Скользящие окна
+windows = [7, 14, 30]
+
+for window in windows:
+    # Среднее
+    df[f'value_rolling_mean_{window}'] = \
+        df['value'].rolling(window).mean()
+    
+    # Стандартное отклонение
+    df[f'value_rolling_std_{window}'] = \
+        df['value'].rolling(window).std()
+    
+    # Минимум и максимум
+    df[f'value_rolling_min_{window}'] = \
+        df['value'].rolling(window).min()
+    df[f'value_rolling_max_{window}'] = \
+        df['value'].rolling(window).max()
+    
+    # Медиана
+    df[f'value_rolling_median_{window}'] = \
+        df['value'].rolling(window).median()
+    
+    # Квантили
+    df[f'value_rolling_q25_{window}'] = \
+        df['value'].rolling(window).quantile(0.25)
+    df[f'value_rolling_q75_{window}'] = \
+        df['value'].rolling(window).quantile(0.75)
+
+# Скользящая сумма
+df['value_rolling_sum_7'] = \
+    df['value'].rolling(7).sum()
+
+# Экспоненциальное скользящее среднее
+df['value_ewm_7'] = \
+    df['value'].ewm(span=7).mean()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Expanding признаки</h2>
+    <p>Накопленные статистики с начала ряда:</p>
+    <pre><code># Накопленные значения
+df['value_expanding_mean'] = \
+    df['value'].expanding().mean()
+
+df['value_expanding_std'] = \
+    df['value'].expanding().std()
+
+df['value_expanding_min'] = \
+    df['value'].expanding().min()
+
+df['value_expanding_max'] = \
+    df['value'].expanding().max()
+
+# Кумулятивная сумма
+df['value_cumsum'] = df['value'].cumsum()
+
+# Расстояние от максимума/минимума
+df['dist_from_max'] = \
+    df['value_expanding_max'] - df['value']
+
+df['dist_from_min'] = \
+    df['value'] - df['value_expanding_min']
+
+# Позиция в диапазоне [0, 1]
+df['position_in_range'] = \
+    (df['value'] - df['value_expanding_min']) / \
+    (df['value_expanding_max'] - 
+     df['value_expanding_min'])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Взаимодействия с лагами</h2>
+    <pre><code># Разности между лагами
+df['lag_diff_1_7'] = \
+    df['value_lag_1'] - df['value_lag_7']
+
+df['lag_diff_7_30'] = \
+    df['value_lag_7'] - df['value_lag_30']
+
+# Отношения
+df['lag_ratio_1_7'] = \
+    df['value_lag_1'] / (df['value_lag_7'] + 1e-8)
+
+# Разница с скользящим средним
+df['diff_from_ma_7'] = \
+    df['value'] - df['value_rolling_mean_7']
+
+# Volatility (rolling std / rolling mean)
+df['volatility_7'] = \
+    df['value_rolling_std_7'] / \
+    (df['value_rolling_mean_7'] + 1e-8)
+
+# Z-score относительно скользящего окна
+df['zscore_30'] = \
+    (df['value'] - df['value_rolling_mean_30']) / \
+    (df['value_rolling_std_30'] + 1e-8)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Праздники и события</h2>
+    <pre><code>from pandas.tseries.holiday import USFederalHolidayCalendar
+
+# Праздники
+cal = USFederalHolidayCalendar()
+holidays = cal.holidays(
+    start='2023-01-01', 
+    end='2023-12-31'
+)
+
+df['is_holiday'] = df['date'].isin(holidays)
+
+# Дни до/после праздника
+df['days_to_holiday'] = np.nan
+df['days_from_holiday'] = np.nan
+
+for holiday in holidays:
+    mask = df['date'] < holiday
+    days_to = (holiday - df.loc[mask, 'date']).dt.days
+    df.loc[mask, 'days_to_holiday'] = \
+        df.loc[mask, 'days_to_holiday'].fillna(
+            days_to
+        ).combine_first(days_to)
+    
+    mask = df['date'] > holiday
+    days_from = (df.loc[mask, 'date'] - holiday).dt.days
+    df.loc[mask, 'days_from_holiday'] = \
+        df.loc[mask, 'days_from_holiday'].fillna(
+            days_from
+        ).combine_first(days_from)
+
+# Кастомные события
+special_dates = pd.to_datetime([
+    '2023-02-14',  # Valentine's Day
+    '2023-11-24',  # Black Friday
+    '2023-12-25'   # Christmas
+])
+
+df['is_special_event'] = df['date'].isin(special_dates)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Автокорреляционные признаки</h2>
+    <pre><code>from statsmodels.tsa.stattools import acf, pacf
+
+# Автокорреляция
+# (использовать для анализа, не как признак напрямую)
+autocorr_vals = acf(df['value'].dropna(), nlags=30)
+
+# Но можем создать признаки на основе лагов
+# с высокой автокорреляцией
+significant_lags = np.where(
+    np.abs(autocorr_vals[1:]) > 0.3
+)[0] + 1
+
+print(f"Значимые лаги: {significant_lags}")
+
+# Создать признаки только для значимых лагов
+for lag in significant_lags:
+    df[f'value_lag_{lag}'] = df['value'].shift(lag)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Тренд и сезонность</h2>
+    <pre><code>from statsmodels.tsa.seasonal import seasonal_decompose
+
+# Декомпозиция
+decomposition = seasonal_decompose(
+    df.set_index('date')['value'],
+    model='additive',
+    period=7  # недельная сезонность
+)
+
+# Добавить компоненты как признаки
+df['trend'] = decomposition.trend.values
+df['seasonal'] = decomposition.seasonal.values
+df['residual'] = decomposition.resid.values
+
+# Линейный тренд (просто порядковый номер)
+df['time_index'] = np.arange(len(df))
+
+# Квадратичный тренд
+df['time_index_squared'] = df['time_index'] ** 2
+
+# Отклонение от тренда
+from sklearn.linear_model import LinearRegression
+
+X = df[['time_index']].values
+y = df['value'].values
+
+lr = LinearRegression()
+lr.fit(X, y)
+trend_pred = lr.predict(X)
+
+df['detrended'] = df['value'] - trend_pred
+df['trend_component'] = trend_pred</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Fourier признаки</h2>
+    <p>Для моделирования сезонности:</p>
+    <pre><code>def add_fourier_terms(df, period, order):
+    """
+    period: период сезонности (365 для годовой)
+    order: количество гармоник
+    """
+    for i in range(1, order + 1):
+        df[f'sin_{period}_{i}'] = np.sin(
+            2 * np.pi * i * df['time_index'] / period
+        )
+        df[f'cos_{period}_{i}'] = np.cos(
+            2 * np.pi * i * df['time_index'] / period
+        )
+    return df
+
+# Годовая сезонность (4 гармоники)
+df = add_fourier_terms(df, period=365, order=4)
+
+# Недельная сезонность (2 гармоники)
+df = add_fourier_terms(df, period=7, order=2)
+
+# Дневная сезонность (для почасовых данных)
+# df = add_fourier_terms(df, period=24, order=3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Группировки и агрегации</h2>
+    <pre><code># Статистики по группам
+# (например, среднее по дням недели)
+
+# Среднее значение для каждого дня недели
+df['value_mean_by_dow'] = df.groupby(
+    'dayofweek'
+)['value'].transform('mean')
+
+# Среднее по месяцам
+df['value_mean_by_month'] = df.groupby(
+    'month'
+)['value'].transform('mean')
+
+# Отклонение от группового среднего
+df['diff_from_dow_mean'] = \
+    df['value'] - df['value_mean_by_dow']
+
+df['diff_from_month_mean'] = \
+    df['value'] - df['value_mean_by_month']
+
+# Ранг внутри группы
+df['rank_in_month'] = df.groupby(
+    'month'
+)['value'].rank()
+
+# Процентиль в группе
+df['percentile_in_dow'] = df.groupby(
+    'dayofweek'
+)['value'].rank(pct=True)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Внешние признаки</h2>
+    <pre><code># Внешние данные (погода, экономика, и т.д.)
+# Пример с погодой
+
+weather_df = pd.DataFrame({
+    'date': df['date'],
+    'temperature': np.random.uniform(10, 30, len(df)),
+    'precipitation': np.random.uniform(0, 50, len(df)),
+    'humidity': np.random.uniform(30, 90, len(df))
+})
+
+# Объединение
+df = df.merge(weather_df, on='date', how='left')
+
+# Лаговые значения внешних признаков
+for col in ['temperature', 'precipitation']:
+    df[f'{col}_lag_1'] = df[col].shift(1)
+    df[f'{col}_lag_7'] = df[col].shift(7)
+    
+    # Скользящие средние
+    df[f'{col}_ma_7'] = df[col].rolling(7).mean()
+
+# Взаимодействия
+df['temp_x_humidity'] = \
+    df['temperature'] * df['humidity'] / 100
+
+df['is_rainy'] = df['precipitation'] > 10</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Полный пайплайн</h2>
+    <pre><code>def create_time_series_features(df, target_col, 
+                                date_col='date'):
+    df = df.copy()
+    
+    # 1. Временные признаки
+    df['year'] = df[date_col].dt.year
+    df['month'] = df[date_col].dt.month
+    df['dayofweek'] = df[date_col].dt.dayofweek
+    df['dayofyear'] = df[date_col].dt.dayofyear
+    df['is_weekend'] = df['dayofweek'].isin([5, 6])
+    
+    # 2. Циклические
+    df = encode_cyclical(df, 'month', 12)
+    df = encode_cyclical(df, 'dayofweek', 7)
+    
+    # 3. Лаги
+    for lag in [1, 7, 14, 30]:
+        df[f'{target_col}_lag_{lag}'] = \
+            df[target_col].shift(lag)
+    
+    # 4. Скользящие статистики
+    for window in [7, 14, 30]:
+        df[f'{target_col}_ma_{window}'] = \
+            df[target_col].rolling(window).mean()
+        df[f'{target_col}_std_{window}'] = \
+            df[target_col].rolling(window).std()
+    
+    # 5. Взаимодействия
+    df[f'{target_col}_diff_from_ma_7'] = \
+        df[target_col] - df[f'{target_col}_ma_7']
+    
+    return df
+
+# Использование
+df_features = create_time_series_features(
+    df, target_col='value'
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Важные советы</h2>
+    <ul>
+      <li><strong>Утечка данных</strong>: не использовать будущие значения!</li>
+      <li><strong>Пропуски</strong>: лаги создают NaN в начале</li>
+      <li><strong>Мультиколлинеарность</strong>: лаги часто коррелируют</li>
+      <li><strong>Отбор признаков</strong>: не все признаки полезны</li>
+      <li><strong>Валидация</strong>: только forward validation!</li>
+    </ul>
+    <pre><code># Проверка на утечку данных
+# НЕПРАВИЛЬНО: скользящее среднее вперед
+# df['ma_future'] = df['value'].rolling(
+#     window=7, center=True
+# ).mean()
+
+# ПРАВИЛЬНО: только назад
+df['ma_past'] = df['value'].rolling(
+    window=7, 
+    center=False
+).mean()
+
+# Удаление строк с NaN
+df_clean = df.dropna()
+
+# Или заполнение
+df_filled = df.fillna(method='ffill')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Создать базовые временные признаки</li>
+      <li>[ ] Добавить циклические преобразования</li>
+      <li>[ ] Создать лаговые признаки</li>
+      <li>[ ] Добавить скользящие статистики</li>
+      <li>[ ] Учесть праздники и события</li>
+      <li>[ ] Проанализировать автокорреляцию</li>
+      <li>[ ] Добавить тренд и сезонность</li>
+      <li>[ ] Проверить на утечку данных</li>
+      <li>[ ] Отобрать важные признаки</li>
+      <li>[ ] Валидировать на тестовой выборке</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Feature engineering для временных рядов — это извлечение скрытых паттернов из даты и времени. Например, мы можем учесть, что понедельники отличаются от пятниц, что есть сезонность по месяцам, и что текущие продажи связаны с продажами неделю назад. Все эти закономерности превращаются в признаки для модели».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
