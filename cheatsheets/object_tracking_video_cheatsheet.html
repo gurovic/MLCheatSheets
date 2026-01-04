@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Object Tracking in Video Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎬 Object Tracking in Video Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Object Tracking?</h2>
+    <ul>
+      <li><strong>Цель</strong>: отслеживать объект в видеопоследовательности</li>
+      <li><strong>Вход</strong>: первый кадр с bounding box объекта</li>
+      <li><strong>Выход</strong>: позиция объекта на всех кадрах</li>
+      <li><strong>Применение</strong>: наблюдение, автономные авто, спорт, AR/VR</li>
+      <li><strong>Проблемы</strong>: окклюзии, смена масштаба, деформация, освещение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы трекинга</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Сложность</th></tr>
+      <tr><td><strong>Single Object Tracking (SOT)</strong></td><td>Один объект</td><td>Средняя</td></tr>
+      <tr><td><strong>Multiple Object Tracking (MOT)</strong></td><td>Несколько объектов</td><td>Высокая</td></tr>
+      <tr><td><strong>Online</strong></td><td>Только прошлые кадры</td><td>Real-time</td></tr>
+      <tr><td><strong>Offline</strong></td><td>Вся последовательность</td><td>Точнее</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Классические методы</h2>
+    <p><strong>КорреляцияОснованные методы:</strong></p>
+    <ul>
+      <li><strong>Template Matching</strong>: поиск template в новом кадре</li>
+      <li><strong>Lucas-Kanade</strong>: optical flow tracking</li>
+      <li><strong>Mean-Shift</strong>: итеративный поиск максимума плотности</li>
+      <li><strong>CAMShift</strong>: адаптивный Mean-Shift с изменением размера</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. OpenCV Trackers</h2>
+    <pre><code>import cv2
+
+# Инициализация видео
+cap = cv2.VideoCapture('video.mp4')
+ret, frame = cap.read()
+
+# Выбор ROI (Region of Interest)
+bbox = cv2.selectROI('Frame', frame, False)
+
+# Создание трекера
+tracker = cv2.TrackerKCF_create()
+# Альтернативы:
+# tracker = cv2.TrackerCSRT_create()  # более точный
+# tracker = cv2.TrackerMOSSE_create()  # быстрый
+# tracker = cv2.TrackerMIL_create()
+# tracker = cv2.TrackerBoosting_create()
+
+# Инициализация
+tracker.init(frame, bbox)
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+    
+    # Обновление трекера
+    success, bbox = tracker.update(frame)
+    
+    if success:
+        x, y, w, h = [int(v) for v in bbox]
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+    else:
+        cv2.putText(frame, "Tracking failed", (50, 80),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 255), 2)
+    
+    cv2.imshow('Tracking', frame)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()
+cv2.destroyAllWindows()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. KCF (Kernelized Correlation Filters)</h2>
+    <ul>
+      <li><strong>Идея</strong>: корреляционный фильтр в частотной области</li>
+      <li><strong>Скорость</strong>: очень быстрый (~200 FPS)</li>
+      <li><strong>Точность</strong>: хорошая для простых случаев</li>
+      <li><strong>Недостаток</strong>: не работает при окклюзиях</li>
+    </ul>
+    <p><strong>Особенности</strong>:</p>
+    <ul>
+      <li>Использует HOG features</li>
+      <li>Kernel trick для нелинейности</li>
+      <li>Fast Fourier Transform для эффективности</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Deep Learning трекеры</h2>
+    <table>
+      <tr><th>Метод</th><th>Год</th><th>Особенности</th></tr>
+      <tr><td><strong>MDNet</strong></td><td>2016</td><td>Онлайн обучение CNN</td></tr>
+      <tr><td><strong>SiamFC</strong></td><td>2016</td><td>Siamese сеть, fast</td></tr>
+      <tr><td><strong>SiamRPN</strong></td><td>2018</td><td>Siamese + Region Proposal</td></tr>
+      <tr><td><strong>DiMP</strong></td><td>2019</td><td>Discriminative model prediction</td></tr>
+      <tr><td><strong>TransT</strong></td><td>2021</td><td>Transformer для tracking</td></tr>
+      <tr><td><strong>OSTrack</strong></td><td>2022</td><td>One-stream tracker</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Siamese Networks для трекинга</h2>
+    <p><strong>Идея</strong>: сравнение template с search region</p>
+    <pre><code>import torch
+import torch.nn as nn
+
+class SiameseTracker(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Общая feature extraction сеть
+        self.backbone = nn.Sequential(
+            nn.Conv2d(3, 64, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(64, 128, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(128, 256, 3, padding=1),
+            nn.ReLU()
+        )
+    
+    def forward(self, template, search):
+        # Извлечение признаков
+        z = self.backbone(template)  # (B, 256, H/4, W/4)
+        x = self.backbone(search)    # (B, 256, H'/4, W'/4)
+        
+        # Cross-correlation
+        response = self.cross_correlation(z, x)
+        
+        return response
+    
+    def cross_correlation(self, z, x):
+        # z: template features
+        # x: search region features
+        batch = x.shape[0]
+        channels = x.shape[1]
+        
+        # Reshape для convolution
+        z = z.view(1, -1, z.size(2), z.size(3))
+        x = x.view(1, -1, x.size(2), x.size(3))
+        
+        # Cross-correlation как convolution
+        response = nn.functional.conv2d(x, z, groups=batch)
+        
+        return response
+
+# Использование
+model = SiameseTracker()
+template = torch.randn(1, 3, 127, 127)  # объект
+search = torch.randn(1, 3, 255, 255)    # поиск
+response = model(template, search)
+# Максимум response указывает на позицию объекта</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. SiamRPN (Region Proposal Network)</h2>
+    <p><strong>Улучшение</strong>: добавление RPN для регрессии bbox</p>
+    <pre><code>class SiamRPN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.backbone = ResNet50()  # feature extractor
+        
+        # RPN heads
+        self.cls_head = nn.Conv2d(256, 2*5, 1)  # 5 anchors, 2 classes
+        self.reg_head = nn.Conv2d(256, 4*5, 1)  # 5 anchors, 4 coords
+    
+    def forward(self, template, search):
+        z = self.backbone(template)
+        x = self.backbone(search)
+        
+        # Cross-correlation
+        cls_feat = self.cross_corr(z, x, self.cls_head)
+        reg_feat = self.cross_corr(z, x, self.reg_head)
+        
+        # Classification и regression
+        cls_score = cls_feat.view(-1, 2, 5, cls_feat.size(2), cls_feat.size(3))
+        bbox_pred = reg_feat.view(-1, 4, 5, reg_feat.size(2), reg_feat.size(3))
+        
+        return cls_score, bbox_pred
+    
+    def cross_corr(self, kernel, search, head):
+        # Depth-wise cross-correlation
+        kernel = head(kernel)
+        search = self.backbone.last_conv(search)
+        
+        batch = search.shape[0]
+        channel = search.shape[1]
+        
+        kernel = kernel.view(batch, channel, -1).transpose(1, 2)
+        search = search.view(batch, channel, -1)
+        
+        response = torch.matmul(kernel, search)
+        return response.view(batch, -1, search.size(2), search.size(3))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Multiple Object Tracking (MOT)</h2>
+    <p><strong>Задача</strong>: отслеживать несколько объектов одновременно</p>
+    <ul>
+      <li><strong>Detection + Association</strong>: детекция каждого кадра + связывание</li>
+      <li><strong>SORT</strong>: Simple Online Realtime Tracking</li>
+      <li><strong>DeepSORT</strong>: SORT + appearance features</li>
+      <li><strong>FairMOT</strong>: One-shot detection + embedding</li>
+      <li><strong>ByteTrack</strong>: низкие confidence детекции тоже</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. DeepSORT алгоритм</h2>
+    <pre><code>class DeepSORT:
+    def __init__(self):
+        self.detector = YOLOv5()  # или Faster R-CNN
+        self.tracker = KalmanFilter()
+        self.feature_extractor = ResNet()  # для appearance
+        self.max_age = 30  # максимальное время без детекции
+        self.min_hits = 3  # минимум детекций для подтверждения
+        self.iou_threshold = 0.3
+        
+        self.tracks = []  # активные треки
+        self.next_id = 0
+    
+    def update(self, frame):
+        # 1. Детекция объектов
+        detections = self.detector(frame)
+        
+        # 2. Извлечение appearance features
+        features = []
+        for det in detections:
+            crop = frame[det.y1:det.y2, det.x1:det.x2]
+            feat = self.feature_extractor(crop)
+            features.append(feat)
+        
+        # 3. Предсказание для существующих треков
+        for track in self.tracks:
+            track.predict()
+        
+        # 4. Ассоциация (Hungarian algorithm)
+        matched, unmatched_dets, unmatched_tracks = \
+            self.associate(detections, features, self.tracks)
+        
+        # 5. Обновление matched треков
+        for track_idx, det_idx in matched:
+            self.tracks[track_idx].update(detections[det_idx], 
+                                         features[det_idx])
+        
+        # 6. Создание новых треков
+        for det_idx in unmatched_dets:
+            if len(self.tracks) < self.max_tracks:
+                new_track = Track(self.next_id, detections[det_idx], 
+                                features[det_idx])
+                self.tracks.append(new_track)
+                self.next_id += 1
+        
+        # 7. Удаление старых треков
+        self.tracks = [t for t in self.tracks if t.age < self.max_age]
+        
+        return self.tracks
+    
+    def associate(self, detections, features, tracks):
+        # Вычисление cost matrix (IoU + appearance)
+        cost_matrix = np.zeros((len(tracks), len(detections)))
+        
+        for i, track in enumerate(tracks):
+            for j, det in enumerate(detections):
+                iou = self.compute_iou(track.bbox, det.bbox)
+                appearance = self.cosine_distance(track.feature, features[j])
+                cost_matrix[i, j] = 0.5 * (1 - iou) + 0.5 * appearance
+        
+        # Hungarian algorithm для оптимальной ассоциации
+        from scipy.optimize import linear_sum_assignment
+        row_ind, col_ind = linear_sum_assignment(cost_matrix)
+        
+        # Фильтрация по порогу
+        matched = []
+        unmatched_dets = set(range(len(detections)))
+        unmatched_tracks = set(range(len(tracks)))
+        
+        for i, j in zip(row_ind, col_ind):
+            if cost_matrix[i, j] < 0.7:
+                matched.append((i, j))
+                unmatched_dets.discard(j)
+                unmatched_tracks.discard(i)
+        
+        return matched, list(unmatched_dets), list(unmatched_tracks)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Kalman Filter для трекинга</h2>
+    <pre><code>import numpy as np
+from filterpy.kalman import KalmanFilter
+
+class KalmanBoxTracker:
+    """Kalman Filter для трекинга bbox"""
+    
+    def __init__(self, bbox):
+        # State: [x, y, s, r, vx, vy, vs]
+        # x, y - центр, s - площадь, r - aspect ratio
+        # vx, vy, vs - скорости
+        
+        self.kf = KalmanFilter(dim_x=7, dim_z=4)
+        
+        # Матрица перехода
+        self.kf.F = np.array([
+            [1,0,0,0,1,0,0],
+            [0,1,0,0,0,1,0],
+            [0,0,1,0,0,0,1],
+            [0,0,0,1,0,0,0],
+            [0,0,0,0,1,0,0],
+            [0,0,0,0,0,1,0],
+            [0,0,0,0,0,0,1]
+        ])
+        
+        # Матрица наблюдения
+        self.kf.H = np.array([
+            [1,0,0,0,0,0,0],
+            [0,1,0,0,0,0,0],
+            [0,0,1,0,0,0,0],
+            [0,0,0,1,0,0,0]
+        ])
+        
+        # Ковариации
+        self.kf.R *= 10.0  # measurement uncertainty
+        self.kf.P[4:, 4:] *= 1000.0  # high uncertainty for velocities
+        self.kf.Q[-1, -1] *= 0.01
+        self.kf.Q[4:, 4:] *= 0.01
+        
+        # Инициализация состояния
+        self.kf.x[:4] = self.bbox_to_z(bbox)
+    
+    def predict(self):
+        """Предсказание следующего состояния"""
+        self.kf.predict()
+        return self.z_to_bbox(self.kf.x)
+    
+    def update(self, bbox):
+        """Обновление с новым наблюдением"""
+        self.kf.update(self.bbox_to_z(bbox))
+    
+    def bbox_to_z(self, bbox):
+        """[x1, y1, x2, y2] → [cx, cy, s, r]"""
+        w = bbox[2] - bbox[0]
+        h = bbox[3] - bbox[1]
+        cx = bbox[0] + w/2
+        cy = bbox[1] + h/2
+        s = w * h
+        r = w / h
+        return np.array([cx, cy, s, r])
+    
+    def z_to_bbox(self, z):
+        """[cx, cy, s, r] → [x1, y1, x2, y2]"""
+        w = np.sqrt(z[2] * z[3])
+        h = z[2] / w
+        x1 = z[0] - w/2
+        y1 = z[1] - h/2
+        x2 = z[0] + w/2
+        y2 = z[1] + h/2
+        return np.array([x1, y1, x2, y2])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Метрики оценки</h2>
+    <table>
+      <tr><th>Метрика</th><th>Описание</th><th>Диапазон</th></tr>
+      <tr><td><strong>Success Rate</strong></td><td>Доля кадров с IoU > порог</td><td>[0, 1]</td></tr>
+      <tr><td><strong>Precision</strong></td><td>Средняя дистанция центров</td><td>[0, ∞)</td></tr>
+      <tr><td><strong>MOTA</strong></td><td>Multiple Object Tracking Accuracy</td><td>(-∞, 1]</td></tr>
+      <tr><td><strong>MOTP</strong></td><td>Multiple Object Tracking Precision</td><td>[0, ∞)</td></tr>
+      <tr><td><strong>IDF1</strong></td><td>ID F1 score (ассоциации)</td><td>[0, 1]</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Практические советы</h2>
+    <ul>
+      <li><strong>Выбор трекера</strong>:
+        <ul>
+          <li>Real-time: KCF, MOSSE, SiamFC</li>
+          <li>Точность: CSRT, DiMP, TransT</li>
+          <li>Компромисс: SiamRPN++</li>
+        </ul>
+      </li>
+      <li><strong>Обработка окклюзий</strong>: храните последние N features</li>
+      <li><strong>Re-detection</strong>: запускайте детектор периодически</li>
+      <li><strong>Масштаб</strong>: адаптируйте search region</li>
+      <li><strong>Ускорение</strong>: уменьшите разрешение, используйте GPU</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Популярные датасеты</h2>
+    <table>
+      <tr><th>Датасет</th><th>Тип</th><th>Видео</th><th>Объекты</th></tr>
+      <tr><td><strong>OTB</strong></td><td>SOT</td><td>100</td><td>1</td></tr>
+      <tr><td><strong>VOT</strong></td><td>SOT</td><td>60</td><td>1</td></tr>
+      <tr><td><strong>LaSOT</strong></td><td>SOT</td><td>1,400</td><td>1</td></tr>
+      <tr><td><strong>MOT17/20</strong></td><td>MOT</td><td>14/8</td><td>Много</td></tr>
+      <tr><td><strong>TAO</strong></td><td>MOT</td><td>2,900</td><td>Много классов</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] <strong>Выбрать тип</strong>: SOT или MOT</li>
+      <li>[ ] <strong>Real-time requirements</strong>: KCF/MOSSE vs DiMP/TransT</li>
+      <li>[ ] <strong>Инициализация</strong>: хороший bbox на первом кадре</li>
+      <li>[ ] <strong>Re-detection</strong> при потере трека</li>
+      <li>[ ] <strong>Kalman Filter</strong> для сглаживания в MOT</li>
+      <li>[ ] <strong>Appearance features</strong> для association</li>
+      <li>[ ] <strong>Обработка окклюзий</strong>: храните историю</li>
+      <li>[ ] <strong>Тестирование</strong> на разных сценариях</li>
+      <li>[ ] <strong>Оптимизация</strong>: GPU, mixed precision</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Object tracking — это как следить глазами за движущимся объектом: система запоминает как выглядит объект и постоянно ищет его в новых кадрах видео, даже если он частично скрыт или меняет размер и поворот».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
