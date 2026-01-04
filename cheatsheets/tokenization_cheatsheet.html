@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Токенизация для NLP Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔤 Токенизация для NLP Cheatsheet</h1>
+  <div class="subtitle">BPE • WordPiece • SentencePiece • Transformers • LLM<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Зачем нужна токенизация</h2>
+<ul><li><strong>Цель</strong>: разбить текст на части (токены) для модели</li><li><strong>Проблема</strong>: огромный словарь vs потеря информации</li><li><strong>Решение</strong>: subword токенизация (BPE, WordPiece)</li><li><strong>Применение</strong>: BERT, GPT, T5, все современные LLM</li></ul><blockquote>Токенизация — это компромисс между словами (слишком много) и символами (теряется смысл).</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Виды токенизации</h2>
+<table><tr><th>Тип</th><th>Пример</th><th>Использование</th></tr><tr><td>Word-level</td><td>"Hello world" → ["Hello", "world"]</td><td>Простые задачи</td></tr><tr><td>Character-level</td><td>"cat" → ["c", "a", "t"]</td><td>Редко (языки без пробелов)</td></tr><tr><td>Subword (BPE)</td><td>"tokenization" → ["token", "ization"]</td><td>GPT, RoBERTa</td></tr><tr><td>WordPiece</td><td>"tokenization" → ["token", "##ization"]</td><td>BERT</td></tr></table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. BPE (Byte Pair Encoding)</h2>
+<pre><code># Алгоритм BPE
+1. Начать с символов
+2. Найти самую частую пару символов
+3. Объединить в новый токен
+4. Повторять до размера словаря
+
+Пример:
+"low" + "low" + "lowest"
+→ словарь: {l, o, w, e, s, t, lo, low, est}
+
+"lowest" → ["low", "est"]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. BPE с Hugging Face</h2>
+<pre><code>from transformers import GPT2Tokenizer
+
+# GPT-2 использует BPE
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+
+text = "Tokenization is awesome!"
+tokens = tokenizer.tokenize(text)
+print(tokens)
+# ['Token', 'ization', ' is', ' awesome', '!']
+
+# Encode в ID
+ids = tokenizer.encode(text)
+print(ids)
+# [15667, 1634, 318, 7427, 0]
+
+# Decode обратно
+original = tokenizer.decode(ids)
+print(original)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. WordPiece (BERT)</h2>
+<pre><code>from transformers import BertTokenizer
+
+tokenizer = BertTokenizer.from_pretrained("bert-base-uncased")
+
+text = "Tokenization"
+tokens = tokenizer.tokenize(text)
+print(tokens)
+# ['token', '##ization']
+
+# ## означает продолжение слова
+# Помогает различать "token" как отдельное слово
+# и "token" как часть "tokenization"</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. SentencePiece</h2>
+<pre><code>import sentencepiece as spm
+
+# Обучение токенизатора
+spm.SentencePieceTrainer.train(
+    input="corpus.txt",
+    model_prefix="tokenizer",
+    vocab_size=32000,
+    model_type="bpe"  # или "unigram"
+)
+
+# Загрузка
+sp = spm.SentencePieceProcessor()
+sp.load("tokenizer.model")
+
+# Токенизация
+tokens = sp.encode_as_pieces("Hello world")
+print(tokens)
+# ['▁Hello', '▁world']
+# ▁ означает начало слова
+
+ids = sp.encode_as_ids("Hello world")
+print(ids)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Обучение токенизатора</h2>
+<pre><code>from tokenizers import Tokenizer
+from tokenizers.models import BPE
+from tokenizers.trainers import BpeTrainer
+from tokenizers.pre_tokenizers import Whitespace
+
+# Создание токенизатора
+tokenizer = Tokenizer(BPE(unk_token="[UNK]"))
+tokenizer.pre_tokenizer = Whitespace()
+
+# Обучение
+trainer = BpeTrainer(
+    vocab_size=30000,
+    special_tokens=["[UNK]", "[CLS]", "[SEP]", "[PAD]", "[MASK]"]
+)
+
+files = ["train.txt"]
+tokenizer.train(files, trainer)
+
+# Сохранение
+tokenizer.save("my_tokenizer.json")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Специальные токены</h2>
+<table><tr><th>Токен</th><th>Назначение</th><th>Модель</th></tr><tr><td>[CLS]</td><td>Начало последовательности</td><td>BERT</td></tr><tr><td>[SEP]</td><td>Разделитель предложений</td><td>BERT</td></tr><tr><td>[PAD]</td><td>Padding (выравнивание длины)</td><td>Все</td></tr><tr><td>[MASK]</td><td>Маскированный токен</td><td>BERT (MLM)</td></tr><tr><td>[UNK]</td><td>Неизвестное слово</td><td>Все</td></tr><tr><td>&lt;|endoftext|&gt;</td><td>Конец текста</td><td>GPT</td></tr></table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Padding и Truncation</h2>
+<pre><code># Padding - выравнивание по длине
+tokens_batch = tokenizer(
+    ["Short text", "Very long text that needs truncation"],
+    padding=True,  # добавить [PAD]
+    truncation=True,  # обрезать длинные
+    max_length=128,
+    return_tensors="pt"  # PyTorch tensors
+)
+
+print(tokens_batch["input_ids"])
+# tensor([[ 101, 2460, 3793,  102,    0,    0],
+#         [ 101, 2200, 2146, ...  102]])
+
+print(tokens_batch["attention_mask"])
+# tensor([[1, 1, 1, 1, 0, 0],
+#         [1, 1, 1, ..., 1]])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Fast Tokenizers</h2>
+<pre><code># HuggingFace Fast Tokenizers (Rust-based)
+from transformers import AutoTokenizer
+
+# Автоматически выбирает fast версию
+tokenizer = AutoTokenizer.from_pretrained(
+    "bert-base-uncased",
+    use_fast=True
+)
+
+# Преимущества:
+# - В 10x быстрее
+# - Поддержка offset_mapping
+# - Батчевая обработка
+
+# Offset mapping (позиции в оригинальном тексте)
+encoding = tokenizer(
+    "Hello world",
+    return_offsets_mapping=True
+)
+print(encoding.offset_mapping)
+# [(0, 5), (6, 11)]  # "Hello" и "world"</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Multilingual токенизация</h2>
+<pre><code># XLM-RoBERTa - 100 языков
+tokenizer = AutoTokenizer.from_pretrained(
+    "xlm-roberta-base"
+)
+
+texts = [
+    "Hello world",  # English
+    "Привет мир",   # Russian
+    "你好世界"       # Chinese
+]
+
+for text in texts:
+    tokens = tokenizer.tokenize(text)
+    print(f"{text}: {tokens}")
+
+# SentencePiece хорошо работает для разных языков
+# BPE/WordPiece могут быть проблематичны</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Обработка OOV (Out-of-Vocabulary)</h2>
+<pre><code># Стратегии для неизвестных слов:
+
+# 1. UNK token
+"unknownword" → ["[UNK]"]
+
+# 2. Subword decomposition (BPE/WordPiece)
+"unknownword" → ["unknown", "word"]
+
+# 3. Character fallback
+"unknownword" → ["u", "n", "k", ...]
+
+# BPE всегда может разбить до символов
+# Никогда не будет OOV!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Byte-level BPE (GPT-2)</h2>
+<pre><code># GPT-2/GPT-3 используют byte-level BPE
+# Работает на уровне байтов, не символов
+
+# Преимущества:
+# - Любые Unicode символы
+# - Фиксированный base vocab (256 bytes)
+# - Никаких UNK токенов
+
+tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
+
+# Может токенизировать что угодно
+text = "Hello 世界 🌍"
+tokens = tokenizer.tokenize(text)
+print(tokens)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Metrics</h2>
+<pre><code># Оценка качества токенизации
+
+# 1. Размер словаря
+vocab_size = len(tokenizer)
+print(f"Vocabulary size: {vocab_size}")
+
+# 2. Средняя длина токена
+tokens_per_word = len(tokens) / len(text.split())
+print(f"Tokens per word: {tokens_per_word:.2f}")
+# Меньше = лучше (меньше токенов для той же информации)
+
+# 3. Coverage (% известных токенов)
+unk_count = tokens.count("[UNK]")
+coverage = 1 - unk_count / len(tokens)
+print(f"Coverage: {coverage:.2%}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Best Practices</h2>
+<ul><li>[ ] Использовать pretrained токенизаторы когда возможно</li><li>[ ] BPE для generative (GPT)</li><li>[ ] WordPiece для BERT-like</li><li>[ ] SentencePiece для multilingual</li><li>[ ] Fast tokenizers для production</li><li>[ ] Правильные special tokens</li><li>[ ] Padding и truncation настроены</li><li>[ ] Словарь достаточного размера (30k-50k)</li></ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+<ul><li>[ ] Токенизатор выбран (BPE/WordPiece/SentencePiece)</li><li>[ ] Размер словаря определен</li><li>[ ] Специальные токены добавлены</li><li>[ ] Padding/truncation настроены</li><li>[ ] Проверена coverage на данных</li><li>[ ] Токены→IDs→Текст работает</li></ul><blockquote>«Токенизация — это словарь между человеческим языком и языком нейросетей. Правильный выбор токенизатора может улучшить модель на 5-10% accuracy».</blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

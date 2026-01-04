@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Fraud Detection (Обнаружение мошенничества) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🚨 Fraud Detection (Обнаружение мошенничества) Cheatsheet</h1>
+  <div class="subtitle">Anomaly Detection • Imbalanced Data • Real-time • Финансы<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Специфика задачи</h2>
+<ul><li><strong>Дисбаланс классов</strong>: 0.1-1% мошенничества</li><li><strong>Real-time</strong>: решение за миллисекунды</li><li><strong>Адаптивность</strong>: мошенники меняют тактику</li><li><strong>Цена ошибки</strong>: FP блокирует клиентов, FN теряет деньги</li><li><strong>Интерпретируемость</strong>: нужно объяснять решения</li></ul><blockquote>В fraud detection ошибка первого рода (false positive) блокирует легитимного клиента, ошибка второго рода (false negative) пропускает мошенника.</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы мошенничества</h2>
+<table><tr><th>Тип</th><th>Пример</th><th>Признаки</th></tr><tr><td>Credit card fraud</td><td>Украденная карта</td><td>Необычные суммы, локация</td></tr><tr><td>Account takeover</td><td>Взлом аккаунта</td><td>Смена устройства, IP</td></tr><tr><td>Payment fraud</td><td>Фейковые транзакции</td><td>Паттерн покупок</td></tr><tr><td>Identity theft</td><td>Кража личности</td><td>Несоответствие данных</td></tr><tr><td>Insurance fraud</td><td>Ложные заявки</td><td>Статистические аномалии</td></tr></table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Feature Engineering</h2>
+<pre><code># Временные признаки
+df["hour"] = df["timestamp"].dt.hour
+df["day_of_week"] = df["timestamp"].dt.dayofweek
+df["is_weekend"] = df["day_of_week"].isin([5, 6])
+df["is_night"] = df["hour"].between(0, 6)
+
+# Агрегированные за период
+df["count_24h"] = df.groupby("user_id")["transaction"].rolling(
+    window="24H", on="timestamp"
+).count()
+df["sum_24h"] = df.groupby("user_id")["amount"].rolling(
+    window="24H", on="timestamp"
+).sum()
+
+# Отклонения от нормы
+df["amount_zscore"] = (
+    df["amount"] - df.groupby("user_id")["amount"].transform("mean")
+) / df.groupby("user_id")["amount"].transform("std")
+
+# Скорость транзакций
+df["velocity"] = df.groupby("user_id")["timestamp"].diff().dt.seconds</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Работа с дисбалансом</h2>
+<pre><code>from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.pipeline import Pipeline as ImbPipeline
+
+# SMOTE для minority class
+smote = SMOTE(sampling_strategy=0.1, random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X_train, y_train)
+
+# Или комбинация
+over = SMOTE(sampling_strategy=0.3)
+under = RandomUnderSampler(sampling_strategy=0.5)
+pipeline = ImbPipeline([
+    ("over", over),
+    ("under", under)
+])
+X_res, y_res = pipeline.fit_resample(X_train, y_train)
+
+# Class weights для моделей
+from sklearn.utils.class_weight import compute_class_weight
+weights = compute_class_weight(
+    "balanced", 
+    classes=np.unique(y_train), 
+    y=y_train
+)
+model = XGBClassifier(scale_pos_weight=weights[1]/weights[0])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Модели</h2>
+<pre><code># Random Forest с class weights
+from sklearn.ensemble import RandomForestClassifier
+
+rf = RandomForestClassifier(
+    n_estimators=200,
+    max_depth=10,
+    class_weight="balanced",  # важно!
+    random_state=42
+)
+rf.fit(X_train, y_train)
+
+# XGBoost - хорошо работает с дисбалансом
+import xgboost as xgb
+
+scale_pos_weight = len(y_train[y_train==0]) / len(y_train[y_train==1])
+xgb_model = xgb.XGBClassifier(
+    scale_pos_weight=scale_pos_weight,
+    max_depth=6,
+    learning_rate=0.1,
+    n_estimators=200
+)
+xgb_model.fit(X_train, y_train)
+
+# LightGBM - быстрее для больших данных
+import lightgbm as lgb
+
+lgb_model = lgb.LGBMClassifier(
+    scale_pos_weight=scale_pos_weight,
+    num_leaves=31,
+    learning_rate=0.05
+)
+lgb_model.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Anomaly Detection подход</h2>
+<pre><code># Isolation Forest
+from sklearn.ensemble import IsolationForest
+
+iso_forest = IsolationForest(
+    contamination=0.01,  # ожидаемая доля аномалий
+    random_state=42
+)
+
+# Обучение только на нормальных транзакциях
+X_normal = X_train[y_train == 0]
+iso_forest.fit(X_normal)
+
+# Предсказание аномалий (-1 = anomaly, 1 = normal)
+predictions = iso_forest.predict(X_test)
+anomalies = predictions == -1
+
+# One-Class SVM
+from sklearn.svm import OneClassSVM
+
+ocsvm = OneClassSVM(nu=0.01, gamma="auto")
+ocsvm.fit(X_normal)
+predictions = ocsvm.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Метрики</h2>
+<pre><code>from sklearn.metrics import (precision_recall_fscore_support,
+                             roc_auc_score, average_precision_score,
+                             confusion_matrix)
+
+# Precision, Recall, F1 (важнее accuracy!)
+precision, recall, f1, _ = precision_recall_fscore_support(
+    y_test, y_pred, average="binary"
+)
+
+print(f"Precision: {precision:.3f}")  # из предсказанных fraud, сколько правильно
+print(f"Recall: {recall:.3f}")        # из реальных fraud, сколько нашли
+print(f"F1: {f1:.3f}")
+
+# ROC AUC
+roc_auc = roc_auc_score(y_test, y_pred_proba[:, 1])
+print(f"ROC AUC: {roc_auc:.3f}")
+
+# PR AUC (лучше для imbalanced)
+pr_auc = average_precision_score(y_test, y_pred_proba[:, 1])
+print(f"PR AUC: {pr_auc:.3f}")
+
+# Confusion Matrix
+tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
+print(f"TP: {tp}, FP: {fp}, TN: {tn}, FN: {fn}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Threshold tuning</h2>
+<pre><code># Подбор порога для баланса precision/recall
+from sklearn.metrics import precision_recall_curve
+
+precisions, recalls, thresholds = precision_recall_curve(
+    y_test, y_pred_proba[:, 1]
+)
+
+# F1-оптимальный порог
+f1_scores = 2 * (precisions * recalls) / (precisions + recalls)
+opt_idx = np.argmax(f1_scores)
+opt_threshold = thresholds[opt_idx]
+
+print(f"Optimal threshold: {opt_threshold:.3f}")
+
+# Применение
+y_pred_tuned = (y_pred_proba[:, 1] >= opt_threshold).astype(int)
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.plot(thresholds, precisions[:-1], label="Precision")
+plt.plot(thresholds, recalls[:-1], label="Recall")
+plt.axvline(opt_threshold, color="r", linestyle="--")
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Real-time scoring</h2>
+<pre><code># Пайплайн для production
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+
+pipeline = Pipeline([
+    ("scaler", StandardScaler()),
+    ("model", xgb_model)
+])
+
+# Сохранение
+import joblib
+joblib.dump(pipeline, "fraud_detector.pkl")
+
+# API для real-time скоринга
+from fastapi import FastAPI
+import pandas as pd
+
+app = FastAPI()
+model = joblib.load("fraud_detector.pkl")
+
+@app.post("/predict")
+def predict(transaction: dict):
+    # Feature engineering
+    features = extract_features(transaction)
+    X = pd.DataFrame([features])
+    
+    # Предсказание
+    fraud_probability = model.predict_proba(X)[0, 1]
+    
+    # Решение
+    if fraud_probability > 0.8:
+        return {"decision": "BLOCK", "score": fraud_probability}
+    elif fraud_probability > 0.5:
+        return {"decision": "REVIEW", "score": fraud_probability}
+    else:
+        return {"decision": "APPROVE", "score": fraud_probability}</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Interpretability</h2>
+<pre><code># SHAP для объяснения
+import shap
+
+explainer = shap.TreeExplainer(xgb_model)
+shap_values = explainer.shap_values(X_test)
+
+# Visualize для конкретной транзакции
+shap.force_plot(
+    explainer.expected_value,
+    shap_values[0],
+    X_test.iloc[0]
+)
+
+# Feature importance
+shap.summary_plot(shap_values, X_test)
+
+# Для бизнеса: топ-3 причины
+def explain_decision(transaction_idx):
+    shap_val = shap_values[transaction_idx]
+    feature_importance = pd.DataFrame({
+        "feature": X_test.columns,
+        "importance": abs(shap_val)
+    }).sort_values("importance", ascending=False)
+    
+    return feature_importance.head(3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Online Learning</h2>
+<pre><code># Обновление модели с новыми данными
+from river import tree, metrics
+
+# Online Random Forest (river library)
+model = tree.HoeffdingAdaptiveTreeClassifier(
+    grace_period=100,
+    split_confidence=1e-5
+)
+
+# Инкрементальное обучение
+for x, y in zip(X_stream, y_stream):
+    # Предсказание
+    y_pred = model.predict_one(x)
+    
+    # Обновление модели
+    model.learn_one(x, y)
+    
+    # Метрики
+    if y_pred is not None:
+        metric.update(y, y_pred)
+
+print(f"Running accuracy: {metric.get()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Rule-based система</h2>
+<pre><code># Комбинация ML + правила
+def fraud_detection_system(transaction, ml_model):
+    # Жесткие правила (всегда блокировать)
+    if transaction["amount"] > 10000 and transaction["country"] == "risky":
+        return "BLOCK", 1.0, "Rule: High amount in risky country"
+    
+    if transaction["velocity"] < 60:  # < 1 минуты между транзакциями
+        return "BLOCK", 1.0, "Rule: Too fast transactions"
+    
+    # ML модель
+    features = extract_features(transaction)
+    fraud_prob = ml_model.predict_proba([features])[0, 1]
+    
+    # Комбинированное решение
+    if fraud_prob > 0.9:
+        return "BLOCK", fraud_prob, "ML: High fraud probability"
+    elif fraud_prob > 0.7:
+        return "REVIEW", fraud_prob, "ML: Medium fraud probability"
+    else:
+        return "APPROVE", fraud_prob, "ML: Low fraud probability"</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Мониторинг</h2>
+<pre><code># Tracking model performance
+import wandb
+
+# Инициализация
+wandb.init(project="fraud-detection")
+
+# Логирование метрик
+wandb.log({
+    "precision": precision,
+    "recall": recall,
+    "f1": f1,
+    "roc_auc": roc_auc,
+    "pr_auc": pr_auc,
+    "false_positives": fp,
+    "false_negatives": fn,
+    "fraud_rate": y_test.mean(),
+    "detection_rate": tp / (tp + fn)
+})
+
+# Алерты при деградации
+if pr_auc < 0.85:
+    send_alert("Model performance degraded!")
+    retrain_model()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Feature Store</h2>
+<pre><code># Feast для feature management
+from feast import FeatureStore
+
+store = FeatureStore(repo_path=".")
+
+# Получение features для транзакции
+entity_rows = [{
+    "user_id": transaction["user_id"],
+    "event_timestamp": transaction["timestamp"]
+}]
+
+features = store.get_online_features(
+    features=[
+        "user_features:count_24h",
+        "user_features:sum_24h",
+        "user_features:avg_amount"
+    ],
+    entity_rows=entity_rows
+).to_dict()
+
+# Real-time feature computation + historical features</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Best Practices</h2>
+<ul><li>[ ] Работать с дисбалансом (SMOTE, class weights)</li><li>[ ] Использовать правильные метрики (PR AUC > ROC AUC)</li><li>[ ] Подбирать threshold под бизнес-цели</li><li>[ ] Комбинировать ML + rules</li><li>[ ] Обеспечить интерпретируемость (SHAP)</li><li>[ ] Real-time inference (<100ms)</li><li>[ ] Continuous monitoring и retraining</li><li>[ ] A/B тестирование новых моделей</li></ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+<ul><li>[ ] Features созданы (temporal, aggregated, deviations)</li><li>[ ] Дисбаланс обработан</li><li>[ ] Модель обучена (RF/XGB/LGB)</li><li>[ ] Threshold подобран</li><li>[ ] Метрики вычислены (Precision/Recall/PR AUC)</li><li>[ ] Explainability добавлена</li><li>[ ] Real-time API готов</li><li>[ ] Мониторинг настроен</li></ul><blockquote>«В fraud detection false positive стоит потерянного клиента, false negative — потерянных денег. Задача — найти баланс, который минимизирует суммарные потери бизнеса».</blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
