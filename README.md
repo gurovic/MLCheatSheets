@@ -158,6 +158,7 @@
 1. Matplotlib/Seaborn для визуализации
 
 ### **21. Дополнительные темы**
+1. [Active Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/active_learning_cheatsheet.html)
 1. [Transfer Learning (классические подходы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transfer_learning_cheatsheet.html)
 1. Multi-task Learning
 1. Multi-output модели
