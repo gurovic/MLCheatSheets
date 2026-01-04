@@ -72,12 +72,18 @@
 1. [Кривые обучения](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/learning_curves_cheatsheet.html)
 1. [Калибровка моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_calibration_cheatsheet.html)
 1. [Статистические тесты для сравнения моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/statistical_tests_cheatsheet.html)
+1. Статистические тесты (t-test, McNemar)
+1. Кривые обучения и валидации
+1. Bias-variance decomposition
+1. Неметрические критерии (интерпретируемость, скорость)
 
 ### **7. Поиск гиперпараметров**
 1. [Grid Search / Random Search](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hyperparameter_tuning_cheatsheet.html)
 1. [Bayesian Optimization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bayesian_optimization_cheatsheet.html)
 1. [Optuna / Hyperopt](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/optuna_hyperopt_cheatsheet.html)
 1. [Стратегии поиска гиперпараметров](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hyperparameter_strategies_cheatsheet.html)
+1. Байесовская оптимизация гиперпараметров
+1. Байесовские нейронные сети
 
 ### **8. Работа с временными рядами (классические методы)**
 1. [ARIMA / SARIMA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_cheatsheet.html)
@@ -85,6 +91,11 @@
 1. [Методы на основе скользящих средних](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/moving_average_methods_cheatsheet.html)
 1. [Feature Engineering для временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_feature_engineering_cheatsheet.html)
 1. [Валидация временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_validation_cheatsheet.html)
+1. [Prophet и современные методы временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/prophet_time_series_cheatsheet.html)
+1. State space models
+1. Kalman filters
+1. Сезонная декомпозиция
+1. Теория временных рядов Box-Jenkins
 
 ### **9. Обнаружение аномалий**
 1. [Isolation Forest](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/isolation_forest_cheatsheet.html)
@@ -98,6 +109,11 @@
 1. [Контентная фильтрация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/content_based_filtering_cheatsheet.html)
 1. [Матричная факторизация (SVD)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/matrix_factorization_svd_cheatsheet.html)
 1. [ALS (Alternating Least Squares)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/als_recommender_cheatsheet.html)
+1. Коллаборативная фильтрация (user-based, item-based)
+1. Матричная факторизация (SVD, NMF)
+1. Гибридные системы
+1. Context-aware рекомендации
+1. Sequence-aware рекомендации
 
 ### **11. Градиентный бустинг**
 1. [Градиентный бустинг для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/boosting_cheatsheet.html)
@@ -159,6 +175,11 @@
 1. [Сериализация моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_serialization_cheatsheet.html)
 1. [Дрейф данных и концептуальный дрейф](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/concept_drift_cheatsheet.html)
 1. [Пайплайны ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ml_pipelines_cheatsheet.html)
+1. [MLOps Best Practices](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mlops_best_practices_cheatsheet.html)
+1. [Мониторинг моделей и A/B тестирование](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_monitoring_ab_testing_cheatsheet.html)
+1. Модельные реестры
+1. Feature stores
+1. CI/CD для ML
 
 ### **17. Специальные алгоритмы**
 1. [Метод главных компонент (PCA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pca_method_cheatsheet.html)
@@ -181,6 +202,9 @@
 1. [Регуляризация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/regularization_cheatsheet.html)
 1. [Байесовский подход](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bayesian_approach_cheatsheet.html)
 1. [Теория информации в ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/information_theory_ml_cheatsheet.html)
+1. Линейная алгебра и оптимизация
+1. Теория графов для ML
+1. Теория решений
 
 ### **20. Инструменты и библиотеки**
 1. [Scikit-learn полный обзор](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/sklearn_overview_cheatsheet.html)
@@ -195,7 +219,24 @@
 1. [Multi-output регрессионные модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multi_output_regression_cheatsheet.html)
 1. [Квантильная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantile_regression_cheatsheet.html)
 
-### **22. Графовые алгоритмы (классические)**
+### **22. Этика, безопасность и приватность**
+1. [Fairness в ML (Справедливость)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fairness_ml_cheatsheet.html)
+1. [Adversarial Attacks (Состязательные атаки)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adversarial_attacks_cheatsheet.html)
+1. Adversarial robustness (классические атаки)
+1. Differential privacy
+1. Explainability и accountability
+
+### **23. Безопасность и обнаружение аномалий в приложениях**
+1. Обнаружение вторжений
+1. Malware detection
+1. [Fraud detection](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fraud_detection_cheatsheet.html)
+
+### **24. Финансовое и бизнес ML**
+1. Алгоритмический трейдинг
+1. Кредитный скоринг
+1. Risk management
+
+### **25. Графовые алгоритмы (классические)**
 1. Алгоритмы на графах (кластеризация, поиск путей)
 1. Социальный сетевой анализ
 1. Графовые эмбеддинги (Node2Vec, DeepWalk)
@@ -203,7 +244,7 @@
 1. Графовые ядра (Graph kernels)
 1. Influence maximization
 
-### **23. Традиционная обработка текста (NLP)**
+### **26. Традиционная обработка текста (NLP)**
 1. Тематическое моделирование (LDA, NMF)
 1. TF-IDF и векторное пространство
 1. Латентно-семантический анализ (LSA)
@@ -212,7 +253,7 @@
 1. CRF (Conditional Random Fields) для NER
 1. Синтаксический разбор (constituency, dependency)
 
-### **24. Полуавтоматическое обучение (Semi-supervised)**
+### **27. Полуавтоматическое обучение (Semi-supervised)**
 1. [Semi-supervised Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/semi_supervised_learning_cheatsheet.html)
 1. Self-training
 1. Co-training
@@ -221,7 +262,7 @@
 1. Pseudo-labeling
 1. Generative models (классические)
 
-### **25. Онлайн обучение и инкрементное обучение**
+### **28. Онлайн обучение и инкрементное обучение**
 1. [Online Learning (SGD, Perceptron, Concept Drift)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/online_learning_cheatsheet.html)
 1. [Incremental Learning (Инкрементное обучение)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/incremental_learning_cheatsheet.html)
 1. Concept drift detection
@@ -230,27 +271,27 @@
 1. Reservoir sampling
 1. Hoeffding trees
 
-### **26. Мультимодальное обучение (классическое)**
+### **29. Мультимодальное обучение (классическое)**
 1. Early fusion и late fusion
 1. [Canonical Correlation Analysis (CCA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/canonical_correlation_analysis_cheatsheet.html)
 1. Kernel CCA
 1. Multi-view learning
 1. Co-training
 
-### **27. Обучение с ограничениями**
+### **30. Обучение с ограничениями**
 1. Constrained optimization в ML
 1. Fairness constraints
 1. Monotonic constraints
 1. Shape constraints
 
-### **28. Комбинаторная оптимизация и ML**
+### **31. Комбинаторная оптимизация и ML**
 1. Генетические алгоритмы
 1. Эволюционные стратегии
 1. Swarm intelligence (PSO, ant colony)
 1. Simulated annealing
 1. Tabu search
 
-### **29. Обучение с подкреплением (классическое RL)**
+### **32. Обучение с подкреплением (классическое RL)**
 1. [Reinforcement Learning Basics (RL основы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/reinforcement_learning_basics_cheatsheet.html)
 1. Классическое RL (табличное, без нейросетей)
 1. Многорукие бандиты (Multi-armed bandits)
@@ -260,6 +301,9 @@
 1. Временная разница (TD-learning)
 1. [Q-learning и SARSA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/q_learning_sarsa_cheatsheet.html)
 1. Функции приближения (линейные, ядерные)
+1. Иерархическое RL
+1. Многозадачное RL
+1. Инверсное RL
 
 ## II Глубокое обучение
 
@@ -489,58 +533,14 @@
 
 ## III Разные темы машинного обучения
 
-### **1. Обучение с подкреплением (продвинутые темы)**
-1. Иерархическое RL
-1. Многозадачное RL
-1. Инверсное RL
-
-### **2. Байесовская оптимизация**
-1. Байесовская оптимизация
-1. Байесовские нейронные сети (отдельно от DL)
-
-### **3. Матричная факторизация и рекомендательные системы**
-1. Коллаборативная фильтрация (user-based, item-based)
-1. Матричная факторизация (SVD, NMF)
-1. ALS (Alternating Least Squares)
-1. Гибридные системы
-1. Context-aware рекомендации
-1. Sequence-aware рекомендации
-
-### **4. Обработка временных рядов (продвинутые методы)**
-1. [Prophet и современные методы временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/prophet_time_series_cheatsheet.html)
-1. State space models
-1. Kalman filters
-1. Сезонная декомпозиция
-1. Теория временных рядов Box-Jenkins
-
-### **5. Мета-обучение (Meta-learning)**
+### **1. Мета-обучение (Meta-learning) - продвинутые темы**
 1. Model-agnostic meta-learning (MAML)
 1. Metric-based (Siamese networks, Matching networks)
 1. Optimization-based meta-learning
 1. Few-shot learning (традиционные подходы)
 1. Meta-features и meta-learning
 
-### **6. Выбор и сравнение моделей**
-1. Статистические тесты (t-test, McNemar)
-1. Кривые обучения и валидации
-1. Bias-variance decomposition
-1. Неметрические критерии (интерпретируемость, скорость)
-
-### **7. Математические основы ML**
-1. Теория вероятностей для ML
-1. Линейная алгебра и оптимизация
-1. Информационная теория в ML
-1. Теория графов для ML
-1. Теория решений
-
-### **8. Промышленное ML и MLOps**
-1. [MLOps Best Practices](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mlops_best_practices_cheatsheet.html)
-1. [Мониторинг моделей и A/B тестирование](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_monitoring_ab_testing_cheatsheet.html)
-1. Модельные реестры
-1. Feature stores
-1. CI/CD для ML
-
-### **9. Специализированные прикладные области**
+### **2. Специализированные прикладные области**
 1. Биоинформатика и computational biology
 1. Computational chemistry
 1. Астрофизика и космология
@@ -548,30 +548,22 @@
 1. Цифровая гуманитаристика
 1. Computational social science
 
-### **10. Этика, безопасность и приватность**
-1. [Fairness в ML (Справедливость)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fairness_ml_cheatsheet.html)
-1. [Adversarial Attacks (Состязательные атаки)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adversarial_attacks_cheatsheet.html)
-1. Adversarial robustness (классические атаки)
-1. Differential privacy
-1. [Federated Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/federated_learning_cheatsheet.html)
-1. Explainability и accountability
-
-### **11. Композиционное и структурное обучение**
+### **3. Композиционное и структурное обучение**
 1. Grammatical inference
 1. Inductive logic programming
 1. Program synthesis
 
-### **12. Материаловедение и ML**
+### **4. Материаловедение и ML**
 1. Материальные информатики
 1. Свойства материалов и ML
 1. Дизайн материалов
 
-### **13. Компьютерная безопасность и ML**
-1. Обнаружение вторжений
-1. Malware detection
-1. [Fraud detection](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fraud_detection_cheatsheet.html)
+### **5. Квантовое машинное обучение**
+1. Квантовые алгоритмы для ML
+1. Квантовые нейронные сети
+1. Квантовое усиление классических алгоритмов
 
-### **14. Финансовое ML**
-1. Алгоритмический трейдинг
-1. Кредитный скоринг
-1. Risk management
+### **6. Нейро-символьное ИИ**
+1. Гибридные нейро-символьные системы
+1. Rule-based системы с ML
+1. Логический вывод с обучением
