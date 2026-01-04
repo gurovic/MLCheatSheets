@@ -109,6 +109,29 @@
       font-size: 0.88em;
     }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 6px 0;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border: 1px solid #e0e7ff;
+    }
+
+    th {
+      background-color: #1a5fb4;
+      color: white;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
     @media print {
       .container { column-gap: 12px; }
       .block { box-shadow: none; }
@@ -128,17 +151,290 @@
   <div class="block">
     <h2>🔷 1. Суть метода</h2>
     <p>Предполагает, что нормальные данные следуют многомерному гауссовому распределению. Строит эллипс (или гиперэллипсоид) вокруг нормальных данных. Точки за пределами эллипса — аномалии.</p>
+    <ul>
+      <li><strong>Основа</strong>: многомерное нормальное распределение</li>
+      <li><strong>Метод</strong>: оценка ковариационной матрицы (Minimum Covariance Determinant)</li>
+      <li><strong>Идея</strong>: определяет форму и положение эллипса, охватывающего нормальные данные</li>
+      <li><strong>Порог</strong>: расстояние Махаланобиса</li>
+    </ul>
   </div>
 
   <div class="block">
-    <h2>🔷 2. Код</h2>
+    <h2>🔷 2. Базовый пример</h2>
     <pre><code>from sklearn.covariance import EllipticEnvelope
+from sklearn.datasets import make_blobs
+import numpy as np
 
+# Генерация данных
+X, _ = make_blobs(n_samples=300, centers=1, 
+                  cluster_std=0.5, random_state=42)
+
+# Добавляем выбросы
+X_outliers = np.random.uniform(low=-4, high=4, size=(20, 2))
+X = np.vstack([X, X_outliers])
+
+# Обучение модели
+ee = EllipticEnvelope(contamination=0.1, random_state=42)
+ee.fit(X)
+
+# Предсказание
+predictions = ee.predict(X)
+# 1 = normal, -1 = anomaly
+
+# Оценка аномальности (scores)
+scores = ee.decision_function(X)
+# Чем меньше score, тем больше аномальность</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Ключевые параметры</h2>
+    <ul>
+      <li><strong>contamination</strong>: доля выбросов в данных (по умолчанию 0.1)</li>
+      <li><strong>support_fraction</strong>: доля точек для оценки ковариационной матрицы (None = auto)</li>
+      <li><strong>random_state</strong>: для воспроизводимости результатов</li>
+    </ul>
+    <blockquote>
+      💡 Установите contamination равным ожидаемой доле аномалий в ваших данных
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Визуализация результатов</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Разделение на нормальные и аномальные
+normal = X[predictions == 1]
+anomalies = X[predictions == -1]
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.scatter(normal[:, 0], normal[:, 1], 
+           c='blue', label='Normal', alpha=0.6)
+plt.scatter(anomalies[:, 0], anomalies[:, 1], 
+           c='red', label='Anomaly', marker='x', s=100)
+plt.title('Elliptic Envelope: Обнаружение аномалий')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+# Визуализация с уровнями решения
+xx, yy = np.meshgrid(np.linspace(-4, 4, 100),
+                     np.linspace(-4, 4, 100))
+Z = ee.decision_function(np.c_[xx.ravel(), yy.ravel()])
+Z = Z.reshape(xx.shape)
+
+plt.contour(xx, yy, Z, levels=[0], 
+           linewidths=2, colors='darkred')
+plt.contourf(xx, yy, Z, levels=[Z.min(), 0], 
+            colors='pink', alpha=0.3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Оценка качества</h2>
+    <pre><code>from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+
+# Если есть истинные метки (true_labels)
+print(classification_report(true_labels, predictions))
+
+# Матрица ошибок
+cm = confusion_matrix(true_labels, predictions)
+print("Confusion Matrix:")
+print(cm)
+
+# Precision, Recall, F1
+from sklearn.metrics import precision_score, recall_score, f1_score
+
+precision = precision_score(true_labels, predictions, pos_label=-1)
+recall = recall_score(true_labels, predictions, pos_label=-1)
+f1 = f1_score(true_labels, predictions, pos_label=-1)
+
+print(f"Precision: {precision:.3f}")
+print(f"Recall: {recall:.3f}")
+print(f"F1-Score: {f1:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Многомерные данные</h2>
+    <pre><code># Работа с многомерными данными
+from sklearn.datasets import load_iris
+
+# Загрузка данных
+data = load_iris()
+X = data.data  # 4 признака
+
+# Обучение на многомерных данных
+ee = EllipticEnvelope(contamination=0.05)
+ee.fit(X)
+
+# Предсказание
+predictions = ee.predict(X)
+n_outliers = (predictions == -1).sum()
+print(f"Обнаружено аномалий: {n_outliers}")
+
+# Получение индексов аномалий
+outlier_indices = np.where(predictions == -1)[0]
+print(f"Индексы аномалий: {outlier_indices}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сравнение с другими методами</h2>
+    <pre><code>from sklearn.ensemble import IsolationForest
+from sklearn.svm import OneClassSVM
+
+# Elliptic Envelope
 ee = EllipticEnvelope(contamination=0.1)
-ee.fit(X_train)
+ee_pred = ee.fit_predict(X)
 
-predictions = ee.predict(X_test)
-# 1 = normal, -1 = anomaly</code></pre>
+# Isolation Forest
+iso = IsolationForest(contamination=0.1, random_state=42)
+iso_pred = iso.fit_predict(X)
+
+# One-Class SVM
+ocs = OneClassSVM(nu=0.1, gamma='auto')
+ocs_pred = ocs.fit_predict(X)
+
+# Сравнение результатов
+from sklearn.metrics import adjusted_rand_score
+print(f"EE vs IF: {adjusted_rand_score(ee_pred, iso_pred):.3f}")
+print(f"EE vs OC-SVM: {adjusted_rand_score(ee_pred, ocs_pred):.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Преимущества и недостатки</h2>
+    <ul>
+      <li><strong>✅ Преимущества:</strong>
+        <ul>
+          <li>Быстрый и эффективный для гауссовских данных</li>
+          <li>Хорошо работает в многомерном пространстве</li>
+          <li>Робастная оценка ковариационной матрицы (MCD)</li>
+          <li>Интерпретируемые результаты</li>
+        </ul>
+      </li>
+      <li><strong>❌ Недостатки:</strong>
+        <ul>
+          <li>Предполагает гауссовское распределение данных</li>
+          <li>Не подходит для сложных нелинейных структур</li>
+          <li>Чувствителен к выбору параметра contamination</li>
+          <li>Плохо работает с кластерными данными</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Подбор параметров</h2>
+    <pre><code># Подбор оптимального contamination
+contamination_values = [0.05, 0.1, 0.15, 0.2]
+best_score = -np.inf
+best_cont = None
+
+for cont in contamination_values:
+    ee = EllipticEnvelope(contamination=cont, random_state=42)
+    ee.fit(X_train)
+    
+    # Оценка на валидационной выборке
+    scores = ee.decision_function(X_val)
+    avg_score = np.mean(scores)
+    
+    if avg_score > best_score:
+        best_score = avg_score
+        best_cont = cont
+
+print(f"Лучший contamination: {best_cont}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применение в реальных задачах</h2>
+    <ul>
+      <li><strong>Финансы</strong>: обнаружение мошеннических транзакций</li>
+      <li><strong>Производство</strong>: выявление дефектных изделий</li>
+      <li><strong>Медицина</strong>: обнаружение редких заболеваний</li>
+      <li><strong>IoT</strong>: мониторинг датчиков и обнаружение сбоев</li>
+      <li><strong>Кибербезопасность</strong>: выявление аномального поведения</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Работа с категориальными признаками</h2>
+    <pre><code>from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+
+# Предобработка данных
+categorical_features = ['category_col']
+numeric_features = ['num_col1', 'num_col2']
+
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', 'passthrough', numeric_features),
+        ('cat', OneHotEncoder(), categorical_features)
+    ])
+
+X_processed = preprocessor.fit_transform(X)
+
+# Применение Elliptic Envelope
+ee = EllipticEnvelope(contamination=0.1)
+predictions = ee.fit_predict(X_processed)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Обработка временных рядов</h2>
+    <pre><code># Обнаружение аномалий во временных рядах
+import pandas as pd
+
+# Создание признаков из временного ряда
+def create_features(ts, window=5):
+    features = []
+    for i in range(len(ts) - window):
+        window_data = ts[i:i+window]
+        features.append([
+            np.mean(window_data),
+            np.std(window_data),
+            np.min(window_data),
+            np.max(window_data)
+        ])
+    return np.array(features)
+
+# Применение
+time_series = np.random.randn(1000)
+X_features = create_features(time_series)
+
+ee = EllipticEnvelope(contamination=0.05)
+anomalies = ee.fit_predict(X_features)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Когда использовать</h2>
+    <blockquote>
+      <strong>Используйте Elliptic Envelope когда:</strong>
+      <ul>
+        <li>Данные приблизительно следуют нормальному распределению</li>
+        <li>Нужна быстрая и простая модель</li>
+        <li>Важна интерпретируемость результатов</li>
+        <li>Работаете с непрерывными числовыми признаками</li>
+      </ul>
+      <strong>НЕ используйте когда:</strong>
+      <ul>
+        <li>Данные имеют сложную нелинейную структуру</li>
+        <li>Есть несколько кластеров нормальных данных</li>
+        <li>Распределение далеко от нормального</li>
+        <li>Нужна высокая точность на несбалансированных данных</li>
+      </ul>
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ol>
+      <li>✅ Проверить распределение данных (близко к нормальному?)</li>
+      <li>✅ Масштабировать признаки (StandardScaler)</li>
+      <li>✅ Выбрать подходящий contamination</li>
+      <li>✅ Обучить модель на чистых данных</li>
+      <li>✅ Визуализировать результаты</li>
+      <li>✅ Оценить качество на тестовых данных</li>
+      <li>✅ Сравнить с другими методами</li>
+      <li>✅ Настроить параметры при необходимости</li>
+    </ol>
   </div>
 
 </div>
