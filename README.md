@@ -134,7 +134,7 @@
 1. Метод главных компонент (PCA)
 1. Линейный дискриминантный анализ (LDA)
 1. Канонический корреляционный анализ
-1. Скрытые марковские модели
+1. [Скрытые марковские модели (HMM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hmm_cheatsheet.html)
 1. [EM-алгоритм](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/em_algorithm_cheatsheet.html)
 
 ### **18. Визуализация в ML**
@@ -206,11 +206,11 @@
 ### **4. Трансформеры и механизмы внимания**
 1. [Механизм внимания (attention)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/attention_mechanism_cheatsheet.html)
 1. Self-attention
-1. Multi-head attention
+1. [Multi-head Attention](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multi_head_attention_cheatsheet.html)
 1. [Архитектура Transformer](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transformers_cheatsheet.html)
-1. Positional encoding
-1. BERT и языковые модели
-1. Vision Transformers (ViT)
+1. [Positional Encoding](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/positional_encoding_cheatsheet.html)
+1. [BERT и языковые модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bert_language_models_cheatsheet.html)
+1. [Vision Transformers (ViT)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/vision_transformers_vit_cheatsheet.html)
 1. Efficient Transformers
 
 ### **5. Генеративные модели**
@@ -224,7 +224,7 @@
 
 ### **6. Обучение с подкреплением (Deep RL)**
 1. [Deep Q-Networks (DQN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dqn_cheatsheet.html)
-1. Policy Gradient методы
+1. [Policy Gradient методы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/policy_gradient_cheatsheet.html)
 1. [Actor-Critic методы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/actor_critic_cheatsheet.html)
 1. PPO (Proximal Policy Optimization)
 1. Многозадачное RL
@@ -236,7 +236,7 @@
 1. RNN/LSTM для NLP
 1. Transformer для NLP
 1. [BERT и его вариации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bert_finetuning_cheatsheet.html)
-1. GPT-архитектуры
+1. [GPT-архитектуры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gpt_architectures_cheatsheet.html)
 1. [Prompt Engineering для LLM (ChatGPT, GPT-4, Claude)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/prompt_engineering_cheatsheet.html)
 1. [Токенизация (BPE, WordPiece, SentencePiece)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tokenization_cheatsheet.html)
 1. Задачи NLP (NER, классификация, суммаризация)
@@ -278,7 +278,7 @@
 1. Domain adaptation
 
 ### **12. Объяснимость и интерпретируемость**
-1. CAM и Grad-CAM
+1. [CAM и Grad-CAM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/grad_cam_cheatsheet.html)
 1. Saliency maps
 1. Integrated gradients
 1. LIME для нейросетей
@@ -402,7 +402,7 @@
 1. Скрытые марковские модели (HMM)
 1. [Гауссовские процессы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gaussian_processes_cheatsheet.html)
 1. Вариационный вывод
-1. Марковские цепи Монте-Карло (MCMC)
+1. [Марковские цепи Монте-Карло (MCMC) и Байесовский вывод](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mcmc_bayesian_inference_cheatsheet.html)
 1. Expectation-Maximization (EM)
 1. Графические модели
 1. Наивный Байес (как байесовский метод)
@@ -457,7 +457,7 @@
 ### **8. Обработка временных рядов (классические методы)**
 1. ARIMA/SARIMA
 1. Экспоненциальное сглаживание
-1. Prophet
+1. [Prophet и современные методы временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/prophet_time_series_cheatsheet.html)
 1. State space models
 1. Kalman filters
 1. Сезонная декомпозиция

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>GPT архитектуры Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 GPT архитектуры Cheatsheet</h1>
+  <div class="subtitle">От GPT-1 до GPT-4 и ChatGPT • Генеративные трансформеры<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. GPT: основы</h2>
+    <p><strong>GPT</strong> (Generative Pre-trained Transformer) — семейство авторегрессионных языковых моделей от OpenAI</p>
+    <ul>
+      <li><strong>Decoder-only</strong>: использует только decoder трансформера</li>
+      <li><strong>Авторегрессионная</strong>: генерирует токен за токеном</li>
+      <li><strong>Предобучение</strong>: на огромных текстовых корпусах</li>
+      <li><strong>Fine-tuning</strong>: адаптация под конкретные задачи</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Эволюция GPT</h2>
+    <table>
+      <tr><th>Модель</th><th>Год</th><th>Параметры</th><th>Особенность</th></tr>
+      <tr><td><strong>GPT-1</strong></td><td>2018</td><td>117M</td><td>Proof of concept</td></tr>
+      <tr><td><strong>GPT-2</strong></td><td>2019</td><td>1.5B</td><td>Zero-shot learning</td></tr>
+      <tr><td><strong>GPT-3</strong></td><td>2020</td><td>175B</td><td>Few-shot in-context</td></tr>
+      <tr><td><strong>ChatGPT</strong></td><td>2022</td><td>~175B</td><td>RLHF, диалоги</td></tr>
+      <tr><td><strong>GPT-4</strong></td><td>2023</td><td>~1.7T*</td><td>Multimodal</td></tr>
+    </table>
+    <p style="font-size: 0.8em;">*оценка, точное число не раскрыто</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Архитектура GPT</h2>
+    <p>Основана на <strong>Transformer Decoder</strong> с causal masking</p>
+    <ul>
+      <li><strong>Self-attention</strong>: только на предыдущие токены</li>
+      <li><strong>Causal mask</strong>: запрещает смотреть в будущее</li>
+      <li><strong>Layer Norm</strong>: до self-attention</li>
+      <li><strong>Residual connections</strong>: между слоями</li>
+      <li><strong>Position encoding</strong>: learned positional embeddings</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Предобучение GPT</h2>
+    <p><strong>Задача</strong>: предсказать следующий токен (next token prediction)</p>
+    <pre><code># Цель обучения
+P(x_t | x_1, x_2, ..., x_{t-1})
+
+# Loss функция
+L = -∑ log P(x_t | x_<t)</code></pre>
+    <p>Модель учится моделировать распределение языка, что позволяет ей:</p>
+    <ul>
+      <li>Генерировать связный текст</li>
+      <li>Понимать контекст</li>
+      <li>Выполнять zero-shot задачи</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Базовый код с GPT-2</h2>
+    <pre><code>from transformers import GPT2LMHeadModel, GPT2Tokenizer
+import torch
+
+# Загрузка модели
+tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+model = GPT2LMHeadModel.from_pretrained('gpt2')
+
+# Генерация текста
+prompt = "Искусственный интеллект — это"
+inputs = tokenizer.encode(prompt, return_tensors='pt')
+
+# Параметры генерации
+outputs = model.generate(
+    inputs,
+    max_length=100,
+    num_return_sequences=1,
+    temperature=0.7,
+    top_k=50,
+    top_p=0.95,
+    do_sample=True
+)
+
+text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+print(text)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Методы генерации</h2>
+    <table>
+      <tr><th>Метод</th><th>Описание</th><th>Применение</th></tr>
+      <tr><td><strong>Greedy</strong></td><td>Выбор самого вероятного</td><td>Детерминированно</td></tr>
+      <tr><td><strong>Beam Search</strong></td><td>Поиск лучших K путей</td><td>Более качественно</td></tr>
+      <tr><td><strong>Sampling</strong></td><td>Случайный выбор по вероятности</td><td>Разнообразие</td></tr>
+      <tr><td><strong>Top-K</strong></td><td>Sampling из K лучших</td><td>Контроль качества</td></tr>
+      <tr><td><strong>Top-P (nucleus)</strong></td><td>Sampling из топ-P вероятности</td><td>Баланс</td></tr>
+      <tr><td><strong>Temperature</strong></td><td>Масштабирование logits</td><td>Контроль случайности</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Temperature в генерации</h2>
+    <p><strong>Temperature</strong> контролирует случайность генерации</p>
+    <pre><code># Формула
+P(x) = exp(logits / T) / sum(exp(logits / T))
+
+# T = 0.1 → более детерминированно
+# T = 1.0 → стандартное распределение
+# T = 2.0 → более случайно</code></pre>
+    <ul>
+      <li><strong>T → 0</strong>: почти greedy, повторяющийся текст</li>
+      <li><strong>T = 0.7-0.9</strong>: креативно, но связно</li>
+      <li><strong>T > 1.0</strong>: очень случайно, может быть несвязно</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Zero-shot, Few-shot, Fine-tuning</h2>
+    <table>
+      <tr><th>Подход</th><th>Описание</th><th>Примеры</th></tr>
+      <tr><td><strong>Zero-shot</strong></td><td>Без примеров, только промпт</td><td>0</td></tr>
+      <tr><td><strong>One-shot</strong></td><td>Один пример в промпте</td><td>1</td></tr>
+      <tr><td><strong>Few-shot</strong></td><td>Несколько примеров (3-10)</td><td>3-10</td></tr>
+      <tr><td><strong>Fine-tuning</strong></td><td>Дообучение на данных</td><td>1000+</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. In-context Learning</h2>
+    <p>GPT-3 умеет обучаться <strong>в контексте</strong> без обновления весов</p>
+    <pre><code># Few-shot пример
+prompt = """
+Переведи на английский:
+
+Привет → Hello
+Спасибо → Thank you
+Как дела? → How are you?
+Пока → """
+
+# GPT предскажет: Goodbye</code></pre>
+    <p>Модель "понимает" паттерн из примеров</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. ChatGPT и RLHF</h2>
+    <p><strong>RLHF</strong> (Reinforcement Learning from Human Feedback)</p>
+    <ol>
+      <li><strong>Supervised Fine-tuning</strong>: обучение на диалогах</li>
+      <li><strong>Reward Model</strong>: обучение модели оценки ответов</li>
+      <li><strong>PPO</strong>: оптимизация политики с наградами</li>
+    </ol>
+    <blockquote>
+      RLHF делает модель более полезной, безопасной и следующей инструкциям
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. GPT-4: улучшения</h2>
+    <ul>
+      <li><strong>Multimodal</strong>: понимает изображения + текст</li>
+      <li><strong>Больше параметров</strong>: лучше рассуждение</li>
+      <li><strong>Длинный контекст</strong>: до 32K токенов</li>
+      <li><strong>Меньше галлюцинаций</strong>: более точные ответы</li>
+      <li><strong>Следование инструкциям</strong>: лучше понимает запросы</li>
+      <li><strong>Безопасность</strong>: меньше токсичного контента</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Fine-tuning GPT</h2>
+    <pre><code>from transformers import GPT2LMHeadModel, Trainer
+from transformers import TrainingArguments
+
+model = GPT2LMHeadModel.from_pretrained('gpt2')
+
+training_args = TrainingArguments(
+    output_dir='./gpt2-finetuned',
+    num_train_epochs=3,
+    per_device_train_batch_size=4,
+    learning_rate=5e-5,
+    warmup_steps=500,
+    save_steps=1000,
+    logging_steps=100
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset
+)
+
+trainer.train()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Применения GPT</h2>
+    <ul>
+      <li><strong>Генерация текста</strong>: статьи, истории, код</li>
+      <li><strong>Диалоговые системы</strong>: чатботы, ассистенты</li>
+      <li><strong>Суммаризация</strong>: краткое изложение</li>
+      <li><strong>Перевод</strong>: многоязычный перевод</li>
+      <li><strong>Q&A</strong>: ответы на вопросы</li>
+      <li><strong>Code generation</strong>: Copilot, CodeGen</li>
+      <li><strong>Creative writing</strong>: стихи, сценарии</li>
+      <li><strong>Data augmentation</strong>: генерация синтетических данных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Проблемы и ограничения</h2>
+    <ul>
+      <li><strong>Галлюцинации</strong>: генерация ложной информации</li>
+      <li><strong>Bias</strong>: предвзятость из обучающих данных</li>
+      <li><strong>Context window</strong>: ограничение длины</li>
+      <li><strong>Вычислительные ресурсы</strong>: дорого обучать и запускать</li>
+      <li><strong>Отсутствие reasoning</strong>: сложно с логикой</li>
+      <li><strong>Не обучается в реальном времени</strong>: знания до даты обучения</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Альтернативы GPT</h2>
+    <table>
+      <tr><th>Модель</th><th>Организация</th><th>Особенность</th></tr>
+      <tr><td><strong>LLaMA</strong></td><td>Meta</td><td>Эффективная, open-source</td></tr>
+      <tr><td><strong>Claude</strong></td><td>Anthropic</td><td>Constitutional AI</td></tr>
+      <tr><td><strong>PaLM</strong></td><td>Google</td><td>Pathways architecture</td></tr>
+      <tr><td><strong>Mistral</strong></td><td>Mistral AI</td><td>Открытая, эффективная</td></tr>
+      <tr><td><strong>Gemini</strong></td><td>Google</td><td>Multimodal, конкурент GPT-4</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Оптимизация для production</h2>
+    <ul>
+      <li><strong>Quantization</strong>: 8-bit, 4-bit (GPTQ, AWQ)</li>
+      <li><strong>LoRA</strong>: efficient fine-tuning</li>
+      <li><strong>Flash Attention</strong>: ускорение attention</li>
+      <li><strong>KV cache</strong>: кеширование для генерации</li>
+      <li><strong>Model pruning</strong>: удаление весов</li>
+      <li><strong>Distillation</strong>: в меньшую модель</li>
+    </ul>
+    <pre><code># Загрузка с квантованием
+from transformers import GPT2LMHeadModel
+
+model = GPT2LMHeadModel.from_pretrained(
+    'gpt2',
+    load_in_8bit=True,
+    device_map='auto'
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Prompt Engineering</h2>
+    <p>Искусство создания эффективных промптов</p>
+    <ul>
+      <li><strong>Clear instructions</strong>: четкие инструкции</li>
+      <li><strong>Context</strong>: предоставить контекст</li>
+      <li><strong>Examples</strong>: few-shot примеры</li>
+      <li><strong>Format</strong>: указать формат вывода</li>
+      <li><strong>Constraints</strong>: ограничения</li>
+      <li><strong>Reasoning</strong>: "think step by step"</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Преимущества и недостатки</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>Преимущества</h3>
+        <ul>
+          <li>Превосходная генерация текста</li>
+          <li>Zero-shot и few-shot способности</li>
+          <li>Универсальность задач</li>
+          <li>Естественные диалоги</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>Недостатки</h3>
+        <ul>
+          <li>Галлюцинации и неточности</li>
+          <li>Дорого обучать и запускать</li>
+          <li>Ограничение контекста</li>
+          <li>Bias и этические проблемы</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Чек-лист использования</h2>
+    <ol>
+      <li>✓ Выбрать размер модели (GPT-2, GPT-3, GPT-4)</li>
+      <li>✓ Определить задачу (генерация, Q&A, классификация)</li>
+      <li>✓ Создать эффективный промпт</li>
+      <li>✓ Настроить параметры генерации (temperature, top-p)</li>
+      <li>✓ Протестировать на примерах</li>
+      <li>✓ Проверить на галлюцинации</li>
+      <li>✓ Оптимизировать для production (quantization)</li>
+      <li>✓ Мониторить качество и затраты</li>
+    </ol>
+  </div>
+
+</div>
+
+</body>
+</html>

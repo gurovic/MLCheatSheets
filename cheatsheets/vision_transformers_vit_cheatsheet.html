@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Vision Transformers (ViT) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Vision Transformers (ViT) Cheatsheet</h1>
+  <div class="subtitle">Трансформеры для Computer Vision • От теории к практике<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое ViT</h2>
+    <p><strong>Vision Transformer</strong> — применение архитектуры Transformer к изображениям без использования свёрток</p>
+    <ul>
+      <li><strong>Революция</strong>: доказали, что CNN не обязательны</li>
+      <li><strong>Патчи</strong>: изображение делится на патчи</li>
+      <li><strong>Attention</strong>: self-attention на патчах</li>
+      <li><strong>Масштабируемость</strong>: лучше с большими данными</li>
+    </ul>
+    <blockquote>
+      "An Image is Worth 16x16 Words" - Google Research, 2020
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Архитектура ViT</h2>
+    <ol>
+      <li><strong>Patch Embedding</strong>: изображение → патчи</li>
+      <li><strong>Linear Projection</strong>: патчи → векторы</li>
+      <li><strong>Position Embedding</strong>: добавление позиций</li>
+      <li><strong>Class Token</strong>: [CLS] для классификации</li>
+      <li><strong>Transformer Encoder</strong>: N слоев attention</li>
+      <li><strong>MLP Head</strong>: финальная классификация</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Patch Embedding</h2>
+    <p>Изображение размера H×W×C делится на патчи P×P:</p>
+    <pre><code># Пример: 224×224×3 → патчи 16×16
+Количество патчей = (224/16)² = 196
+
+# Каждый патч
+Размер патча = 16×16×3 = 768 значений
+
+# Linear projection
+patch → embedding (768 → D)
+где D = 768 (для ViT-Base)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Базовый код ViT</h2>
+    <pre><code>import torch
+from transformers import ViTForImageClassification
+from transformers import ViTFeatureExtractor
+from PIL import Image
+
+# Загрузка модели
+model = ViTForImageClassification.from_pretrained(
+    'google/vit-base-patch16-224'
+)
+feature_extractor = ViTFeatureExtractor.from_pretrained(
+    'google/vit-base-patch16-224'
+)
+
+# Подготовка изображения
+image = Image.open('image.jpg')
+inputs = feature_extractor(images=image, return_tensors="pt")
+
+# Классификация
+outputs = model(**inputs)
+logits = outputs.logits
+predicted_class = logits.argmax(-1).item()
+
+print(f"Predicted class: {predicted_class}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Варианты ViT</h2>
+    <table>
+      <tr><th>Модель</th><th>Слои</th><th>Hidden</th><th>Heads</th><th>Params</th></tr>
+      <tr><td><strong>ViT-Tiny</strong></td><td>12</td><td>192</td><td>3</td><td>5.5M</td></tr>
+      <tr><td><strong>ViT-Small</strong></td><td>12</td><td>384</td><td>6</td><td>22M</td></tr>
+      <tr><td><strong>ViT-Base</strong></td><td>12</td><td>768</td><td>12</td><td>86M</td></tr>
+      <tr><td><strong>ViT-Large</strong></td><td>24</td><td>1024</td><td>16</td><td>307M</td></tr>
+      <tr><td><strong>ViT-Huge</strong></td><td>32</td><td>1280</td><td>16</td><td>632M</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. ViT vs CNN</h2>
+    <table>
+      <tr><th>Аспект</th><th>ViT</th><th>CNN</th></tr>
+      <tr><td><strong>Inductive bias</strong></td><td>Минимальный</td><td>Локальность, иерархия</td></tr>
+      <tr><td><strong>Данные</strong></td><td>Нужно много</td><td>Эффективен с малыми</td></tr>
+      <tr><td><strong>Вычисления</strong></td><td>Квадратичные по патчам</td><td>Линейные</td></tr>
+      <tr><td><strong>Интерпретируемость</strong></td><td>Attention maps</td><td>Feature maps</td></tr>
+      <tr><td><strong>Transfer learning</strong></td><td>Отлично</td><td>Хорошо</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Предобучение ViT</h2>
+    <p>ViT требует <strong>большого количества</strong> данных для обучения с нуля</p>
+    <ul>
+      <li><strong>ImageNet-1K</strong>: недостаточно, хуже CNN</li>
+      <li><strong>ImageNet-21K</strong>: 14M изображений, хорошо</li>
+      <li><strong>JFT-300M</strong>: 300M изображений, SOTA</li>
+    </ul>
+    <blockquote>
+      С большими данными ViT превосходит ResNet и EfficientNet
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Fine-tuning ViT</h2>
+    <pre><code>from transformers import ViTForImageClassification
+from transformers import Trainer, TrainingArguments
+
+# Загрузка предобученной модели
+model = ViTForImageClassification.from_pretrained(
+    'google/vit-base-patch16-224-in21k',
+    num_labels=10,  # для вашей задачи
+    ignore_mismatched_sizes=True
+)
+
+# Параметры обучения
+training_args = TrainingArguments(
+    output_dir='./vit-finetuned',
+    num_train_epochs=10,
+    per_device_train_batch_size=32,
+    learning_rate=3e-4,
+    warmup_steps=500,
+    logging_steps=50,
+    evaluation_strategy='epoch',
+    save_strategy='epoch',
+    load_best_model_at_end=True
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=val_dataset
+)
+
+trainer.train()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Data Augmentation для ViT</h2>
+    <p>ViT выигрывает от сильной аугментации:</p>
+    <ul>
+      <li><strong>RandAugment</strong>: случайные преобразования</li>
+      <li><strong>MixUp</strong>: смешивание изображений</li>
+      <li><strong>CutMix</strong>: вырезание и вставка</li>
+      <li><strong>AutoAugment</strong>: learned augmentation</li>
+      <li><strong>Random Erasing</strong>: случайное стирание</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Улучшения ViT</h2>
+    <table>
+      <tr><th>Модель</th><th>Улучшение</th></tr>
+      <tr><td><strong>DeiT</strong></td><td>Distillation, меньше данных</td></tr>
+      <tr><td><strong>Swin Transformer</strong></td><td>Shifted windows, иерархия</td></tr>
+      <tr><td><strong>BEiT</strong></td><td>BERT-style pretraining</td></tr>
+      <tr><td><strong>MAE</strong></td><td>Masked Autoencoder</td></tr>
+      <tr><td><strong>CvT</strong></td><td>Convolutional token embedding</td></tr>
+      <tr><td><strong>CoAtNet</strong></td><td>CNN + ViT гибрид</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. DeiT: Data-efficient ViT</h2>
+    <p><strong>DeiT</strong> позволяет обучать ViT на ImageNet-1K</p>
+    <ul>
+      <li><strong>Knowledge Distillation</strong>: учитель (CNN) → ученик (ViT)</li>
+      <li><strong>Distillation Token</strong>: дополнительный токен [DIST]</li>
+      <li><strong>Strong Augmentation</strong>: RandAugment + др.</li>
+    </ul>
+    <pre><code># Использование DeiT
+from transformers import DeiTForImageClassification
+
+model = DeiTForImageClassification.from_pretrained(
+    'facebook/deit-base-distilled-patch16-224'
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Swin Transformer</h2>
+    <p><strong>Swin</strong> — иерархический ViT с shifted windows</p>
+    <ul>
+      <li><strong>Локальные окна</strong>: attention в окнах</li>
+      <li><strong>Shifted windows</strong>: связь между окнами</li>
+      <li><strong>Иерархия</strong>: многоуровневые feature maps</li>
+      <li><strong>Линейная сложность</strong>: O(n) вместо O(n²)</li>
+    </ul>
+    <blockquote>
+      Swin превзошёл ViT на многих задачах CV (detection, segmentation)
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Attention Visualization</h2>
+    <p>Визуализация attention weights показывает, на что смотрит модель</p>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Получение attention weights
+outputs = model(**inputs, output_attentions=True)
+attentions = outputs.attentions  # tuple of layers
+
+# Attention последнего слоя
+last_attention = attentions[-1]  # [batch, heads, tokens, tokens]
+
+# Визуализация
+attention_map = last_attention[0].mean(0)[0, 1:]  # [CLS] к патчам
+attention_map = attention_map.reshape(14, 14)  # для 224/16
+
+plt.imshow(attention_map.detach().numpy(), cmap='viridis')
+plt.colorbar()
+plt.title('ViT Attention Map')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Применения ViT</h2>
+    <ul>
+      <li><strong>Image Classification</strong>: основная задача</li>
+      <li><strong>Object Detection</strong>: DETR с ViT</li>
+      <li><strong>Semantic Segmentation</strong>: SegFormer</li>
+      <li><strong>Instance Segmentation</strong>: Mask2Former</li>
+      <li><strong>Video Understanding</strong>: TimeSformer</li>
+      <li><strong>Medical Imaging</strong>: анализ рентгенов, МРТ</li>
+      <li><strong>Multimodal</strong>: CLIP (vision + language)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Оптимизация ViT</h2>
+    <ul>
+      <li><strong>Mixed Precision</strong>: fp16 обучение</li>
+      <li><strong>Gradient Checkpointing</strong>: экономия памяти</li>
+      <li><strong>DeepSpeed</strong>: distributed training</li>
+      <li><strong>Flash Attention</strong>: быстрый attention</li>
+      <li><strong>Quantization</strong>: int8 inference</li>
+      <li><strong>Pruning</strong>: удаление heads/слоев</li>
+    </ul>
+    <pre><code># Mixed precision training
+from torch.cuda.amp import autocast, GradScaler
+
+scaler = GradScaler()
+
+for data, target in dataloader:
+    optimizer.zero_grad()
+    
+    with autocast():
+        output = model(data)
+        loss = criterion(output, target)
+    
+    scaler.scale(loss).backward()
+    scaler.step(optimizer)
+    scaler.update()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Best Practices</h2>
+    <ol>
+      <li><strong>Используйте предобучение</strong>: на ImageNet-21K</li>
+      <li><strong>Strong augmentation</strong>: RandAugment, MixUp</li>
+      <li><strong>Правильный LR</strong>: 1e-3 для обучения с нуля, 3e-4 для fine-tuning</li>
+      <li><strong>Warmup</strong>: 5-10 эпох или 500-1000 шагов</li>
+      <li><strong>Label smoothing</strong>: 0.1</li>
+      <li><strong>Stochastic depth</strong>: dropout для слоёв</li>
+      <li><strong>Batch size</strong>: как можно больше (512-4096)</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Преимущества и недостатки</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>Преимущества</h3>
+        <ul>
+          <li>SOTA на больших датасетах</li>
+          <li>Отличный transfer learning</li>
+          <li>Интерпретируемость (attention)</li>
+          <li>Масштабируемость</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>Недостатки</h3>
+        <ul>
+          <li>Требует много данных</li>
+          <li>Вычислительно дорого</li>
+          <li>Хуже CNN на малых данных</li>
+          <li>Квадратичная сложность attention</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист использования</h2>
+    <ol>
+      <li>✓ Выбрать размер модели (Tiny/Small/Base/Large)</li>
+      <li>✓ Загрузить предобученные веса (ImageNet-21K)</li>
+      <li>✓ Подготовить данные с аугментацией</li>
+      <li>✓ Настроить гиперпараметры (LR, warmup)</li>
+      <li>✓ Fine-tune с правильным learning rate</li>
+      <li>✓ Мониторить overfitting</li>
+      <li>✓ Визуализировать attention maps</li>
+      <li>✓ Оптимизировать для production</li>
+    </ol>
+  </div>
+
+</div>
+
+</body>
+</html>

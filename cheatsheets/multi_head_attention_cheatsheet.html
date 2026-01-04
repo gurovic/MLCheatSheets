@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Multi-head Attention Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Multi-head Attention Cheatsheet</h1>
+  <div class="subtitle">Ключевой механизм трансформеров • Параллельное внимание<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Multi-head Attention</h2>
+    <p><strong>Multi-head Attention</strong> — ключевой компонент трансформеров</p>
+    <ul>
+      <li><strong>Идея</strong>: несколько параллельных attention механизмов</li>
+      <li><strong>Разные представления</strong>: каждая голова учит свой паттерн</li>
+      <li><strong>Объединение</strong>: конкатенация + линейная проекция</li>
+      <li><strong>Применение</strong>: BERT, GPT, ViT, все трансформеры</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Scaled Dot-Product Attention</h2>
+    <p>Базовый механизм attention:</p>
+    <pre><code>Attention(Q, K, V) = softmax(QK^T / √d_k) V
+
+где:
+- Q = queries (что ищем)
+- K = keys (где ищем)
+- V = values (что извлекаем)
+- d_k = размерность ключа</code></pre>
+    <blockquote>
+      Деление на √d_k стабилизирует градиенты
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Multi-head формула</h2>
+    <pre><code>MultiHead(Q, K, V) = Concat(head_1, ..., head_h)W^O
+
+где каждая голова:
+head_i = Attention(QW_i^Q, KW_i^K, VW_i^V)
+
+Параметры:
+- W_i^Q, W_i^K, W_i^V: проекции для головы i
+- W^O: выходная проекция
+- h: количество голов (обычно 8 или 12)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Реализация на PyTorch</h2>
+    <pre><code>import torch
+import torch.nn as nn
+import math
+
+class MultiHeadAttention(nn.Module):
+    def __init__(self, d_model=512, num_heads=8):
+        super().__init__()
+        assert d_model % num_heads == 0
+        
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.d_k = d_model // num_heads
+        
+        # Линейные проекции
+        self.W_q = nn.Linear(d_model, d_model)
+        self.W_k = nn.Linear(d_model, d_model)
+        self.W_v = nn.Linear(d_model, d_model)
+        self.W_o = nn.Linear(d_model, d_model)
+    
+    def forward(self, query, key, value, mask=None):
+        batch_size = query.size(0)
+        
+        # Линейные проекции и разделение на головы
+        Q = self.W_q(query).view(batch_size, -1, self.num_heads, self.d_k)
+        K = self.W_k(key).view(batch_size, -1, self.num_heads, self.d_k)
+        V = self.W_v(value).view(batch_size, -1, self.num_heads, self.d_k)
+        
+        # Transpose для batch processing
+        Q = Q.transpose(1, 2)  # [batch, heads, seq, d_k]
+        K = K.transpose(1, 2)
+        V = V.transpose(1, 2)
+        
+        # Scaled dot-product attention
+        scores = torch.matmul(Q, K.transpose(-2, -1)) / math.sqrt(self.d_k)
+        
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, -1e9)
+        
+        attention = torch.softmax(scores, dim=-1)
+        context = torch.matmul(attention, V)
+        
+        # Объединение голов
+        context = context.transpose(1, 2).contiguous()
+        context = context.view(batch_size, -1, self.d_model)
+        
+        # Финальная проекция
+        output = self.W_o(context)
+        return output, attention</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Зачем несколько голов?</h2>
+    <ul>
+      <li><strong>Разные паттерны</strong>: каждая голова фокусируется на своём</li>
+      <li><strong>Богатство представления</strong>: множество перспектив</li>
+      <li><strong>Специализация</strong>: синтаксис, семантика, позиции</li>
+      <li><strong>Устойчивость</strong>: redundancy помогает обучению</li>
+    </ul>
+    <blockquote>
+      Эмпирически: больше голов = лучше качество (до определённого предела)
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Типичные конфигурации</h2>
+    <table>
+      <tr><th>Модель</th><th>d_model</th><th>Heads</th><th>d_k</th></tr>
+      <tr><td><strong>BERT-Base</strong></td><td>768</td><td>12</td><td>64</td></tr>
+      <tr><td><strong>BERT-Large</strong></td><td>1024</td><td>16</td><td>64</td></tr>
+      <tr><td><strong>GPT-2</strong></td><td>768</td><td>12</td><td>64</td></tr>
+      <tr><td><strong>GPT-3</strong></td><td>12288</td><td>96</td><td>128</td></tr>
+      <tr><td><strong>ViT-Base</strong></td><td>768</td><td>12</td><td>64</td></tr>
+      <tr><td><strong>T5-Base</strong></td><td>768</td><td>12</td><td>64</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Self-Attention vs Cross-Attention</h2>
+    <table>
+      <tr><th>Тип</th><th>Q</th><th>K, V</th><th>Применение</th></tr>
+      <tr><td><strong>Self-Attention</strong></td><td>X</td><td>X</td><td>Encoder, Decoder</td></tr>
+      <tr><td><strong>Cross-Attention</strong></td><td>Decoder</td><td>Encoder</td><td>Encoder-Decoder</td></tr>
+      <tr><td><strong>Causal Self-Attention</strong></td><td>X</td><td>X (masked)</td><td>GPT, Decoder</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Masking в Attention</h2>
+    <p>Два типа масок:</p>
+    <ul>
+      <li><strong>Padding mask</strong>: игнорировать padding токены</li>
+      <li><strong>Causal mask</strong>: запретить смотреть в будущее (GPT)</li>
+    </ul>
+    <pre><code># Padding mask
+mask = (input_ids != pad_token_id).unsqueeze(1).unsqueeze(2)
+
+# Causal mask (для автореграссии)
+seq_len = x.size(1)
+causal_mask = torch.triu(
+    torch.ones(seq_len, seq_len), diagonal=1
+).bool()
+
+# Применение: scores.masked_fill(mask, -1e9)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Вычислительная сложность</h2>
+    <p>Для последовательности длины n:</p>
+    <pre><code>Complexity = O(n² × d_model)
+
+Где:
+- n²: все пары токенов
+- d_model: размерность эмбеддинга
+
+Память: O(n² × num_heads)</code></pre>
+    <p><strong>Проблема</strong>: квадратичная сложность для длинных последовательностей</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Эффективные варианты</h2>
+    <table>
+      <tr><th>Метод</th><th>Сложность</th><th>Идея</th></tr>
+      <tr><td><strong>Sparse Attention</strong></td><td>O(n√n)</td><td>Разреженные паттерны</td></tr>
+      <tr><td><strong>Linformer</strong></td><td>O(n)</td><td>Low-rank проекция</td></tr>
+      <tr><td><strong>Performer</strong></td><td>O(n)</td><td>Kernel approximation</td></tr>
+      <tr><td><strong>Flash Attention</strong></td><td>O(n²)</td><td>IO-оптимизация</td></tr>
+      <tr><td><strong>Local Attention</strong></td><td>O(n×w)</td><td>Окно размера w</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Визуализация Attention</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import seaborn as sns
+
+def visualize_attention(attention_weights, tokens):
+    """
+    attention_weights: [seq_len, seq_len]
+    tokens: list of token strings
+    """
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(
+        attention_weights,
+        xticklabels=tokens,
+        yticklabels=tokens,
+        cmap='viridis',
+        cbar=True
+    )
+    plt.xlabel('Key')
+    plt.ylabel('Query')
+    plt.title('Attention Weights')
+    plt.tight_layout()
+    plt.show()
+
+# Использование
+model.eval()
+with torch.no_grad():
+    outputs = model(input_ids, output_attentions=True)
+    attention = outputs.attentions[0][0].mean(0)  # усреднить по головам
+    visualize_attention(attention.cpu(), tokens)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Attention Patterns</h2>
+    <p>Типичные паттерны, которые учат головы:</p>
+    <ul>
+      <li><strong>Positional</strong>: внимание к соседним токенам</li>
+      <li><strong>Syntactic</strong>: внимание к синтаксически связанным</li>
+      <li><strong>Semantic</strong>: внимание к семантически близким</li>
+      <li><strong>Delimiter</strong>: фокус на разделителях ([CLS], [SEP])</li>
+      <li><strong>Broadcast</strong>: один токен смотрит на все</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Grouped Query Attention (GQA)</h2>
+    <p>Оптимизация из LLaMA-2:</p>
+    <ul>
+      <li><strong>Идея</strong>: группы голов делят K и V</li>
+      <li><strong>Экономия памяти</strong>: меньше KV cache</li>
+      <li><strong>Скорость</strong>: быстрее inference</li>
+      <li><strong>Качество</strong>: почти как MHA</li>
+    </ul>
+    <pre><code># MHA: каждая голова имеет свои K, V
+# GQA: группа голов делит K, V
+num_heads = 32
+num_kv_heads = 8  # 4 головы на 1 KV</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Dropout в Attention</h2>
+    <p>Применение dropout для регуляризации:</p>
+    <pre><code>attention = torch.softmax(scores, dim=-1)
+attention = F.dropout(attention, p=0.1, training=self.training)
+context = torch.matmul(attention, V)</code></pre>
+    <ul>
+      <li><strong>Где</strong>: после softmax</li>
+      <li><strong>Значение</strong>: обычно 0.1</li>
+      <li><strong>Эффект</strong>: предотвращает overfitting</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Практические советы</h2>
+    <ol>
+      <li><strong>d_k выбор</strong>: обычно d_model / num_heads = 64</li>
+      <li><strong>Количество голов</strong>: 8-16 для большинства задач</li>
+      <li><strong>Инициализация</strong>: Xavier или He для весов</li>
+      <li><strong>Gradient clipping</strong>: max_norm=1.0</li>
+      <li><strong>Flash Attention</strong>: использовать для ускорения</li>
+      <li><strong>KV cache</strong>: кешировать для генерации</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Debugging Multi-head Attention</h2>
+    <pre><code># Проверка размерностей
+print(f"Q shape: {Q.shape}")  # [batch, heads, seq, d_k]
+print(f"K shape: {K.shape}")
+print(f"V shape: {V.shape}")
+print(f"Scores shape: {scores.shape}")  # [batch, heads, seq, seq]
+print(f"Attention shape: {attention.shape}")
+print(f"Output shape: {output.shape}")  # [batch, seq, d_model]
+
+# Проверка attention weights
+assert torch.allclose(attention.sum(dim=-1), torch.ones_like(attention.sum(dim=-1)))
+
+# Визуализация attention
+for head_idx in range(num_heads):
+    plt.subplot(3, 4, head_idx + 1)
+    plt.imshow(attention[0, head_idx].detach())
+    plt.title(f'Head {head_idx}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Преимущества и недостатки</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>Преимущества</h3>
+        <ul>
+          <li>Параллелизуемо (в отличие от RNN)</li>
+          <li>Захватывает long-range зависимости</li>
+          <li>Интерпретируемо (attention maps)</li>
+          <li>Универсально (NLP, CV, audio)</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>Недостатки</h3>
+        <ul>
+          <li>Квадратичная сложность O(n²)</li>
+          <li>Требует много памяти</li>
+          <li>Медленно для длинных последовательностей</li>
+          <li>Нужен positional encoding</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист использования</h2>
+    <ol>
+      <li>✓ Выбрать d_model и num_heads</li>
+      <li>✓ Убедиться, что d_model делится на num_heads</li>
+      <li>✓ Добавить positional encoding к входам</li>
+      <li>✓ Настроить masking (padding, causal)</li>
+      <li>✓ Добавить dropout для регуляризации</li>
+      <li>✓ Проверить размерности на каждом шаге</li>
+      <li>✓ Визуализировать attention patterns</li>
+      <li>✓ Оптимизировать с Flash Attention</li>
+    </ol>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>MCMC и Байесовский вывод Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 MCMC и Байесовский вывод Cheatsheet</h1>
+  <div class="subtitle">Markov Chain Monte Carlo • Вероятностное машинное обучение<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Байесовский подход</h2>
+    <p><strong>Байесовский вывод</strong> — обновление beliefs на основе данных</p>
+    <ul>
+      <li><strong>Prior</strong>: P(θ) — априорные знания о параметрах</li>
+      <li><strong>Likelihood</strong>: P(D|θ) — вероятность данных при θ</li>
+      <li><strong>Posterior</strong>: P(θ|D) — обновленные beliefs</li>
+      <li><strong>Evidence</strong>: P(D) — нормализующая константа</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Теорема Байеса</h2>
+    <pre><code>P(θ|D) = P(D|θ) × P(θ) / P(D)
+
+posterior = likelihood × prior / evidence
+
+P(D) = ∫ P(D|θ) P(θ) dθ</code></pre>
+    <blockquote>
+      Evidence часто неизвестен и сложен для вычисления
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Зачем нужен MCMC</h2>
+    <p>Проблема: вычисление интеграла P(D) часто невозможно аналитически</p>
+    <ul>
+      <li><strong>Цель</strong>: оценить posterior P(θ|D)</li>
+      <li><strong>Решение</strong>: семплирование из posterior</li>
+      <li><strong>MCMC</strong>: создать цепь Маркова, сходящуюся к posterior</li>
+      <li><strong>Результат</strong>: samples ~ P(θ|D)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Марковская цепь</h2>
+    <p>Последовательность состояний с марковским свойством</p>
+    <ul>
+      <li><strong>Свойство</strong>: P(θ_t+1 | θ_1...θ_t) = P(θ_t+1 | θ_t)</li>
+      <li><strong>Стационарное распределение</strong>: π(θ)</li>
+      <li><strong>Эргодичность</strong>: любое состояние достижимо</li>
+      <li><strong>Детальный баланс</strong>: π(θ)T(θ'|θ) = π(θ')T(θ|θ')</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Metropolis-Hastings алгоритм</h2>
+    <p>Базовый MCMC алгоритм</p>
+    <pre><code>1. Начать с θ_0
+2. Для t = 1, 2, ..., N:
+   a) Предложить θ* ~ q(θ*|θ_t)
+   b) Вычислить acceptance ratio:
+      α = min(1, P(θ*)q(θ_t|θ*) / (P(θ_t)q(θ*|θ_t)))
+   c) С вероятностью α:
+      θ_t+1 = θ*
+      Иначе:
+      θ_t+1 = θ_t</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Реализация Metropolis-Hastings</h2>
+    <pre><code>import numpy as np
+
+def metropolis_hastings(target_pdf, proposal_std, 
+                        n_samples, initial_state):
+    """
+    target_pdf: целевое распределение P(θ)
+    proposal_std: std для proposal distribution
+    """
+    samples = [initial_state]
+    current = initial_state
+    accepted = 0
+    
+    for i in range(n_samples - 1):
+        # Proposal (Gaussian random walk)
+        proposed = current + np.random.normal(0, proposal_std)
+        
+        # Acceptance ratio
+        alpha = min(1, target_pdf(proposed) / target_pdf(current))
+        
+        # Accept or reject
+        if np.random.rand() < alpha:
+            current = proposed
+            accepted += 1
+        
+        samples.append(current)
+    
+    print(f"Acceptance rate: {accepted / n_samples:.2%}")
+    return np.array(samples)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Gibbs Sampling</h2>
+    <p>Специальный случай MH для многомерных распределений</p>
+    <ul>
+      <li><strong>Идея</strong>: семплировать по одной переменной</li>
+      <li><strong>Условие</strong>: P(θ_i | θ_{-i}) доступно</li>
+      <li><strong>Acceptance rate</strong>: всегда 100%</li>
+      <li><strong>Применение</strong>: LDA, Bayesian networks</li>
+    </ul>
+    <pre><code>for iteration in range(n_samples):
+    for i in range(n_vars):
+        # Семплировать i-ую переменную
+        # при фиксированных остальных
+        θ[i] = sample_from(P(θ_i | θ_{-i}))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Hamiltonian Monte Carlo (HMC)</h2>
+    <p><strong>HMC</strong> использует градиенты для эффективного семплирования</p>
+    <ul>
+      <li><strong>Идея</strong>: представить семплирование как физическую систему</li>
+      <li><strong>Импульс</strong>: вспомогательная переменная p</li>
+      <li><strong>Hamiltonian</strong>: H(θ,p) = -log P(θ) + p²/2m</li>
+      <li><strong>Leapfrog integrator</strong>: численное решение</li>
+      <li><strong>Преимущество</strong>: меньше корреляции между samples</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. No U-Turn Sampler (NUTS)</h2>
+    <p>Расширение HMC, используемое в Stan и PyMC3</p>
+    <ul>
+      <li><strong>Проблема HMC</strong>: настройка длины траектории</li>
+      <li><strong>NUTS</strong>: автоматически адаптирует траекторию</li>
+      <li><strong>Критерий</strong>: stop когда траектория "разворачивается"</li>
+      <li><strong>Эффективность</strong>: state-of-the-art для MCMC</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Диагностика сходимости</h2>
+    <table>
+      <tr><th>Метод</th><th>Описание</th><th>Критерий</th></tr>
+      <tr><td><strong>Trace plots</strong></td><td>Визуализация цепи</td><td>Стационарность</td></tr>
+      <tr><td><strong>R-hat (Gelman-Rubin)</strong></td><td>Сравнение цепей</td><td>R < 1.1</td></tr>
+      <tr><td><strong>Effective sample size</strong></td><td>Независимые samples</td><td>ESS > 400</td></tr>
+      <tr><td><strong>Autocorrelation</strong></td><td>Корреляция лагов</td><td>Быстрое затухание</td></tr>
+      <tr><td><strong>Geweke test</strong></td><td>Начало vs конец</td><td>p > 0.05</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Burn-in и thinning</h2>
+    <ul>
+      <li><strong>Burn-in</strong>: отбросить первые N samples (до сходимости)</li>
+      <li><strong>Thinning</strong>: брать каждый k-ый sample (уменьшить корреляцию)</li>
+      <li><strong>Обычно</strong>: burn-in = 20-50% samples</li>
+      <li><strong>Thinning</strong>: зависит от autocorrelation</li>
+    </ul>
+    <pre><code># Burn-in
+samples = samples[burn_in:]
+
+# Thinning
+samples = samples[::thin]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. PyMC для Bayesian inference</h2>
+    <pre><code>import pymc as pm
+import numpy as np
+
+# Данные
+y_obs = np.array([28, 8, -3, 7, -1, 1, 18, 12])
+
+with pm.Model() as model:
+    # Priors
+    μ = pm.Normal('μ', mu=0, sigma=10)
+    σ = pm.HalfNormal('σ', sigma=10)
+    
+    # Likelihood
+    y = pm.Normal('y', mu=μ, sigma=σ, observed=y_obs)
+    
+    # Sampling (NUTS)
+    trace = pm.sample(2000, tune=1000, chains=4)
+
+# Анализ
+pm.summary(trace)
+pm.plot_trace(trace)
+pm.plot_posterior(trace)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Stan для сложных моделей</h2>
+    <pre><code># Stan model file (model.stan)
+data {
+  int<lower=0> N;
+  vector[N] y;
+}
+parameters {
+  real mu;
+  real<lower=0> sigma;
+}
+model {
+  mu ~ normal(0, 10);
+  sigma ~ cauchy(0, 5);
+  y ~ normal(mu, sigma);
+}
+
+# Python
+import pystan
+model = pystan.StanModel(file='model.stan')
+fit = model.sampling(data={'N': len(y), 'y': y}, 
+                     iter=2000, chains=4)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Variational Inference альтернатива</h2>
+    <p><strong>VI</strong> — оптимизация вместо семплирования</p>
+    <ul>
+      <li><strong>Идея</strong>: аппроксимировать P(θ|D) простым q(θ)</li>
+      <li><strong>Цель</strong>: минимизировать KL(q||p)</li>
+      <li><strong>ELBO</strong>: Evidence Lower Bound для оптимизации</li>
+      <li><strong>Преимущество</strong>: быстрее MCMC</li>
+      <li><strong>Недостаток</strong>: может недооценить variance</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Применения Байесовского вывода</h2>
+    <ul>
+      <li><strong>A/B testing</strong>: оценка конверсии с uncertainty</li>
+      <li><strong>Time series</strong>: Bayesian structural models</li>
+      <li><strong>Bayesian optimization</strong>: гиперпараметры ML</li>
+      <li><strong>Causal inference</strong>: interventions</li>
+      <li><strong>Hierarchical models</strong>: multi-level data</li>
+      <li><strong>Missing data imputation</strong></li>
+      <li><strong>Model selection</strong>: Bayes factors</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Байесовские нейронные сети</h2>
+    <p>Распределения вместо точечных оценок весов</p>
+    <pre><code># PyMC3 Bayesian NN
+with pm.Model() as nn_model:
+    # Веса — распределения
+    w1 = pm.Normal('w1', 0, 1, shape=(n_in, n_hidden))
+    w2 = pm.Normal('w2', 0, 1, shape=(n_hidden, n_out))
+    
+    # Forward pass
+    hidden = pm.math.tanh(pm.math.dot(X, w1))
+    out = pm.math.dot(hidden, w2)
+    
+    # Likelihood
+    y = pm.Normal('y', mu=out, sigma=1, observed=Y)
+    
+    trace = pm.sample(1000)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Bayesian optimization</h2>
+    <p>Оптимизация дорогих black-box функций</p>
+    <ol>
+      <li><strong>Surrogate model</strong>: Gaussian Process</li>
+      <li><strong>Acquisition function</strong>: EI, UCB, PI</li>
+      <li><strong>Optimize acquisition</strong>: найти следующую точку</li>
+      <li><strong>Evaluate</strong>: получить f(x)</li>
+      <li><strong>Update GP</strong>: добавить новую точку</li>
+    </ol>
+    <pre><code>from bayes_opt import BayesianOptimization
+
+def black_box_function(x, y):
+    return -x ** 2 - (y - 1) ** 2 + 1
+
+optimizer = BayesianOptimization(
+    f=black_box_function,
+    pbounds={'x': (-2, 2), 'y': (-3, 3)},
+    random_state=1
+)
+
+optimizer.maximize(init_points=2, n_iter=3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Преимущества и недостатки</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>Преимущества</h3>
+        <ul>
+          <li>Uncertainty quantification</li>
+          <li>Инкорпорация prior knowledge</li>
+          <li>Естественная регуляризация</li>
+          <li>Работа с малыми данными</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>Недостатки</h3>
+        <ul>
+          <li>Вычислительно дорого</li>
+          <li>Требует выбора priors</li>
+          <li>Сложная диагностика</li>
+          <li>Не всегда сходится</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Best Practices</h2>
+    <ol>
+      <li><strong>Начать с простого prior</strong>: слабо информативный</li>
+      <li><strong>Несколько цепей</strong>: проверка сходимости</li>
+      <li><strong>Достаточно samples</strong>: ESS > 1000</li>
+      <li><strong>Диагностика</strong>: R-hat, trace plots</li>
+      <li><strong>Reparametrization</strong>: для лучшей сходимости</li>
+      <li><strong>Адаптация</strong>: tune period для NUTS</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Чек-лист использования</h2>
+    <ol>
+      <li>✓ Определить likelihood и prior</li>
+      <li>✓ Выбрать MCMC алгоритм (NUTS, MH, Gibbs)</li>
+      <li>✓ Выбрать библиотеку (PyMC, Stan, NumPyro)</li>
+      <li>✓ Настроить sampling (chains, samples, warmup)</li>
+      <li>✓ Запустить и проверить warnings</li>
+      <li>✓ Диагностика сходимости (R-hat, ESS)</li>
+      <li>✓ Визуализация trace и posterior</li>
+      <li>✓ Интерпретация и валидация</li>
+    </ol>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Positional Encoding Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Positional Encoding Cheatsheet</h1>
+  <div class="subtitle">Кодирование позиций в трансформерах • Теория и практика<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Проблема позиций</h2>
+    <p><strong>Трансформер</strong> не имеет встроенного понимания порядка токенов</p>
+    <ul>
+      <li><strong>Self-attention</strong>: permutation-invariant</li>
+      <li><strong>Без позиций</strong>: "cat sat" = "sat cat"</li>
+      <li><strong>Решение</strong>: добавить позиционную информацию</li>
+      <li><strong>Способы</strong>: sinusoidal, learned, relative</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Sinusoidal Encoding</h2>
+    <p>Оригинальный метод из "Attention is All You Need"</p>
+    <pre><code>PE(pos, 2i) = sin(pos / 10000^(2i/d_model))
+PE(pos, 2i+1) = cos(pos / 10000^(2i/d_model))
+
+где:
+- pos = позиция токена (0, 1, 2, ...)
+- i = индекс измерения (0...d_model/2)
+- d_model = размерность эмбеддинга</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Свойства Sinusoidal PE</h2>
+    <ul>
+      <li><strong>Детерминированно</strong>: не требует обучения</li>
+      <li><strong>Экстраполяция</strong>: работает на длинных последовательностях</li>
+      <li><strong>Линейность</strong>: PE(pos+k) линейная функция от PE(pos)</li>
+      <li><strong>Уникальность</strong>: каждая позиция имеет уникальный код</li>
+      <li><strong>Периодичность</strong>: разные частоты для измерений</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Реализация Sinusoidal PE</h2>
+    <pre><code>import torch
+import numpy as np
+
+def get_sinusoidal_encoding(max_len, d_model):
+    """
+    Создать sinusoidal positional encoding
+    """
+    position = torch.arange(max_len).unsqueeze(1)
+    div_term = torch.exp(
+        torch.arange(0, d_model, 2) * 
+        -(np.log(10000.0) / d_model)
+    )
+    
+    pe = torch.zeros(max_len, d_model)
+    pe[:, 0::2] = torch.sin(position * div_term)
+    pe[:, 1::2] = torch.cos(position * div_term)
+    
+    return pe
+
+# Использование
+max_len = 512
+d_model = 512
+pe = get_sinusoidal_encoding(max_len, d_model)
+
+# Добавление к эмбеддингам
+embeddings = token_embeddings + pe[:seq_len]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Learned Positional Embeddings</h2>
+    <p><strong>Обучаемые</strong> позиционные эмбеддинги (как в BERT)</p>
+    <pre><code>import torch.nn as nn
+
+class LearnedPositionalEmbedding(nn.Module):
+    def __init__(self, max_len, d_model):
+        super().__init__()
+        self.embedding = nn.Embedding(max_len, d_model)
+    
+    def forward(self, x):
+        # x: [batch, seq_len, d_model]
+        batch_size, seq_len, _ = x.size()
+        positions = torch.arange(seq_len, device=x.device)
+        positions = positions.unsqueeze(0).expand(batch_size, -1)
+        return x + self.embedding(positions)
+
+# Использование
+pos_emb = LearnedPositionalEmbedding(512, 768)
+x_with_pos = pos_emb(token_embeddings)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Преимущества</th><th>Недостатки</th></tr>
+      <tr><td><strong>Sinusoidal</strong></td><td>Экстраполяция, детерминированность</td><td>Фиксированный паттерн</td></tr>
+      <tr><td><strong>Learned</strong></td><td>Адаптивность к данным</td><td>Ограничено max_len</td></tr>
+      <tr><td><strong>Relative</strong></td><td>Относительные позиции</td><td>Сложнее реализация</td></tr>
+      <tr><td><strong>RoPE</strong></td><td>Эффективность, экстраполяция</td><td>Сложная математика</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Relative Positional Encoding</h2>
+    <p>Кодирует <strong>относительное</strong> расстояние между токенами</p>
+    <ul>
+      <li><strong>Идея</strong>: важно расстояние, а не абсолютная позиция</li>
+      <li><strong>Преимущество</strong>: лучше generalization</li>
+      <li><strong>Использование</strong>: в Transformer-XL, T5</li>
+      <li><strong>Bias в attention</strong>: добавляется к attention scores</li>
+    </ul>
+    <pre><code># В attention
+attention_scores = Q @ K.T + relative_pos_bias</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. RoPE (Rotary Position Embedding)</h2>
+    <p><strong>RoPE</strong> — метод из LLaMA, Mistral и других современных LLM</p>
+    <ul>
+      <li><strong>Ротация</strong>: применяет rotation matrix к эмбеддингам</li>
+      <li><strong>Эффективность</strong>: работает напрямую с Q, K</li>
+      <li><strong>Экстраполяция</strong>: хорошо работает на длинных контекстах</li>
+      <li><strong>Относительность</strong>: кодирует относительные позиции</li>
+    </ul>
+    <blockquote>
+      RoPE стал стандартом в современных LLM (GPT-Neo, LLaMA)
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. ALiBi (Attention with Linear Biases)</h2>
+    <p>Простой метод из T5 и других моделей</p>
+    <pre><code># Линейный bias
+bias = -m * |i - j|
+
+где m — slope для каждой головы attention
+
+# Добавление к attention scores
+scores = Q @ K.T / sqrt(d_k) + bias
+attention = softmax(scores)</code></pre>
+    <ul>
+      <li><strong>Простота</strong>: нет дополнительных параметров</li>
+      <li><strong>Экстраполяция</strong>: отлично работает</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применение в разных моделях</h2>
+    <table>
+      <tr><th>Модель</th><th>Тип PE</th></tr>
+      <tr><td><strong>Original Transformer</strong></td><td>Sinusoidal</td></tr>
+      <tr><td><strong>BERT</strong></td><td>Learned absolute</td></tr>
+      <tr><td><strong>GPT-2</strong></td><td>Learned absolute</td></tr>
+      <tr><td><strong>Transformer-XL</strong></td><td>Relative</td></tr>
+      <tr><td><strong>T5</strong></td><td>Relative (simplified)</td></tr>
+      <tr><td><strong>LLaMA, Mistral</strong></td><td>RoPE</td></tr>
+      <tr><td><strong>BLOOM</strong></td><td>ALiBi</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. 2D Positional Encoding</h2>
+    <p>Для <strong>изображений</strong> (Vision Transformer)</p>
+    <pre><code># Отдельное кодирование для x и y
+PE(x, y) = concat(PE_x(x), PE_y(y))
+
+# Или learned 2D embedding
+pos_emb_2d = nn.Parameter(
+    torch.randn(H, W, d_model)
+)</code></pre>
+    <ul>
+      <li>Используется в ViT, DETR</li>
+      <li>Можно sinusoidal или learned</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Визуализация PE</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Создать PE
+pe = get_sinusoidal_encoding(100, 128)
+
+# Визуализация
+plt.figure(figsize=(12, 6))
+sns.heatmap(
+    pe.numpy().T, 
+    cmap='RdBu', 
+    center=0,
+    xticklabels=10,
+    yticklabels=10
+)
+plt.xlabel('Position')
+plt.ylabel('Embedding Dimension')
+plt.title('Sinusoidal Positional Encoding')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Длинные контексты</h2>
+    <p>Методы для обработки <strong>длинных последовательностей</strong>:</p>
+    <ul>
+      <li><strong>ALiBi</strong>: экстраполирует хорошо</li>
+      <li><strong>RoPE with scaling</strong>: линейное масштабирование</li>
+      <li><strong>Absolute + Relative</strong>: комбинация</li>
+      <li><strong>Learned extrapolation</strong>: специальное обучение</li>
+      <li><strong>Position interpolation</strong>: интерполяция позиций</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Best Practices</h2>
+    <ol>
+      <li><strong>Для NLP</strong>: learned или RoPE</li>
+      <li><strong>Для Vision</strong>: learned 2D</li>
+      <li><strong>Для длинных контекстов</strong>: ALiBi или RoPE</li>
+      <li><strong>Для экстраполяции</strong>: sinusoidal или ALiBi</li>
+      <li><strong>Для transfer learning</strong>: relative PE</li>
+      <li><strong>Для эффективности</strong>: RoPE</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Влияние на производительность</h2>
+    <table>
+      <tr><th>Метод</th><th>Скорость</th><th>Память</th></tr>
+      <tr><td><strong>Sinusoidal</strong></td><td>Быстро</td><td>O(max_len × d)</td></tr>
+      <tr><td><strong>Learned</strong></td><td>Быстро</td><td>O(max_len × d)</td></tr>
+      <tr><td><strong>Relative</strong></td><td>Медленнее</td><td>O(max_len²)</td></tr>
+      <tr><td><strong>RoPE</strong></td><td>Быстро</td><td>O(1)</td></tr>
+      <tr><td><strong>ALiBi</strong></td><td>Быстро</td><td>O(1)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Debugging PE</h2>
+    <pre><code># Проверка работы PE
+def check_pe(model, text):
+    # Токенизация
+    tokens = tokenizer(text, return_tensors='pt')
+    
+    # Получение attention
+    outputs = model(**tokens, output_attentions=True)
+    
+    # Визуализация attention
+    attention = outputs.attentions[0][0].mean(0)
+    
+    # Проверка: близкие слова должны иметь
+    # высокое attention друг к другу
+    plt.imshow(attention.detach())
+    plt.colorbar()
+    plt.show()
+
+# Тест: без PE attention должен быть равномерным</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Преимущества и недостатки</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>Преимущества PE</h3>
+        <ul>
+          <li>Даёт понимание порядка</li>
+          <li>Простая реализация</li>
+          <li>Эффективно в трансформерах</li>
+          <li>Много вариантов на выбор</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>Ограничения</h3>
+        <ul>
+          <li>Фиксированная длина (learned)</li>
+          <li>Дополнительная память</li>
+          <li>Не всегда экстраполирует</li>
+          <li>Выбор метода не очевиден</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист использования</h2>
+    <ol>
+      <li>✓ Выбрать тип PE (sinusoidal/learned/relative/RoPE)</li>
+      <li>✓ Определить max_len</li>
+      <li>✓ Реализовать или использовать готовый</li>
+      <li>✓ Добавить к token embeddings</li>
+      <li>✓ Проверить размерности</li>
+      <li>✓ Протестировать на экстраполяцию</li>
+      <li>✓ Визуализировать attention maps</li>
+      <li>✓ Сравнить с baseline без PE</li>
+    </ol>
+  </div>
+
+</div>
+
+</body>
+</html>
