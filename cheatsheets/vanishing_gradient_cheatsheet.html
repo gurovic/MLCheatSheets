@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Проблема исчезающего градиента Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>⚡ Проблема исчезающего градиента Cheatsheet</h1>
+  <div class="subtitle">Причины, последствия и решения<br>📅 Январь 2026</div>
+  <div class="block">
+    <h2>🔷 1. Что это такое?</h2>
+<p><strong>Vanishing Gradient Problem</strong> — градиенты становятся экспоненциально малыми при backpropagation через глубокие сети.</p>
+<ul><li>Проявление: ранние слои не обучаются</li><li>Причина: произведение многих малых значений</li><li>Особенно критично: для RNN и очень глубоких сетей</li><li>Противоположность: exploding gradient</li></ul>
+<blockquote>💡 Градиент уменьшается в геометрической прогрессии при прохождении назад через слои</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Математика проблемы</h2>
+<p>При backpropagation градиенты вычисляются через цепное правило:</p>
+<p>∂L/∂w₁ = ∂L/∂aₙ × ∂aₙ/∂aₙ₋₁ × ... × ∂a₂/∂a₁ × ∂a₁/∂w₁</p>
+<p>Если каждая производная |∂aᵢ/∂aᵢ₋₁| < 1, то произведение стремится к 0</p>
+<ul><li>Sigmoid: σ'(x) ≤ 0.25 (максимум)</li><li>Tanh: tanh'(x) ≤ 1 (обычно < 1)</li><li>Для n слоев: градиент ~ 0.25ⁿ</li></ul>
+<pre><code>import numpy as np
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+gradient = 1.0
+for layer in range(10):
+    gradient *= 0.25  # derivative
+
+print(f"После 10 слоев: {gradient:.10f}")  # очень малое число!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Причины</h2>
+<table>
+<tr><th>Причина</th><th>Описание</th></tr>
+<tr><td>Saturating activations</td><td>Sigmoid/tanh с производными ≈ 0 в насыщении</td></tr>
+<tr><td>Глубина сети</td><td>Произведение многих чисел < 1</td></tr>
+<tr><td>Плохая инициализация</td><td>Веса слишком малы/велики</td></tr>
+<tr><td>Длинные последовательности (RNN)</td><td>Много временных шагов</td></tr>
+</table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Последствия</h2>
+<ul>
+<li>❌ Ранние слои не обучаются: градиенты ≈ 0</li>
+<li>❌ Медленная сходимость: обучение застревает</li>
+<li>❌ Плохое качество: модель не может изучить сложные паттерны</li>
+<li>❌ Невозможность глубоких сетей</li>
+<li>❌ Проблемы с длинными зависимостями в RNN</li>
+</ul>
+<pre><code># Диагностика vanishing gradient
+for name, param in model.named_parameters():
+    if param.grad is not None:
+        grad_norm = param.grad.norm().item()
+        print(f"{name}: {grad_norm:.6f}")
+        if grad_norm < 1e-7:
+            print(f"⚠️ Vanishing gradient!")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Решение 1: ReLU активация</h2>
+<p><strong>ReLU(x) = max(0, x)</strong> не насыщается для положительных значений</p>
+<ul><li>✅ Производная = 1 для x > 0</li><li>✅ Не исчезает градиент</li><li>✅ Быстрые вычисления</li><li>❌ Dying ReLU (нейроны могут "умереть")</li></ul>
+<pre><code>import torch.nn as nn
+
+model = nn.Sequential(
+    nn.Linear(784, 256),
+    nn.ReLU(),  # вместо Sigmoid
+    nn.Linear(256, 128),
+    nn.ReLU(),
+    nn.Linear(128, 10)
+)
+
+# Вариации
+nn.LeakyReLU(0.01)  # небольшой градиент для x < 0
+nn.PReLU()  # обучаемый параметр
+nn.ELU()  # smooth для x < 0
+nn.GELU()  # для Transformers</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Решение 2: Правильная инициализация</h2>
+<table>
+<tr><th>Метод</th><th>Для активации</th><th>Формула</th></tr>
+<tr><td>Xavier/Glorot</td><td>Sigmoid, Tanh</td><td>Uniform[-√(6/(n_in+n_out)), ...]</td></tr>
+<tr><td>He</td><td>ReLU, LeakyReLU</td><td>Normal(0, √(2/n_in))</td></tr>
+<tr><td>LeCun</td><td>SELU</td><td>Normal(0, √(1/n_in))</td></tr>
+</table>
+<pre><code>import torch.nn.init as init
+
+for m in model.modules():
+    if isinstance(m, nn.Linear):
+        # He initialization для ReLU
+        init.kaiming_normal_(m.weight, mode='fan_in', nonlinearity='relu')
+        if m.bias is not None:
+            init.constant_(m.bias, 0)
+
+# Xavier для Sigmoid/Tanh
+init.xavier_normal_(layer.weight)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Решение 3: Batch Normalization</h2>
+<ul>
+<li>✅ Стабилизирует обучение</li>
+<li>✅ Позволяет большие learning rates</li>
+<li>✅ Уменьшает зависимость от инициализации</li>
+<li>✅ Регуляризующий эффект</li>
+</ul>
+<pre><code># PyTorch
+class Model(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc1 = nn.Linear(784, 256)
+        self.bn1 = nn.BatchNorm1d(256)
+        self.fc2 = nn.Linear(256, 10)
+    
+    def forward(self, x):
+        x = self.fc1(x)
+        x = self.bn1(x)
+        x = F.relu(x)
+        x = self.fc2(x)
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Решение 4: Residual Connections</h2>
+<p><strong>Skip connections</strong> позволяют градиентам проходить напрямую: y = F(x) + x</p>
+<ul><li>✅ Градиент может течь без затухания</li><li>✅ Позволяет обучать 100+ слоев</li><li>✅ Легко оптимизировать</li></ul>
+<pre><code>class ResidualBlock(nn.Module):
+    def __init__(self, dim):
+        super().__init__()
+        self.fc1 = nn.Linear(dim, dim)
+        self.bn1 = nn.BatchNorm1d(dim)
+        self.fc2 = nn.Linear(dim, dim)
+        self.bn2 = nn.BatchNorm1d(dim)
+    
+    def forward(self, x):
+        identity = x
+        out = F.relu(self.bn1(self.fc1(x)))
+        out = self.bn2(self.fc2(out))
+        out += identity  # skip connection
+        out = F.relu(out)
+        return out</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Решение 5: LSTM/GRU для RNN</h2>
+<p><strong>LSTM</strong> использует gating для контроля информационного потока</p>
+<ul><li>Forget gate: что забыть</li><li>Input gate: что добавить</li><li>Output gate: что выдать</li><li>Cell state: магистраль для градиентов</li></ul>
+<pre><code># PyTorch LSTM
+lstm = nn.LSTM(
+    input_size=100,
+    hidden_size=256,
+    num_layers=2,
+    dropout=0.2,
+    batch_first=True
+)
+
+# GRU
+gru = nn.GRU(
+    input_size=100,
+    hidden_size=256,
+    num_layers=2
+)
+
+output, (hidden, cell) = lstm(input_seq)</code></pre>
+<blockquote>💡 LSTM решает vanishing gradient через cell state на длинных последовательностях</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Gradient Clipping</h2>
+<p>Для exploding gradients (обратная проблема)</p>
+<pre><code># PyTorch gradient clipping
+torch.nn.utils.clip_grad_norm_(
+    model.parameters(), 
+    max_norm=1.0
+)
+
+# В training loop
+optimizer.zero_grad()
+loss.backward()
+torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
+optimizer.step()
+
+# TensorFlow/Keras
+optimizer = tf.keras.optimizers.Adam(clipnorm=1.0)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Практический чеклист</h2>
+<p><strong>Лучшие практики:</strong></p>
+<ul>
+<li>✅ Использовать ReLU/LeakyReLU/GELU вместо Sigmoid/Tanh</li>
+<li>✅ He initialization для ReLU</li>
+<li>✅ Batch Normalization после каждого слоя</li>
+<li>✅ Residual connections для глубоких сетей</li>
+<li>✅ LSTM/GRU для последовательностей</li>
+<li>✅ Gradient clipping (особенно для RNN)</li>
+<li>✅ Мониторить gradient norms</li>
+<li>✅ Adaptive optimizers (Adam, AdamW)</li>
+</ul>
+<table>
+<tr><th>Активация</th><th>Vanishing?</th><th>Когда использовать</th></tr>
+<tr><td>Sigmoid</td><td>❌ Да</td><td>Бинарный output layer</td></tr>
+<tr><td>Tanh</td><td>❌ Да</td><td>Лучше sigmoid для hidden</td></tr>
+<tr><td>ReLU</td><td>✅ Нет</td><td>Стандарт для большинства случаев</td></tr>
+<tr><td>LeakyReLU</td><td>✅ Нет</td><td>Когда dying ReLU проблема</td></tr>
+<tr><td>GELU</td><td>✅ Нет</td><td>Transformers, современные модели</td></tr>
+</table>
+  </div>
+
+
+</div>
+</body>
+</html>

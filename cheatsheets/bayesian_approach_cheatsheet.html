@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Байесовский подход в Machine Learning Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎲 Байесовский подход в Machine Learning Cheatsheet</h1>
+  <div class="subtitle">Вероятностное мышление • От теоремы до практики<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы байесовского подхода</h2>
+    <p><strong>Байесовский подход</strong> рассматривает параметры модели как случайные величины с распределениями вероятностей.</p>
+    <ul>
+      <li><strong>Ключевая идея</strong>: обновление убеждений на основе данных</li>
+      <li><strong>Отличие от частотного подхода</strong>: параметры — случайные величины</li>
+      <li><strong>Преимущества</strong>:
+        <ul>
+          <li>Квантификация неопределенности</li>
+          <li>Естественная регуляризация через априорные распределения</li>
+          <li>Работа с малым количеством данных</li>
+        </ul>
+      </li>
+    </ul>
+    <blockquote>💡 "Частотный подход спрашивает: какова вероятность данных при фиксированных параметрах? Байесовский: какова вероятность параметров при данных?"</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Теорема Байеса</h2>
+    <p><strong>Фундаментальная формула</strong>:</p>
+    <p style="text-align: center; font-size: 1.1em;">P(θ|D) = P(D|θ) × P(θ) / P(D)</p>
+    
+    <table>
+      <tr><th>Термин</th><th>Название</th><th>Интерпретация</th></tr>
+      <tr>
+        <td>P(θ|D)</td>
+        <td><strong>Posterior</strong><br>Апостериорное</td>
+        <td>Убеждение о θ после наблюдения данных D</td>
+      </tr>
+      <tr>
+        <td>P(D|θ)</td>
+        <td><strong>Likelihood</strong><br>Правдоподобие</td>
+        <td>Вероятность данных при параметрах θ</td>
+      </tr>
+      <tr>
+        <td>P(θ)</td>
+        <td><strong>Prior</strong><br>Априорное</td>
+        <td>Начальное убеждение о θ до данных</td>
+      </tr>
+      <tr>
+        <td>P(D)</td>
+        <td><strong>Evidence</strong><br>Свидетельство</td>
+        <td>Нормализующая константа</td>
+      </tr>
+    </table>
+    
+    <p><strong>Интуиция</strong>:</p>
+    <p>Posterior ∝ Likelihood × Prior</p>
+    <p>"Новое убеждение = Данные × Старое убеждение"</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Пример: монета</h2>
+    <p><strong>Задача</strong>: оценить вероятность выпадения орла θ</p>
+    <pre><code>import numpy as np
+from scipy import stats
+import matplotlib.pyplot as plt
+
+# Данные: 7 орлов из 10 бросков
+heads = 7
+tosses = 10
+
+# Prior: Beta(2, 2) - слегка информативный
+prior_alpha, prior_beta = 2, 2
+
+# Likelihood: Binomial(heads | θ, tosses)
+# Posterior: Beta(alpha + heads, beta + tails)
+posterior_alpha = prior_alpha + heads
+posterior_beta = prior_beta + (tosses - heads)
+
+# Posterior распределение
+theta = np.linspace(0, 1, 1000)
+prior = stats.beta.pdf(theta, prior_alpha, prior_beta)
+posterior = stats.beta.pdf(theta, posterior_alpha, posterior_beta)
+
+# Визуализация
+plt.figure(figsize=(10, 5))
+plt.plot(theta, prior, label='Prior', linestyle='--')
+plt.plot(theta, posterior, label='Posterior')
+plt.axvline(heads/tosses, color='red', 
+            linestyle=':', label='MLE')
+plt.xlabel('θ (вероятность орла)')
+plt.ylabel('Плотность вероятности')
+plt.legend()
+plt.title('Байесовская оценка параметра монеты')
+plt.show()
+
+# Posterior среднее и интервал
+post_mean = posterior_alpha / (posterior_alpha + posterior_beta)
+post_std = np.sqrt(posterior_alpha * posterior_beta / 
+                   ((posterior_alpha + posterior_beta)**2 * 
+                    (posterior_alpha + posterior_beta + 1)))
+
+print(f"Posterior среднее: {post_mean:.3f}")
+print(f"Posterior std: {post_std:.3f}")
+
+# 95% credible interval
+ci_low, ci_high = stats.beta.ppf([0.025, 0.975], 
+                                  posterior_alpha, 
+                                  posterior_beta)
+print(f"95% CI: [{ci_low:.3f}, {ci_high:.3f}]")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Выбор априорного распределения (Prior)</h2>
+    <p><strong>Типы приоров</strong>:</p>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Когда использовать</th></tr>
+      <tr>
+        <td><strong>Uninformative</strong><br>(неинформативный)</td>
+        <td>Равномерное или широкое распределение</td>
+        <td>Нет предварительных знаний</td>
+      </tr>
+      <tr>
+        <td><strong>Informative</strong><br>(информативный)</td>
+        <td>Узкое распределение вокруг ожидаемого значения</td>
+        <td>Есть сильные убеждения</td>
+      </tr>
+      <tr>
+        <td><strong>Conjugate</strong><br>(сопряженный)</td>
+        <td>Prior и posterior одного семейства</td>
+        <td>Для аналитического вывода</td>
+      </tr>
+      <tr>
+        <td><strong>Empirical</strong><br>(эмпирический)</td>
+        <td>Оценен из данных</td>
+        <td>Иерархические модели</td>
+      </tr>
+    </table>
+
+    <p><strong>Популярные сопряженные пары</strong>:</p>
+    <ul>
+      <li>Binomial likelihood → Beta prior</li>
+      <li>Normal likelihood (известная σ) → Normal prior</li>
+      <li>Poisson likelihood → Gamma prior</li>
+      <li>Categorical likelihood → Dirichlet prior</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Байесовская линейная регрессия</h2>
+    <p><strong>Модель</strong>: y = Xw + ε, где w ~ N(μ₀, Σ₀)</p>
+    <pre><code>import numpy as np
+from scipy import stats
+
+class BayesianLinearRegression:
+    def __init__(self, alpha=1.0, beta=1.0):
+        """
+        alpha: precision of prior (1/variance)
+        beta: precision of noise (1/noise_variance)
+        """
+        self.alpha = alpha
+        self.beta = beta
+        self.w_mean = None
+        self.w_cov = None
+    
+    def fit(self, X, y):
+        # Prior: w ~ N(0, (1/alpha)I)
+        n_features = X.shape[1]
+        
+        # Posterior parameters
+        S_N_inv = self.alpha * np.eye(n_features) + \
+                  self.beta * X.T @ X
+        self.w_cov = np.linalg.inv(S_N_inv)
+        self.w_mean = self.beta * self.w_cov @ X.T @ y
+        
+        return self
+    
+    def predict(self, X, return_std=False):
+        y_mean = X @ self.w_mean
+        
+        if return_std:
+            # Predictive variance
+            y_var = 1/self.beta + np.sum(X @ self.w_cov * X, axis=1)
+            y_std = np.sqrt(y_var)
+            return y_mean, y_std
+        
+        return y_mean
+
+# Использование
+from sklearn.datasets import make_regression
+from sklearn.model_selection import train_test_split
+
+X, y = make_regression(n_samples=100, n_features=5, noise=0.5)
+X_train, X_test, y_train, y_test = train_test_split(X, y)
+
+# Обучение
+model = BayesianLinearRegression(alpha=1.0, beta=25.0)
+model.fit(X_train, y_train)
+
+# Предсказание с неопределенностью
+y_pred, y_std = model.predict(X_test, return_std=True)
+
+print(f"Posterior mean weights:\n{model.w_mean}")
+print(f"Posterior covariance:\n{model.w_cov}")
+
+# Визуализация неопределенности
+plt.figure(figsize=(10, 5))
+plt.errorbar(range(len(y_test)), y_pred, yerr=2*y_std, 
+             fmt='o', capsize=5, alpha=0.7, label='Predictions')
+plt.plot(y_test, 'r*', label='True values')
+plt.xlabel('Sample')
+plt.ylabel('Value')
+plt.legend()
+plt.title('Байесовская регрессия с неопределенностью')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Наивный байесовский классификатор</h2>
+    <p><strong>Предположение</strong>: признаки условно независимы при данном классе</p>
+    <p>P(y|x₁,...,xₙ) ∝ P(y) × ∏P(xᵢ|y)</p>
+    
+    <pre><code>from sklearn.naive_bayes import GaussianNB, MultinomialNB
+
+# Gaussian Naive Bayes (для числовых признаков)
+gnb = GaussianNB()
+gnb.fit(X_train, y_train)
+
+# Предсказания
+y_pred = gnb.predict(X_test)
+
+# Вероятности классов
+y_proba = gnb.predict_proba(X_test)
+
+# Multinomial NB (для текста, счетов)
+from sklearn.feature_extraction.text import CountVectorizer
+
+vectorizer = CountVectorizer()
+X_train_counts = vectorizer.fit_transform(texts_train)
+
+mnb = MultinomialNB(alpha=1.0)  # alpha - сглаживание Лапласа
+mnb.fit(X_train_counts, y_train)
+
+# Bernoulli NB (для бинарных признаков)
+from sklearn.naive_bayes import BernoulliNB
+
+bnb = BernoulliNB()
+bnb.fit(X_train_binary, y_train)</code></pre>
+
+    <p><strong>Когда использовать</strong>:</p>
+    <ul>
+      <li>✅ Классификация текстов (очень эффективно)</li>
+      <li>✅ Базовый baseline</li>
+      <li>✅ Когда нужна быстрая модель</li>
+      <li>✅ Малое количество данных</li>
+      <li>❌ Сильная корреляция между признаками</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Байесовская оптимизация гиперпараметров</h2>
+    <p>Использование байесовского подхода для эффективного поиска гиперпараметров:</p>
+    <pre><code>from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import Matern
+from scipy.stats import norm
+from scipy.optimize import minimize
+
+def bayesian_optimization(func, bounds, n_iter=20):
+    """
+    Байесовская оптимизация
+    func: целевая функция (например, валидационная точность)
+    bounds: границы параметров
+    """
+    # Начальные случайные точки
+    X_sample = np.random.uniform(bounds[:, 0], bounds[:, 1], 
+                                 size=(5, bounds.shape[0]))
+    y_sample = np.array([func(x) for x in X_sample])
+    
+    # Gaussian Process
+    gp = GaussianProcessRegressor(
+        kernel=Matern(nu=2.5),
+        alpha=1e-6,
+        n_restarts_optimizer=10
+    )
+    
+    for i in range(n_iter):
+        # Обновить GP
+        gp.fit(X_sample, y_sample)
+        
+        # Acquisition function (Expected Improvement)
+        def acquisition(x):
+            mu, sigma = gp.predict(x.reshape(1, -1), 
+                                   return_std=True)
+            best_y = np.max(y_sample)
+            
+            # Expected Improvement
+            with np.errstate(divide='ignore'):
+                Z = (mu - best_y) / sigma
+                ei = (mu - best_y) * norm.cdf(Z) + \
+                     sigma * norm.pdf(Z)
+            
+            return -ei  # минимизируем отрицательное EI
+        
+        # Найти следующую точку
+        x_next = None
+        best_acq = np.inf
+        
+        for x0 in np.random.uniform(bounds[:, 0], bounds[:, 1],
+                                    size=(10, bounds.shape[0])):
+            result = minimize(acquisition, x0, bounds=bounds,
+                            method='L-BFGS-B')
+            if result.fun < best_acq:
+                best_acq = result.fun
+                x_next = result.x
+        
+        # Оценить функцию в новой точке
+        y_next = func(x_next)
+        
+        # Добавить к сэмплам
+        X_sample = np.vstack([X_sample, x_next])
+        y_sample = np.append(y_sample, y_next)
+    
+    # Лучшая найденная точка
+    best_idx = np.argmax(y_sample)
+    return X_sample[best_idx], y_sample[best_idx]
+
+# Пример использования
+def objective(params):
+    """Оценка модели с данными гиперпараметрами"""
+    from sklearn.ensemble import RandomForestClassifier
+    model = RandomForestClassifier(
+        n_estimators=int(params[0]),
+        max_depth=int(params[1]),
+        min_samples_split=int(params[2])
+    )
+    model.fit(X_train, y_train)
+    return model.score(X_val, y_val)
+
+bounds = np.array([
+    [50, 200],    # n_estimators
+    [3, 20],      # max_depth
+    [2, 20]       # min_samples_split
+])
+
+best_params, best_score = bayesian_optimization(
+    objective, bounds, n_iter=30
+)
+
+print(f"Лучшие параметры: {best_params}")
+print(f"Лучший score: {best_score:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Байесовские нейронные сети</h2>
+    <p>Вместо точечных оценок весов используем распределения:</p>
+    <pre><code># PyTorch + Blitz (Bayesian NN library)
+import torch
+import torch.nn as nn
+from blitz.modules import BayesianLinear
+from blitz.utils import variational_estimator
+
+@variational_estimator
+class BayesianNN(nn.Module):
+    def __init__(self, input_dim, hidden_dim, output_dim):
+        super().__init__()
+        self.blinear1 = BayesianLinear(input_dim, hidden_dim)
+        self.blinear2 = BayesianLinear(hidden_dim, output_dim)
+    
+    def forward(self, x):
+        x = torch.relu(self.blinear1(x))
+        x = self.blinear2(x)
+        return x
+
+# Обучение
+model = BayesianNN(input_dim=10, hidden_dim=50, output_dim=1)
+criterion = nn.MSELoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+
+for epoch in range(100):
+    loss = model.sample_elbo(
+        inputs=X_train,
+        labels=y_train,
+        criterion=criterion,
+        sample_nbr=3  # количество сэмплов весов
+    )
+    
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+# Предсказание с неопределенностью
+predictions = []
+for _ in range(100):  # множественные сэмплы
+    with torch.no_grad():
+        pred = model(X_test)
+        predictions.append(pred)
+
+predictions = torch.stack(predictions)
+mean = predictions.mean(dim=0)
+std = predictions.std(dim=0)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Марковские цепи Монте-Карло (MCMC)</h2>
+    <p>Для сложных posterior распределений используем сэмплирование:</p>
+    <pre><code># PyMC для байесовского моделирования
+import pymc as pm
+
+with pm.Model() as model:
+    # Prior
+    alpha = pm.Normal('alpha', mu=0, sigma=10)
+    beta = pm.Normal('beta', mu=0, sigma=10)
+    sigma = pm.HalfNormal('sigma', sigma=1)
+    
+    # Likelihood
+    mu = alpha + beta * X
+    y_obs = pm.Normal('y_obs', mu=mu, sigma=sigma, 
+                      observed=y)
+    
+    # MCMC сэмплирование
+    trace = pm.sample(
+        2000,  # количество сэмплов
+        tune=1000,  # burn-in период
+        return_inferencedata=True,
+        chains=4  # параллельные цепи
+    )
+
+# Анализ результатов
+import arviz as az
+
+# Summary статистики
+print(az.summary(trace))
+
+# Визуализация posterior
+az.plot_posterior(trace)
+
+# Trace plots
+az.plot_trace(trace)
+
+# Диагностика сходимости
+print(f"R-hat: {az.rhat(trace)}")  # должно быть ~1.0</code></pre>
+
+    <p><strong>Популярные MCMC алгоритмы</strong>:</p>
+    <ul>
+      <li><strong>Metropolis-Hastings</strong>: базовый алгоритм</li>
+      <li><strong>Gibbs Sampling</strong>: для известных условных распределений</li>
+      <li><strong>Hamiltonian Monte Carlo (HMC)</strong>: эффективный для высоких размерностей</li>
+      <li><strong>NUTS</strong>: автоматическая настройка HMC</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Вариационный байесовский вывод</h2>
+    <p>Аппроксимация posterior простым распределением:</p>
+    <p>Минимизируем KL(q(θ) || p(θ|D))</p>
+    <p>Эквивалентно максимизации ELBO (Evidence Lower Bound)</p>
+    
+    <pre><code># Variational Inference с PyMC
+with pm.Model() as model:
+    # Prior и likelihood как раньше
+    alpha = pm.Normal('alpha', mu=0, sigma=10)
+    beta = pm.Normal('beta', mu=0, sigma=10, shape=X.shape[1])
+    sigma = pm.HalfNormal('sigma', sigma=1)
+    
+    mu = alpha + pm.math.dot(X, beta)
+    y_obs = pm.Normal('y_obs', mu=mu, sigma=sigma, 
+                      observed=y)
+    
+    # Variational inference (быстрее MCMC)
+    approx = pm.fit(
+        n=10000,  # итераций
+        method='advi'  # Automatic Differentiation VI
+    )
+    
+    # Получить posterior сэмплы
+    trace = approx.sample(2000)
+
+# Преимущества VI:
+# ✅ Быстрее MCMC
+# ✅ Масштабируется на большие данные
+# ✅ Удобно для нейросетей (VAE)
+# ❌ Аппроксимация (не точный posterior)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Гауссовские процессы</h2>
+    <p>Байесовский подход к регрессии с бесконечномерными приорами:</p>
+    <pre><code>from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF, WhiteKernel
+
+# Ядро (kernel) определяет prior
+kernel = RBF(length_scale=1.0) + WhiteKernel(noise_level=0.1)
+
+gp = GaussianProcessRegressor(
+    kernel=kernel,
+    n_restarts_optimizer=10,
+    alpha=1e-10
+)
+
+# Обучение
+gp.fit(X_train, y_train)
+
+# Предсказание с неопределенностью
+y_pred, y_std = gp.predict(X_test, return_std=True)
+
+# Визуализация
+plt.figure(figsize=(12, 5))
+plt.plot(X_test, y_test, 'r.', label='True')
+plt.plot(X_test, y_pred, 'b-', label='Prediction')
+plt.fill_between(
+    X_test.ravel(),
+    y_pred - 2*y_std,
+    y_pred + 2*y_std,
+    alpha=0.3,
+    label='95% confidence'
+)
+plt.legend()
+plt.title('Gaussian Process Regression')
+plt.show()
+
+# Оптимизированные гиперпараметры ядра
+print(f"Оптимизированное ядро:\n{gp.kernel_}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Байесовский A/B тест</h2>
+    <p>Сравнение двух вариантов с учетом неопределенности:</p>
+    <pre><code>import pymc as pm
+
+# Данные A/B теста
+n_A, conversions_A = 1000, 100  # вариант A
+n_B, conversions_B = 1000, 120  # вариант B
+
+with pm.Model() as model:
+    # Prior (Beta распределение)
+    p_A = pm.Beta('p_A', alpha=1, beta=1)
+    p_B = pm.Beta('p_B', alpha=1, beta=1)
+    
+    # Likelihood (Binomial)
+    obs_A = pm.Binomial('obs_A', n=n_A, p=p_A, 
+                        observed=conversions_A)
+    obs_B = pm.Binomial('obs_B', n=n_B, p=p_B, 
+                        observed=conversions_B)
+    
+    # Разница между вариантами
+    delta = pm.Deterministic('delta', p_B - p_A)
+    
+    # Сэмплирование
+    trace = pm.sample(5000, tune=1000, return_inferencedata=True)
+
+# Анализ
+import arviz as az
+
+print(az.summary(trace, var_names=['p_A', 'p_B', 'delta']))
+
+# Вероятность, что B лучше A
+prob_B_better = (trace.posterior['delta'] > 0).mean()
+print(f"P(B > A) = {prob_B_better:.1%}")
+
+# Визуализация
+az.plot_posterior(trace, var_names=['delta'])
+
+# Expected loss (ожидаемые потери при выборе неправильного варианта)
+delta_samples = trace.posterior['delta'].values.flatten()
+loss_choose_A = np.maximum(delta_samples, 0).mean()
+loss_choose_B = np.maximum(-delta_samples, 0).mean()
+
+print(f"Expected loss если выбрать A: {loss_choose_A:.4f}")
+print(f"Expected loss если выбрать B: {loss_choose_B:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Иерархические байесовские модели</h2>
+    <p>Модели с несколькими уровнями параметров:</p>
+    <pre><code># Пример: студенты в разных школах
+import pymc as pm
+
+# Данные
+n_schools = 8
+n_students_per_school = 20
+
+with pm.Model() as hierarchical_model:
+    # Гиперпараметры (популяционные)
+    mu_global = pm.Normal('mu_global', mu=0, sigma=10)
+    sigma_global = pm.HalfNormal('sigma_global', sigma=5)
+    
+    # Параметры школ (групповые)
+    mu_school = pm.Normal('mu_school', 
+                          mu=mu_global, 
+                          sigma=sigma_global,
+                          shape=n_schools)
+    
+    sigma_school = pm.HalfNormal('sigma_school', 
+                                  sigma=2, 
+                                  shape=n_schools)
+    
+    # Наблюдения студентов
+    for i in range(n_schools):
+        pm.Normal(f'obs_school_{i}',
+                  mu=mu_school[i],
+                  sigma=sigma_school[i],
+                  observed=student_scores[i])
+    
+    # Inference
+    trace = pm.sample(2000, tune=1000, return_inferencedata=True)
+
+# Shrinkage effect: школы с малым количеством данных
+# "притягиваются" к глобальному среднему</code></pre>
+
+    <p><strong>Преимущества</strong>:</p>
+    <ul>
+      <li>Частичное pooling данных между группами</li>
+      <li>Работа с малым количеством данных в группах</li>
+      <li>Естественная регуляризация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Bayesian Model Averaging (BMA)</h2>
+    <p>Комбинирование предсказаний нескольких моделей:</p>
+    <pre><code># BMA: взвешивание моделей по posterior вероятности
+def bayesian_model_averaging(models, X_train, y_train, X_test):
+    """
+    models: список моделей [(model1, prior1), (model2, prior2), ...]
+    """
+    from scipy.special import logsumexp
+    
+    # Вычислить evidence для каждой модели
+    log_evidences = []
+    predictions = []
+    
+    for model, prior in models:
+        # Обучить модель
+        model.fit(X_train, y_train)
+        
+        # Log likelihood (приближение)
+        y_pred = model.predict(X_train)
+        log_likelihood = -0.5 * np.sum((y_train - y_pred)**2)
+        
+        # Log evidence = log likelihood + log prior
+        log_evidence = log_likelihood + np.log(prior)
+        log_evidences.append(log_evidence)
+        
+        # Предсказание
+        predictions.append(model.predict(X_test))
+    
+    # Posterior model probabilities
+    log_evidences = np.array(log_evidences)
+    log_posterior_probs = log_evidences - logsumexp(log_evidences)
+    posterior_probs = np.exp(log_posterior_probs)
+    
+    # Взвешенное предсказание
+    predictions = np.array(predictions)
+    bma_prediction = np.average(predictions, axis=0, 
+                                 weights=posterior_probs)
+    
+    return bma_prediction, posterior_probs
+
+# Пример
+from sklearn.linear_model import Ridge
+from sklearn.ensemble import RandomForestRegressor
+
+models = [
+    (Ridge(alpha=1.0), 0.3),
+    (Ridge(alpha=10.0), 0.3),
+    (RandomForestRegressor(n_estimators=100), 0.4)
+]
+
+bma_pred, model_probs = bayesian_model_averaging(
+    models, X_train, y_train, X_test
+)
+
+print("Posterior model probabilities:")
+for i, prob in enumerate(model_probs):
+    print(f"Model {i+1}: {prob:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Best Practices</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <ul>
+          <li>Визуализировать prior и posterior</li>
+          <li>Проверять сходимость MCMC (R-hat, trace plots)</li>
+          <li>Использовать информативные приоры когда есть знания</li>
+          <li>Квантифицировать неопределенность</li>
+          <li>Проводить posterior predictive checks</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Избегать</h3>
+        <ul>
+          <li>Игнорировать выбор приора</li>
+          <li>Использовать MCMC без проверки сходимости</li>
+          <li>Забывать про масштабирование признаков</li>
+          <li>Переоценивать точность с малым количеством сэмплов</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Библиотеки Python</h2>
+    <table>
+      <tr><th>Библиотека</th><th>Особенности</th><th>Применение</th></tr>
+      <tr>
+        <td><strong>PyMC</strong></td>
+        <td>Мощная, современная</td>
+        <td>Общее байесовское моделирование</td>
+      </tr>
+      <tr>
+        <td><strong>Stan (PyStan)</strong></td>
+        <td>HMC/NUTS, быстрый</td>
+        <td>Сложные иерархические модели</td>
+      </tr>
+      <tr>
+        <td><strong>TensorFlow Probability</strong></td>
+        <td>Интеграция с TF</td>
+        <td>Байесовские нейросети</td>
+      </tr>
+      <tr>
+        <td><strong>Pyro</strong></td>
+        <td>Основан на PyTorch</td>
+        <td>Глубокие вероятностные модели</td>
+      </tr>
+      <tr>
+        <td><strong>scikit-learn</strong></td>
+        <td>Простые методы</td>
+        <td>Naive Bayes, GP</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Частотный vs Байесовский</h2>
+    <table>
+      <tr><th>Аспект</th><th>Частотный</th><th>Байесовский</th></tr>
+      <tr>
+        <td>Параметры</td>
+        <td>Фиксированные, неизвестные</td>
+        <td>Случайные величины</td>
+      </tr>
+      <tr>
+        <td>Вероятность</td>
+        <td>Частота событий</td>
+        <td>Степень убеждения</td>
+      </tr>
+      <tr>
+        <td>Prior knowledge</td>
+        <td>Не используется</td>
+        <td>Через prior</td>
+      </tr>
+      <tr>
+        <td>Неопределенность</td>
+        <td>Confidence intervals</td>
+        <td>Credible intervals</td>
+      </tr>
+      <tr>
+        <td>Интерпретация</td>
+        <td>Сложнее</td>
+        <td>Интуитивнее</td>
+      </tr>
+      <tr>
+        <td>Вычисления</td>
+        <td>Обычно быстрее</td>
+        <td>Может быть дорого</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Когда использовать байесовский подход</h2>
+    <ul>
+      <li>✅ <strong>Малое количество данных</strong>: prior помогает регуляризации</li>
+      <li>✅ <strong>Нужна неопределенность</strong>: получаем credible intervals</li>
+      <li>✅ <strong>Есть экспертные знания</strong>: можно включить через prior</li>
+      <li>✅ <strong>Иерархические структуры</strong>: естественное моделирование</li>
+      <li>✅ <strong>Онлайн обучение</strong>: легко обновлять posterior</li>
+      <li>✅ <strong>A/B тестирование</strong>: точная квантификация рисков</li>
+      <li>❌ <strong>Очень большие данные + нужна скорость</strong>: частотный быстрее</li>
+      <li>❌ <strong>Простые задачи</strong>: может быть overkill</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

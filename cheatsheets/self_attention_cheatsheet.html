@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><title>Attention Mechanism Cheatsheet</title>
+<style>@media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}@media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}.container{column-count:3;column-gap:20px;max-width:100%}.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}p,ul,ol{font-size:0.92em;margin:0.6em 0}ul,ol{padding-left:18px}li{margin-bottom:4px}code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}pre code{padding:0;background:none;white-space:pre-wrap}table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}td{padding:4px 6px;border-bottom:1px solid #f0f4ff}tr:nth-child(even){background-color:#f8fbff}blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}</style>
+</head>
+<body>
+<div class="container">
+<h1>🎯 Attention Mechanism Cheatsheet</h1>
+<div class="subtitle">Для начинающих • Механизм внимания • Практический фокус<br>📅 Январь 2026</div>
+
+<div class="block"><h2>🔷 1. Суть Attention</h2><ul><li><strong>Проблема RNN</strong>: сложно запоминать длинные последовательности</li><li><strong>Идея</strong>: модель "обращает внимание" на важные части входа</li><li><strong>Механизм</strong>: взвешенная сумма входов</li><li><strong>Веса</strong>: вычисляются динамически</li><li><strong>Применение</strong>: NLP, CV, Speech</li><li><strong>Основа</strong>: Transformers (BERT, GPT)</li></ul></div>
+
+<div class="block"><h2>🔷 2. Математика (упрощённо)</h2><p><strong>Query, Key, Value</strong>:</p><ul><li><strong>Query (Q)</strong>: что ищем</li><li><strong>Key (K)</strong>: с чем сравниваем</li><li><strong>Value (V)</strong>: что извлекаем</li></ul><p><strong>Формула</strong>:</p><p>Attention(Q, K, V) = softmax(QKᵀ / √dₖ) · V</p></div>
+
+<div class="block"><h2>🔷 3. Базовая реализация</h2><pre><code>import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class ScaledDotProductAttention(nn.Module):
+    def __init__(self, d_k):
+        super().__init__()
+        self.d_k = d_k
+    
+    def forward(self, Q, K, V, mask=None):
+        # Q, K, V: (batch, seq_len, d_k)
+        
+        # 1. Dot product
+        scores = torch.matmul(Q, K.transpose(-2, -1))
+        
+        # 2. Scale
+        scores = scores / (self.d_k ** 0.5)
+        
+        # 3. Mask (optional)
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, -1e9)
+        
+        # 4. Softmax
+        attention_weights = F.softmax(scores, dim=-1)
+        
+        # 5. Multiply by V
+        output = torch.matmul(attention_weights, V)
+        
+        return output, attention_weights</code></pre></div>
+
+<div class="block"><h2>🔷 4. Self-Attention</h2><p><strong>Каждый элемент внимания к остальным</strong></p><pre><code>class SelfAttention(nn.Module):
+    def __init__(self, d_model):
+        super().__init__()
+        self.d_model = d_model
+        
+        # Проекции для Q, K, V
+        self.W_q = nn.Linear(d_model, d_model)
+        self.W_k = nn.Linear(d_model, d_model)
+        self.W_v = nn.Linear(d_model, d_model)
+        
+        self.attention = ScaledDotProductAttention(d_model)
+    
+    def forward(self, x):
+        # x: (batch, seq_len, d_model)
+        
+        Q = self.W_q(x)
+        K = self.W_k(x)
+        V = self.W_v(x)
+        
+        output, weights = self.attention(Q, K, V)
+        
+        return output, weights</code></pre></div>
+
+<div class="block"><h2>🔷 5. Multi-Head Attention</h2><p><strong>Несколько attention параллельно</strong></p><pre><code>class MultiHeadAttention(nn.Module):
+    def __init__(self, d_model, num_heads):
+        super().__init__()
+        assert d_model % num_heads == 0
+        
+        self.d_model = d_model
+        self.num_heads = num_heads
+        self.d_k = d_model // num_heads
+        
+        self.W_q = nn.Linear(d_model, d_model)
+        self.W_k = nn.Linear(d_model, d_model)
+        self.W_v = nn.Linear(d_model, d_model)
+        self.W_o = nn.Linear(d_model, d_model)
+        
+    def split_heads(self, x):
+        batch_size = x.size(0)
+        x = x.view(batch_size, -1, self.num_heads, self.d_k)
+        return x.transpose(1, 2)
+    
+    def forward(self, Q, K, V, mask=None):
+        Q = self.split_heads(self.W_q(Q))
+        K = self.split_heads(self.W_k(K))
+        V = self.split_heads(self.W_v(V))
+        
+        # Attention для каждой головы
+        scores = torch.matmul(Q, K.transpose(-2, -1)) / (self.d_k ** 0.5)
+        
+        if mask is not None:
+            scores = scores.masked_fill(mask == 0, -1e9)
+        
+        attention = F.softmax(scores, dim=-1)
+        output = torch.matmul(attention, V)
+        
+        # Concat heads
+        output = output.transpose(1, 2).contiguous()
+        output = output.view(output.size(0), -1, self.d_model)
+        
+        return self.W_o(output)</code></pre></div>
+
+<div class="block"><h2>🔷 6. Типы Attention</h2><table><tr><th>Тип</th><th>Описание</th><th>Применение</th></tr><tr><td><strong>Self-Attention</strong></td><td>Элементы внимают друг к другу</td><td>Transformers, BERT</td></tr><tr><td><strong>Cross-Attention</strong></td><td>Две разные последовательности</td><td>Encoder-Decoder, Translation</td></tr><tr><td><strong>Causal/Masked</strong></td><td>Внимание только на прошлое</td><td>GPT, языковые модели</td></tr><tr><td><strong>Global</strong></td><td>Внимание ко всем элементам</td><td>Большинство Transformers</td></tr><tr><td><strong>Local</strong></td><td>Только к ближайшим</td><td>Эффективные Transformers</td></tr></table></div>
+
+<div class="block"><h2>🔷 7. Masked Attention (GPT)</h2><pre><code># Маска для causal attention
+def create_causal_mask(seq_len):
+    mask = torch.triu(torch.ones(seq_len, seq_len), diagonal=1)
+    mask = mask.masked_fill(mask == 1, -float('inf'))
+    return mask
+
+# Применение
+mask = create_causal_mask(seq_len)
+scores = scores + mask  # Broadcasting</code></pre></div>
+
+<div class="block"><h2>🔷 8. Позиционное кодирование</h2><p><strong>Attention не учитывает порядок — добавляем позиции</strong></p><pre><code>class PositionalEncoding(nn.Module):
+    def __init__(self, d_model, max_len=5000):
+        super().__init__()
+        
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len).unsqueeze(1)
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2) * 
+            -(math.log(10000.0) / d_model)
+        )
+        
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        
+        self.register_buffer('pe', pe)
+    
+    def forward(self, x):
+        x = x + self.pe[:x.size(1), :]
+        return x</code></pre></div>
+
+<div class="block"><h2>🔷 9. Преимущества Attention</h2><ul><li><strong>Параллелизация</strong>: в отличие от RNN</li><li><strong>Длинные зависимости</strong>: любая позиция к любой</li><li><strong>Интерпретируемость</strong>: веса attention показывают важность</li><li><strong>Гибкость</strong>: работает для разных модальностей</li><li><strong>Масштабируемость</strong>: эффективные варианты для длинных последовательностей</li></ul></div>
+
+<div class="block"><h2>🔷 10. Применения</h2><ul><li><strong>NLP</strong>: BERT, GPT, T5 — все на Transformers</li><li><strong>Machine Translation</strong>: оригинальное применение</li><li><strong>Computer Vision</strong>: Vision Transformers (ViT)</li><li><strong>Speech Recognition</strong>: Whisper, Wav2Vec2</li><li><strong>Multimodal</strong>: CLIP (изображения + текст)</li></ul></div>
+
+<div class="block"><h2>🔷 11. Cross-Attention в Encoder-Decoder</h2><pre><code># Encoder output → Keys & Values
+# Decoder state → Query
+
+class EncoderDecoderAttention(nn.Module):
+    def __init__(self, d_model):
+        super().__init__()
+        self.mha = MultiHeadAttention(d_model, num_heads=8)
+    
+    def forward(self, decoder_state, encoder_output):
+        # Query from decoder
+        Q = decoder_state
+        
+        # Keys and Values from encoder
+        K = encoder_output
+        V = encoder_output
+        
+        output = self.mha(Q, K, V)
+        return output</code></pre></div>
+
+<div class="block"><h2>🔷 12. Эффективные варианты</h2><ul><li><strong>Linear Attention</strong>: O(n) вместо O(n²)</li><li><strong>Sparse Attention</strong>: внимание к подмножеству</li><li><strong>Longformer</strong>: sliding window + global</li><li><strong>Reformer</strong>: LSH attention</li><li><strong>Performer</strong>: kernel approximation</li></ul></div>
+
+<div class="block"><h2>🔷 13. Лучшие практики</h2><ul><li><strong>Масштабирование</strong>: делить на √d_k обязательно!</li><li><strong>Multi-head</strong>: 8 или 16 голов стандарт</li><li><strong>Dropout</strong>: на attention weights (0.1)</li><li><strong>Residual</strong>: Add & Norm после attention</li><li><strong>Позиции</strong>: добавлять positional encoding</li></ul></div>
+
+<div class="block"><h2>🔷 14. Чек-лист</h2><ul><li>[ ] Реализовать Q, K, V проекции</li><li>[ ] Масштабировать scores на √d_k</li><li>[ ] Применить softmax</li><li>[ ] Для decoder — использовать маску</li><li>[ ] Multi-head для лучшего качества</li><li>[ ] Добавить positional encoding</li><li>[ ] Residual connections + LayerNorm</li><li>[ ] Dropout на attention weights</li></ul><blockquote>«Attention — это механизм выборочного внимания: модель смотрит на весь текст и решает, какие слова важны для понимания текущего слова. Как когда мы читаем — фокусируемся на ключевых словах, а не на каждом одинаково».</blockquote></div>
+
+</div>
+</body>
+</html>

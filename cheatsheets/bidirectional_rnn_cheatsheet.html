@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>RNN Основы Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔄 RNN (Двунаправленные нейросети) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Специализация</strong>: последовательные данные</li>
+      <li><strong>Память</strong>: использует информацию из прошлого</li>
+      <li><strong>Двунаправленность</strong>: выход возвращается на вход</li>
+      <li><strong>Применение</strong>: текст, временные ряды, аудио</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Структура RNN</h2>
+    <ul>
+      <li><strong>x_t</strong>: входные данные в момент t</li>
+      <li><strong>h_t</strong>: скрытое состояние (память)</li>
+      <li><strong>y_t</strong>: выходные данные</li>
+    </ul>
+    <p><strong>Формула:</strong></p>
+    <pre><code>h_t = tanh(W_hh * h_{t-1} + W_xh * x_t + b_h)
+y_t = W_hy * h_t + b_y</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Простая RNN (PyTorch)</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class SimpleRNN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super().__init__()
+        self.hidden_size = hidden_size
+        
+        self.rnn = nn.RNN(
+            input_size=input_size,
+            hidden_size=hidden_size,
+            num_layers=1,
+            batch_first=True
+        )
+        
+        self.fc = nn.Linear(hidden_size, output_size)
+    
+    def forward(self, x):
+        # x: (batch_size, seq_len, input_size)
+        out, hidden = self.rnn(x)
+        # out: (batch_size, seq_len, hidden_size)
+        
+        # Берём последний выход
+        out = self.fc(out[:, -1, :])
+        return out
+
+model = SimpleRNN(input_size=10, hidden_size=128, output_size=1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. LSTM (Long Short-Term Memory)</h2>
+    <p>Решение проблемы исчезающего градиента:</p>
+    <pre><code>class LSTMModel(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super().__init__()
+        
+        self.lstm = nn.LSTM(
+            input_size=input_size,
+            hidden_size=hidden_size,
+            num_layers=2,
+            batch_first=True,
+            dropout=0.2
+        )
+        
+        self.fc = nn.Linear(hidden_size, output_size)
+    
+    def forward(self, x):
+        out, (hidden, cell) = self.lstm(x)
+        out = self.fc(out[:, -1, :])
+        return out</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. GRU (Gated Recurrent Unit)</h2>
+    <p>Упрощённая версия LSTM:</p>
+    <pre><code>class GRUModel(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super().__init__()
+        
+        self.gru = nn.GRU(
+            input_size=input_size,
+            hidden_size=hidden_size,
+            num_layers=2,
+            batch_first=True,
+            dropout=0.2
+        )
+        
+        self.fc = nn.Linear(hidden_size, output_size)
+    
+    def forward(self, x):
+        out, hidden = self.gru(x)
+        out = self.fc(out[:, -1, :])
+        return out
+
+# GRU быстрее LSTM, но немного менее мощный</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Сравнение RNN, LSTM, GRU</h2>
+    <table>
+      <tr><th>Модель</th><th>Скорость</th><th>Память</th><th>Градиент</th></tr>
+      <tr><td><strong>RNN</strong></td><td>⚡⚡⚡</td><td>Короткая</td><td>Исчезает</td></tr>
+      <tr><td><strong>LSTM</strong></td><td>⚡</td><td>Длинная</td><td>Стабильный</td></tr>
+      <tr><td><strong>GRU</strong></td><td>⚡⚡</td><td>Длинная</td><td>Стабильный</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Двунаправленные RNN</h2>
+    <pre><code># Bidirectional RNN
+class BiRNN(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super().__init__()
+        
+        self.lstm = nn.LSTM(
+            input_size=input_size,
+            hidden_size=hidden_size,
+            num_layers=2,
+            batch_first=True,
+            bidirectional=True,  # Ключевой параметр
+            dropout=0.2
+        )
+        
+        # hidden_size * 2 из-за bidirectional
+        self.fc = nn.Linear(hidden_size * 2, output_size)
+    
+    def forward(self, x):
+        out, _ = self.lstm(x)
+        out = self.fc(out[:, -1, :])
+        return out
+
+# Обрабатывает последовательность в обоих направлениях</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Типы задач</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Пример</th></tr>
+      <tr><td><strong>Many-to-One</strong></td><td>Последовательность → одно значение</td><td>Sentiment analysis</td></tr>
+      <tr><td><strong>One-to-Many</strong></td><td>Одно значение → последовательность</td><td>Image captioning</td></tr>
+      <tr><td><strong>Many-to-Many</strong></td><td>Последовательность → последовательность</td><td>Machine translation</td></tr>
+      <tr><td><strong>Seq2Seq</strong></td><td>Encoder-Decoder</td><td>Перевод текста</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Подготовка данных</h2>
+    <pre><code>import torch
+from torch.nn.utils.rnn import pad_sequence
+
+# Паддинг последовательностей разной длины
+sequences = [torch.tensor([1, 2, 3]),
+             torch.tensor([4, 5]),
+             torch.tensor([6, 7, 8, 9])]
+
+padded = pad_sequence(sequences, batch_first=True, padding_value=0)
+# Результат: [[1, 2, 3, 0],
+#             [4, 5, 0, 0],
+#             [6, 7, 8, 9]]
+
+# Создание батчей для RNN
+# Формат: (batch_size, seq_len, input_size)
+X = torch.randn(32, 50, 128)  # 32 сэмпла, 50 шагов, 128 признаков</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Временные ряды</li>
+          <li>Анализ текста</li>
+          <li>Распознавание речи</li>
+          <li>Машинный перевод</li>
+          <li>Предсказание следующего элемента</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень длинные последовательности (используйте Transformers)</li>
+          <li>Нужна параллелизация (RNN последовательны)</li>
+          <li>Табличные данные без временной зависимости</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Исчезающий градиент</td><td>Использовать LSTM/GRU</td></tr>
+      <tr><td>Взрывающийся градиент</td><td>Gradient clipping</td></tr>
+      <tr><td>Медленное обучение</td><td>Batch processing, GPU</td></tr>
+      <tr><td>Переобучение</td><td>Dropout, регуляризация</td></tr>
+      <tr><td>Длинные последовательности</td><td>Truncated BPTT, Attention</td></tr>
+    </table>
+
+    <pre><code># Gradient clipping
+torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать тип RNN (LSTM/GRU для большинства задач)</li>
+      <li>[ ] Нормализовать входные данные</li>
+      <li>[ ] Правильно подготовить последовательности (padding)</li>
+      <li>[ ] Использовать batch_first=True для удобства</li>
+      <li>[ ] Добавить dropout между слоями</li>
+      <li>[ ] Применить gradient clipping</li>
+      <li>[ ] Рассмотреть bidirectional для контекста</li>
+      <li>[ ] Для длинных последовательностей — Transformers</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «RNN работает как наша память: читая предложение слово за словом, мы помним предыдущие слова, чтобы понять смысл. Так же RNN запоминает предыдущие элементы последовательности для анализа текущего».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
