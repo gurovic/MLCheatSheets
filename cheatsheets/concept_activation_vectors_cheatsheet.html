@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Concept Activation Vectors Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🧠 Concept Activation Vectors Cheatsheet</h1>
+  <div class="subtitle">TCAV • Интерпретация высокоуровневых концепций<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть CAV</h2>
+    <ul>
+      <li><strong>Проблема</strong>: нейросети оперируют низкоуровневыми признаками</li>
+      <li><strong>Решение</strong>: связать внутренние представления с человеко-понятными концепциями</li>
+      <li><strong>CAV (Concept Activation Vector)</strong>: направление в пространстве активаций, соответствующее концепции</li>
+      <li><strong>TCAV</strong>: Testing with Concept Activation Vectors - метод количественной оценки</li>
+      <li><strong>Цель</strong>: понять, использует ли модель определенные концепции для предсказаний</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Как работает TCAV</h2>
+    <ol>
+      <li><strong>Выбор концепции</strong>: например, "полосатый", "пушистый"</li>
+      <li><strong>Сбор примеров</strong>: позитивные (с концепцией) и негативные (без)</li>
+      <li><strong>Извлечение активаций</strong>: получить активации слоя для примеров</li>
+      <li><strong>Обучение классификатора</strong>: линейный классификатор разделяет концепцию</li>
+      <li><strong>CAV = нормаль к гиперплоскости</strong>: направление концепции</li>
+      <li><strong>Вычисление TCAV score</strong>: чувствительность предсказаний к концепции</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Математика TCAV</h2>
+    <p><strong>CAV вычисление:</strong></p>
+    <p>Обучить линейный классификатор: w·h + b = 0</p>
+    <p>CAV = w/||w|| (нормализованный вектор весов)</p>
+    <p><strong>Directional derivative:</strong></p>
+    <p>S<sub>C,k,l</sub>(x) = ∇<sub>h<sub>l</sub></sub>f<sub>k</sub>(x) · v<sub>C</sub><sup>l</sup></p>
+    <p>где:</p>
+    <ul>
+      <li>f<sub>k</sub> - предсказание класса k</li>
+      <li>h<sub>l</sub> - активации слоя l</li>
+      <li>v<sub>C</sub><sup>l</sup> - CAV для концепции C в слое l</li>
+    </ul>
+    <p><strong>TCAV score:</strong></p>
+    <p>TCAV<sub>C,k,l</sub> = |{x ∈ X<sub>k</sub> : S<sub>C,k,l</sub>(x) > 0}| / |X<sub>k</sub>|</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Базовый код</h2>
+    <pre><code>import torch
+import torch.nn as nn
+from sklearn.linear_model import LogisticRegression
+
+# 1. Извлечение активаций
+def get_activations(model, images, layer_name):
+    activations = []
+    def hook(module, input, output):
+        activations.append(output.detach())
+    
+    handle = getattr(model, layer_name).register_forward_hook(hook)
+    model(images)
+    handle.remove()
+    return activations[0]
+
+# 2. Обучение CAV
+concept_acts = get_activations(model, concept_imgs, 'layer4')
+random_acts = get_activations(model, random_imgs, 'layer4')
+
+X = torch.cat([concept_acts, random_acts]).cpu().numpy()
+y = [1]*len(concept_acts) + [0]*len(random_acts)
+
+clf = LogisticRegression().fit(X, y)
+cav = clf.coef_[0] / np.linalg.norm(clf.coef_[0])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Вычисление TCAV score</h2>
+    <pre><code>def compute_tcav_score(model, test_images, cav, layer_name):
+    tcav_scores = []
+    
+    for img in test_images:
+        img.requires_grad = True
+        
+        # Forward pass
+        activations = get_activations(model, img.unsqueeze(0), layer_name)
+        output = model(img.unsqueeze(0))
+        
+        # Gradient
+        output[0, target_class].backward()
+        grad = activations.grad
+        
+        # Directional derivative
+        directional_deriv = torch.sum(grad * torch.tensor(cav))
+        tcav_scores.append(directional_deriv.item() > 0)
+    
+    return sum(tcav_scores) / len(tcav_scores)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Полный пример TCAV</h2>
+    <pre><code>import numpy as np
+from sklearn.linear_model import SGDClassifier
+
+class TCAVInterpreter:
+    def __init__(self, model, layer_names):
+        self.model = model
+        self.layer_names = layer_names
+        self.cavs = {}
+    
+    def train_cav(self, concept_images, random_images, layer):
+        # Получить активации
+        concept_acts = self.get_acts(concept_images, layer)
+        random_acts = self.get_acts(random_images, layer)
+        
+        # Обучить классификатор
+        X = np.vstack([concept_acts, random_acts])
+        y = np.array([1]*len(concept_acts) + [0]*len(random_acts))
+        
+        clf = SGDClassifier(loss='log', max_iter=1000)
+        clf.fit(X, y)
+        
+        # CAV = нормализованные веса
+        cav = clf.coef_[0] / np.linalg.norm(clf.coef_[0])
+        self.cavs[(concept, layer)] = cav
+        
+        return cav
+    
+    def compute_tcav(self, test_images, concept, target_class, layer):
+        cav = self.cavs[(concept, layer)]
+        scores = []
+        
+        for img in test_images:
+            score = self.directional_derivative(
+                img, cav, target_class, layer
+            )
+            scores.append(score > 0)
+        
+        return np.mean(scores)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Выбор концепций</h2>
+    <p><strong>Хорошие концепции:</strong></p>
+    <ul>
+      <li>Визуально различимые (полосы, текстуры, цвета)</li>
+      <li>Семантически значимые для задачи</li>
+      <li>Достаточно примеров (20-50 изображений)</li>
+    </ul>
+    <p><strong>Примеры концепций:</strong></p>
+    <table>
+      <tr><th>Задача</th><th>Концепции</th></tr>
+      <tr><td>Медицинская диагностика</td><td>Текстура, плотность, симметрия</td></tr>
+      <tr><td>Классификация животных</td><td>Полосы, пятна, мех, перья</td></tr>
+      <tr><td>Распознавание объектов</td><td>Углы, края, формы</td></tr>
+      <tr><td>Анализ настроения</td><td>Улыбка, слезы, гнев</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Статистическая значимость</h2>
+    <pre><code>from scipy import stats
+
+def tcav_statistical_test(model, concept, n_runs=10):
+    tcav_scores = []
+    
+    for _ in range(n_runs):
+        # Случайные негативные примеры каждый раз
+        random_imgs = sample_random_images()
+        
+        # Обучить CAV
+        cav = train_cav(concept_imgs, random_imgs)
+        
+        # Вычислить TCAV
+        score = compute_tcav_score(test_imgs, cav)
+        tcav_scores.append(score)
+    
+    # t-test: отличается ли от 0.5 (случайность)?
+    t_stat, p_value = stats.ttest_1samp(tcav_scores, 0.5)
+    
+    mean_score = np.mean(tcav_scores)
+    return mean_score, p_value < 0.05  # значимо?</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Визуализация результатов</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+def visualize_tcav_results(concepts, tcav_scores, layers):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    x = np.arange(len(concepts))
+    width = 0.2
+    
+    for i, layer in enumerate(layers):
+        scores = [tcav_scores[c][layer] for c in concepts]
+        ax.bar(x + i*width, scores, width, label=layer)
+    
+    ax.set_ylabel('TCAV Score')
+    ax.set_xlabel('Concept')
+    ax.set_title('Concept Importance by Layer')
+    ax.set_xticks(x + width)
+    ax.set_xticklabels(concepts)
+    ax.legend()
+    ax.axhline(0.5, color='red', linestyle='--', label='Random')
+    
+    plt.tight_layout()
+    plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Интерпретация TCAV scores</h2>
+    <ul>
+      <li><strong>TCAV ≈ 0.5</strong>: концепция не влияет на предсказания</li>
+      <li><strong>TCAV > 0.5</strong>: концепция положительно влияет</li>
+      <li><strong>TCAV < 0.5</strong>: концепция отрицательно влияет</li>
+      <li><strong>TCAV близко к 1</strong>: очень важная концепция</li>
+    </ul>
+    <p><strong>По слоям:</strong></p>
+    <ul>
+      <li>Ранние слои: простые концепции (края, цвета)</li>
+      <li>Средние слои: текстуры, паттерны</li>
+      <li>Поздние слои: сложные семантические концепции</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Библиотека tcav</h2>
+    <pre><code># Установка
+pip install tcav
+
+# Использование
+from tcav import tcav
+
+# Подготовка
+bottlenecks = ['conv4', 'conv5']  # слои
+concepts = ['striped', 'furry']
+target_class = 'zebra'
+
+# Запуск TCAV
+tcav_results = tcav.get_tcav_scores(
+    model,
+    target_class,
+    concepts,
+    bottlenecks,
+    activation_dir='./activations',
+    cav_dir='./cavs',
+    num_random_exp=10
+)
+
+# Результаты
+for concept in concepts:
+    for layer in bottlenecks:
+        score = tcav_results[concept][layer]
+        print(f"{concept} @ {layer}: {score:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Практические советы</h2>
+    <ul>
+      <li><strong>Число примеров</strong>: 20-50 для концепции, 100-500 случайных</li>
+      <li><strong>Качество CAV</strong>: проверьте точность классификатора (должна быть >0.8)</li>
+      <li><strong>Слои</strong>: тестируйте несколько слоев, не только последний</li>
+      <li><strong>Случайные концепции</strong>: используйте для baseline</li>
+      <li><strong>Статистика</strong>: запускайте несколько раз с разными random</li>
+      <li><strong>Нормализация</strong>: активации должны быть нормализованы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Преимущества и ограничения</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Преимущества</h3>
+        <ul>
+          <li>Человеко-понятные концепции</li>
+          <li>Количественная оценка важности</li>
+          <li>Работает без переобучения модели</li>
+          <li>Применимо к разным архитектурам</li>
+          <li>Помогает найти bias</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Ограничения</h3>
+        <ul>
+          <li>Требует подготовки примеров концепций</li>
+          <li>Вычислительно затратно</li>
+          <li>Ограничено линейной разделимостью</li>
+          <li>Субъективный выбор концепций</li>
+          <li>Не подходит для очень глубоких слоев</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Применения TCAV</h2>
+    <table>
+      <tr><th>Область</th><th>Применение</th></tr>
+      <tr><td><strong>Медицина</strong></td><td>Проверка, использует ли модель клинически значимые признаки</td></tr>
+      <tr><td><strong>Fairness</strong></td><td>Обнаружение использования защищенных атрибутов (раса, пол)</td></tr>
+      <tr><td><strong>Debugging</strong></td><td>Понимание ошибок модели через концепции</td></tr>
+      <tr><td><strong>Доверие</strong></td><td>Объяснение решений экспертам</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Расширения TCAV</h2>
+    <ul>
+      <li><strong>ACE</strong>: Automatic Concept Extraction - автоматический поиск концепций</li>
+      <li><strong>Multi-modal TCAV</strong>: для мультимодальных моделей</li>
+      <li><strong>Adversarial TCAV</strong>: устойчивость к adversarial attacks</li>
+      <li><strong>Compositional TCAV</strong>: комбинации концепций</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист использования</h2>
+    <ul>
+      <li>[ ] Определить интересующие концепции</li>
+      <li>[ ] Собрать примеры концепций (20-50 изображений)</li>
+      <li>[ ] Собрать случайные примеры (100-500 изображений)</li>
+      <li>[ ] Выбрать слои для анализа</li>
+      <li>[ ] Обучить CAV для каждой концепции и слоя</li>
+      <li>[ ] Проверить качество CAV (accuracy классификатора)</li>
+      <li>[ ] Вычислить TCAV scores</li>
+      <li>[ ] Провести статистическое тестирование</li>
+      <li>[ ] Визуализировать и интерпретировать результаты</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «TCAV позволяет проверить, использует ли нейросеть понятные нам концепции для принятия решений. Например, при распознавании зебр мы можем проверить, действительно ли модель обращает внимание на полосы, а не на фон или другие случайные признаки. Это как спросить: "Ты смотришь на то, на что нужно?"».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

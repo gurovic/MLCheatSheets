@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Message Passing Networks Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📨 Message Passing Networks Cheatsheet</h1>
+  <div class="subtitle">MPNN Framework • Unified GNN Approach<br>📅 4 января 2026</div>
+  <div class="block">
+    <h2>🔷 1. Суть MPNN</h2>
+    <ul>
+      <li><strong>Unified framework</strong>: обобщение многих GNN методов</li>
+      <li><strong>Message passing</strong>: узлы обмениваются "сообщениями"</li>
+      <li><strong>Два этапа</strong>: Message + Update</li>
+      <li><strong>Итеративно</strong>: T раундов передачи сообщений</li>
+      <li><strong>Readout</strong>: агрегация для graph-level задач</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 2. MPNN Framework</h2>
+    <p><strong>Этап 1: Message passing (T шагов):</strong></p>
+    <p>m<sub>v</sub><sup>t+1</sup> = Σ<sub>w∈N(v)</sub> M<sub>t</sub>(h<sub>v</sub><sup>t</sup>, h<sub>w</sub><sup>t</sup>, e<sub>vw</sub>)</p>
+    <p>h<sub>v</sub><sup>t+1</sup> = U<sub>t</sub>(h<sub>v</sub><sup>t</sup>, m<sub>v</sub><sup>t+1</sup>)</p>
+    <p><strong>Этап 2: Readout:</strong></p>
+    <p>ŷ = R({h<sub>v</sub><sup>T</sup> | v ∈ G})</p>
+    <p>где:</p>
+    <ul>
+      <li>M<sub>t</sub> - message function</li>
+      <li>U<sub>t</sub> - update function</li>
+      <li>R - readout function</li>
+      <li>e<sub>vw</sub> - edge features</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 3. Компоненты MPNN</h2>
+    <p><strong>Message function M<sub>t</sub>:</strong></p>
+    <ul>
+      <li>Вычисляет сообщение от соседа w к узлу v</li>
+      <li>Может учитывать edge features</li>
+      <li>Примеры: MLP, attention, gating</li>
+    </ul>
+    <p><strong>Update function U<sub>t</sub>:</strong></p>
+    <ul>
+      <li>Обновляет состояние узла</li>
+      <li>Примеры: GRU, LSTM, MLP</li>
+    </ul>
+    <p><strong>Readout function R:</strong></p>
+    <ul>
+      <li>Агрегирует узлы для graph-level предсказания</li>
+      <li>Примеры: sum, mean, max, attention pooling</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 4. Базовая реализация</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class MessagePassingLayer(nn.Module):
+    def __init__(self, node_dim, edge_dim, hidden_dim):
+        super().__init__()
+        # Message function
+        self.message_net = nn.Sequential(
+            nn.Linear(2*node_dim + edge_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, node_dim)
+        )
+        # Update function
+        self.update_net = nn.GRUCell(node_dim, node_dim)
+    
+    def forward(self, h, edge_index, edge_attr):
+        # h: [N, node_dim]
+        # edge_index: [2, E]
+        # edge_attr: [E, edge_dim]
+        
+        row, col = edge_index
+        messages = []
+        
+        # Message computation
+        for i in range(edge_index.size(1)):
+            src, dst = row[i], col[i]
+            msg_input = torch.cat([
+                h[src], h[dst], edge_attr[i]
+            ])
+            msg = self.message_net(msg_input)
+            messages.append((dst, msg))
+        
+        # Aggregate messages
+        aggregated = torch.zeros_like(h)
+        for dst, msg in messages:
+            aggregated[dst] += msg
+        
+        # Update
+        h_new = self.update_net(aggregated, h)
+        return h_new</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 5. PyTorch Geometric MPNN</h2>
+    <pre><code>from torch_geometric.nn import MessagePassing
+from torch_geometric.utils import add_self_loops, degree
+
+class MPNNConv(MessagePassing):
+    def __init__(self, in_channels, out_channels):
+        super().__init__(aggr='add')  # aggregation: 'add', 'mean', 'max'
+        self.mlp = nn.Sequential(
+            nn.Linear(in_channels, out_channels),
+            nn.ReLU(),
+            nn.Linear(out_channels, out_channels)
+        )
+    
+    def forward(self, x, edge_index):
+        # x: [N, in_channels]
+        # edge_index: [2, E]
+        
+        # Add self-loops
+        edge_index, _ = add_self_loops(edge_index, num_nodes=x.size(0))
+        
+        # Start propagating messages
+        return self.propagate(edge_index, x=x)
+    
+    def message(self, x_j):
+        # x_j: [E, in_channels] - features of source nodes
+        return self.mlp(x_j)
+    
+    def update(self, aggr_out):
+        # aggr_out: [N, out_channels] - aggregated messages
+        return aggr_out</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 6. Различные MPNN варианты</h2>
+    <table>
+      <tr><th>Модель</th><th>Message M</th><th>Update U</th></tr>
+      <tr><td><strong>GCN</strong></td><td>Wh<sub>w</sub></td><td>σ(Σm + b)</td></tr>
+      <tr><td><strong>GraphSAGE</strong></td><td>h<sub>w</sub></td><td>σ(W[h<sub>v</sub>||Σm])</td></tr>
+      <tr><td><strong>GAT</strong></td><td>α<sub>vw</sub>h<sub>w</sub></td><td>σ(Σm)</td></tr>
+      <tr><td><strong>GIN</strong></td><td>h<sub>w</sub></td><td>MLP((1+ε)h<sub>v</sub>+Σm)</td></tr>
+      <tr><td><strong>MPNN</strong></td><td>NN(h<sub>v</sub>,h<sub>w</sub>,e<sub>vw</sub>)</td><td>GRU(h<sub>v</sub>,Σm)</td></tr>
+    </table>
+  </div>
+  <div class="block">
+    <h2>🔷 7. Edge features в MPNN</h2>
+    <pre><code>class MPNNWithEdgeFeatures(MessagePassing):
+    def __init__(self, node_dim, edge_dim, hidden_dim):
+        super().__init__(aggr='add')
+        self.edge_encoder = nn.Linear(edge_dim, hidden_dim)
+        self.node_encoder = nn.Linear(node_dim, hidden_dim)
+        self.message_mlp = nn.Sequential(
+            nn.Linear(2*hidden_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, hidden_dim)
+        )
+    
+    def forward(self, x, edge_index, edge_attr):
+        return self.propagate(edge_index, x=x, edge_attr=edge_attr)
+    
+    def message(self, x_i, x_j, edge_attr):
+        # x_i: target node, x_j: source node
+        # edge_attr: edge features
+        edge_emb = self.edge_encoder(edge_attr)
+        x_j_emb = self.node_encoder(x_j)
+        msg = self.message_mlp(
+            torch.cat([x_j_emb, edge_emb], dim=-1)
+        )
+        return msg</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 8. Global graph pooling</h2>
+    <pre><code>from torch_geometric.nn import global_add_pool, global_mean_pool
+
+class MPNNGraphClassifier(nn.Module):
+    def __init__(self, node_dim, edge_dim, num_classes):
+        super().__init__()
+        self.conv1 = MPNNConv(node_dim, 64)
+        self.conv2 = MPNNConv(64, 64)
+        self.conv3 = MPNNConv(64, 64)
+        
+        # Readout
+        self.lin1 = nn.Linear(64, 32)
+        self.lin2 = nn.Linear(32, num_classes)
+    
+    def forward(self, data):
+        x, edge_index, batch = data.x, data.edge_index, data.batch
+        
+        # Message passing
+        x = F.relu(self.conv1(x, edge_index))
+        x = F.relu(self.conv2(x, edge_index))
+        x = F.relu(self.conv3(x, edge_index))
+        
+        # Pooling (graph-level)
+        x = global_add_pool(x, batch)  # or global_mean_pool
+        
+        # Classification
+        x = F.relu(self.lin1(x))
+        x = F.dropout(x, p=0.5, training=self.training)
+        x = self.lin2(x)
+        
+        return F.log_softmax(x, dim=1)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 9. Attention-based pooling</h2>
+    <pre><code>class AttentionPooling(nn.Module):
+    def __init__(self, in_channels):
+        super().__init__()
+        self.attention = nn.Sequential(
+            nn.Linear(in_channels, in_channels),
+            nn.Tanh(),
+            nn.Linear(in_channels, 1)
+        )
+    
+    def forward(self, x, batch):
+        # x: [N, in_channels]
+        # batch: [N] - graph assignment
+        
+        # Compute attention scores
+        scores = self.attention(x)  # [N, 1]
+        
+        # Softmax per graph
+        scores = scores.squeeze(-1)  # [N]
+        attention_weights = torch.zeros_like(scores)
+        
+        for i in range(batch.max() + 1):
+            mask = (batch == i)
+            attention_weights[mask] = F.softmax(scores[mask], dim=0)
+        
+        # Weighted sum
+        weighted = x * attention_weights.unsqueeze(-1)
+        
+        # Aggregate per graph
+        return scatter_add(weighted, batch, dim=0)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 10. Temporal MPNN</h2>
+    <p>Для динамических графов:</p>
+    <pre><code>class TemporalMPNN(nn.Module):
+    def __init__(self, node_dim, edge_dim, hidden_dim):
+        super().__init__()
+        self.mpnn = MPNNConv(node_dim, hidden_dim)
+        self.temporal = nn.GRU(hidden_dim, hidden_dim)
+    
+    def forward(self, graphs_sequence):
+        # graphs_sequence: список графов по времени
+        hidden = None
+        outputs = []
+        
+        for graph in graphs_sequence:
+            # Spatial: MPNN на текущем графе
+            x = self.mpnn(graph.x, graph.edge_index)
+            
+            # Temporal: GRU через время
+            x, hidden = self.temporal(
+                x.unsqueeze(0),
+                hidden
+            )
+            outputs.append(x.squeeze(0))
+        
+        return outputs</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 11. Практические советы</h2>
+    <ul>
+      <li><strong>Число шагов T</strong>: 2-5 обычно достаточно</li>
+      <li><strong>Edge features</strong>: важны для молекул, химических соединений</li>
+      <li><strong>Residual connections</strong>: для глубоких сетей</li>
+      <li><strong>Batch normalization</strong>: после каждого слоя</li>
+      <li><strong>Virtual node</strong>: добавить глобальный узел для long-range dependencies</li>
+      <li><strong>Pre-training</strong>: на больших графовых датасетах</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 12. Aggregation functions</h2>
+    <table>
+      <tr><th>Функция</th><th>Свойства</th><th>Когда использовать</th></tr>
+      <tr><td><strong>sum</strong></td><td>Инвариантна к порядку, зависит от размера</td><td>По умолчанию</td></tr>
+      <tr><td><strong>mean</strong></td><td>Инвариантна к порядку и размеру</td><td>Разные размеры графов</td></tr>
+      <tr><td><strong>max</strong></td><td>Инвариантна к порядку</td><td>Важны пиковые значения</td></tr>
+      <tr><td><strong>attention</strong></td><td>Взвешенная сумма</td><td>Разная важность узлов</td></tr>
+      <tr><td><strong>lstm</strong></td><td>Зависит от порядка</td><td>Упорядоченные соседи</td></tr>
+    </table>
+  </div>
+  <div class="block">
+    <h2>🔷 13. Применения MPNN</h2>
+    <table>
+      <tr><th>Область</th><th>Задача</th><th>Особенности</th></tr>
+      <tr><td><strong>Химия</strong></td><td>Предсказание свойств молекул</td><td>Edge features критичны</td></tr>
+      <tr><td><strong>Drug discovery</strong></td><td>Молекулярная активность</td><td>Graph-level предсказания</td></tr>
+      <tr><td><strong>Физика</strong></td><td>Симуляция частиц</td><td>Временные графы</td></tr>
+      <tr><td><strong>NLP</strong></td><td>Dependency parsing</td><td>Directed graphs</td></tr>
+      <tr><td><strong>Robotics</strong></td><td>Планирование траектории</td><td>Spatial reasoning</td></tr>
+    </table>
+  </div>
+  <div class="block">
+    <h2>🔷 14. Expressive power</h2>
+    <p><strong>WL-test</strong>: Weisfeiler-Lehman graph isomorphism test</p>
+    <ul>
+      <li>MPNN не мощнее WL-test</li>
+      <li>Не может различить некоторые non-isomorphic графы</li>
+      <li><strong>Решения</strong>:
+        <ul>
+          <li>Higher-order GNN (k-WL)</li>
+          <li>Structural features (cycles, subgraphs)</li>
+          <li>Random node features</li>
+        </ul>
+      </li>
+    </ul>
+    <pre><code># GIN: максимально выразительный MPNN
+class GINConv(MessagePassing):
+    def __init__(self, in_channels, out_channels, eps=0):
+        super().__init__(aggr='add')
+        self.eps = nn.Parameter(torch.Tensor([eps]))
+        self.mlp = nn.Sequential(
+            nn.Linear(in_channels, out_channels),
+            nn.ReLU(),
+            nn.Linear(out_channels, out_channels)
+        )
+    
+    def forward(self, x, edge_index):
+        out = self.propagate(edge_index, x=x)
+        return self.mlp((1 + self.eps) * x + out)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 15. Когда использовать MPNN</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо для</h3>
+        <ul>
+          <li>Молекулярные графы (edge features)</li>
+          <li>Graph-level предсказания</li>
+          <li>Нужна гибкость в дизайне</li>
+          <li>Исследовательские задачи</li>
+          <li>Сложные графовые структуры</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Осторожно</h3>
+        <ul>
+          <li>Простые задачи (GCN достаточно)</li>
+          <li>Очень большие графы (медленнее)</li>
+          <li>Нет edge features (проще методы)</li>
+          <li>Production (сложнее имплементация)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить message, update, readout functions</li>
+      <li>[ ] Выбрать число message passing шагов (2-5)</li>
+      <li>[ ] Решить, нужны ли edge features</li>
+      <li>[ ] Выбрать aggregation (sum/mean/max/attention)</li>
+      <li>[ ] Добавить residual connections для >3 слоев</li>
+      <li>[ ] Использовать batch normalization</li>
+      <li>[ ] Для graph-level: выбрать pooling strategy</li>
+      <li>[ ] Тестировать на expressive power если нужно</li>
+    </ul>
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Message Passing Networks — это общий фреймворк для графовых нейросетей. Узлы обмениваются "сообщениями" с соседями несколько раз, постепенно собирая информацию со всего графа. Как распространение новостей в сети: каждый узел получает информацию от друзей, обновляет свое понимание, и передает дальше».
+    </blockquote>
+  </div>
+</div>
+</body>
+</html>

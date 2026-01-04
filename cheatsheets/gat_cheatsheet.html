@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Graph Attention Networks (GAT) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🔭 Graph Attention Networks (GAT) Cheatsheet</h1>
+  <div class="subtitle">Attention на графах • Adaptive aggregation<br>📅 4 января 2026</div>
+  <div class="block">
+    <h2>🔷 1. Суть GAT</h2>
+    <ul>
+      <li><strong>Проблема GCN</strong>: все соседи одинаково важны</li>
+      <li><strong>Решение</strong>: attention механизм — взвешивание соседей</li>
+      <li><strong>Adaptive</strong>: веса зависят от признаков узлов</li>
+      <li><strong>Multi-head attention</strong>: несколько attention heads</li>
+      <li><strong>Преимущество</strong>: разные соседи получают разные веса</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 2. Математика GAT</h2>
+    <p><strong>Attention coefficients:</strong></p>
+    <p>e<sub>ij</sub> = LeakyReLU(a<sup>T</sup>[W h<sub>i</sub> || W h<sub>j</sub>])</p>
+    <p><strong>Normalization (softmax):</strong></p>
+    <p>α<sub>ij</sub> = exp(e<sub>ij</sub>) / Σ<sub>k∈N<sub>i</sub></sub> exp(e<sub>ik</sub>)</p>
+    <p><strong>Aggregation:</strong></p>
+    <p>h'<sub>i</sub> = σ(Σ<sub>j∈N<sub>i</sub></sub> α<sub>ij</sub> W h<sub>j</sub>)</p>
+    <p>где:</p>
+    <ul>
+      <li>h<sub>i</sub> - признаки узла i</li>
+      <li>W - веса преобразования</li>
+      <li>a - attention вектор</li>
+      <li>|| - конкатенация</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 3. Intuition</h2>
+    <p><strong>Как работает:</strong></p>
+    <ol>
+      <li>Линейное преобразование признаков: Wh</li>
+      <li>Вычислить attention для каждой пары (i,j)</li>
+      <li>Нормализовать attention коэффициенты</li>
+      <li>Агрегировать с весами attention</li>
+    </ol>
+    <p><strong>Отличие от GCN:</strong></p>
+    <ul>
+      <li>GCN: фиксированные веса (1/√(d<sub>i</sub>d<sub>j</sub>))</li>
+      <li>GAT: адаптивные веса (зависят от признаков)</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 4. Базовый код PyTorch</h2>
+    <pre><code>import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class GATLayer(nn.Module):
+    def __init__(self, in_features, out_features, dropout=0.6, alpha=0.2):
+        super().__init__()
+        self.W = nn.Parameter(torch.zeros(in_features, out_features))
+        self.a = nn.Parameter(torch.zeros(2*out_features, 1))
+        self.dropout = dropout
+        self.leakyrelu = nn.LeakyReLU(alpha)
+        nn.init.xavier_uniform_(self.W.data)
+        nn.init.xavier_uniform_(self.a.data)
+    
+    def forward(self, h, adj):
+        # h: [N, in_features], adj: [N, N]
+        Wh = torch.mm(h, self.W)  # [N, out_features]
+        
+        # Attention mechanism
+        N = Wh.size(0)
+        a_input = torch.cat([
+            Wh.repeat(1, N).view(N*N, -1),
+            Wh.repeat(N, 1)
+        ], dim=1).view(N, N, -1)  # [N, N, 2*out_features]
+        
+        e = self.leakyrelu(torch.matmul(a_input, self.a).squeeze(2))
+        
+        # Mask with adjacency
+        zero_vec = -9e15*torch.ones_like(e)
+        attention = torch.where(adj > 0, e, zero_vec)
+        attention = F.softmax(attention, dim=1)
+        attention = F.dropout(attention, self.dropout, training=self.training)
+        
+        # Aggregation
+        h_prime = torch.matmul(attention, Wh)
+        return h_prime</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 5. Multi-head Attention</h2>
+    <pre><code>class MultiHeadGATLayer(nn.Module):
+    def __init__(self, in_features, out_features, num_heads, merge='cat'):
+        super().__init__()
+        self.heads = nn.ModuleList([
+            GATLayer(in_features, out_features)
+            for _ in range(num_heads)
+        ])
+        self.merge = merge
+    
+    def forward(self, h, adj):
+        head_outs = [head(h, adj) for head in self.heads]
+        
+        if self.merge == 'cat':
+            return torch.cat(head_outs, dim=1)
+        else:  # mean
+            return torch.mean(torch.stack(head_outs), dim=0)
+
+# GAT с multi-head
+class GAT(nn.Module):
+    def __init__(self, nfeat, nhid, nclass, nheads):
+        super().__init__()
+        self.gat1 = MultiHeadGATLayer(nfeat, nhid, nheads, merge='cat')
+        self.gat2 = MultiHeadGATLayer(nhid*nheads, nclass, 1, merge='mean')
+    
+    def forward(self, x, adj):
+        x = F.elu(self.gat1(x, adj))
+        x = F.dropout(x, p=0.6, training=self.training)
+        x = self.gat2(x, adj)
+        return F.log_softmax(x, dim=1)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 6. PyTorch Geometric</h2>
+    <pre><code>from torch_geometric.nn import GATConv
+
+class GAT(torch.nn.Module):
+    def __init__(self, num_features, num_classes, hidden=8, heads=8):
+        super().__init__()
+        self.conv1 = GATConv(
+            num_features,
+            hidden,
+            heads=heads,
+            dropout=0.6
+        )
+        self.conv2 = GATConv(
+            hidden * heads,
+            num_classes,
+            heads=1,
+            concat=False,
+            dropout=0.6
+        )
+    
+    def forward(self, data):
+        x, edge_index = data.x, data.edge_index
+        
+        x = F.dropout(x, p=0.6, training=self.training)
+        x = F.elu(self.conv1(x, edge_index))
+        x = F.dropout(x, p=0.6, training=self.training)
+        x = self.conv2(x, edge_index)
+        
+        return F.log_softmax(x, dim=1)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 7. Параметры настройки</h2>
+    <table>
+      <tr><th>Параметр</th><th>Значение</th><th>Комментарий</th></tr>
+      <tr><td><code>num_heads</code></td><td>8</td><td>Стандартное значение</td></tr>
+      <tr><td><code>hidden_size</code></td><td>8</td><td>На head, итого 64</td></tr>
+      <tr><td><code>dropout</code></td><td>0.6</td><td>Высокий dropout важен</td></tr>
+      <tr><td><code>alpha</code></td><td>0.2</td><td>LeakyReLU slope</td></tr>
+      <tr><td><code>num_layers</code></td><td>2</td><td>Обычно достаточно</td></tr>
+      <tr><td><code>merge</code></td><td>'cat' / 'mean'</td><td>Конкатенация или усреднение heads</td></tr>
+    </table>
+  </div>
+  <div class="block">
+    <h2>🔷 8. Преимущества GAT</h2>
+    <ul>
+      <li><strong>Адаптивность</strong>: разные веса для разных соседей</li>
+      <li><strong>Interpretable</strong>: attention веса можно визуализировать</li>
+      <li><strong>Inductive</strong>: работает на unseen graphs</li>
+      <li><strong>Нет спектральной зависимости</strong>: не требует полный граф</li>
+      <li><strong>Параллелизация</strong>: attention вычисляется параллельно</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 9. Визуализация attention</h2>
+    <pre><code>import networkx as nx
+import matplotlib.pyplot as plt
+
+def visualize_attention(G, attention_weights, node_features):
+    pos = nx.spring_layout(G)
+    
+    # Размер узлов по важности
+    node_sizes = [attention_weights[i].sum() * 300 for i in G.nodes()]
+    
+    # Рисовать ребра с толщиной по attention
+    for (u, v) in G.edges():
+        alpha = attention_weights[u, v].item()
+        nx.draw_networkx_edges(
+            G, pos,
+            [(u, v)],
+            width=alpha*5,
+            alpha=alpha,
+            edge_color='gray'
+        )
+    
+    nx.draw_networkx_nodes(
+        G, pos,
+        node_size=node_sizes,
+        node_color=range(len(G.nodes())),
+        cmap='viridis'
+    )
+    nx.draw_networkx_labels(G, pos)
+    plt.show()</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 10. GAT vs GCN</h2>
+    <table>
+      <tr><th>Аспект</th><th>GCN</th><th>GAT</th></tr>
+      <tr><td>Веса</td><td>Фиксированные (по структуре)</td><td>Адаптивные (learned)</td></tr>
+      <tr><td>Complexity</td><td>O(|E|d²)</td><td>O(|E|d² + |V|d)</td></tr>
+      <tr><td>Inductive</td><td>Ограничено</td><td>Да</td></tr>
+      <tr><td>Interpretability</td><td>Низкая</td><td>Высокая (attention)</td></tr>
+      <tr><td>Training time</td><td>Быстрее</td><td>Медленнее (attention)</td></tr>
+      <tr><td>Performance</td><td>Хорошо</td><td>Часто лучше</td></tr>
+    </table>
+  </div>
+  <div class="block">
+    <h2>🔷 11. DGL реализация</h2>
+    <pre><code>import dgl
+import dgl.nn as dglnn
+
+class GAT(nn.Module):
+    def __init__(self, in_feats, h_feats, num_classes, num_heads=8):
+        super().__init__()
+        self.conv1 = dglnn.GATConv(in_feats, h_feats, num_heads)
+        self.conv2 = dglnn.GATConv(h_feats*num_heads, num_classes, 1)
+    
+    def forward(self, g, features):
+        h = self.conv1(g, features)
+        h = h.flatten(1)  # concatenate heads
+        h = F.elu(h)
+        h = self.conv2(g, h)
+        h = h.mean(1)  # average heads
+        return h
+
+# Использование
+g = dgl.graph(([0, 1, 2, 3], [1, 2, 3, 0]))
+g.ndata['feat'] = torch.randn(4, 10)
+model = GAT(10, 8, 3)
+logits = model(g, g.ndata['feat'])</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 12. Варианты GAT</h2>
+    <ul>
+      <li><strong>GATv2</strong>: улучшенная attention функция</li>
+      <li><strong>SuperGAT</strong>: attention supervision</li>
+      <li><strong>HAN</strong>: Heterogeneous attention (разные типы узлов/ребер)</li>
+      <li><strong>Transformer-like GAT</strong>: добавить key-query-value</li>
+    </ul>
+    <pre><code># GATv2 (PyTorch Geometric)
+from torch_geometric.nn import GATv2Conv
+
+conv = GATv2Conv(
+    in_channels,
+    out_channels,
+    heads=8,
+    concat=True
+)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 13. Tricks для обучения</h2>
+    <ul>
+      <li><strong>High dropout</strong>: 0.6 на слоях и attention</li>
+      <li><strong>Layer normalization</strong>: перед attention</li>
+      <li><strong>Residual connections</strong>: для глубоких сетей</li>
+      <li><strong>Attention dropout</strong>: отдельный dropout для attention</li>
+      <li><strong>Edge features</strong>: добавить в attention computation</li>
+    </ul>
+    <pre><code>class GATWithResidual(nn.Module):
+    def forward(self, x, adj):
+        h = self.gat1(x, adj)
+        h = h + x  # residual
+        h = F.layer_norm(h, h.shape)
+        return h</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 14. Применения</h2>
+    <table>
+      <tr><th>Область</th><th>Задача</th></tr>
+      <tr><td><strong>NLP</strong></td><td>Синтаксический парсинг, co-reference resolution</td></tr>
+      <tr><td><strong>Chemistry</strong></td><td>Предсказание свойств молекул</td></tr>
+      <tr><td><strong>Social Networks</strong></td><td>Influence propagation, community detection</td></tr>
+      <tr><td><strong>Recommendation</strong></td><td>User-item интеракции</td></tr>
+      <tr><td><strong>Traffic</strong></td><td>Предсказание загруженности дорог</td></tr>
+    </table>
+  </div>
+  <div class="block">
+    <h2>🔷 15. Когда использовать GAT</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо для</h3>
+        <ul>
+          <li>Нужна interpretability (attention веса)</li>
+          <li>Разные соседи имеют разную важность</li>
+          <li>Inductive learning (новые узлы)</li>
+          <li>Heterogeneous graphs</li>
+          <li>Динамические графы</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Осторожно</h3>
+        <ul>
+          <li>Очень большие графы (медленнее GCN)</li>
+          <li>Мало данных (overfit риск)</li>
+          <li>Ограниченные вычислительные ресурсы</li>
+          <li>Простые задачи (GCN может быть достаточно)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать число attention heads (8 стандарт)</li>
+      <li>[ ] Настроить high dropout (0.6)</li>
+      <li>[ ] Использовать ELU или LeakyReLU активацию</li>
+      <li>[ ] Concat heads на первом слое, mean на последнем</li>
+      <li>[ ] Добавить residual connections для >2 слоев</li>
+      <li>[ ] Визуализировать attention веса</li>
+      <li>[ ] Сравнить с GCN baseline</li>
+      <li>[ ] Проверить на overfitting</li>
+    </ul>
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «GAT — это улучшение GCN с механизмом внимания. Модель сама решает, какие соседи важнее для каждого узла, вместо одинаковых весов для всех. Как в команде: не все коллеги одинаково влияют на ваши решения, GAT это учитывает».
+    </blockquote>
+  </div>
+</div>
+</body>
+</html>

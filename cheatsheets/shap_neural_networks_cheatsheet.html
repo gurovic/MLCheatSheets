@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>SHAP для нейросетей Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 SHAP для нейросетей Cheatsheet</h1>
+  <div class="subtitle">SHapley Additive exPlanations • Теория игр для ML<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть SHAP</h2>
+    <ul>
+      <li><strong>Основа</strong>: значения Шепли из теории кооперативных игр</li>
+      <li><strong>Цель</strong>: справедливое распределение вклада каждого признака</li>
+      <li><strong>Аддитивность</strong>: сумма SHAP значений = разница между предсказанием и средним</li>
+      <li><strong>Локальная точность</strong>: точно объясняет конкретное предсказание</li>
+      <li><strong>Consistency</strong>: если признак важнее, его SHAP значение больше</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Математика SHAP</h2>
+    <p><strong>Значение Шепли для признака i:</strong></p>
+    <p>φᵢ = Σ<sub>S⊆N\{i}</sub> |S|!(|N|-|S|-1)!/|N|! [f(S∪{i}) - f(S)]</p>
+    <p>где:</p>
+    <ul>
+      <li>N - все признаки</li>
+      <li>S - подмножество признаков</li>
+      <li>f(S) - предсказание с признаками S</li>
+    </ul>
+    <p><strong>Свойства:</strong></p>
+    <ul>
+      <li>Эффективность: Σφᵢ = f(x) - E[f(X)]</li>
+      <li>Симметрия: одинаковый вклад → одинаковые значения</li>
+      <li>Dummy: нулевой вклад → нулевое значение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код</h2>
+    <pre><code>import shap
+import numpy as np
+
+# Для глубоких моделей
+explainer = shap.DeepExplainer(model, X_train[:100])
+shap_values = explainer.shap_values(X_test[:10])
+
+# Визуализация одного примера
+shap.initjs()
+shap.force_plot(
+    explainer.expected_value,
+    shap_values[0],
+    X_test[0]
+)
+
+# Множество примеров
+shap.summary_plot(shap_values, X_test[:100])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Типы SHAP explainer'ов</h2>
+    <table>
+      <tr><th>Explainer</th><th>Для каких моделей</th><th>Скорость</th></tr>
+      <tr><td><strong>TreeExplainer</strong></td><td>Tree-based (XGBoost, RF)</td><td>Очень быстро</td></tr>
+      <tr><td><strong>DeepExplainer</strong></td><td>PyTorch, TensorFlow</td><td>Быстро</td></tr>
+      <tr><td><strong>GradientExplainer</strong></td><td>Дифференцируемые модели</td><td>Средне</td></tr>
+      <tr><td><strong>KernelExplainer</strong></td><td>Любые (model-agnostic)</td><td>Медленно</td></tr>
+      <tr><td><strong>LinearExplainer</strong></td><td>Линейные модели</td><td>Очень быстро</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. SHAP для PyTorch</h2>
+    <pre><code>import torch
+import shap
+
+# Подготовка данных
+background = X_train[:100]
+test_images = X_test[:5]
+
+# DeepExplainer
+explainer = shap.DeepExplainer(
+    model, 
+    torch.tensor(background).float()
+)
+
+shap_values = explainer.shap_values(
+    torch.tensor(test_images).float()
+)
+
+# Визуализация для изображений
+shap.image_plot(
+    shap_values,
+    -test_images,
+    show=True
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. SHAP для TensorFlow</h2>
+    <pre><code>import tensorflow as tf
+import shap
+
+# Для Keras/TensorFlow модели
+explainer = shap.DeepExplainer(
+    model,
+    X_train[:100]
+)
+
+shap_values = explainer.shap_values(X_test[:10])
+
+# Для GradientTape
+explainer = shap.GradientExplainer(
+    model,
+    X_train[:100]
+)
+
+shap_values = explainer.shap_values(
+    X_test[:10],
+    ranked_outputs=1
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Визуализации SHAP</h2>
+    <p><strong>Force plot</strong>: вклад каждого признака для одного предсказания</p>
+    <pre><code>shap.force_plot(
+    base_value,
+    shap_values[0],
+    features[0]
+)</code></pre>
+    <p><strong>Summary plot</strong>: важность признаков для всего датасета</p>
+    <pre><code>shap.summary_plot(shap_values, X_test)</code></pre>
+    <p><strong>Dependence plot</strong>: как признак влияет на предсказания</p>
+    <pre><code>shap.dependence_plot("feature_name", shap_values, X_test)</code></pre>
+    <p><strong>Waterfall plot</strong>: каскадная диаграмма вклада</p>
+    <pre><code>shap.waterfall_plot(
+    shap.Explanation(
+        values=shap_values[0],
+        base_values=base_value,
+        data=X_test[0]
+    )
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. SHAP для изображений</h2>
+    <pre><code># Для CNN
+def f(x):
+    return model.predict(x)
+
+masker = shap.maskers.Image("inpaint_telea", X_train[0].shape)
+
+explainer = shap.Explainer(f, masker, output_names=classes)
+
+shap_values = explainer(
+    X_test[:3],
+    max_evals=500,
+    batch_size=50
+)
+
+# Визуализация
+shap.image_plot(shap_values)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. SHAP для NLP</h2>
+    <pre><code>import transformers
+import shap
+
+# Для трансформеров
+model = transformers.pipeline(
+    'sentiment-analysis',
+    return_all_scores=True
+)
+
+explainer = shap.Explainer(model)
+
+shap_values = explainer(["I love this product!"])
+
+# Текстовая визуализация
+shap.plots.text(shap_values)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Интерпретация SHAP значений</h2>
+    <ul>
+      <li><strong>Положительное SHAP</strong>: признак увеличивает предсказание</li>
+      <li><strong>Отрицательное SHAP</strong>: признак уменьшает предсказание</li>
+      <li><strong>Величина</strong>: абсолютное значение = сила влияния</li>
+      <li><strong>Base value</strong>: среднее предсказание по обучающей выборке</li>
+      <li><strong>Сумма</strong>: base_value + Σ(shap_values) = предсказание</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Глобальные объяснения</h2>
+    <pre><code># Feature importance
+shap_values_array = np.array(shap_values)
+feature_importance = np.abs(shap_values_array).mean(axis=0)
+
+# Сортировка
+indices = np.argsort(feature_importance)[::-1]
+top_features = [feature_names[i] for i in indices[:10]]
+
+# Bar plot для глобальной важности
+shap.summary_plot(
+    shap_values,
+    X_test,
+    plot_type="bar"
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Оптимизация производительности</h2>
+    <ul>
+      <li><strong>Background data</strong>: используйте 50-100 примеров вместо всей выборки</li>
+      <li><strong>KMeans sampling</strong>: кластеризуйте и берите центроиды</li>
+      <li><strong>Батчинг</strong>: обрабатывайте данные батчами</li>
+      <li><strong>Approximate</strong>: используйте approximate=True для больших моделей</li>
+    </ul>
+    <pre><code># K-Means sampling
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters=50).fit(X_train)
+background = kmeans.cluster_centers_
+
+explainer = shap.DeepExplainer(model, background)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. SHAP vs другие методы</h2>
+    <table>
+      <tr><th>Метод</th><th>Преимущества</th><th>Недостатки</th></tr>
+      <tr><td><strong>SHAP</strong></td><td>Теоретическое обоснование, consistency</td><td>Медленно для больших данных</td></tr>
+      <tr><td><strong>LIME</strong></td><td>Быстрее, проще</td><td>Нестабильно, нет гарантий</td></tr>
+      <tr><td><strong>Feature Importance</strong></td><td>Очень быстро</td><td>Только глобально, не учитывает взаимодействия</td></tr>
+      <tr><td><strong>Grad-CAM</strong></td><td>Специфично для CNN, визуально</td><td>Только для изображений</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Когда использовать SHAP</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо для</h3>
+        <ul>
+          <li>Нужны математически обоснованные объяснения</li>
+          <li>Важна consistency</li>
+          <li>Глобальный и локальный анализ</li>
+          <li>Regulatory compliance</li>
+          <li>Детектирование bias</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не подходит для</h3>
+        <ul>
+          <li>Real-time inference с объяснениями</li>
+          <li>Очень большие модели (без аппроксимаций)</li>
+          <li>Ограниченные вычислительные ресурсы</li>
+          <li>Очень высокоразмерные данные</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Практические советы</h2>
+    <ul>
+      <li><strong>Background size</strong>: 50-100 примеров обычно достаточно</li>
+      <li><strong>Для табличных данных</strong>: используйте TreeExplainer если возможно</li>
+      <li><strong>Для нейросетей</strong>: DeepExplainer быстрее KernelExplainer</li>
+      <li><strong>Sampling</strong>: используйте kmeans для выбора background</li>
+      <li><strong>Интерактивность</strong>: force_plot в Jupyter отлично подходит для презентаций</li>
+      <li><strong>Масштаб</strong>: нормализуйте данные перед вычислением SHAP</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист использования</h2>
+    <ul>
+      <li>[ ] Выбрать подходящий explainer для типа модели</li>
+      <li>[ ] Подготовить background data (50-100 примеров)</li>
+      <li>[ ] Вычислить SHAP значения для тестовых данных</li>
+      <li>[ ] Проверить: сумма SHAP = предсказание - base_value</li>
+      <li>[ ] Создать визуализации (force, summary, dependence)</li>
+      <li>[ ] Интерпретировать результаты в контексте задачи</li>
+      <li>[ ] Проверить на противоречия и аномалии</li>
+      <li>[ ] Документировать находки</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «SHAP показывает, насколько каждый фактор влияет на решение модели. Это как распределение премии в команде: каждый игрок получает справедливую долю в зависимости от вклада. Если модель предсказала высокую цену дома, SHAP покажет, сколько добавили площадь, район, количество комнат и т.д.»
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

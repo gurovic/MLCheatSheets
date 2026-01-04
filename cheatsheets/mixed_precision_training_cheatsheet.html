@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Mixed Precision Training Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⚡ Mixed Precision Training Cheatsheet</h1>
+  <div class="subtitle">FP16/BF16 • Ускорение обучения • Практический фокус<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть Mixed Precision</h2>
+    <ul>
+      <li><strong>Идея</strong>: использовать FP16 (half precision) вместо FP32 для ускорения</li>
+      <li><strong>Mixed</strong>: часть операций в FP16, часть в FP32</li>
+      <li><strong>Преимущества</strong>: 2x скорость, 2x меньше памяти</li>
+      <li><strong>Tensor Cores</strong>: GPU-ускорители для FP16</li>
+      <li><strong>Automatic Mixed Precision (AMP)</strong>: автоматический выбор precision</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Форматы чисел</h2>
+    <table>
+      <tr><th>Тип</th><th>Биты</th><th>Диапазон</th><th>Точность</th></tr>
+      <tr><td><strong>FP32</strong></td><td>32</td><td>~10⁻⁴⁵ до 10³⁸</td><td>7 значащих цифр</td></tr>
+      <tr><td><strong>FP16</strong></td><td>16</td><td>~10⁻⁸ до 65504</td><td>3-4 значащих цифры</td></tr>
+      <tr><td><strong>BF16</strong></td><td>16</td><td>~10⁻⁴⁵ до 10³⁸</td><td>2-3 значащих цифры</td></tr>
+    </table>
+    <p><strong>FP16 структура</strong>: 1 бит знак + 5 бит экспонента + 10 бит мантисса</p>
+    <p><strong>BF16 структура</strong>: 1 бит знак + 8 бит экспонента + 7 бит мантисса</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. PyTorch AMP - базовый код</h2>
+    <pre><code>import torch
+from torch.cuda.amp import autocast, GradScaler
+
+model = MyModel().cuda()
+optimizer = torch.optim.Adam(model.parameters())
+scaler = GradScaler()
+
+for epoch in range(num_epochs):
+    for batch in dataloader:
+        optimizer.zero_grad()
+        
+        # Forward в FP16
+        with autocast():
+            output = model(batch)
+            loss = criterion(output, target)
+        
+        # Backward с gradient scaling
+        scaler.scale(loss).backward()
+        scaler.step(optimizer)
+        scaler.update()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. TensorFlow AMP</h2>
+    <pre><code>import tensorflow as tf
+
+# Включить mixed precision
+policy = tf.keras.mixed_precision.Policy('mixed_float16')
+tf.keras.mixed_precision.set_global_policy(policy)
+
+# Модель автоматически использует FP16
+model = create_model()
+
+# Loss scaling для стабильности
+optimizer = tf.keras.optimizers.Adam()
+optimizer = tf.keras.mixed_precision.LossScaleOptimizer(optimizer)
+
+model.compile(
+    optimizer=optimizer,
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+model.fit(train_data, epochs=10)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Gradient Scaling</h2>
+    <p><strong>Проблема</strong>: градиенты в FP16 могут underflow (стать нулями)</p>
+    <p><strong>Решение</strong>: масштабировать loss перед backward</p>
+    <ol>
+      <li>Loss умножается на scale_factor (обычно 2¹⁶)</li>
+      <li>Backward вычисляет масштабированные градиенты</li>
+      <li>Градиенты делятся на scale_factor перед optimizer.step()</li>
+      <li>Если градиенты inf/nan → уменьшить scale_factor</li>
+    </ol>
+    <pre><code># Ручной gradient scaling
+loss_scaled = loss * scale_factor
+loss_scaled.backward()
+for param in model.parameters():
+    param.grad /= scale_factor
+optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Операции в FP32 vs FP16</h2>
+    <p><strong>Всегда FP32:</strong></p>
+    <ul>
+      <li>Веса модели (master copy)</li>
+      <li>Batch normalization</li>
+      <li>Softmax</li>
+      <li>Layer normalization</li>
+      <li>Loss computation (иногда)</li>
+    </ul>
+    <p><strong>Можно FP16:</strong></p>
+    <ul>
+      <li>Matrix multiplications</li>
+      <li>Convolutions</li>
+      <li>Activations (ReLU, GELU)</li>
+      <li>Attention computations</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. FP16 vs BF16</h2>
+    <table>
+      <tr><th>Аспект</th><th>FP16</th><th>BF16</th></tr>
+      <tr><td>Диапазон</td><td>Узкий (65504 max)</td><td>Широкий (как FP32)</td></tr>
+      <tr><td>Точность</td><td>Выше</td><td>Ниже</td></tr>
+      <tr><td>Overflow риск</td><td>Высокий</td><td>Низкий</td></tr>
+      <tr><td>Gradient scaling</td><td>Обязательно</td><td>Часто не нужно</td></tr>
+      <tr><td>Hardware поддержка</td><td>Большинство GPU</td><td>TPU, A100, H100</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Практические советы</h2>
+    <ul>
+      <li><strong>Batch size</strong>: можно увеличить в 2x благодаря экономии памяти</li>
+      <li><strong>Learning rate</strong>: обычно не требует изменений</li>
+      <li><strong>Gradient accumulation</strong>: хорошо сочетается с AMP</li>
+      <li><strong>Dynamic loss scaling</strong>: используйте по умолчанию</li>
+      <li><strong>Проверка</strong>: убедитесь, что результаты сходятся так же, как в FP32</li>
+      <li><strong>BF16 предпочтительнее</strong>: если GPU поддерживает</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Hugging Face Transformers</h2>
+    <pre><code>from transformers import Trainer, TrainingArguments
+
+training_args = TrainingArguments(
+    output_dir='./results',
+    fp16=True,  # Включить FP16
+    fp16_opt_level='O2',  # Уровень оптимизации
+    # или
+    bf16=True,  # Использовать BF16 вместо FP16
+    per_device_train_batch_size=32,
+    gradient_accumulation_steps=4,
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+)
+
+trainer.train()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Отладка проблем</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Loss становится NaN</td><td>Уменьшить LR, проверить gradient scaling</td></tr>
+      <tr><td>Overflow в forward</td><td>Использовать BF16 или gradient clipping</td></tr>
+      <tr><td>Underflow градиентов</td><td>Увеличить gradient scale factor</td></tr>
+      <tr><td>Не сходится</td><td>Попробовать FP32 для проблемных слоев</td></tr>
+      <tr><td>Нестабильность</td><td>Layer normalization вместо Batch norm</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Мониторинг и профилирование</h2>
+    <pre><code># Проверка использования FP16
+import torch.cuda.amp as amp
+
+with torch.cuda.amp.autocast():
+    # Проверить dtype тензора
+    x = torch.randn(10, 10).cuda()
+    y = model(x)
+    print(y.dtype)  # должно быть torch.float16
+
+# Профилирование
+from torch.profiler import profile, ProfilerActivity
+
+with profile(activities=[ProfilerActivity.CUDA]) as prof:
+    with autocast():
+        output = model(input)
+        loss = criterion(output, target)
+    scaler.scale(loss).backward()
+
+print(prof.key_averages().table())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Ускорение и экономия памяти</h2>
+    <p><strong>Типичное ускорение:</strong></p>
+    <ul>
+      <li>V100: 1.5-2x</li>
+      <li>A100: 2-3x (с Tensor Cores)</li>
+      <li>H100: 3-4x</li>
+    </ul>
+    <p><strong>Экономия памяти:</strong></p>
+    <ul>
+      <li>Активации: 2x меньше</li>
+      <li>Градиенты: 2x меньше</li>
+      <li>Веса: сохраняются в FP32 (no savings)</li>
+      <li>Общая экономия: ~30-40%</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо для</h3>
+        <ul>
+          <li>Обучение больших моделей</li>
+          <li>GPU с Tensor Cores (V100, A100, H100)</li>
+          <li>Batch size ограничен памятью</li>
+          <li>Computer Vision задачи</li>
+          <li>Language Models</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Осторожно</h3>
+        <ul>
+          <li>Очень маленькие значения весов/градиентов</li>
+          <li>Старые GPU без Tensor Cores</li>
+          <li>Задачи требующие высокой численной точности</li>
+          <li>Reinforcement learning (может быть нестабильно)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Apex от NVIDIA</h2>
+    <pre><code># Установка
+pip install apex
+
+from apex import amp
+
+model, optimizer = amp.initialize(
+    model, 
+    optimizer, 
+    opt_level='O2'  # O0, O1, O2, O3
+)
+
+# Обучение
+with amp.scale_loss(loss, optimizer) as scaled_loss:
+    scaled_loss.backward()
+
+# Opt levels:
+# O0: FP32 (baseline)
+# O1: Conservative mixed precision
+# O2: Fast mixed precision  
+# O3: Pure FP16</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Сравнение библиотек</h2>
+    <table>
+      <tr><th>Библиотека</th><th>Плюсы</th><th>Минусы</th></tr>
+      <tr><td><strong>PyTorch AMP</strong></td><td>Встроенная, простая</td><td>Меньше контроля</td></tr>
+      <tr><td><strong>Apex</strong></td><td>Гибкая, opt levels</td><td>Сложная установка</td></tr>
+      <tr><td><strong>TF mixed_precision</strong></td><td>Автоматическая</td><td>Только TensorFlow</td></tr>
+      <tr><td><strong>DeepSpeed</strong></td><td>Для огромных моделей</td><td>Сложная настройка</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Проверить поддержку GPU (Tensor Cores)</li>
+      <li>[ ] Выбрать FP16 или BF16</li>
+      <li>[ ] Добавить autocast для forward pass</li>
+      <li>[ ] Настроить GradScaler для backward</li>
+      <li>[ ] Увеличить batch size при возможности</li>
+      <li>[ ] Мониторить loss на NaN/Inf</li>
+      <li>[ ] Сравнить скорость с FP32</li>
+      <li>[ ] Проверить качество модели</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Mixed Precision — это как использовать разные уровни детализации в разных частях работы. Большинство вычислений делаются быстрее с меньшей точностью, но критические операции остаются точными. Результат: обучение в 2 раза быстрее с той же точностью модели».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

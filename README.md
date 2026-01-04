@@ -184,7 +184,7 @@
 1. [Основы свертки](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_basics_cheatsheet.html)
 1. [Пулинг-слои (Max, Average, Global Pooling)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pooling_layers_cheatsheet.html)
 1. [Архитектуры CNN (LeNet, AlexNet, VGG)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_architectures_cheatsheet.html)
-1. Современные архитектуры ([ResNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/resnet_cheatsheet.html), Inception, EfficientNet)
+1. Современные архитектуры ([ResNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/resnet_cheatsheet.html), [Inception, EfficientNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/inception_efficientnet_cheatsheet.html))
 1. [Attention для Computer Vision (CBAM, SENet)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/vision_attention_mechanisms_cheatsheet.html)
 1. [Neural Architecture Design Patterns](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_architecture_patterns_cheatsheet.html)
 1. [Transfer learning для CNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transfer_learning_cnn_cheatsheet.html)
@@ -281,22 +281,22 @@
 1. [CAM и Grad-CAM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/grad_cam_cheatsheet.html)
 1. [Saliency maps](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/saliency_maps_cheatsheet.html)
 1. [Integrated gradients](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/integrated_gradients_cheatsheet.html)
-1. LIME для нейросетей
-1. SHAP для нейросетей
-1. Concept activation vectors
+1. [LIME для нейросетей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lime_neural_networks_cheatsheet.html)
+1. [SHAP для нейросетей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/shap_neural_networks_cheatsheet.html)
+1. [Concept activation vectors](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/concept_activation_vectors_cheatsheet.html)
 
 ### **13. Оптимизация и ускорение**
 1. [Сжатие моделей (Квантизация, Прунинг, Knowledge Distillation)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_compression_cheatsheet.html)
-1. Mixed precision training
-1. Gradient checkpointing
-1. Distributed training
+1. [Mixed precision training](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mixed_precision_training_cheatsheet.html)
+1. [Gradient checkpointing](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gradient_checkpointing_cheatsheet.html)
+1. [Distributed training](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/distributed_training_cheatsheet.html)
 1. [Neural Architecture Search (NAS)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/nas_cheatsheet.html)
 
 ### **14. Графовые нейронные сети (GNN)**
 1. [Graph Neural Networks Basics (GCN, GAT, GraphSAGE)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gnn_basics_cheatsheet.html)
-1. Graph Convolutional Networks (GCN)
-1. Graph Attention Networks (GAT)
-1. Message Passing Networks
+1. [Graph Convolutional Networks (GCN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gcn_cheatsheet.html)
+1. [Graph Attention Networks (GAT)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gat_cheatsheet.html)
+1. [Message Passing Networks](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/message_passing_networks_cheatsheet.html)
 1. Применения GNN
 
 ### **15. Временные ряды и прогнозирование**
