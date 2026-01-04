@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Алгоритмические подходы к несбалансированным данным Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🛠️ Алгоритмические подходы к несбалансированным данным</h1>
+  <div class="subtitle">Методы на уровне алгоритмов • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Обзор подходов</h2>
+    <p>Три основные стратегии работы с imbalanced data:</p>
+    <ul>
+      <li><strong>Data-level</strong>: ресемплинг (SMOTE, undersampling)</li>
+      <li><strong>Algorithm-level</strong>: модификация алгоритмов</li>
+      <li><strong>Hybrid</strong>: комбинация обоих подходов</li>
+    </ul>
+    <p>Этот cheatsheet — про algorithm-level подходы</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Class Weights (Веса классов)</h2>
+    <p><strong>Идея</strong>: назначить больший штраф за ошибки на минорном классе</p>
+    <pre><code>from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+
+# Auto-балансировка весов
+lr = LogisticRegression(class_weight='balanced')
+rf = RandomForestClassifier(class_weight='balanced')
+svm = SVC(class_weight='balanced')
+
+# Ручная установка весов
+# class_weight={0: 1, 1: 10} 
+# означает ошибка на классе 1 в 10 раз дороже
+lr = LogisticRegression(class_weight={0: 1, 1: 10})
+rf.fit(X_train, y_train)
+
+# Для XGBoost
+import xgboost as xgb
+scale_pos_weight = len(y_train[y_train==0]) / len(y_train[y_train==1])
+model = xgb.XGBClassifier(scale_pos_weight=scale_pos_weight)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Вычисление весов</h2>
+    <pre><code>from sklearn.utils.class_weight import compute_class_weight
+import numpy as np
+
+# Автоматическое вычисление
+classes = np.unique(y_train)
+weights = compute_class_weight(
+    class_weight='balanced',
+    classes=classes,
+    y=y_train
+)
+class_weights = dict(zip(classes, weights))
+print(f"Class weights: {class_weights}")
+
+# Формула: n_samples / (n_classes * n_samples_class)
+# Пример: 1000 samples, 900 класс 0, 100 класс 1
+# weight_0 = 1000 / (2 * 900) = 0.56
+# weight_1 = 1000 / (2 * 100) = 5.0
+
+# Применение
+model = LogisticRegression(class_weight=class_weights)
+model.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Sample Weights</h2>
+    <p>Веса для каждого объекта индивидуально:</p>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+import numpy as np
+
+# Создание весов
+sample_weights = np.ones(len(y_train))
+sample_weights[y_train == 1] = 10  # Минорный класс важнее
+
+# Обучение с весами
+model = RandomForestClassifier()
+model.fit(X_train, y_train, sample_weight=sample_weights)
+
+# Динамические веса (например, по важности)
+# Чем старше данные, тем меньше вес
+time_decay = np.exp(-0.01 * np.arange(len(y_train)))
+combined_weights = sample_weights * time_decay
+model.fit(X_train, y_train, sample_weight=combined_weights)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Threshold Moving</h2>
+    <p>Смещение порога классификации:</p>
+    <pre><code>from sklearn.metrics import precision_recall_curve, f1_score
+import numpy as np
+
+# Получение вероятностей
+y_proba = model.predict_proba(X_val)[:, 1]
+
+# Поиск оптимального порога
+precisions, recalls, thresholds = precision_recall_curve(y_val, y_proba)
+f1_scores = 2 * (precisions * recalls) / (precisions + recalls + 1e-10)
+
+# Максимизация F1
+optimal_idx = np.argmax(f1_scores)
+optimal_threshold = thresholds[optimal_idx]
+print(f"Optimal threshold: {optimal_threshold:.3f}")
+
+# Применение порога
+y_pred = (y_proba >= optimal_threshold).astype(int)
+
+# Альтернатива: максимизация других метрик
+# Максимизация recall при precision >= 0.8
+valid_idx = precisions >= 0.8
+if np.any(valid_idx):
+    best_idx = np.argmax(recalls[valid_idx])
+    threshold = thresholds[valid_idx][best_idx]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Ensemble of Balanced Bagging</h2>
+    <p>Ансамбль на сбалансированных подвыборках:</p>
+    <pre><code>from sklearn.ensemble import BaggingClassifier
+from sklearn.tree import DecisionTreeClassifier
+
+# Balanced Random Forest
+from imblearn.ensemble import BalancedRandomForestClassifier
+
+brf = BalancedRandomForestClassifier(
+    n_estimators=100,
+    random_state=42,
+    sampling_strategy='auto',  # Балансирует каждый bootstrap
+    replacement=True
+)
+brf.fit(X_train, y_train)
+
+# Или ручная реализация через Bagging
+from imblearn.under_sampling import RandomUnderSampler
+
+base_estimator = DecisionTreeClassifier()
+bagging = BaggingClassifier(
+    base_estimator=base_estimator,
+    n_estimators=50,
+    max_samples=0.8,
+    bootstrap=True
+)
+bagging.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Easy Ensemble</h2>
+    <p>Множественный undersampling + ансамбль:</p>
+    <pre><code>from imblearn.ensemble import EasyEnsembleClassifier
+
+# Создает N сбалансированных подвыборок
+# Обучает базовый классификатор на каждой
+# Комбинирует предсказания
+eec = EasyEnsembleClassifier(
+    n_estimators=10,
+    random_state=42,
+    sampling_strategy='auto',  # Балансирует мажоритарный класс
+    replacement=False  # Без возвращения при undersampling
+)
+eec.fit(X_train, y_train)
+y_pred = eec.predict(X_test)
+
+# Преимущества:
+# - Использует все данные минорного класса
+# - Diversity через разные undersampled мажоритарные выборки
+# - Reduce overfitting</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Balanced Bagging Classifier</h2>
+    <pre><code>from imblearn.ensemble import BalancedBaggingClassifier
+from sklearn.tree import DecisionTreeClassifier
+
+bbc = BalancedBaggingClassifier(
+    base_estimator=DecisionTreeClassifier(),
+    n_estimators=50,
+    sampling_strategy='auto',  # Балансирует каждый bootstrap
+    replacement=False,
+    random_state=42
+)
+bbc.fit(X_train, y_train)
+
+# Комбинирует:
+# - Bagging для снижения variance
+# - Random undersampling для баланса
+# - Работает с любым base estimator</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. RUSBoost</h2>
+    <p>Random Undersampling + Boosting:</p>
+    <pre><code>from imblearn.ensemble import RUSBoostClassifier
+
+rusboost = RUSBoostClassifier(
+    n_estimators=50,
+    learning_rate=1.0,
+    algorithm='SAMME.R',  # Real AdaBoost
+    random_state=42
+)
+rusboost.fit(X_train, y_train)
+
+# На каждой итерации boosting:
+# 1. Random undersampling мажоритарного класса
+# 2. Обучение слабого классификатора
+# 3. Обновление весов
+# Combine boosting с балансировкой</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. One-Class Classification</h2>
+    <p>Когда минорный класс крайне редкий (< 1%):</p>
+    <pre><code>from sklearn.svm import OneClassSVM
+from sklearn.ensemble import IsolationForest
+
+# One-Class SVM: обучается только на одном классе
+# Обычно на мажоритарном (normal)
+X_normal = X_train[y_train == 0]
+
+ocsvm = OneClassSVM(
+    kernel='rbf',
+    gamma='auto',
+    nu=0.05  # Expected fraction of outliers
+)
+ocsvm.fit(X_normal)
+
+# Предсказание: 1 = normal, -1 = anomaly
+y_pred = ocsvm.predict(X_test)
+y_pred = (y_pred == -1).astype(int)  # Конвертация в 0/1
+
+# Isolation Forest (лучше для высоких размерностей)
+iso_forest = IsolationForest(
+    contamination=0.01,  # Ожидаемая доля аномалий
+    random_state=42
+)
+iso_forest.fit(X_normal)
+y_pred = iso_forest.predict(X_test)
+y_pred = (y_pred == -1).astype(int)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Focal Loss</h2>
+    <p>Для нейросетей — фокус на hard examples:</p>
+    <pre><code>import tensorflow as tf
+
+def focal_loss(gamma=2.0, alpha=0.25):
+    """
+    Focal Loss для борьбы с class imbalance
+    gamma: фокус на hard examples (обычно 2)
+    alpha: вес положительного класса
+    """
+    def loss(y_true, y_pred):
+        y_pred = tf.clip_by_value(y_pred, 1e-7, 1 - 1e-7)
+        
+        # Binary focal loss
+        pt = tf.where(tf.equal(y_true, 1), y_pred, 1 - y_pred)
+        alpha_t = tf.where(tf.equal(y_true, 1), alpha, 1 - alpha)
+        
+        focal_weight = alpha_t * tf.pow((1 - pt), gamma)
+        loss = -focal_weight * tf.log(pt)
+        
+        return tf.reduce_mean(loss)
+    return loss
+
+# Использование в Keras
+model.compile(
+    optimizer='adam',
+    loss=focal_loss(gamma=2.0, alpha=0.25),
+    metrics=['accuracy']
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Cost-Sensitive Neural Networks</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+# PyTorch: веса классов в loss
+class_weights = torch.tensor([1.0, 10.0])  # Класс 1 важнее
+criterion = nn.CrossEntropyLoss(weight=class_weights)
+
+# Keras/TensorFlow
+from tensorflow.keras.losses import BinaryCrossentropy
+
+# Веса для каждого sample
+loss = BinaryCrossentropy()
+model.compile(optimizer='adam', loss=loss)
+
+# При обучении
+class_weight = {0: 1.0, 1: 10.0}
+model.fit(
+    X_train, y_train,
+    class_weight=class_weight,
+    epochs=50
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Anomaly Detection подходы</h2>
+    <pre><code>from sklearn.covariance import EllipticEnvelope
+from sklearn.neighbors import LocalOutlierFactor
+
+# Elliptic Envelope (предполагает Gaussian распределение)
+ee = EllipticEnvelope(contamination=0.05)
+ee.fit(X_train[y_train == 0])  # Только normal class
+y_pred = ee.predict(X_test)
+y_pred = (y_pred == -1).astype(int)
+
+# Local Outlier Factor
+lof = LocalOutlierFactor(
+    n_neighbors=20,
+    contamination=0.05,
+    novelty=True  # Для predict на новых данных
+)
+lof.fit(X_train[y_train == 0])
+y_pred = lof.predict(X_test)
+y_pred = (y_pred == -1).astype(int)
+
+# Когда использовать:
+# - Крайний дисбаланс (< 1% minority)
+# - Anomaly detection задачи
+# - Fraud detection, intrusion detection</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Cascade/Rejection Classifier</h2>
+    <p>Двухэтапная классификация:</p>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+
+# Этап 1: грубый фильтр (high recall)
+filter_model = RandomForestClassifier(class_weight={0: 1, 1: 20})
+filter_model.fit(X_train, y_train)
+
+# Получить вероятности
+y_proba_filter = filter_model.predict_proba(X_test)[:, 1]
+
+# Выбрать кандидатов (низкий порог для high recall)
+candidates_idx = y_proba_filter >= 0.1
+X_candidates = X_test[candidates_idx]
+
+# Этап 2: точная классификация (high precision)
+if len(X_candidates) > 0:
+    refiner_model = LogisticRegression(class_weight={0: 1, 1: 5})
+    refiner_model.fit(X_train, y_train)
+    y_pred_refined = refiner_model.predict(X_candidates)
+    
+# Итоговые предсказания
+y_pred = np.zeros(len(X_test))
+y_pred[candidates_idx] = y_pred_refined
+
+# Преимущества:
+# - Снижение false positives
+# - Efficiency (не все проходят stage 2)
+# - Можно использовать дорогие модели на stage 2</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Сравнение подходов</h2>
+    <table>
+      <tr><th>Метод</th><th>Преимущества</th><th>Недостатки</th></tr>
+      <tr><td><strong>Class Weights</strong></td><td>Простота, быстро</td><td>Не всегда достаточно</td></tr>
+      <tr><td><strong>Threshold Moving</strong></td><td>Гибкость, бизнес-метрики</td><td>Требует вероятности</td></tr>
+      <tr><td><strong>Balanced Bagging</strong></td><td>Использует все данные</td><td>Вычислительно дорого</td></tr>
+      <tr><td><strong>Easy Ensemble</strong></td><td>Diversity, robustness</td><td>Много моделей</td></tr>
+      <tr><td><strong>One-Class</strong></td><td>Для крайнего дисбаланса</td><td>Теряет информацию</td></tr>
+      <tr><td><strong>Focal Loss</strong></td><td>Для NN, hard examples</td><td>Только для NN</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Практические рекомендации</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <ul>
+          <li>Начинать с class_weight='balanced'</li>
+          <li>Комбинировать с data-level методами</li>
+          <li>Настраивать threshold для бизнес-метрик</li>
+          <li>Использовать ансамбли для robustness</li>
+          <li>Валидировать на правильных метриках</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не делать</h3>
+        <ul>
+          <li>Игнорировать дисбаланс</li>
+          <li>Использовать только accuracy</li>
+          <li>Применять один метод без тестирования альтернатив</li>
+          <li>Забывать про computational cost</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Полный пайплайн</h2>
+    <pre><code>from sklearn.model_selection import cross_val_score
+from sklearn.metrics import f1_score, make_scorer
+
+def train_imbalanced_model(X_train, y_train, X_val, y_val):
+    """Комплексный подход"""
+    
+    # 1. Class weights
+    from sklearn.utils.class_weight import compute_class_weight
+    classes = np.unique(y_train)
+    weights = compute_class_weight('balanced', classes=classes, y=y_train)
+    class_weights = dict(zip(classes, weights))
+    
+    # 2. Balanced ensemble
+    from imblearn.ensemble import BalancedRandomForestClassifier
+    model = BalancedRandomForestClassifier(
+        n_estimators=100,
+        class_weight=class_weights,
+        random_state=42
+    )
+    
+    # 3. Train
+    model.fit(X_train, y_train)
+    
+    # 4. Threshold tuning
+    y_proba = model.predict_proba(X_val)[:, 1]
+    from sklearn.metrics import precision_recall_curve
+    precisions, recalls, thresholds = precision_recall_curve(y_val, y_proba)
+    f1_scores = 2 * (precisions * recalls) / (precisions + recalls + 1e-10)
+    optimal_idx = np.argmax(f1_scores)
+    optimal_threshold = thresholds[optimal_idx]
+    
+    # 5. Final predictions
+    y_pred = (y_proba >= optimal_threshold).astype(int)
+    
+    print(f"Optimal threshold: {optimal_threshold:.3f}")
+    print(f"F1-Score: {f1_score(y_val, y_pred):.3f}")
+    
+    return model, optimal_threshold
+
+model, threshold = train_imbalanced_model(X_train, y_train, X_val, y_val)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист</h2>
+    <ul>
+      <li>[ ] Измерить степень дисбаланса классов</li>
+      <li>[ ] Попробовать class_weight='balanced'</li>
+      <li>[ ] Настроить threshold для целевой метрики</li>
+      <li>[ ] Протестировать ensemble методы</li>
+      <li>[ ] Комбинировать с SMOTE или undersampling</li>
+      <li>[ ] Использовать правильные метрики (F1, PR-AUC)</li>
+      <li>[ ] Cross-validation со stratification</li>
+      <li>[ ] Проверить на hold-out test set</li>
+      <li>[ ] Сравнить с baseline</li>
+      <li>[ ] Визуализировать confusion matrix</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Мы не просто обучаем модель на несбалансированных данных. Мы делаем так, чтобы модель придавала больше внимания редким, но важным случаям — например, мошенничеству или болезням. Это как опытный врач, который особенно внимателен к редким, но опасным симптомам».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
