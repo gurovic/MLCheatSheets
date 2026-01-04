@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Обобщённые линейные модели (GLM) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;color: #333;background: #fafcff;padding: 10px;}}
+    @media print {body {background: white;padding: 0;}@page {size: A4 landscape;margin: 10mm;}}
+    .container {column-count: 3;column-gap: 20px;max-width: 100%;}
+    .block {break-inside: avoid;margin-bottom: 1.2em;padding: 12px;background: white;border-radius: 6px;box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+    h1 {font-size: 1.6em;font-weight: 700;color: #1a5fb4;text-align: center;margin: 0 0 8px;column-span: all;}
+    .subtitle {text-align: center;color: #666;font-size: 0.9em;margin-bottom: 12px;column-span: all;}
+    h2 {font-size: 1.15em;font-weight: 700;color: #1a5fb4;margin: 0 0 8px;padding-bottom: 4px;border-bottom: 1px solid #e0e7ff;}
+    p, ul, ol {font-size: 0.92em;margin: 0.6em 0;}
+    ul, ol {padding-left: 18px;}
+    li {margin-bottom: 4px;}
+    code {font-family: 'Consolas', 'Courier New', monospace;background-color: #f0f4ff;padding: 1px 4px;border-radius: 3px;font-size: 0.88em;}
+    pre {background-color: #f0f4ff;padding: 8px;border-radius: 4px;overflow-x: auto;font-size: 0.84em;margin: 6px 0;}
+    pre code {padding: 0;background: none;white-space: pre-wrap;}
+    strong {color: #1a5fb4;font-weight: 600;}
+    .formula {background: #fff9e6;padding: 6px;border-left: 3px solid #ffcc00;margin: 8px 0;font-style: italic;}
+    table {width: 100%;border-collapse: collapse;font-size: 0.88em;margin: 8px 0;}
+    table th {background-color: #e0e7ff;padding: 6px;text-align: left;font-weight: 600;}
+    table td {padding: 5px 6px;border-bottom: 1px solid #e0e7ff;}
+  </style>
+</head>
+<body>
+<h1>Обобщённые линейные модели (GLM)</h1>
+<div class="subtitle">Generalized Linear Models — расширение линейной регрессии для различных распределений</div>
+<div class="container">
+
+  <div class="block">
+    <h2>1. Основы GLM</h2>
+    <p><strong>Generalized Linear Model</strong> — расширение линейной регрессии.</p>
+    <p><strong>Компоненты GLM:</strong></p>
+    <ul>
+      <li><strong>Линейный предиктор:</strong> η = Xβ</li>
+      <li><strong>Link function:</strong> g(μ) = η</li>
+      <li><strong>Семейство распределений:</strong> y ~ ExpFamily(μ, φ)</li>
+    </ul>
+    <div class="formula">
+      E[Y|X] = μ = g⁻¹(Xβ)
+    </div>
+    <p><strong>Примеры:</strong></p>
+    <ul>
+      <li>Линейная регрессия: g = identity, Normal</li>
+      <li>Логистическая регрессия: g = logit, Bernoulli</li>
+      <li>Пуассоновская регрессия: g = log, Poisson</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>2. Семейства распределений</h2>
+    <table>
+      <tr>
+        <th>Семейство</th>
+        <th>Область</th>
+        <th>Link</th>
+      </tr>
+      <tr>
+        <td>Gaussian</td>
+        <td>Continuous</td>
+        <td>Identity</td>
+      </tr>
+      <tr>
+        <td>Binomial</td>
+        <td>Binary/Count</td>
+        <td>Logit</td>
+      </tr>
+      <tr>
+        <td>Poisson</td>
+        <td>Count ≥ 0</td>
+        <td>Log</td>
+      </tr>
+      <tr>
+        <td>Gamma</td>
+        <td>Positive</td>
+        <td>Inverse</td>
+      </tr>
+      <tr>
+        <td>Inverse Gaussian</td>
+        <td>Positive</td>
+        <td>1/μ²</td>
+      </tr>
+    </table>
+    <pre><code>import statsmodels.api as sm
+from statsmodels.genmod.families import Gaussian, Binomial, Poisson, Gamma
+
+# Выбор семейства
+family = Poisson()
+model = sm.GLM(y, X, family=family)
+result = model.fit()
+print(result.summary())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>3. Link functions</h2>
+    <p><strong>Identity link:</strong> g(μ) = μ</p>
+    <ul>
+      <li>Для Gaussian</li>
+      <li>Классическая линейная регрессия</li>
+    </ul>
+    
+    <p><strong>Logit link:</strong> g(μ) = log(μ/(1-μ))</p>
+    <ul>
+      <li>Для Binomial</li>
+      <li>Логистическая регрессия</li>
+    </ul>
+    
+    <p><strong>Log link:</strong> g(μ) = log(μ)</p>
+    <ul>
+      <li>Для Poisson, Gamma</li>
+      <li>Всегда положительные предсказания</li>
+    </ul>
+    
+    <pre><code>from statsmodels.genmod.families import links
+
+# Logit link для Binomial
+family = Binomial(link=links.logit())
+
+# Probit link
+family = Binomial(link=links.probit())
+
+# Complementary log-log
+family = Binomial(link=links.cloglog())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>4. Logistic Regression как GLM</h2>
+    <p><strong>Binomial family + logit link</strong></p>
+    <pre><code>import statsmodels.api as sm
+
+# GLM подход
+X = sm.add_constant(X_train)
+glm_logit = sm.GLM(
+    y_train,
+    X,
+    family=sm.families.Binomial()
+)
+result = glm_logit.fit()
+
+print(result.summary())
+
+# Предсказания
+y_pred_prob = result.predict(X_test)
+y_pred = (y_pred_prob > 0.5).astype(int)</code></pre>
+    
+    <p><strong>Интерпретация коэффициентов:</strong></p>
+    <ul>
+      <li>exp(β_i): odds ratio для признака i</li>
+      <li>β_i > 0: увеличивает вероятность</li>
+      <li>β_i < 0: уменьшает вероятность</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>5. Poisson Regression</h2>
+    <p><strong>Для count data</strong> (число событий).</p>
+    <div class="formula">
+      log(E[Y|X]) = β₀ + β₁X₁ + ... + β_pX_p
+    </div>
+    
+    <pre><code># Пример: число заболеваний
+X = sm.add_constant(X_train)
+poisson_model = sm.GLM(
+    y_counts,
+    X,
+    family=sm.families.Poisson()
+)
+result = poisson_model.fit()
+
+# Интерпретация
+# exp(β_i): multiplicative effect на count</code></pre>
+    
+    <p><strong>Проверка на overdispersion:</strong></p>
+    <pre><code># Если var(Y) >> E[Y], используй Negative Binomial
+from statsmodels.discrete.count_model import NegativeBinomial
+
+nb_model = NegativeBinomial(y, X)
+nb_result = nb_model.fit()
+
+# Сравнение
+print(f"Poisson AIC: {result.aic}")
+print(f"NegBinom AIC: {nb_result.aic}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>6. Gamma Regression</h2>
+    <p><strong>Для положительных непрерывных данных</strong> с right-skew.</p>
+    
+    <pre><code># Пример: страховые выплаты, время
+X = sm.add_constant(X_train)
+gamma_model = sm.GLM(
+    y_positive,
+    X,
+    family=sm.families.Gamma(link=links.log())
+)
+result = gamma_model.fit()
+print(result.summary())
+
+# Предсказания
+predictions = result.predict(X_test)</code></pre>
+    
+    <p><strong>Применения:</strong></p>
+    <ul>
+      <li>Страховые выплаты</li>
+      <li>Время до события</li>
+      <li>Стоимость с right-skew</li>
+      <li>Альтернатива log-transform + OLS</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>7. Оценка параметров</h2>
+    <p><strong>Maximum Likelihood Estimation (MLE)</strong></p>
+    <div class="formula">
+      β̂ = argmax L(β; y, X)
+    </div>
+    
+    <p><strong>Итеративный процесс:</strong></p>
+    <ul>
+      <li>Iteratively Reweighted Least Squares (IRLS)</li>
+      <li>Fisher scoring</li>
+      <li>Newton-Raphson</li>
+    </ul>
+    
+    <pre><code># Контроль сходимости
+model = sm.GLM(y, X, family=family)
+result = model.fit(
+    maxiter=100,
+    tol=1e-8,
+    method='newton'  # или 'irls'
+)
+
+# Проверка сходимости
+print(f"Converged: {result.converged}")
+print(f"Iterations: {result.fit_history['iteration']}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>8. Диагностика модели</h2>
+    <p><strong>Deviance residuals:</strong></p>
+    <pre><code># Остатки
+residuals = result.resid_deviance
+pearson_resid = result.resid_pearson
+
+# Графики
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+# 1. Residuals vs Fitted
+axes[0,0].scatter(result.fittedvalues, residuals)
+axes[0,0].axhline(y=0, color='r', linestyle='--')
+axes[0,0].set_xlabel('Fitted values')
+axes[0,0].set_ylabel('Deviance residuals')
+
+# 2. QQ plot
+from scipy import stats
+stats.probplot(residuals, dist="norm", plot=axes[0,1])
+
+# 3. Scale-Location
+axes[1,0].scatter(result.fittedvalues, np.sqrt(np.abs(residuals)))
+axes[1,0].set_xlabel('Fitted values')
+axes[1,0].set_ylabel('√|Deviance residuals|')
+
+# 4. Residuals vs Leverage
+from statsmodels.stats.outliers_influence import OLSInfluence
+influence = OLSInfluence(result)
+axes[1,1].scatter(influence.hat_matrix_diag, residuals)
+axes[1,1].set_xlabel('Leverage')
+axes[1,1].set_ylabel('Deviance residuals')
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>9. Goodness of fit</h2>
+    <p><strong>Метрики:</strong></p>
+    <ul>
+      <li><strong>Deviance:</strong> -2(log L_full - log L_model)</li>
+      <li><strong>AIC:</strong> -2 log L + 2p</li>
+      <li><strong>BIC:</strong> -2 log L + p log(n)</li>
+      <li><strong>Pearson χ²:</strong> Σ(y - μ̂)²/V(μ̂)</li>
+    </ul>
+    
+    <pre><code>print(f"Deviance: {result.deviance:.2f}")
+print(f"Pearson χ²: {result.pearson_chi2:.2f}")
+print(f"AIC: {result.aic:.2f}")
+print(f"BIC: {result.bic:.2f}")
+
+# Pseudo R²
+null_model = sm.GLM(y, np.ones(len(y)), family=family)
+null_result = null_model.fit()
+
+pseudo_r2 = 1 - result.deviance / null_result.deviance
+print(f"Pseudo R²: {pseudo_r2:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>10. Hypothesis testing</h2>
+    <p><strong>Wald test:</strong></p>
+    <pre><code># Тест отдельного коэффициента
+print(result.summary())  # p-values в таблице
+
+# Wald test для множества коэффициентов
+from statsmodels.stats.anova import anova_lm
+
+# H0: β_1 = β_2 = 0
+wald_test = result.wald_test('x1 = 0, x2 = 0')
+print(wald_test)</code></pre>
+    
+    <p><strong>Likelihood Ratio Test:</strong></p>
+    <pre><code># Сравнение вложенных моделей
+model_reduced = sm.GLM(y, X_reduced, family=family)
+result_reduced = model_reduced.fit()
+
+# LRT statistic
+lr_stat = -2 * (result_reduced.llf - result.llf)
+df = result.df_model - result_reduced.df_model
+p_value = stats.chi2.sf(lr_stat, df)
+
+print(f"LR statistic: {lr_stat:.2f}")
+print(f"p-value: {p_value:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>11. Пример: GLM pipeline</h2>
+    <pre><code>import pandas as pd
+import numpy as np
+import statsmodels.api as sm
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# Загрузка данных
+df = pd.read_csv('data.csv')
+
+# Разделение
+X = df.drop('target', axis=1)
+y = df['target']
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Масштабирование
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Добавление константы
+X_train_scaled = sm.add_constant(X_train_scaled)
+X_test_scaled = sm.add_constant(X_test_scaled)
+
+# Выбор семейства (Poisson для counts)
+family = sm.families.Poisson()
+
+# Обучение
+model = sm.GLM(y_train, X_train_scaled, family=family)
+result = model.fit()
+
+# Оценка
+y_pred = result.predict(X_test_scaled)
+
+# Метрики
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+mse = mean_squared_error(y_test, y_pred)
+mae = mean_absolute_error(y_test, y_pred)
+
+print(f"MSE: {mse:.2f}")
+print(f"MAE: {mae:.2f}")
+print(f"\nModel Summary:\n{result.summary()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>12. Практические советы</h2>
+    <p><strong>Выбор семейства:</strong></p>
+    <ul>
+      <li>Binary outcome → Binomial</li>
+      <li>Count data → Poisson (или Negative Binomial)</li>
+      <li>Positive continuous → Gamma</li>
+      <li>Normal continuous → Gaussian</li>
+    </ul>
+    
+    <p><strong>Выбор link:</strong></p>
+    <ul>
+      <li>Используйте canonical link (по умолчанию)</li>
+      <li>Logit для Binomial</li>
+      <li>Log для Poisson, Gamma</li>
+    </ul>
+    
+    <p><strong>Проверки:</strong></p>
+    <ul>
+      <li>Проверьте overdispersion для Poisson</li>
+      <li>Смотрите на residual plots</li>
+      <li>Проверьте влиятельные наблюдения</li>
+      <li>Cross-validation для выбора модели</li>
+    </ul>
+    
+    <p><strong>Альтернативы:</strong></p>
+    <ul>
+      <li>Quasi-Poisson для overdispersion</li>
+      <li>Negative Binomial вместо Poisson</li>
+      <li>Zero-inflated models</li>
+      <li>Hurdle models</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

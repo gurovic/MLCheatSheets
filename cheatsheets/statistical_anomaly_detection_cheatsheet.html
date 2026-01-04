@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Статистические методы обнаружения аномалий Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    strong {
+      color: #1a5fb4;
+      font-weight: 600;
+    }
+
+    .formula {
+      background: #fff9e6;
+      padding: 6px;
+      border-left: 3px solid #ffcc00;
+      margin: 8px 0;
+      font-style: italic;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 8px 0;
+    }
+
+    table th {
+      background-color: #e0e7ff;
+      padding: 6px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    table td {
+      padding: 5px 6px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Статистические методы обнаружения аномалий</h1>
+<div class="subtitle">Классические статистические подходы для выявления выбросов и аномалий</div>
+
+<div class="container">
+
+  <div class="block">
+    <h2>1. Z-score метод</h2>
+    <p><strong>Z-score</strong> — количество стандартных отклонений от среднего.</p>
+    
+    <div class="formula">
+      Z = (x - μ) / σ
+    </div>
+    
+    <p><strong>Правило:</strong> |Z| > 3 считается аномалией</p>
+    
+    <pre><code>import numpy as np
+from scipy import stats
+
+def detect_zscore(data, threshold=3):
+    z_scores = np.abs(stats.zscore(data))
+    return z_scores > threshold
+
+# Использование
+anomalies = detect_zscore(df['value'])
+df['is_anomaly'] = anomalies</code></pre>
+    
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Простота вычисления</li>
+      <li>Легко интерпретировать</li>
+      <li>Работает для нормального распределения</li>
+    </ul>
+    
+    <p><strong>Недостатки:</strong></p>
+    <ul>
+      <li>Предполагает нормальность</li>
+      <li>Чувствителен к выбросам в данных</li>
+      <li>Неробастный</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>2. Modified Z-score</h2>
+    <p><strong>Модифицированный Z-score</strong> — использует медиану вместо среднего.</p>
+    
+    <div class="formula">
+      M = 0.6745(x - median) / MAD
+      MAD = median(|x - median|)
+    </div>
+    
+    <p><strong>Порог:</strong> |M| > 3.5</p>
+    
+    <pre><code>def modified_zscore(data, threshold=3.5):
+    median = np.median(data)
+    mad = np.median(np.abs(data - median))
+    modified_z = 0.6745 * (data - median) / mad
+    return np.abs(modified_z) > threshold
+
+# Робастнее обычного Z-score
+anomalies = modified_zscore(df['value'])</code></pre>
+    
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Робастен к выбросам</li>
+      <li>Не требует нормальности</li>
+      <li>Лучше для сильно скошенных распределений</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>3. IQR метод</h2>
+    <p><strong>Interquartile Range</strong> — метод на основе квартилей.</p>
+    
+    <div class="formula">
+      IQR = Q3 - Q1
+      Lower bound = Q1 - 1.5 × IQR
+      Upper bound = Q3 + 1.5 × IQR
+    </div>
+    
+    <pre><code>def detect_iqr(data, k=1.5):
+    Q1 = np.percentile(data, 25)
+    Q3 = np.percentile(data, 75)
+    IQR = Q3 - Q1
+    
+    lower = Q1 - k * IQR
+    upper = Q3 + k * IQR
+    
+    return (data < lower) | (data > upper)
+
+# Стандартные пороги
+anomalies_mild = detect_iqr(df['value'], k=1.5)  # Умеренные выбросы
+anomalies_extreme = detect_iqr(df['value'], k=3)  # Экстремальные</code></pre>
+    
+    <p><strong>Настройка чувствительности:</strong></p>
+    <ul>
+      <li>k = 1.5: стандартный (умеренные выбросы)</li>
+      <li>k = 3.0: экстремальные выбросы</li>
+      <li>k = 2.0-2.5: промежуточный вариант</li>
+    </ul>
+    
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Не зависит от распределения</li>
+      <li>Робастен к выбросам</li>
+      <li>Визуально понятен (boxplot)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>4. Метод Граббса</h2>
+    <p><strong>Grubbs' test</strong> — статистический тест для выявления одного выброса.</p>
+    
+    <div class="formula">
+      G = max|x_i - x̄| / s
+    </div>
+    
+    <p>где s — выборочное стандартное отклонение</p>
+    
+    <pre><code>from scipy import stats
+
+def grubbs_test(data, alpha=0.05):
+    n = len(data)
+    mean = np.mean(data)
+    std = np.std(data, ddof=1)
+    
+    # G статистика
+    G_max = max(abs(data - mean)) / std
+    
+    # Критическое значение
+    t_crit = stats.t.ppf(1 - alpha/(2*n), n-2)
+    G_crit = ((n-1) * np.sqrt(np.square(t_crit))) / np.sqrt(n * (n-2 + np.square(t_crit)))
+    
+    return G_max > G_crit, G_max, G_crit
+
+# Использование
+is_outlier, G, G_crit = grubbs_test(df['value'])
+if is_outlier:
+    print(f"Выброс обнаружен: G={G:.3f} > {G_crit:.3f}")</code></pre>
+    
+    <p><strong>Особенности:</strong></p>
+    <ul>
+      <li>Для одного выброса за раз</li>
+      <li>Предполагает нормальность</li>
+      <li>Итеративное применение для множественных выбросов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>5. Тест Диксона</h2>
+    <p><strong>Dixon's Q test</strong> — для малых выборок (n < 30).</p>
+    
+    <div class="formula">
+      Q = |x_suspect - x_nearest| / range
+    </div>
+    
+    <pre><code>def dixon_test(data, alpha=0.05):
+    """Dixon Q test для выброса на краю"""
+    data_sorted = np.sort(data)
+    n = len(data)
+    
+    # Q для наименьшего
+    Q_low = (data_sorted[1] - data_sorted[0]) / (data_sorted[-1] - data_sorted[0])
+    
+    # Q для наибольшего
+    Q_high = (data_sorted[-1] - data_sorted[-2]) / (data_sorted[-1] - data_sorted[0])
+    
+    # Критические значения (для alpha=0.05)
+    Q_critical = {
+        3: 0.970, 4: 0.829, 5: 0.710, 6: 0.625,
+        7: 0.568, 8: 0.526, 9: 0.493, 10: 0.466
+    }
+    
+    Q_crit = Q_critical.get(n, 0.466)
+    
+    return Q_low > Q_crit or Q_high > Q_crit
+
+# Для малых выборок
+small_sample = df['value'].head(10)
+has_outlier = dixon_test(small_sample)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>6. Boxplot метод</h2>
+    <p><strong>Визуальный анализ с boxplot.</strong></p>
+    
+    <pre><code>import matplotlib.pyplot as plt
+
+def boxplot_analysis(data, column):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Стандартный boxplot
+    ax1.boxplot(data[column])
+    ax1.set_title('Standard Boxplot')
+    ax1.set_ylabel(column)
+    
+    # С аннотированными выбросами
+    bp = ax2.boxplot(data[column], vert=True, patch_artist=True)
+    ax2.set_title('Annotated Boxplot')
+    
+    # Найти выбросы
+    Q1 = data[column].quantile(0.25)
+    Q3 = data[column].quantile(0.75)
+    IQR = Q3 - Q1
+    outliers = data[(data[column] < Q1 - 1.5*IQR) | (data[column] > Q3 + 1.5*IQR)]
+    
+    # Аннотировать
+    for idx, value in outliers[column].items():
+        ax2.text(1.1, value, f'{value:.2f}', fontsize=8)
+    
+    plt.tight_layout()
+    return outliers
+
+outliers_df = boxplot_analysis(df, 'value')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>7. GESD (Generalized ESD)</h2>
+    <p><strong>Generalized Extreme Studentized Deviate</strong> — для множественных выбросов.</p>
+    
+    <pre><code>def generalized_esd(data, max_outliers, alpha=0.05):
+    """
+    Обнаружение до max_outliers выбросов
+    """
+    n = len(data)
+    outliers_indices = []
+    
+    for i in range(max_outliers):
+        data_temp = np.delete(data, outliers_indices)
+        mean = np.mean(data_temp)
+        std = np.std(data_temp, ddof=1)
+        
+        # Находим максимальное отклонение
+        abs_deviations = np.abs(data_temp - mean)
+        max_idx = np.argmax(abs_deviations)
+        max_deviation = abs_deviations[max_idx]
+        
+        # R статистика
+        R = max_deviation / std
+        
+        # Критическое значение
+        p = 1 - alpha / (2 * (n - i))
+        t = stats.t.ppf(p, n - i - 2)
+        lambda_crit = ((n - i - 1) * t) / np.sqrt((n - i - 2 + t**2) * (n - i))
+        
+        if R > lambda_crit:
+            outliers_indices.append(max_idx)
+        else:
+            break
+    
+    return outliers_indices
+
+# Использование
+outlier_indices = generalized_esd(df['value'].values, max_outliers=10)
+df['is_outlier_gesd'] = False
+df.iloc[outlier_indices, df.columns.get_loc('is_outlier_gesd')] = True</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>8. Seasonal Hybrid ESD</h2>
+    <p><strong>Для временных рядов с сезонностью.</strong></p>
+    
+    <pre><code>from statsmodels.tsa.seasonal import seasonal_decompose
+
+def seasonal_esd(data, period=7, max_outliers=10):
+    """
+    ESD с учётом сезонности
+    """
+    # Декомпозиция
+    decomposition = seasonal_decompose(
+        data, 
+        model='additive', 
+        period=period,
+        extrapolate_trend='freq'
+    )
+    
+    # Применить ESD к остаткам
+    residuals = decomposition.resid.dropna()
+    outlier_indices = generalized_esd(residuals.values, max_outliers)
+    
+    return residuals.index[outlier_indices]
+
+# Для временного ряда
+outlier_dates = seasonal_esd(df['value'], period=7, max_outliers=10)
+df['is_seasonal_outlier'] = df.index.isin(outlier_dates)</code></pre>
+    
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Учитывает сезонность</li>
+      <li>Учитывает тренд</li>
+      <li>Множественные выбросы</li>
+      <li>Популярен в индустрии (Twitter's AnomalyDetection)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>9. Chi-square тест</h2>
+    <p><strong>Для категориальных данных.</strong></p>
+    
+    <pre><code>from scipy.stats import chi2
+
+def chi_square_outliers(data, alpha=0.05):
+    """
+    Chi-square тест для многомерных данных
+    """
+    # Предполагаем нормальное распределение
+    mean = np.mean(data, axis=0)
+    cov = np.cov(data.T)
+    
+    # Расстояние Махаланобиса
+    inv_cov = np.linalg.inv(cov)
+    diff = data - mean
+    mahal_dist = np.sum(diff @ inv_cov * diff, axis=1)
+    
+    # Chi-square критическое значение
+    p = data.shape[1]  # размерность
+    chi2_crit = chi2.ppf(1 - alpha, p)
+    
+    return mahal_dist > chi2_crit
+
+# Для многомерных данных
+features = df[['feature1', 'feature2', 'feature3']].values
+outliers = chi_square_outliers(features)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>10. Контрольные карты</h2>
+    <p><strong>Control charts</strong> — из статистического контроля качества.</p>
+    
+    <pre><code>def control_chart(data, window=30, k=3):
+    """
+    Shewhart control chart
+    """
+    # Скользящие среднее и std
+    rolling_mean = data.rolling(window).mean()
+    rolling_std = data.rolling(window).std()
+    
+    # Контрольные границы
+    ucl = rolling_mean + k * rolling_std  # Upper Control Limit
+    lcl = rolling_mean - k * rolling_std  # Lower Control Limit
+    
+    # Выбросы
+    outliers = (data > ucl) | (data < lcl)
+    
+    return outliers, ucl, lcl
+
+# Визуализация
+outliers, ucl, lcl = control_chart(df['value'], window=30, k=3)
+
+plt.figure(figsize=(14, 6))
+plt.plot(df.index, df['value'], label='Data', alpha=0.6)
+plt.plot(df.index, ucl, 'r--', label='UCL', linewidth=2)
+plt.plot(df.index, lcl, 'r--', label='LCL', linewidth=2)
+plt.scatter(df.index[outliers], df['value'][outliers], 
+            color='red', label='Outliers', s=50)
+plt.legend()
+plt.title('Control Chart')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>11. CUSUM (Cumulative Sum)</h2>
+    <p><strong>Кумулятивная сумма</strong> — для обнаружения сдвигов.</p>
+    
+    <div class="formula">
+      S_t = max(0, S_(t-1) + (x_t - μ - k))
+    </div>
+    
+    <pre><code>def cusum(data, target_mean=None, k=0.5, h=5):
+    """
+    CUSUM для обнаружения сдвигов
+    k: допустимый сдвиг (обычно 0.5*sigma)
+    h: порог решения (обычно 4-5*sigma)
+    """
+    if target_mean is None:
+        target_mean = np.mean(data)
+    
+    sigma = np.std(data)
+    k_value = k * sigma
+    h_value = h * sigma
+    
+    # Позитивная и негативная CUSUM
+    s_pos = np.zeros(len(data))
+    s_neg = np.zeros(len(data))
+    
+    for i in range(1, len(data)):
+        s_pos[i] = max(0, s_pos[i-1] + data[i] - target_mean - k_value)
+        s_neg[i] = max(0, s_neg[i-1] - data[i] + target_mean - k_value)
+    
+    # Аномалии
+    outliers = (s_pos > h_value) | (s_neg > h_value)
+    
+    return outliers, s_pos, s_neg
+
+outliers, s_pos, s_neg = cusum(df['value'].values)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>12. Комбинированные методы</h2>
+    <p><strong>Ensemble подход:</strong></p>
+    
+    <pre><code>def ensemble_outlier_detection(data, methods_threshold=0.5):
+    """
+    Комбинация нескольких методов
+    """
+    results = pd.DataFrame(index=data.index)
+    
+    # Метод 1: Z-score
+    results['zscore'] = detect_zscore(data.values)
+    
+    # Метод 2: IQR
+    results['iqr'] = detect_iqr(data.values)
+    
+    # Метод 3: Modified Z-score
+    results['mod_zscore'] = modified_zscore(data.values)
+    
+    # Голосование: аномалия если большинство методов согласны
+    results['ensemble'] = (results.sum(axis=1) / len(results.columns)) > methods_threshold
+    
+    return results
+
+# Использование
+outlier_results = ensemble_outlier_detection(df['value'])
+df['is_outlier_ensemble'] = outlier_results['ensemble']
+
+# Статистика
+print(f"Z-score: {outlier_results['zscore'].sum()} выбросов")
+print(f"IQR: {outlier_results['iqr'].sum()} выбросов")
+print(f"Modified Z-score: {outlier_results['mod_zscore'].sum()} выбросов")
+print(f"Ensemble: {outlier_results['ensemble'].sum()} выбросов")</code></pre>
+    
+    <p><strong>Weighted ensemble:</strong></p>
+    <pre><code>def weighted_ensemble(data, weights=None):
+    if weights is None:
+        weights = {'zscore': 0.3, 'iqr': 0.4, 'mod_zscore': 0.3}
+    
+    results = pd.DataFrame(index=data.index)
+    results['zscore'] = detect_zscore(data.values).astype(float)
+    results['iqr'] = detect_iqr(data.values).astype(float)
+    results['mod_zscore'] = modified_zscore(data.values).astype(float)
+    
+    # Взвешенная сумма
+    score = sum(results[method] * weight for method, weight in weights.items())
+    
+    return score > 0.5</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>

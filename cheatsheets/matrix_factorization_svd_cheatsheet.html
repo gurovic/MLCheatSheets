@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Матричная факторизация (SVD) для рекомендательных систем Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;color: #333;background: #fafcff;padding: 10px;}}
+    @media print {body {background: white;padding: 0;}@page {size: A4 landscape;margin: 10mm;}}
+    .container {column-count: 3;column-gap: 20px;max-width: 100%;}
+    .block {break-inside: avoid;margin-bottom: 1.2em;padding: 12px;background: white;border-radius: 6px;box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+    h1 {font-size: 1.6em;font-weight: 700;color: #1a5fb4;text-align: center;margin: 0 0 8px;column-span: all;}
+    .subtitle {text-align: center;color: #666;font-size: 0.9em;margin-bottom: 12px;column-span: all;}
+    h2 {font-size: 1.15em;font-weight: 700;color: #1a5fb4;margin: 0 0 8px;padding-bottom: 4px;border-bottom: 1px solid #e0e7ff;}
+    p, ul, ol {font-size: 0.92em;margin: 0.6em 0;}
+    ul, ol {padding-left: 18px;}
+    li {margin-bottom: 4px;}
+    code {font-family: 'Consolas', 'Courier New', monospace;background-color: #f0f4ff;padding: 1px 4px;border-radius: 3px;font-size: 0.88em;}
+    pre {background-color: #f0f4ff;padding: 8px;border-radius: 4px;overflow-x: auto;font-size: 0.84em;margin: 6px 0;}
+    pre code {padding: 0;background: none;white-space: pre-wrap;}
+    strong {color: #1a5fb4;font-weight: 600;}
+    .formula {background: #fff9e6;padding: 6px;border-left: 3px solid #ffcc00;margin: 8px 0;font-style: italic;}
+    table {width: 100%;border-collapse: collapse;font-size: 0.88em;margin: 8px 0;}
+    table th {background-color: #e0e7ff;padding: 6px;text-align: left;font-weight: 600;}
+    table td {padding: 5px 6px;border-bottom: 1px solid #e0e7ff;}
+  </style>
+</head>
+<body>
+<h1>Матричная факторизация (SVD) для рекомендательных систем</h1>
+<div class="subtitle">Разложение матриц для collaborative filtering и рекомендаций</div>
+<div class="container">
+
+  <div class="block">
+    <h2>1. Основы SVD</h2>
+<p><strong>Singular Value Decomposition</strong> — разложение матрицы на три матрицы.</p><div class='formula'>A = UΣVᵀ</div><ul><li>U: левые сингулярные векторы (пользователи)</li><li>Σ: сингулярные значения (диагональная)</li><li>V: правые сингулярные векторы (items)</li></ul><pre><code>import numpy as np
+from scipy.linalg import svd
+
+# SVD разложение
+U, sigma, Vt = svd(rating_matrix, full_matrices=False)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>2. SVD для рекомендаций</h2>
+<p><strong>Применение SVD:</strong></p><ul><li>Понижение размерности</li><li>Заполнение пропусков в матрице рейтингов</li><li>Предсказание рейтингов</li></ul><pre><code># Реконструкция с k компонентами
+k = 50
+U_k = U[:, :k]
+sigma_k = np.diag(sigma[:k])
+Vt_k = Vt[:k, :]
+
+# Предсказанные рейтинги
+ratings_pred = U_k @ sigma_k @ Vt_k</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>3. Truncated SVD</h2>
+<p><strong>Усеченное SVD</strong> — только k наибольших сингулярных значений.</p><pre><code>from sklearn.decomposition import TruncatedSVD
+
+svd = TruncatedSVD(n_components=50, random_state=42)
+user_factors = svd.fit_transform(rating_matrix)
+item_factors = svd.components_.T
+
+# Предсказание
+def predict(user_id, item_id):
+    return user_factors[user_id] @ item_factors[item_id]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>4. SVD++ расширение</h2>
+<p><strong>SVD++</strong> — учитывает неявные отзывы.</p><div class='formula'>r̂_ui = μ + b_u + b_i + qᵢᵀ(p_u + |N(u)|^(-0.5)Σ_j∈N(u) y_j)</div><p>где N(u) — множество items с которыми взаимодействовал пользователь u</p>
+  </div>
+
+  <div class="block">
+    <h2>5. Работа с пропусками</h2>
+<p><strong>Проблема:</strong> В реальных данных много пропусков (sparse matrix).</p><pre><code># Заполнение средними
+user_mean = np.nanmean(rating_matrix, axis=1, keepdims=True)
+rating_matrix_filled = np.where(
+    np.isnan(rating_matrix),
+    user_mean,
+    rating_matrix
+)
+
+# Или item mean
+item_mean = np.nanmean(rating_matrix, axis=0, keepdims=True)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>6. NMF (Non-negative Matrix Factorization)</h2>
+<p><strong>Неотрицательная факторизация</strong> — W и H неотрицательны.</p><div class='formula'>A ≈ WH, W ≥ 0, H ≥ 0</div><pre><code>from sklearn.decomposition import NMF
+
+nmf = NMF(n_components=50, init='nndsvd', random_state=42)
+W = nmf.fit_transform(rating_matrix)
+H = nmf.components_
+
+# Предсказанная матрица
+rating_pred = W @ H</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>7. Регуляризованная факторизация</h2>
+<p><strong>С L2 регуляризацией:</strong></p><div class='formula'>min Σ(r_ui - p_uᵀq_i)² + λ(||p_u||² + ||q_i||²)</div><p>Предотвращает переобучение</p><pre><code>from sklearn.decomposition import NMF
+
+nmf = NMF(
+    n_components=50,
+    alpha=0.01,  # L2 regularization
+    l1_ratio=0,
+    random_state=42
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>8. Градиентный спуск для MF</h2>
+<pre><code>def matrix_factorization(R, K, alpha=0.002, beta=0.02, iterations=5000):
+    m, n = R.shape
+    P = np.random.rand(m, K)
+    Q = np.random.rand(n, K)
+    
+    for iteration in range(iterations):
+        for i in range(m):
+            for j in range(n):
+                if R[i, j] > 0:
+                    eij = R[i, j] - np.dot(P[i, :], Q[j, :].T)
+                    P[i, :] += alpha * (2 * eij * Q[j, :] - beta * P[i, :])
+                    Q[j, :] += alpha * (2 * eij * P[i, :] - beta * Q[j, :])
+        
+        if iteration % 100 == 0:
+            print(f'Iteration {iteration}, MSE: {compute_mse(R, P, Q):.4f}')
+    
+    return P, Q</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>9. Оценка качества</h2>
+<p><strong>Метрики:</strong></p><ul><li><strong>RMSE:</strong> корень из среднеквадратичной ошибки</li><li><strong>MAE:</strong> средняя абсолютная ошибка</li><li><strong>Precision@K, Recall@K</strong></li></ul><pre><code>def rmse(true, pred):
+    mask = ~np.isnan(true)
+    return np.sqrt(np.mean((true[mask] - pred[mask]) ** 2))
+
+def mae(true, pred):
+    mask = ~np.isnan(true)
+    return np.mean(np.abs(true[mask] - pred[mask]))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>10. Cold start проблема</h2>
+<p><strong>Решения:</strong></p><ul><li>Гибридные методы (content + collaborative)</li><li>Использование сайд-информации</li><li>Популярные рекомендации для новых</li><li>Feature-based факторизация</li></ul>
+  </div>
+
+</div>
+</body>
+</html>

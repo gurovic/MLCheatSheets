@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Множественная регрессия Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;color: #333;background: #fafcff;padding: 10px;}}
+    @media print {body {background: white;padding: 0;}@page {size: A4 landscape;margin: 10mm;}}
+    .container {column-count: 3;column-gap: 20px;max-width: 100%;}
+    .block {break-inside: avoid;margin-bottom: 1.2em;padding: 12px;background: white;border-radius: 6px;box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+    h1 {font-size: 1.6em;font-weight: 700;color: #1a5fb4;text-align: center;margin: 0 0 8px;column-span: all;}
+    .subtitle {text-align: center;color: #666;font-size: 0.9em;margin-bottom: 12px;column-span: all;}
+    h2 {font-size: 1.15em;font-weight: 700;color: #1a5fb4;margin: 0 0 8px;padding-bottom: 4px;border-bottom: 1px solid #e0e7ff;}
+    p, ul, ol {font-size: 0.92em;margin: 0.6em 0;}
+    ul, ol {padding-left: 18px;}
+    li {margin-bottom: 4px;}
+    code {font-family: 'Consolas', 'Courier New', monospace;background-color: #f0f4ff;padding: 1px 4px;border-radius: 3px;font-size: 0.88em;}
+    pre {background-color: #f0f4ff;padding: 8px;border-radius: 4px;overflow-x: auto;font-size: 0.84em;margin: 6px 0;}
+    pre code {padding: 0;background: none;white-space: pre-wrap;}
+    strong {color: #1a5fb4;font-weight: 600;}
+    .formula {background: #fff9e6;padding: 6px;border-left: 3px solid #ffcc00;margin: 8px 0;font-style: italic;}
+    table {width: 100%;border-collapse: collapse;font-size: 0.88em;margin: 8px 0;}
+    table th {background-color: #e0e7ff;padding: 6px;text-align: left;font-weight: 600;}
+    table td {padding: 5px 6px;border-bottom: 1px solid #e0e7ff;}
+  </style>
+</head>
+<body>
+
+<h1>Множественная регрессия</h1>
+<div class="subtitle">Multiple Linear Regression — моделирование зависимости от нескольких переменных</div>
+
+<div class="container">
+
+  <div class="block">
+    <h2>1. Основы множественной регрессии</h2>
+    <p><strong>Модель:</strong></p>
+    <div class="formula">
+      Y = β₀ + β₁X₁ + β₂X₂ + ... + β_pX_p + ε
+    </div>
+    
+    <p><strong>Матричная форма:</strong></p>
+    <div class="formula">
+      Y = Xβ + ε
+    </div>
+    
+    <p>где:</p>
+    <ul>
+      <li>Y: вектор откликов (n × 1)</li>
+      <li>X: матрица признаков (n × (p+1))</li>
+      <li>β: вектор коэффициентов ((p+1) × 1)</li>
+      <li>ε: вектор ошибок (n × 1)</li>
+    </ul>
+    
+    <p><strong>Предположения:</strong></p>
+    <ul>
+      <li>Линейность между Y и X</li>
+      <li>Независимость наблюдений</li>
+      <li>Гомоскедастичность (const variance)</li>
+      <li>Нормальность остатков</li>
+      <li>Отсутствие мультиколлинеарности</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>2. Оценка параметров (OLS)</h2>
+    <p><strong>Обычный метод наименьших квадратов:</strong></p>
+    <div class="formula">
+      β̂ = (X'X)⁻¹X'Y
+    </div>
+    
+    <p><strong>Минимизируем:</strong></p>
+    <div class="formula">
+      RSS = Σ(y_i - ŷ_i)² = (Y - Xβ)'(Y - Xβ)
+    </div>
+    
+    <pre><code>import numpy as np
+from sklearn.linear_model import LinearRegression
+
+# Метод 1: sklearn
+model = LinearRegression()
+model.fit(X_train, y_train)
+print(f"Coefficients: {model.coef_}")
+print(f"Intercept: {model.intercept_}")
+
+# Метод 2: NumPy
+X_with_intercept = np.column_stack([np.ones(len(X)), X])
+beta = np.linalg.inv(X_with_intercept.T @ X_with_intercept) @ X_with_intercept.T @ y
+print(f"Beta: {beta}")
+
+# Метод 3: statsmodels (для статистики)
+import statsmodels.api as sm
+X_with_const = sm.add_constant(X_train)
+model_sm = sm.OLS(y_train, X_with_const)
+results = model_sm.fit()
+print(results.summary())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>3. Интерпретация коэффициентов</h2>
+    <p><strong>Интерпретация β_i:</strong></p>
+    <ul>
+      <li>Изменение Y при увеличении X_i на 1 единицу</li>
+      <li>При фиксированных остальных X_j (j ≠ i)</li>
+      <li>β₀: значение Y когда все X = 0</li>
+    </ul>
+    
+    <p><strong>Пример:</strong></p>
+    <pre><code># Модель цены дома
+# Y = 50000 + 100*площадь + 10000*комнаты - 5000*возраст
+
+# Интерпретация:
+# - Увеличение площади на 1 кв.м → +100₽
+# - Дополнительная комната → +10000₽
+# - Год возраста → -5000₽
+# - Базовая цена (при 0) = 50000₽
+
+import pandas as pd
+results_df = pd.DataFrame({
+    'feature': ['const', 'area', 'rooms', 'age'],
+    'coef': results.params,
+    'std_err': results.bse,
+    'p_value': results.pvalues
+})
+print(results_df)</code></pre>
+    
+    <p><strong>Стандартизованные коэффициенты:</strong></p>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+model.fit(X_scaled, y)
+
+# Стандартизованные коэффициенты показывают
+# относительную важность признаков
+print("Standardized coefficients:", model.coef_)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>4. Оценка качества модели</h2>
+    <p><strong>R² (коэффициент детерминации):</strong></p>
+    <div class="formula">
+      R² = 1 - SS_res/SS_tot = 1 - Σ(y_i - ŷ_i)²/Σ(y_i - ȳ)²
+    </div>
+    
+    <p><strong>Adjusted R²:</strong></p>
+    <div class="formula">
+      R²_adj = 1 - (1-R²)(n-1)/(n-p-1)
+    </div>
+    
+    <pre><code>from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+
+y_pred = model.predict(X_test)
+
+# Метрики
+r2 = r2_score(y_test, y_pred)
+rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+mae = mean_absolute_error(y_test, y_pred)
+
+print(f"R²: {r2:.4f}")
+print(f"RMSE: {rmse:.2f}")
+print(f"MAE: {mae:.2f}")
+
+# Adjusted R² (из statsmodels)
+print(f"Adj R²: {results.rsquared_adj:.4f}")</code></pre>
+    
+    <p><strong>MSE, RMSE, MAE:</strong></p>
+    <ul>
+      <li><strong>MSE:</strong> среднеквадратичная ошибка</li>
+      <li><strong>RMSE:</strong> корень из MSE (в единицах Y)</li>
+      <li><strong>MAE:</strong> средняя абсолютная ошибка</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>5. Проверка значимости</h2>
+    <p><strong>F-test для всей модели:</strong></p>
+    <div class="formula">
+      F = (SS_reg/p) / (SS_res/(n-p-1))
+    </div>
+    
+    <p>H₀: β₁ = β₂ = ... = β_p = 0</p>
+    
+    <pre><code># Из statsmodels summary
+print(f"F-statistic: {results.fvalue:.2f}")
+print(f"Prob (F-statistic): {results.f_pvalue:.4e}")
+
+# Вручную
+from scipy import stats
+
+SS_reg = np.sum((y_pred - y_train.mean())**2)
+SS_res = np.sum((y_train - y_pred)**2)
+n, p = X_train.shape
+
+F_stat = (SS_reg / p) / (SS_res / (n - p - 1))
+p_value = 1 - stats.f.cdf(F_stat, p, n - p - 1)
+print(f"F = {F_stat:.2f}, p = {p_value:.4e}")</code></pre>
+    
+    <p><strong>t-test для отдельных коэффициентов:</strong></p>
+    <div class="formula">
+      t = β̂_i / SE(β̂_i)
+    </div>
+    
+    <pre><code># Из statsmodels
+for name, coef, pval in zip(X.columns, results.params, results.pvalues):
+    sig = "***" if pval < 0.001 else "**" if pval < 0.01 else "*" if pval < 0.05 else ""
+    print(f"{name:15s}: β={coef:8.3f}, p={pval:.4f} {sig}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>6. Мультиколлинеарность</h2>
+    <p><strong>VIF (Variance Inflation Factor):</strong></p>
+    <div class="formula">
+      VIF_i = 1 / (1 - R²_i)
+    </div>
+    
+    <p>где R²_i — R² регрессии X_i на остальные X</p>
+    
+    <pre><code>from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+# Вычисление VIF
+vif_data = pd.DataFrame()
+vif_data["feature"] = X.columns
+vif_data["VIF"] = [variance_inflation_factor(X.values, i) for i in range(len(X.columns))]
+
+print(vif_data.sort_values('VIF', ascending=False))
+
+# Правило:
+# VIF > 10: серьёзная мультиколлинеарность
+# VIF > 5: умеренная
+# VIF < 5: нормально</code></pre>
+    
+    <p><strong>Решение:</strong></p>
+    <ul>
+      <li>Удалить коррелированные признаки</li>
+      <li>Использовать Ridge регрессию</li>
+      <li>PCA для снижения размерности</li>
+      <li>Комбинировать признаки</li>
+    </ul>
+    
+    <pre><code># Корреляционная матрица
+import seaborn as sns
+
+corr = X.corr()
+sns.heatmap(corr, annot=True, cmap='coolwarm')
+
+# Удалить один из высоко коррелированных
+high_corr = corr.abs() > 0.9
+to_drop = [c for c in high_corr.columns if any(high_corr[c] & (high_corr.index != c))]
+X_reduced = X.drop(columns=to_drop)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>7. Диагностика остатков</h2>
+    <p><strong>Residual plots:</strong></p>
+    <pre><code>import matplotlib.pyplot as plt
+
+residuals = y_train - model.predict(X_train)
+
+fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+# 1. Residuals vs Fitted
+axes[0,0].scatter(model.predict(X_train), residuals, alpha=0.5)
+axes[0,0].axhline(y=0, color='r', linestyle='--')
+axes[0,0].set_xlabel('Fitted values')
+axes[0,0].set_ylabel('Residuals')
+axes[0,0].set_title('Residuals vs Fitted')
+
+# 2. QQ plot
+from scipy import stats
+stats.probplot(residuals, dist="norm", plot=axes[0,1])
+axes[0,1].set_title('Normal Q-Q')
+
+# 3. Scale-Location (гомоскедастичность)
+axes[1,0].scatter(model.predict(X_train), np.sqrt(np.abs(residuals)), alpha=0.5)
+axes[1,0].set_xlabel('Fitted values')
+axes[1,0].set_ylabel('√|Residuals|')
+axes[1,0].set_title('Scale-Location')
+
+# 4. Histogram остатков
+axes[1,1].hist(residuals, bins=30, edgecolor='black')
+axes[1,1].set_xlabel('Residuals')
+axes[1,1].set_ylabel('Frequency')
+axes[1,1].set_title('Histogram of Residuals')
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>8. Тесты на предположения</h2>
+    <p><strong>Нормальность остатков (Shapiro-Wilk):</strong></p>
+    <pre><code>from scipy import stats
+
+stat, p_value = stats.shapiro(residuals)
+print(f"Shapiro-Wilk: W={stat:.4f}, p={p_value:.4f}")
+if p_value > 0.05:
+    print("Остатки распределены нормально")
+else:
+    print("Остатки НЕ нормальны")</code></pre>
+    
+    <p><strong>Гомоскедастичность (Breusch-Pagan):</strong></p>
+    <pre><code>from statsmodels.stats.diagnostic import het_breuschpagan
+
+bp_test = het_breuschpagan(residuals, X_with_const)
+print(f"Breusch-Pagan: LM={bp_test[0]:.2f}, p={bp_test[1]:.4f}")
+if bp_test[1] > 0.05:
+    print("Гомоскедастичность OK")
+else:
+    print("Гетероскедастичность обнаружена")</code></pre>
+    
+    <p><strong>Автокорреляция (Durbin-Watson):</strong></p>
+    <pre><code>from statsmodels.stats.stattools import durbin_watson
+
+dw = durbin_watson(residuals)
+print(f"Durbin-Watson: {dw:.2f}")
+# DW ≈ 2: нет автокорреляции
+# DW < 2: положительная автокорреляция
+# DW > 2: отрицательная автокорреляция</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>9. Взаимодействия и полиномы</h2>
+    <p><strong>Interaction terms:</strong></p>
+    <pre><code>from sklearn.preprocessing import PolynomialFeatures
+
+# Создание взаимодействий
+poly = PolynomialFeatures(degree=2, include_bias=False)
+X_poly = poly.fit_transform(X)
+
+# Названия признаков
+feature_names = poly.get_feature_names_out(X.columns)
+X_poly_df = pd.DataFrame(X_poly, columns=feature_names)
+
+# Обучение
+model_poly = LinearRegression()
+model_poly.fit(X_poly_df, y)
+
+print(f"R² with interactions: {model_poly.score(X_poly_df, y):.4f}")</code></pre>
+    
+    <p><strong>Ручное добавление взаимодействий:</strong></p>
+    <pre><code># Модель: Y = β₀ + β₁X₁ + β₂X₂ + β₃(X₁×X₂)
+X_with_interaction = X.copy()
+X_with_interaction['X1_X2'] = X['X1'] * X['X2']
+
+model.fit(X_with_interaction, y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>10. Feature selection</h2>
+    <p><strong>Forward selection:</strong></p>
+    <pre><code>from sklearn.feature_selection import SequentialFeatureSelector
+from sklearn.linear_model import LinearRegression
+
+sfs = SequentialFeatureSelector(
+    LinearRegression(),
+    n_features_to_select=5,
+    direction='forward',
+    scoring='r2',
+    cv=5
+)
+sfs.fit(X_train, y_train)
+selected_features = X_train.columns[sfs.get_support()]
+print(f"Selected features: {selected_features.tolist()}")</code></pre>
+    
+    <p><strong>Backward elimination:</strong></p>
+    <pre><code>sfs_backward = SequentialFeatureSelector(
+    LinearRegression(),
+    n_features_to_select=5,
+    direction='backward',
+    scoring='r2',
+    cv=5
+)
+sfs_backward.fit(X_train, y_train)</code></pre>
+    
+    <p><strong>По p-values:</strong></p>
+    <pre><code># Удалить признаки с p > 0.05
+significant = results.pvalues < 0.05
+X_significant = X.loc[:, significant[1:]]  # [1:] чтобы пропустить константу
+print(f"Significant features: {X_significant.columns.tolist()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>11. Доверительные интервалы</h2>
+    <p><strong>Для коэффициентов:</strong></p>
+    <pre><code># Из statsmodels
+conf_int = results.conf_int(alpha=0.05)
+results_with_ci = pd.DataFrame({
+    'coef': results.params,
+    'ci_lower': conf_int[0],
+    'ci_upper': conf_int[1]
+})
+print(results_with_ci)</code></pre>
+    
+    <p><strong>Для предсказаний:</strong></p>
+    <pre><code># Confidence interval для E[Y|X]
+from statsmodels.sandbox.regression.predstd import wls_prediction_std
+
+prstd, iv_l, iv_u = wls_prediction_std(results)
+
+# Prediction interval для отдельного Y
+# (учитывает σ²)
+pred = results.get_prediction(X_new)
+pred_summary = pred.summary_frame(alpha=0.05)
+
+print(pred_summary[['mean', 'mean_ci_lower', 'mean_ci_upper',
+                     'obs_ci_lower', 'obs_ci_upper']])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>12. Практические советы</h2>
+    <p><strong>Подготовка данных:</strong></p>
+    <ul>
+      <li>Проверьте пропуски и выбросы</li>
+      <li>Нормализуйте/стандартизуйте при необходимости</li>
+      <li>Проверьте линейность (scatter plots)</li>
+      <li>Обработайте категориальные переменные</li>
+    </ul>
+    
+    <p><strong>При построении модели:</strong></p>
+    <ul>
+      <li>Используйте train/test split или CV</li>
+      <li>Проверяйте VIF для мультиколлинеарности</li>
+      <li>Смотрите на residual plots</li>
+      <li>Проводите тесты на предположения</li>
+      <li>Используйте adjusted R² при сравнении</li>
+    </ul>
+    
+    <p><strong>Улучшение модели:</strong></p>
+    <ul>
+      <li>Feature engineering (взаимодействия, полиномы)</li>
+      <li>Feature selection (отбор значимых)</li>
+      <li>Регуляризация (Ridge, Lasso)</li>
+      <li>Трансформация Y (log, sqrt) при гетероскедастичности</li>
+    </ul>
+    
+    <pre><code># Полный pipeline
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import Ridge
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('poly', PolynomialFeatures(degree=2)),
+    ('regression', Ridge(alpha=1.0))
+])
+
+pipeline.fit(X_train, y_train)
+y_pred = pipeline.predict(X_test)
+print(f"Test R²: {r2_score(y_test, y_pred):.4f}")</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>

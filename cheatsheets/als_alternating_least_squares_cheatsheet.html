@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>ALS (Alternating Least Squares) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;color: #333;background: #fafcff;padding: 10px;}}
+    @media print {body {background: white;padding: 0;}@page {size: A4 landscape;margin: 10mm;}}
+    .container {column-count: 3;column-gap: 20px;max-width: 100%;}
+    .block {break-inside: avoid;margin-bottom: 1.2em;padding: 12px;background: white;border-radius: 6px;box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+    h1 {font-size: 1.6em;font-weight: 700;color: #1a5fb4;text-align: center;margin: 0 0 8px;column-span: all;}
+    .subtitle {text-align: center;color: #666;font-size: 0.9em;margin-bottom: 12px;column-span: all;}
+    h2 {font-size: 1.15em;font-weight: 700;color: #1a5fb4;margin: 0 0 8px;padding-bottom: 4px;border-bottom: 1px solid #e0e7ff;}
+    p, ul, ol {font-size: 0.92em;margin: 0.6em 0;}
+    ul, ol {padding-left: 18px;}
+    li {margin-bottom: 4px;}
+    code {font-family: 'Consolas', 'Courier New', monospace;background-color: #f0f4ff;padding: 1px 4px;border-radius: 3px;font-size: 0.88em;}
+    pre {background-color: #f0f4ff;padding: 8px;border-radius: 4px;overflow-x: auto;font-size: 0.84em;margin: 6px 0;}
+    pre code {padding: 0;background: none;white-space: pre-wrap;}
+    strong {color: #1a5fb4;font-weight: 600;}
+    .formula {background: #fff9e6;padding: 6px;border-left: 3px solid #ffcc00;margin: 8px 0;font-style: italic;}
+    table {width: 100%;border-collapse: collapse;font-size: 0.88em;margin: 8px 0;}
+    table th {background-color: #e0e7ff;padding: 6px;text-align: left;font-weight: 600;}
+    table td {padding: 5px 6px;border-bottom: 1px solid #e0e7ff;}
+  </style>
+</head>
+<body>
+<h1>ALS (Alternating Least Squares)</h1>
+<div class="subtitle">Метод чередующихся наименьших квадратов для рекомендательных систем</div>
+<div class="container">
+
+  <div class="block">
+    <h2>1. Основная идея ALS</h2>
+<p><strong>ALS</strong> — итеративный алгоритм для матричной факторизации.</p><p><strong>Принцип:</strong> Чередуем оптимизацию факторов пользователей и items.</p><div class='formula'>min Σ(r_ui - x_uᵀy_i)² + λ(Σ||x_u||² + Σ||y_i||²)</div>
+  </div>
+
+  <div class="block">
+    <h2>2. Алгоритм ALS</h2>
+<p><strong>Шаги:</strong></p><ol><li>Инициализировать X (user factors) случайно</li><li>Зафиксировать X, оптимизировать Y (item factors)</li><li>Зафиксировать Y, оптимизировать X</li><li>Повторять до сходимости</li></ol><p>Каждый шаг решается как задача наименьших квадратов.</p>
+  </div>
+
+  <div class="block">
+    <h2>3. Реализация с NumPy</h2>
+<pre><code>def als(R, K, lambda_reg=0.1, iterations=10):
+    m, n = R.shape
+    X = np.random.rand(m, K)
+    Y = np.random.rand(n, K)
+    
+    for iteration in range(iterations):
+        # Фиксируем X, обновляем Y
+        for i in range(n):
+            users = np.where(R[:, i] > 0)[0]
+            if len(users) > 0:
+                X_u = X[users, :]
+                r_i = R[users, i]
+                Y[i, :] = np.linalg.solve(
+                    X_u.T @ X_u + lambda_reg * np.eye(K),
+                    X_u.T @ r_i
+                )
+        
+        # Фиксируем Y, обновляем X
+        for u in range(m):
+            items = np.where(R[u, :] > 0)[0]
+            if len(items) > 0:
+                Y_i = Y[items, :]
+                r_u = R[u, items]
+                X[u, :] = np.linalg.solve(
+                    Y_i.T @ Y_i + lambda_reg * np.eye(K),
+                    Y_i.T @ r_u
+                )
+        
+        # Вычислить loss
+        loss = compute_loss(R, X, Y, lambda_reg)
+        print(f'Iteration {iteration}, Loss: {loss:.4f}')
+    
+    return X, Y</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>4. Implicit feedback ALS</h2>
+<p><strong>Для неявной обратной связи</strong> (клики, просмотры, покупки).</p><div class='formula'>min Σ c_ui(p_ui - x_uᵀy_i)² + λ(Σ||x_u||² + Σ||y_i||²)</div><p>где:</p><ul><li>p_ui ∈ {0,1}: предпочтение</li><li>c_ui = 1 + α·r_ui: уверенность</li></ul><pre><code># Библиотека implicit
+from implicit.als import AlternatingLeastSquares
+
+model = AlternatingLeastSquares(
+    factors=50,
+    regularization=0.01,
+    iterations=15,
+    calculate_training_loss=True
+)
+
+model.fit(sparse_item_user_matrix)
+
+# Рекомендации
+recommendations = model.recommend(
+    userid=0,
+    user_items=user_item_matrix[0],
+    N=10
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>5. Weighted ALS</h2>
+<p><strong>Веса для уверенности:</strong></p><pre><code>def weighted_als(R, W, K, lambda_reg=0.1, iterations=10):
+    """
+    W: матрица весов (уверенности)
+    """
+    m, n = R.shape
+    X = np.random.rand(m, K)
+    Y = np.random.rand(n, K)
+    
+    for iteration in range(iterations):
+        # Update Y
+        for i in range(n):
+            W_i = np.diag(W[:, i])
+            Y[i, :] = np.linalg.solve(
+                X.T @ W_i @ X + lambda_reg * np.eye(K),
+                X.T @ W_i @ R[:, i]
+            )
+        
+        # Update X
+        for u in range(m):
+            W_u = np.diag(W[u, :])
+            X[u, :] = np.linalg.solve(
+                Y.T @ W_u @ Y + lambda_reg * np.eye(K),
+                Y.T @ W_u @ R[u, :]
+            )
+    
+    return X, Y</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>6. Spark MLlib ALS</h2>
+<p><strong>Для больших данных:</strong></p><pre><code>from pyspark.ml.recommendation import ALS
+
+als = ALS(
+    maxIter=10,
+    regParam=0.1,
+    userCol='userId',
+    itemCol='itemId',
+    ratingCol='rating',
+    coldStartStrategy='drop',
+    implicitPrefs=False  # True для implicit
+)
+
+model = als.fit(train_df)
+
+# Предсказания
+predictions = model.transform(test_df)
+
+# Топ рекомендации
+user_recs = model.recommendForAllUsers(10)
+item_recs = model.recommendForAllItems(10)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>7. Гиперпараметры ALS</h2>
+<p><strong>Ключевые параметры:</strong></p><ul><li><strong>factors (K):</strong> число латентных факторов (10-200)</li><li><strong>regularization (λ):</strong> регуляризация (0.01-0.1)</li><li><strong>iterations:</strong> число итераций (10-20)</li><li><strong>alpha:</strong> для implicit (1-40)</li></ul><pre><code># Grid search
+from sklearn.model_selection import ParameterGrid
+
+param_grid = {
+    'factors': [50, 100, 150],
+    'regularization': [0.01, 0.05, 0.1],
+    'iterations': [10, 15, 20]
+}
+
+for params in ParameterGrid(param_grid):
+    model = AlternatingLeastSquares(**params)
+    # обучение и валидация</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>8. Оценка качества</h2>
+<pre><code>def precision_at_k(recommended, relevant, k=10):
+    recommended_k = recommended[:k]
+    return len(set(recommended_k) & set(relevant)) / k
+
+def recall_at_k(recommended, relevant, k=10):
+    recommended_k = recommended[:k]
+    return len(set(recommended_k) & set(relevant)) / len(relevant)
+
+def mean_average_precision(recommended, relevant):
+    precisions = []
+    for k in range(1, len(recommended) + 1):
+        if recommended[k-1] in relevant:
+            precisions.append(precision_at_k(recommended, relevant, k))
+    return np.mean(precisions) if precisions else 0</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>9. Преимущества ALS</h2>
+<ul><li>✓ Эффективен для больших sparse матриц</li><li>✓ Параллелизуется легко</li><li>✓ Работает с implicit feedback</li><li>✓ Масштабируется (Spark)</li><li>✓ Гарантирует сходимость</li></ul>
+  </div>
+
+  <div class="block">
+    <h2>10. Практические советы</h2>
+<ul><li>Начните с K=50-100</li><li>Используйте cross-validation</li><li>Нормализуйте рейтинги</li><li>Добавьте side features при возможности</li><li>Мониторьте training loss</li><li>Early stopping по validation метрикам</li></ul>
+  </div>
+
+</div>
+</body>
+</html>

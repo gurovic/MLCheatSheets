@@ -51,7 +51,7 @@
 1. [UMAP](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/umap_cheatsheet.html)
 1. [LDA (Linear Discriminant Analysis)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lda_cheatsheet.html)
 1. [SVD (Singular Value Decomposition)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/svd_cheatsheet.html)
-1. Автоэнкодеры (линейные)
+1. [Автоэнкодеры (линейные)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/linear_autoencoders_cheatsheet.html)
 
 ### **6. Оценка моделей и валидация**
 1. [Метрики классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/classification_metrics_cheatsheet.html)
@@ -72,8 +72,8 @@
 ### **8. Работа с временными рядами (классические методы)**
 1. [ARIMA / SARIMA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_cheatsheet.html)
 1. [Экспоненциальное сглаживание](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/exponential_smoothing_cheatsheet.html)
-1. Методы на основе скользящих средних
-1. Feature Engineering для временных рядов
+1. [Методы на основе скользящих средних](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/moving_averages_cheatsheet.html)
+1. [Feature Engineering для временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_feature_engineering_cheatsheet.html)
 1. [Валидация временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_validation_cheatsheet.html)
 
 ### **9. Обнаружение аномалий**
@@ -81,27 +81,27 @@
 1. [One-Class SVM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/one_class_svm_cheatsheet.html)
 1. [Local Outlier Factor](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/local_outlier_factor_cheatsheet.html)
 1. [Elliptic Envelope](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/elliptic_envelope_cheatsheet.html)
-1. Статистические методы
+1. [Статистические методы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/statistical_anomaly_detection_cheatsheet.html)
 
 ### **10. Рекомендательные системы (классические)**
 1. [Коллаборативная фильтрация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/collaborative_filtering_cheatsheet.html)
 1. [Контентная фильтрация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/content_based_filtering_cheatsheet.html)
-1. Матричная факторизация (SVD)
-1. ALS (Alternating Least Squares)
+1. [Матричная факторизация (SVD)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/matrix_factorization_svd_cheatsheet.html)
+1. [ALS (Alternating Least Squares)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/als_alternating_least_squares_cheatsheet.html)
 
 ### **11. Градиентный бустинг**
 1. [XGBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/xgboost_cheatsheet.html)
 1. [LightGBM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lightgbm_cheatsheet.html)
 1. [CatBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/catboost_cheatsheet.html)
-1. Гиперпараметры градиентного бустинга
+1. [Гиперпараметры градиентного бустинга](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gradient_boosting_hyperparameters_cheatsheet.html)
 1. Особенности и тонкости настройки
 
 ### **12. Статистические методы**
 1. [Статистические методы для ML (Bootstrap, тесты)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/statistical_methods_cheatsheet.html)
-1. Линейные модели (GLM)
-1. Множественная регрессия
+1. [Линейные модели (GLM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/glm_cheatsheet.html)
+1. [Множественная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multiple_regression_cheatsheet.html)
 1. Дисперсионный анализ (ANOVA)
-1. Bootstrap
+1. [Bootstrap](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bootstrap_methods_cheatsheet.html)
 1. Статистическая проверка гипотез
 
 ### **13. Проектирование признаков**
