@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Imitation Learning (Имитационное обучение) — Cheatsheet</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      font-size: 0.9em;
+      color: #666;
+      text-align: center;
+      margin-bottom: 20px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-top: 0;
+      color: #1a5fb4;
+      border-bottom: 2px solid #e0e8f5;
+      padding-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 0.95em;
+      font-weight: 600;
+      margin: 8px 0 4px;
+      color: #26a269;
+    }
+
+    p, ul, ol {
+      margin: 6px 0;
+      font-size: 0.88em;
+      line-height: 1.5;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 3px;
+    }
+
+    code {
+      background: #f6f8fa;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.9em;
+      color: #c7254e;
+    }
+
+    pre {
+      background: #282c34;
+      color: #abb2bf;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.8em;
+      line-height: 1.4;
+      margin: 8px 0;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+      font-size: 0.85em;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #e0e8f5;
+      font-weight: 600;
+      color: #1a5fb4;
+    }
+
+    tr:nth-child(even) {
+      background: #f9fbff;
+    }
+
+    blockquote {
+      background: #fff9e6;
+      border-left: 4px solid #f6d32d;
+      padding: 8px 12px;
+      margin: 8px 0;
+      font-size: 0.88em;
+      font-style: italic;
+    }
+
+    .formula {
+      background: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      margin: 8px 0;
+      font-family: 'Cambria', 'Times New Roman', serif;
+      font-size: 0.9em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎯 Imitation Learning (Имитационное обучение)</h1>
+<div class="subtitle">Learning from Expert Demonstrations</div>
+
+<div class="container">
+
+  <div class="block">
+    <h2>🔷 1. Основная идея</h2>
+    <p>Агент учится политике, наблюдая за экспертом, без явной reward function.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Основная идея
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 2. Behavioral Cloning</h2>
+    <p>Простейший подход: supervised learning на парах (состояние, действие эксперта).</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Behavioral Cloning
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 3. Dataset Aggregation (DAgger)</h2>
+    <p>Итеративный сбор данных: агент действует, эксперт корректирует.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Dataset Aggregation (DAgger)
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 4. Inverse Reinforcement Learning</h2>
+    <p>Восстанавливаем reward function из действий эксперта.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Inverse Reinforcement Learning
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 5. Generative Adversarial Imitation Learning (GAIL)</h2>
+    <p>Использует GAN-подход для имитации: discriminator отличает эксперта от агента.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Generative Adversarial Imitation Learning (GAIL)
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 6. Challenges</h2>
+    <p>Distribution mismatch, compounding errors, expert suboptimality.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Challenges
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 7. Applications</h2>
+    <p>Робототехника, автономные автомобили, игры, манипуляция объектами.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Applications
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 8. Comparison with RL</h2>
+    <p>Не требует reward engineering, но нужны экспертные демонстрации.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Comparison with RL
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 9. Data Requirements</h2>
+    <p>Качество > количество. Нужны разнообразные демонстрации.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Data Requirements
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 10. Evaluation</h2>
+    <p>Success rate на тестовых задачах, сравнение с экспертом.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Evaluation
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 11. Best Practices</h2>
+    <p>Augmentation данных, ensemble of policies, uncertainty estimation.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Best Practices
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 12. Code Examples</h2>
+    <p>Implementations in stable-baselines3, imitation library.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Code Examples
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+</div>
+
+</body>
+</html>

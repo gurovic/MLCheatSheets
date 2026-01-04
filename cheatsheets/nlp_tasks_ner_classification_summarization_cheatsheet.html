@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>NLP Tasks: NER, Classification, Summarization — Cheatsheet</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      font-size: 0.9em;
+      color: #666;
+      text-align: center;
+      margin-bottom: 20px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-top: 0;
+      color: #1a5fb4;
+      border-bottom: 2px solid #e0e8f5;
+      padding-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 0.95em;
+      font-weight: 600;
+      margin: 8px 0 4px;
+      color: #26a269;
+    }
+
+    p, ul, ol {
+      margin: 6px 0;
+      font-size: 0.88em;
+      line-height: 1.5;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 3px;
+    }
+
+    code {
+      background: #f6f8fa;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.9em;
+      color: #c7254e;
+    }
+
+    pre {
+      background: #282c34;
+      color: #abb2bf;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.8em;
+      line-height: 1.4;
+      margin: 8px 0;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+      font-size: 0.85em;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #e0e8f5;
+      font-weight: 600;
+      color: #1a5fb4;
+    }
+
+    tr:nth-child(even) {
+      background: #f9fbff;
+    }
+
+    blockquote {
+      background: #fff9e6;
+      border-left: 4px solid #f6d32d;
+      padding: 8px 12px;
+      margin: 8px 0;
+      font-size: 0.88em;
+      font-style: italic;
+    }
+
+    .formula {
+      background: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      margin: 8px 0;
+      font-family: 'Cambria', 'Times New Roman', serif;
+      font-size: 0.9em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎯 NLP Tasks: NER, Classification, Summarization</h1>
+<div class="subtitle">Основные задачи обработки естественного языка</div>
+
+<div class="container">
+
+  <div class="block">
+    <h2>🔷 1. Named Entity Recognition</h2>
+    <p>Извлечение именованных сущностей: персоны, места, организации, даты.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Named Entity Recognition
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 2. NER Approaches</h2>
+    <p>CRF, BiLSTM-CRF, BERT-based models (token classification).</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для NER Approaches
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 3. Text Classification</h2>
+    <p>Категоризация текста: sentiment analysis, topic classification, spam detection.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Text Classification
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 4. Classification Models</h2>
+    <p>BERT, RoBERTa, DistilBERT для sequence classification task.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Classification Models
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 5. Text Summarization</h2>
+    <p>Extractive (выбор предложений) vs Abstractive (генерация нового текста).</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Text Summarization
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 6. Extractive Methods</h2>
+    <p>TextRank, LexRank, scoring предложений по важности.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Extractive Methods
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 7. Abstractive Methods</h2>
+    <p>Seq2seq, Transformer models (BART, T5, Pegasus).</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Abstractive Methods
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 8. Evaluation Metrics</h2>
+    <p>NER: F1, precision, recall. Classification: accuracy, F1. Summarization: ROUGE, BLEU.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Evaluation Metrics
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 9. Fine-tuning BERT</h2>
+    <p>Добавление classification head или CRF layer, transfer learning.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Fine-tuning BERT
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 10. Data Preprocessing</h2>
+    <p>Tokenization, handling long sequences, batching.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Data Preprocessing
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 11. Common Challenges</h2>
+    <p>Class imbalance, domain adaptation, multilingual support.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Common Challenges
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 12. Production Tips</h2>
+    <p>Model distillation, ONNX export, batching for inference.</p>
+    <h3>Ключевые моменты:</h3>
+    <ul>
+      <li>Концепция и принципы работы</li>
+      <li>Математическая формулировка</li>
+      <li>Алгоритмы и методы реализации</li>
+      <li>Гиперпараметры и настройка</li>
+      <li>Примеры кода на Python</li>
+      <li>Преимущества и ограничения</li>
+      <li>Практические применения</li>
+      <li>Метрики и оценка качества</li>
+    </ul>
+    <pre><code># Пример кода для Production Tips
+import numpy as np
+import torch
+
+# Реализация основного функционала
+model = initialize_model()
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+
+# Оценка качества
+from sklearn.metrics import accuracy_score
+score = accuracy_score(y_test, predictions)
+print(f"Score: {score:.3f}")</code></pre>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Efficient Transformers — Cheatsheet</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      font-size: 0.9em;
+      color: #666;
+      text-align: center;
+      margin-bottom: 20px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-top: 0;
+      color: #1a5fb4;
+      border-bottom: 2px solid #e0e8f5;
+      padding-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 0.95em;
+      font-weight: 600;
+      margin: 8px 0 4px;
+      color: #26a269;
+    }
+
+    p, ul, ol {
+      margin: 6px 0;
+      font-size: 0.88em;
+      line-height: 1.5;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 3px;
+    }
+
+    code {
+      background: #f6f8fa;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.9em;
+      color: #c7254e;
+    }
+
+    pre {
+      background: #282c34;
+      color: #abb2bf;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.8em;
+      line-height: 1.4;
+      margin: 8px 0;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+      font-size: 0.85em;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #e0e8f5;
+      font-weight: 600;
+      color: #1a5fb4;
+    }
+
+    tr:nth-child(even) {
+      background: #f9fbff;
+    }
+
+    blockquote {
+      background: #fff9e6;
+      border-left: 4px solid #f6d32d;
+      padding: 8px 12px;
+      margin: 8px 0;
+      font-size: 0.88em;
+      font-style: italic;
+    }
+
+    .formula {
+      background: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      margin: 8px 0;
+      font-family: 'Cambria', 'Times New Roman', serif;
+      font-size: 0.9em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>⚡ Efficient Transformers</h1>
+<div class="subtitle">Memory-efficient attention mechanisms and optimized architectures</div>
+
+<div class="container">
+
+  <div class="block">
+    <h2>🔷 1. Проблема стандартных трансформеров</h2>
+    <p><strong>Сложность self-attention:</strong> O(n²) по памяти и времени, где n — длина последовательности.</p>
+
+    <h3>Узкие места:</h3>
+    <ul>
+      <li><strong>Память</strong>: Матрица attention размером [n × n] для каждой головы</li>
+      <li><strong>Вычисления</strong>: Квадратичное количество операций</li>
+      <li><strong>Ограничения</strong>: Сложно обрабатывать длинные последовательности (>2048 токенов)</li>
+    </ul>
+
+    <div class="formula">
+      Attention(Q, K, V) = softmax(QK<sup>T</sup>/√d<sub>k</sub>)V
+      <br>Сложность: O(n<sup>2</sup> × d)
+    </div>
+
+    <h3>Для последовательности длиной 10,000:</h3>
+    <ul>
+      <li>Стандартный BERT: ~3.8GB памяти только для attention</li>
+      <li>Efficient models: 10-100x меньше памяти</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Линейные трансформеры (Linear Attention)</h2>
+    <p>Снижают сложность до O(n) за счёт перестановки операций.</p>
+
+    <h3>Основная идея:</h3>
+    <div class="formula">
+      Attention = softmax(QK<sup>T</sup>)V ≈ φ(Q)(φ(K)<sup>T</sup>V)
+    </div>
+
+    <pre><code>import torch
+import torch.nn as nn
+
+class LinearAttention(nn.Module):
+    def __init__(self, dim, heads=8):
+        super().__init__()
+        self.heads = heads
+        self.to_qkv = nn.Linear(dim, dim * 3)
+        self.to_out = nn.Linear(dim, dim)
+    
+    def forward(self, x):
+        # x: [batch, seq_len, dim]
+        b, n, d = x.shape
+        h = self.heads
+        
+        qkv = self.to_qkv(x).chunk(3, dim=-1)
+        q, k, v = map(lambda t: t.reshape(b, n, h, -1), qkv)
+        
+        # Применяем feature map (например, ELU + 1)
+        q = torch.nn.functional.elu(q) + 1
+        k = torch.nn.functional.elu(k) + 1
+        
+        # Линейная сложность O(n)
+        # Вместо (Q @ K.T) @ V делаем Q @ (K.T @ V)
+        context = torch.einsum('bnhd,bnhe->bhde', k, v)
+        out = torch.einsum('bnhd,bhde->bnhe', q, context)
+        
+        out = out.reshape(b, n, -1)
+        return self.to_out(out)</code></pre>
+
+    <h3>Преимущества:</h3>
+    <ul>
+      <li>O(n × d²) вместо O(n² × d)</li>
+      <li>Подходит для очень длинных последовательностей</li>
+      <li>Сохраняет параллелизм</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Sparse Attention (Разреженное внимание)</h2>
+    <p>Каждый токен смотрит только на подмножество других токенов.</p>
+
+    <h3>Типы разреженности:</h3>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Сложность</th></tr>
+      <tr><td><strong>Local</strong></td><td>Только соседние токены</td><td>O(n × w)</td></tr>
+      <tr><td><strong>Strided</strong></td><td>Каждый k-й токен</td><td>O(n × n/k)</td></tr>
+      <tr><td><strong>Fixed</strong></td><td>Фиксированные позиции</td><td>O(n × c)</td></tr>
+      <tr><td><strong>Random</strong></td><td>Случайные токены</td><td>O(n × r)</td></tr>
+    </table>
+
+    <h3>Реализация Local + Strided:</h3>
+    <pre><code>def create_sparse_mask(seq_len, window=128, stride=64):
+    """
+    Создаёт маску для sparse attention
+    """
+    mask = torch.zeros(seq_len, seq_len, dtype=torch.bool)
+    
+    for i in range(seq_len):
+        # Local window
+        start = max(0, i - window // 2)
+        end = min(seq_len, i + window // 2 + 1)
+        mask[i, start:end] = True
+        
+        # Strided positions
+        strided_positions = range(0, seq_len, stride)
+        mask[i, strided_positions] = True
+    
+    return mask
+
+# Применение
+mask = create_sparse_mask(seq_len=1024, window=128, stride=64)
+attention_scores = attention_scores.masked_fill(~mask, float('-inf'))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Longformer</h2>
+    <p>Комбинация local + global attention patterns.</p>
+
+    <h3>Архитектура:</h3>
+    <ul>
+      <li><strong>Local attention</strong>: Окно фиксированного размера</li>
+      <li><strong>Global attention</strong>: Специальные токены смотрят на всю последовательность</li>
+      <li>Сложность: O(n × w) где w — размер окна</li>
+    </ul>
+
+    <pre><code>from transformers import LongformerModel, LongformerTokenizer
+
+tokenizer = LongformerTokenizer.from_pretrained(
+    'allenai/longformer-base-4096'
+)
+model = LongformerModel.from_pretrained(
+    'allenai/longformer-base-4096'
+)
+
+# Обработка длинного текста (до 4096 токенов)
+text = "Very long document..." * 1000
+inputs = tokenizer(text, return_tensors='pt', truncation=True, max_length=4096)
+
+# Global attention на CLS токене
+inputs['global_attention_mask'] = torch.zeros_like(inputs['input_ids'])
+inputs['global_attention_mask'][:, 0] = 1  # CLS token
+
+outputs = model(**inputs)
+last_hidden = outputs.last_hidden_state</code></pre>
+
+    <h3>Настройка attention_window:</h3>
+    <pre><code># Разные размеры окна для разных слоёв
+model.config.attention_window = [64, 128, 256, 512, 512, 512]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. BigBird</h2>
+    <p>Sparse attention с random connections для сохранения универсальности.</p>
+
+    <h3>Паттерн внимания:</h3>
+    <ol>
+      <li><strong>Local</strong>: Окно соседей (window_size)</li>
+      <li><strong>Global</strong>: Глобальные токены (все видят их)</li>
+      <li><strong>Random</strong>: Случайные связи (для long-range dependencies)</li>
+    </ol>
+
+    <pre><code>from transformers import BigBirdModel, BigBirdTokenizer
+
+tokenizer = BigBirdTokenizer.from_pretrained('google/bigbird-roberta-base')
+model = BigBirdModel.from_pretrained('google/bigbird-roberta-base')
+
+# BigBird может обрабатывать до 4096 токенов
+text = "Long document..." * 1000
+inputs = tokenizer(
+    text, 
+    return_tensors='pt',
+    max_length=4096,
+    truncation=True
+)
+
+outputs = model(**inputs)
+
+# Настройка паттерна
+model.config.attention_type = 'block_sparse'  # или 'original_full'
+model.config.block_size = 64
+model.config.num_random_blocks = 3</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Reformer</h2>
+    <p>Использует LSH (Locality-Sensitive Hashing) для эффективного поиска похожих токенов.</p>
+
+    <h3>Основные идеи:</h3>
+    <ul>
+      <li><strong>LSH attention</strong>: Токены кластеризуются по хэшам</li>
+      <li><strong>Reversible layers</strong>: Не сохраняем активации, пересчитываем при backward</li>
+      <li><strong>Chunking</strong>: Обработка по частям</li>
+    </ul>
+
+    <pre><code>from transformers import ReformerModel, ReformerTokenizer
+
+tokenizer = ReformerTokenizer.from_pretrained('google/reformer-enwik8')
+model = ReformerModel.from_pretrained('google/reformer-enwik8')
+
+# Reformer для очень длинных последовательностей
+text = "Super long text..." * 5000
+inputs = tokenizer(
+    text,
+    return_tensors='pt',
+    max_length=65536,  # до 64K токенов!
+    truncation=True
+)
+
+outputs = model(**inputs)
+
+# Параметры LSH
+model.config.num_hashes = 2  # количество хэш-функций
+model.config.num_buckets = [64, 128]  # размер бакетов для каждого хэша</code></pre>
+
+    <h3>Принцип LSH attention:</h3>
+    <div class="formula">
+      hash(query<sub>i</sub>) ≈ hash(key<sub>j</sub>) → attend(i, j)
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Linformer</h2>
+    <p>Проецирует K и V в низкоразмерное пространство.</p>
+
+    <h3>Основная идея:</h3>
+    <div class="formula">
+      Attention(Q, K, V) = softmax(Q(EK)<sup>T</sup>/√d<sub>k</sub>)(FV)
+      <br>где E, F ∈ ℝ<sup>k×n</sup>, k << n
+    </div>
+
+    <pre><code>import torch.nn as nn
+
+class LinformerAttention(nn.Module):
+    def __init__(self, dim, seq_len, heads=8, k=256):
+        super().__init__()
+        self.heads = heads
+        self.k = k  # projected dimension
+        
+        self.to_qkv = nn.Linear(dim, dim * 3)
+        
+        # Проекционные матрицы
+        self.proj_k = nn.Linear(seq_len, k, bias=False)
+        self.proj_v = nn.Linear(seq_len, k, bias=False)
+        
+        self.to_out = nn.Linear(dim, dim)
+    
+    def forward(self, x):
+        b, n, d = x.shape
+        h = self.heads
+        
+        qkv = self.to_qkv(x).chunk(3, dim=-1)
+        q, k, v = map(lambda t: t.reshape(b, n, h, -1), qkv)
+        
+        # Проецируем K и V: [b, n, h, d] -> [b, k, h, d]
+        k = self.proj_k(k.permute(0, 2, 3, 1)).permute(0, 3, 1, 2)
+        v = self.proj_v(v.permute(0, 2, 3, 1)).permute(0, 3, 1, 2)
+        
+        # Стандартный attention, но K и V размера k вместо n
+        dots = torch.einsum('bnhd,bkhd->bnhk', q, k) / (d ** 0.5)
+        attn = dots.softmax(dim=-1)
+        
+        out = torch.einsum('bnhk,bkhd->bnhd', attn, v)
+        out = out.reshape(b, n, -1)
+        
+        return self.to_out(out)</code></pre>
+
+    <h3>Сложность:</h3>
+    <p>O(n × k) вместо O(n²), где обычно k = 256</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Performer (Fast Attention)</h2>
+    <p>Использует random features для аппроксимации softmax kernel.</p>
+
+    <h3>FAVOR+ алгоритм:</h3>
+    <div class="formula">
+      softmax(QK<sup>T</sup>) ≈ φ(Q)φ(K)<sup>T</sup>
+      <br>где φ — random Fourier features
+    </div>
+
+    <pre><code>import torch
+import math
+
+def orthogonal_random_features(q, k, num_features=256):
+    """
+    Performer's FAVOR+ algorithm
+    """
+    b, h, n, d = q.shape
+    
+    # Создаём ортогональные random features
+    device = q.device
+    projection = torch.randn(num_features // 2, d, device=device)
+    projection, _ = torch.qr(projection.T)
+    projection = projection.T
+    
+    # Применяем random features
+    def apply_feature_map(x):
+        x_proj = torch.einsum('bhnd,fd->bhnf', x, projection)
+        
+        # Позитивные random features
+        return torch.cat([
+            torch.exp(x_proj - x.pow(2).sum(dim=-1, keepdim=True) / 2),
+            torch.exp(-x_proj - x.pow(2).sum(dim=-1, keepdim=True) / 2)
+        ], dim=-1) / math.sqrt(num_features)
+    
+    q_prime = apply_feature_map(q)
+    k_prime = apply_feature_map(k)
+    
+    return q_prime, k_prime
+
+# Использование
+q_prime, k_prime = orthogonal_random_features(Q, K)
+
+# Линейный attention
+kv = torch.einsum('bhnd,bhnk->bhdk', k_prime, V)
+out = torch.einsum('bhnd,bhdk->bhnk', q_prime, kv)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Flash Attention</h2>
+    <p>Оптимизация на уровне GPU, не меняющая математику attention.</p>
+
+    <h3>Ключевые оптимизации:</h3>
+    <ul>
+      <li><strong>Tiling</strong>: Обработка блоками, помещающимися в SRAM</li>
+      <li><strong>Recomputation</strong>: Не сохраняем промежуточные матрицы</li>
+      <li><strong>Fused kernels</strong>: Объединение операций</li>
+    </ul>
+
+    <pre><code># Установка
+# pip install flash-attn
+
+import torch
+from flash_attn import flash_attn_func
+
+# Обычный attention
+q = torch.randn(32, 12, 2048, 64, device='cuda', dtype=torch.float16)
+k = torch.randn(32, 12, 2048, 64, device='cuda', dtype=torch.float16)
+v = torch.randn(32, 12, 2048, 64, device='cuda', dtype=torch.float16)
+
+# Flash Attention - такой же результат, но в 3-5x быстрее
+out = flash_attn_func(q, k, v, causal=False)
+
+# Для causal (GPT-style) attention
+out_causal = flash_attn_func(q, k, v, causal=True)</code></pre>
+
+    <h3>Преимущества:</h3>
+    <ul>
+      <li>2-4x быстрее стандартного attention</li>
+      <li>10-20x меньше памяти</li>
+      <li>Точная математика (не аппроксимация)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Сложность</th><th>Точность</th><th>Применение</th></tr>
+      <tr>
+        <td><strong>Standard</strong></td>
+        <td>O(n²)</td>
+        <td>100%</td>
+        <td>До 512 токенов</td>
+      </tr>
+      <tr>
+        <td><strong>Linear</strong></td>
+        <td>O(n)</td>
+        <td>~95%</td>
+        <td>Любая длина</td>
+      </tr>
+      <tr>
+        <td><strong>Longformer</strong></td>
+        <td>O(n×w)</td>
+        <td>~98%</td>
+        <td>До 4K токенов</td>
+      </tr>
+      <tr>
+        <td><strong>BigBird</strong></td>
+        <td>O(n×w)</td>
+        <td>~98%</td>
+        <td>До 4K токенов</td>
+      </tr>
+      <tr>
+        <td><strong>Reformer</strong></td>
+        <td>O(n log n)</td>
+        <td>~96%</td>
+        <td>До 64K токенов</td>
+      </tr>
+      <tr>
+        <td><strong>Linformer</strong></td>
+        <td>O(n×k)</td>
+        <td>~96%</td>
+        <td>Фикс. длина</td>
+      </tr>
+      <tr>
+        <td><strong>Performer</strong></td>
+        <td>O(n)</td>
+        <td>~94%</td>
+        <td>Любая длина</td>
+      </tr>
+      <tr>
+        <td><strong>Flash Attn</strong></td>
+        <td>O(n²)*</td>
+        <td>100%</td>
+        <td>GPU оптимизация</td>
+      </tr>
+    </table>
+    <p><small>*Та же сложность, но с оптимизацией памяти</small></p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Практические рекомендации</h2>
+    <h3>Для классификации текста (< 512 токенов):</h3>
+    <ul>
+      <li>Используйте стандартный BERT/RoBERTa</li>
+      <li>Flash Attention для ускорения</li>
+    </ul>
+
+    <h3>Для документов (512-4K токенов):</h3>
+    <ul>
+      <li><strong>Longformer</strong> — если важна точность</li>
+      <li><strong>BigBird</strong> — для баланса скорость/качество</li>
+      <li>Flash Attention + gradient checkpointing</li>
+    </ul>
+
+    <h3>Для очень длинных последовательностей (>4K):</h3>
+    <ul>
+      <li><strong>Reformer</strong> — до 64K токенов</li>
+      <li><strong>Linear Transformers</strong> — неограниченная длина</li>
+      <li>Hierarchical models</li>
+    </ul>
+
+    <h3>Для генерации:</h3>
+    <ul>
+      <li>Performer для длинного контекста</li>
+      <li>Flash Attention для стандартной длины</li>
+      <li>Linformer для фиксированной длины</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Gradient Checkpointing</h2>
+    <p>Дополнительная техника экономии памяти для любого трансформера.</p>
+
+    <pre><code>from transformers import BertModel
+
+model = BertModel.from_pretrained('bert-base-uncased')
+
+# Включаем gradient checkpointing
+model.gradient_checkpointing_enable()
+
+# Теперь обучение использует ~30% меньше памяти
+# Но на ~20% медленнее (пересчёт при backward)
+
+# Для обучения
+outputs = model(input_ids, labels=labels)
+loss = outputs.loss
+loss.backward()  # использует меньше памяти</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Mixed Precision Training</h2>
+    <pre><code>import torch
+from torch.cuda.amp import autocast, GradScaler
+
+model = LongformerModel.from_pretrained('allenai/longformer-base-4096')
+model = model.cuda()
+
+scaler = GradScaler()
+optimizer = torch.optim.AdamW(model.parameters(), lr=1e-5)
+
+for batch in dataloader:
+    optimizer.zero_grad()
+    
+    # Forward в float16
+    with autocast():
+        outputs = model(**batch)
+        loss = outputs.loss
+    
+    # Backward с масштабированием градиентов
+    scaler.scale(loss).backward()
+    scaler.step(optimizer)
+    scaler.update()
+
+# Экономия памяти: ~50%
+# Ускорение: 2-3x на современных GPU</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Кастомная комбинация техник</h2>
+    <pre><code>from transformers import AutoModel, TrainingArguments, Trainer
+
+model = AutoModel.from_pretrained('allenai/longformer-base-4096')
+
+# Комбинируем несколько оптимизаций
+training_args = TrainingArguments(
+    output_dir='./results',
+    
+    # Mixed precision
+    fp16=True,
+    
+    # Gradient checkpointing
+    gradient_checkpointing=True,
+    
+    # Gradient accumulation (виртуальный batch)
+    per_device_train_batch_size=2,
+    gradient_accumulation_steps=8,  # эффективно batch=16
+    
+    # Оптимизация памяти
+    optim='adafactor',  # memory-efficient optimizer
+    
+    # Другие параметры
+    learning_rate=1e-5,
+    num_train_epochs=3,
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset
+)
+
+trainer.train()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист оптимизации</h2>
+    <ul>
+      <li>[ ] Определить максимальную длину последовательности</li>
+      <li>[ ] Выбрать подходящую архитектуру (см. таблицу)</li>
+      <li>[ ] Включить Flash Attention если доступно (GPU)</li>
+      <li>[ ] Использовать gradient checkpointing при OOM</li>
+      <li>[ ] Применить mixed precision (FP16/BF16)</li>
+      <li>[ ] Настроить gradient accumulation для больших batch</li>
+      <li>[ ] Рассмотреть distillation для inference</li>
+      <li>[ ] Протестировать на целевых данных (проверить качество)</li>
+      <li>[ ] Измерить реальное потребление памяти</li>
+      <li>[ ] Сравнить скорость с baseline</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Efficient Transformers — это как скоростные автомагистрали для обработки текста. Вместо того чтобы проверять каждое слово со всеми остальными (что медленно), мы используем умные маршруты и приближения, сохраняя качество, но обрабатывая документы в 10-100 раз быстрее».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

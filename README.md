@@ -92,7 +92,7 @@
 1. [LightGBM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lightgbm_cheatsheet.html)
 1. [CatBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/catboost_cheatsheet.html)
 1. [Гиперпараметры градиентного бустинга](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gradient_boosting_hyperparameters_cheatsheet.html)
-1. Особенности и тонкости настройки
+1. [Особенности и тонкости настройки ансамблей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ensemble_tuning_cheatsheet.html)
 
 ### **12. Статистические методы**
 1. [Статистические методы для ML (Bootstrap, тесты)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/statistical_methods_cheatsheet.html)
@@ -112,7 +112,7 @@
 
 ### **14. Работа с несбалансированными данными**
 1. [Методы семплирования (SMOTE и др.)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/smote_imbalanced_cheatsheet.html)
-1. Веса классов
+1. [Cost-Sensitive Learning и веса классов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cost_sensitive_learning_cheatsheet.html)
 1. Метрики для несбалансированных данных
 1. Алгоритмические подходы
 
@@ -156,13 +156,13 @@
 1. [Scikit-learn полный обзор](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/sklearn_overview_cheatsheet.html)
 1. [Pandas для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pandas_ml_cheatsheet.html)
 1. [NumPy для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/numpy_ml_cheatsheet.html)
-1. Matplotlib/Seaborn для визуализации
+1. [Matplotlib/Seaborn для визуализации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/matplotlib_seaborn_ml_cheatsheet.html)
 
 ### **21. Дополнительные темы**
 1. [Active Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/active_learning_cheatsheet.html)
 1. [Transfer Learning (классические подходы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transfer_learning_cheatsheet.html)
 1. Multi-task Learning
-1. Multi-output модели
+1. [Multi-output регрессионные модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multi_output_regression_cheatsheet.html)
 1. [Квантильная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantile_regression_cheatsheet.html)
 
 ## II Глубокое обучение
@@ -211,13 +211,13 @@
 1. [Positional Encoding](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/positional_encoding_cheatsheet.html)
 1. [BERT и языковые модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bert_language_models_cheatsheet.html)
 1. [Vision Transformers (ViT)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/vision_transformers_vit_cheatsheet.html)
-1. Efficient Transformers
+1. [Efficient Transformers (Memory-efficient attention)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/efficient_transformers_cheatsheet.html)
 
 ### **5. Генеративные модели**
 1. [Автоэнкодеры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/autoencoders_cheatsheet.html)
 1. [Вариационные автоэнкодеры (VAE)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/vae_cheatsheet.html)
 1. [Генеративно-состязательные сети (GAN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gan_cheatsheet.html)
-1. DCGAN, Conditional GAN
+1. [DCGAN и Conditional GAN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dcgan_conditional_gan_cheatsheet.html)
 1. StyleGAN
 1. [Diffusion модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/diffusion_models_cheatsheet.html)
 1. [Нормализующие потоки (Normalizing Flows)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/normalizing_flows_cheatsheet.html)
@@ -229,7 +229,7 @@
 1. [PPO (Proximal Policy Optimization)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ppo_reinforcement_learning_cheatsheet.html)
 1. Многозадачное RL
 1. Иерархическое RL
-1. Имитационное обучение
+1. [Имитационное обучение (Imitation Learning)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/imitation_learning_cheatsheet.html)
 
 ### **7. Обработка естественного языка (NLP)**
 1. [Векторные представления слов (Word2Vec, GloVe, FastText)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/word_embeddings_cheatsheet.html)
@@ -239,14 +239,14 @@
 1. [GPT-архитектуры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gpt_architectures_cheatsheet.html)
 1. [Prompt Engineering для LLM (ChatGPT, GPT-4, Claude)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/prompt_engineering_cheatsheet.html)
 1. [Токенизация (BPE, WordPiece, SentencePiece)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tokenization_cheatsheet.html)
-1. Задачи NLP (NER, классификация, суммаризация)
+1. [Задачи NLP (NER, классификация, суммаризация)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/nlp_tasks_ner_classification_summarization_cheatsheet.html)
 
 ### **8. Компьютерное зрение (Computer Vision)**
 1. Классификация изображений
 1. [Детекция объектов (YOLO, SSD, Faster R-CNN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/yolo_cheatsheet.html)
 1. [Детекция объектов - Faster R-CNN, SSD, RetinaNet, EfficientDet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/object_detection_cheatsheet.html)
 1. [Сегментация изображений (U-Net, DeepLab, Mask R-CNN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/image_segmentation_cheatsheet.html)
-1. Детекция ключевых точек
+1. [Детекция ключевых точек и оценка позы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/keypoint_detection_pose_estimation_cheatsheet.html)
 1. Слежение за объектами
 1. Оценка позы человека
 1. 3D Computer Vision
@@ -542,7 +542,7 @@
 
 ### **19. Мультимодальное обучение (классическое)**
 1. Early fusion и late fusion
-1. Canonical correlation analysis (CCA)
+1. [Canonical Correlation Analysis (CCA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/canonical_correlation_analysis_cheatsheet.html)
 1. Kernel CCA
 1. Multi-view learning
 1. Co-training
