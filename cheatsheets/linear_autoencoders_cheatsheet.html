@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Линейные автоэнкодеры Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    strong {
+      color: #1a5fb4;
+      font-weight: 600;
+    }
+
+    .formula {
+      background: #fff9e6;
+      padding: 6px;
+      border-left: 3px solid #ffcc00;
+      margin: 8px 0;
+      font-style: italic;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 8px 0;
+    }
+
+    table th {
+      background-color: #e0e7ff;
+      padding: 6px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    table td {
+      padding: 5px 6px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Линейные автоэнкодеры (Linear Autoencoders)</h1>
+<div class="subtitle">Простейший тип автоэнкодеров для понижения размерности и извлечения признаков</div>
+
+<div class="container">
+
+  <div class="block">
+    <h2>1. Основные концепции</h2>
+    <p><strong>Линейный автоэнкодер</strong> — это нейронная сеть без нелинейных функций активации, которая обучается восстанавливать входные данные через узкое скрытое представление.</p>
+    
+    <p><strong>Архитектура:</strong></p>
+    <ul>
+      <li><strong>Энкодер:</strong> x → h = W₁ᵀx + b₁</li>
+      <li><strong>Декодер:</strong> h → x̂ = W₂ᵀh + b₂</li>
+      <li>Размерность: n → k → n (k < n)</li>
+    </ul>
+    
+    <p><strong>Функция потерь:</strong></p>
+    <div class="formula">
+      L = ||x - x̂||² = ||x - W₂ᵀ(W₁ᵀx + b₁) + b₂||²
+    </div>
+    
+    <p><strong>Связь с PCA:</strong> При определённых условиях линейный автоэнкодер эквивалентен PCA.</p>
+  </div>
+
+  <div class="block">
+    <h2>2. Математическая основа</h2>
+    <p><strong>Задача оптимизации:</strong></p>
+    <div class="formula">
+      min_{W₁,W₂,b₁,b₂} Σᵢ ||xᵢ - f_decode(f_encode(xᵢ))||²
+    </div>
+    
+    <p><strong>При связанных весах (tied weights):</strong></p>
+    <ul>
+      <li>W₂ = W₁ (транспонированные)</li>
+      <li>Уменьшает количество параметров</li>
+      <li>Симметричная архитектура</li>
+    </ul>
+    
+    <p><strong>Градиенты:</strong></p>
+    <ul>
+      <li>∂L/∂W₂ = -2(x - x̂)hᵀ</li>
+      <li>∂L/∂W₁ = -2W₂(x - x̂)xᵀ</li>
+      <li>Обучение методом обратного распространения</li>
+    </ul>
+    
+    <p><strong>Условия оптимальности:</strong></p>
+    <p>При обучении до сходимости линейный автоэнкодер находит подпространство, максимизирующее дисперсию данных.</p>
+  </div>
+
+  <div class="block">
+    <h2>3. Связь с PCA</h2>
+    <p><strong>Теоретическая связь:</strong></p>
+    <ul>
+      <li>Линейный автоэнкодер с MSE loss ≈ PCA</li>
+      <li>Оба находят главные компоненты</li>
+      <li>Разница в методе оптимизации</li>
+    </ul>
+    
+    <p><strong>Различия:</strong></p>
+    <table>
+      <tr>
+        <th>Аспект</th>
+        <th>PCA</th>
+        <th>Linear AE</th>
+      </tr>
+      <tr>
+        <td>Метод</td>
+        <td>SVD/eigendecomp</td>
+        <td>Gradient descent</td>
+      </tr>
+      <tr>
+        <td>Глобальный оптимум</td>
+        <td>Гарантирован</td>
+        <td>Локальный минимум</td>
+      </tr>
+      <tr>
+        <td>Скорость</td>
+        <td>Быстрее</td>
+        <td>Медленнее</td>
+      </tr>
+      <tr>
+        <td>Масштабируемость</td>
+        <td>Ограничена</td>
+        <td>Mini-batch</td>
+      </tr>
+    </table>
+    
+    <p><strong>Когда использовать автоэнкодер:</strong></p>
+    <ul>
+      <li>Очень большие данные (streaming)</li>
+      <li>Нужна инкрементальная обработка</li>
+      <li>Подготовка к нелинейным моделям</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>4. Типы линейных автоэнкодеров</h2>
+    <p><strong>Undercomplete автоэнкодер:</strong></p>
+    <ul>
+      <li>Размерность скрытого слоя меньше входа</li>
+      <li>k < n (сжатие информации)</li>
+      <li>Вынужден изучать важные признаки</li>
+    </ul>
+    
+    <p><strong>Overcomplete автоэнкодер:</strong></p>
+    <ul>
+      <li>k ≥ n (больше или равно)</li>
+      <li>Риск тривиального решения (identity)</li>
+      <li>Требует регуляризации</li>
+    </ul>
+    
+    <p><strong>Sparse автоэнкодер:</strong></p>
+    <ul>
+      <li>Добавление L1-регуляризации на h</li>
+      <li>L = ||x - x̂||² + λ||h||₁</li>
+      <li>Изучает разреженное представление</li>
+    </ul>
+    
+    <p><strong>Denoising автоэнкодер:</strong></p>
+    <ul>
+      <li>Обучение на зашумленных данных</li>
+      <li>x̃ = x + ε, где ε ~ N(0, σ²)</li>
+      <li>Учится устранять шум</li>
+    </ul>
+    
+    <p><strong>Contractive автоэнкодер:</strong></p>
+    <ul>
+      <li>Штраф на производную энкодера</li>
+      <li>Учится устойчивым признакам</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>5. Реализация в Python</h2>
+    <p><strong>Базовая реализация с NumPy:</strong></p>
+    <pre><code>import numpy as np
+
+class LinearAutoencoder:
+    def __init__(self, input_dim, hidden_dim):
+        self.W1 = np.random.randn(input_dim, hidden_dim) * 0.01
+        self.b1 = np.zeros(hidden_dim)
+        self.W2 = np.random.randn(hidden_dim, input_dim) * 0.01
+        self.b2 = np.zeros(input_dim)
+    
+    def encode(self, X):
+        return X @ self.W1 + self.b1
+    
+    def decode(self, H):
+        return H @ self.W2 + self.b2
+    
+    def forward(self, X):
+        H = self.encode(X)
+        X_reconstructed = self.decode(H)
+        return X_reconstructed, H
+    
+    def train(self, X, epochs=100, lr=0.01):
+        for epoch in range(epochs):
+            # Forward pass
+            X_rec, H = self.forward(X)
+            
+            # Loss
+            loss = np.mean((X - X_rec) ** 2)
+            
+            # Backward pass
+            dX_rec = -2 * (X - X_rec) / len(X)
+            dW2 = H.T @ dX_rec
+            db2 = np.sum(dX_rec, axis=0)
+            dH = dX_rec @ self.W2.T
+            dW1 = X.T @ dH
+            db1 = np.sum(dH, axis=0)
+            
+            # Update
+            self.W1 -= lr * dW1
+            self.b1 -= lr * db1
+            self.W2 -= lr * dW2
+            self.b2 -= lr * db2
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>6. Реализация в scikit-learn</h2>
+    <p><strong>Использование нейронной сети:</strong></p>
+    <pre><code>from sklearn.neural_network import MLPRegressor
+import numpy as np
+
+class SKLearnAutoencoder:
+    def __init__(self, input_dim, hidden_dim):
+        # MLPRegressor с одним скрытым слоем
+        # без активации (identity)
+        self.model = MLPRegressor(
+            hidden_layer_sizes=(hidden_dim,),
+            activation='identity',
+            solver='adam',
+            max_iter=500,
+            random_state=42
+        )
+    
+    def fit(self, X):
+        # Обучение: вход = выход
+        self.model.fit(X, X)
+        return self
+    
+    def transform(self, X):
+        # Извлечение скрытого представления
+        h = X @ self.model.coefs_[0] + self.model.intercepts_[0]
+        return h
+    
+    def fit_transform(self, X):
+        self.fit(X)
+        return self.transform(X)
+    
+    def inverse_transform(self, H):
+        # Восстановление из скрытого слоя
+        return H @ self.model.coefs_[1] + self.model.intercepts_[1]
+
+# Использование
+X = np.random.randn(1000, 20)
+ae = SKLearnAutoencoder(input_dim=20, hidden_dim=5)
+H = ae.fit_transform(X)
+X_reconstructed = ae.inverse_transform(H)
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>7. Реализация в PyTorch</h2>
+    <p><strong>Современная реализация:</strong></p>
+    <pre><code>import torch
+import torch.nn as nn
+import torch.optim as optim
+
+class LinearAutoencoder(nn.Module):
+    def __init__(self, input_dim, hidden_dim):
+        super().__init__()
+        # Энкодер
+        self.encoder = nn.Linear(input_dim, hidden_dim)
+        # Декодер
+        self.decoder = nn.Linear(hidden_dim, input_dim)
+    
+    def forward(self, x):
+        # Прямой проход без активации
+        h = self.encoder(x)
+        x_reconstructed = self.decoder(h)
+        return x_reconstructed
+    
+    def encode(self, x):
+        return self.encoder(x)
+
+# Обучение
+model = LinearAutoencoder(input_dim=784, hidden_dim=32)
+criterion = nn.MSELoss()
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+for epoch in range(100):
+    # Forward pass
+    outputs = model(X_train)
+    loss = criterion(outputs, X_train)
+    
+    # Backward pass
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+
+# Извлечение признаков
+with torch.no_grad():
+    features = model.encode(X_test)
+</code></pre>
+    
+    <p><strong>С tied weights:</strong></p>
+    <pre><code>class TiedAutoencoder(nn.Module):
+    def __init__(self, input_dim, hidden_dim):
+        super().__init__()
+        self.encoder = nn.Linear(input_dim, hidden_dim)
+        # Декодер использует транспонированные веса энкодера
+        self.decoder_bias = nn.Parameter(torch.zeros(input_dim))
+    
+    def forward(self, x):
+        h = self.encoder(x)
+        # Tied weights: W_decoder = W_encoder^T
+        x_reconstructed = torch.matmul(h, self.encoder.weight) + self.decoder_bias
+        return x_reconstructed
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>8. Применения</h2>
+    <p><strong>Понижение размерности:</strong></p>
+    <ul>
+      <li>Сжатие данных перед классификацией</li>
+      <li>Визуализация (при k=2,3)</li>
+      <li>Удаление избыточности</li>
+    </ul>
+    
+    <p><strong>Извлечение признаков:</strong></p>
+    <ul>
+      <li>Предобработка для ML моделей</li>
+      <li>Transfer learning (начальное обучение)</li>
+      <li>Изучение структуры данных</li>
+    </ul>
+    
+    <p><strong>Обнаружение аномалий:</strong></p>
+    <ul>
+      <li>Высокая ошибка реконструкции = аномалия</li>
+      <li>Threshold: error > μ + k·σ</li>
+      <li>Работает для нормальных данных</li>
+    </ul>
+    
+    <p><strong>Удаление шума:</strong></p>
+    <ul>
+      <li>Denoising autoencoder</li>
+      <li>Сглаживание сигналов</li>
+      <li>Очистка изображений</li>
+    </ul>
+    
+    <p><strong>Инициализация глубоких сетей:</strong></p>
+    <ul>
+      <li>Предобучение слоёв</li>
+      <li>Greedy layer-wise training</li>
+      <li>Избежание плохих локальных минимумов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>9. Гиперпараметры и настройка</h2>
+    <p><strong>Размер скрытого слоя (k):</strong></p>
+    <ul>
+      <li>Слишком большой → переобучение</li>
+      <li>Слишком маленький → потеря информации</li>
+      <li>Правило: k ≈ 0.1-0.5 от n</li>
+      <li>Подбор по validation loss</li>
+    </ul>
+    
+    <p><strong>Learning rate:</strong></p>
+    <ul>
+      <li>Начальное значение: 0.001-0.01</li>
+      <li>Learning rate scheduling</li>
+      <li>Adam optimizer обычно лучше SGD</li>
+    </ul>
+    
+    <p><strong>Регуляризация:</strong></p>
+    <ul>
+      <li><strong>L2 (weight decay):</strong> λ||W||²</li>
+      <li><strong>L1 (sparsity):</strong> λ||h||₁</li>
+      <li><strong>Dropout:</strong> (для нелинейных версий)</li>
+      <li>λ обычно 0.0001-0.01</li>
+    </ul>
+    
+    <p><strong>Batch size:</strong></p>
+    <ul>
+      <li>32-256 для больших датасетов</li>
+      <li>Полный batch для малых данных</li>
+      <li>Mini-batch для стабильности</li>
+    </ul>
+    
+    <p><strong>Критерий останова:</strong></p>
+    <ul>
+      <li>Early stopping по validation loss</li>
+      <li>Patience = 10-50 эпох</li>
+      <li>Мониторинг reconstruction error</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>10. Оценка качества</h2>
+    <p><strong>Метрики реконструкции:</strong></p>
+    <ul>
+      <li><strong>MSE:</strong> mean((x - x̂)²)</li>
+      <li><strong>RMSE:</strong> sqrt(MSE)</li>
+      <li><strong>MAE:</strong> mean(|x - x̂|)</li>
+    </ul>
+    
+    <p><strong>Объяснённая дисперсия:</strong></p>
+    <div class="formula">
+      R² = 1 - Σ(x - x̂)² / Σ(x - x̄)²
+    </div>
+    <ul>
+      <li>R² близко к 1 = хорошая реконструкция</li>
+      <li>Аналог explained variance в PCA</li>
+    </ul>
+    
+    <p><strong>Downstream tasks:</strong></p>
+    <ul>
+      <li>Точность классификации на извлечённых признаках</li>
+      <li>Clustering metrics (если цель - кластеризация)</li>
+      <li>Визуальная оценка (для изображений)</li>
+    </ul>
+    
+    <p><strong>Анализ скрытого пространства:</strong></p>
+    <ul>
+      <li>Корреляция между компонентами h</li>
+      <li>Распределение значений h</li>
+      <li>Interpretability компонент</li>
+    </ul>
+    
+    <p><strong>Сравнение с PCA:</strong></p>
+    <pre><code>from sklearn.decomposition import PCA
+from sklearn.metrics import mean_squared_error
+
+# PCA
+pca = PCA(n_components=k)
+X_pca = pca.fit_transform(X)
+X_pca_reconstructed = pca.inverse_transform(X_pca)
+mse_pca = mean_squared_error(X, X_pca_reconstructed)
+
+# Autoencoder
+ae = LinearAutoencoder(n, k)
+ae.fit(X)
+X_ae = ae.transform(X)
+X_ae_reconstructed = ae.inverse_transform(X_ae)
+mse_ae = mean_squared_error(X, X_ae_reconstructed)
+
+print(f"PCA MSE: {mse_pca:.4f}")
+print(f"AE MSE: {mse_ae:.4f}")
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>11. Преимущества и недостатки</h2>
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>✓ Простота реализации и понимания</li>
+      <li>✓ Быстрое обучение</li>
+      <li>✓ Масштабируемость (mini-batch)</li>
+      <li>✓ Легко интегрируется в нейросетевые архитектуры</li>
+      <li>✓ Меньше памяти чем полный SVD</li>
+      <li>✓ Online/incremental learning</li>
+    </ul>
+    
+    <p><strong>Недостатки:</strong></p>
+    <ul>
+      <li>✗ Ограничение линейностью</li>
+      <li>✗ Не гарантирует глобальный оптимум</li>
+      <li>✗ Медленнее классического PCA</li>
+      <li>✗ Чувствительность к инициализации</li>
+      <li>✗ Требует подбора гиперпараметров</li>
+      <li>✗ Может застрять в локальных минимумах</li>
+    </ul>
+    
+    <p><strong>Когда использовать:</strong></p>
+    <ul>
+      <li>Очень большие датасеты (не влезают в память)</li>
+      <li>Streaming/online данные</li>
+      <li>Часть более сложной архитектуры</li>
+      <li>Нужна гибкость в функции потерь</li>
+    </ul>
+    
+    <p><strong>Когда использовать PCA:</strong></p>
+    <ul>
+      <li>Данные средного размера</li>
+      <li>Нужен гарантированный оптимум</li>
+      <li>Важна скорость</li>
+      <li>Интерпретируемость критична</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>12. Практические советы</h2>
+    <p><strong>Подготовка данных:</strong></p>
+    <ul>
+      <li>Обязательная нормализация: StandardScaler</li>
+      <li>Центрирование данных (μ = 0)</li>
+      <li>Масштабирование (σ = 1)</li>
+      <li>Удаление константных признаков</li>
+    </ul>
+    
+    <p><strong>Инициализация весов:</strong></p>
+    <ul>
+      <li>Xavier/Glorot initialization</li>
+      <li>W ~ N(0, √(2/(n_in + n_out)))</li>
+      <li>Или малые случайные значения</li>
+    </ul>
+    
+    <p><strong>Мониторинг обучения:</strong></p>
+    <pre><code>history = {'train_loss': [], 'val_loss': []}
+for epoch in range(epochs):
+    train_loss = train_epoch(model, train_data)
+    val_loss = validate(model, val_data)
+    
+    history['train_loss'].append(train_loss)
+    history['val_loss'].append(val_loss)
+    
+    # Early stopping
+    if val_loss < best_val_loss:
+        best_val_loss = val_loss
+        patience_counter = 0
+    else:
+        patience_counter += 1
+        if patience_counter >= patience:
+            break
+</code></pre>
+    
+    <p><strong>Отладка:</strong></p>
+    <ul>
+      <li>Проверка на переобучение (train vs val loss)</li>
+      <li>Градиенты не должны взрываться/исчезать</li>
+      <li>Loss должна монотонно убывать</li>
+      <li>Веса не должны быть слишком большими</li>
+    </ul>
+    
+    <p><strong>Deployment:</strong></p>
+    <ul>
+      <li>Сохранение весов: torch.save() или pickle</li>
+      <li>Сохранение scaler вместе с моделью</li>
+      <li>Версионирование моделей</li>
+      <li>Мониторинг drift в production</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

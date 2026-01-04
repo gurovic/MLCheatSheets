@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Методы скользящих средних Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    strong {
+      color: #1a5fb4;
+      font-weight: 600;
+    }
+
+    .formula {
+      background: #fff9e6;
+      padding: 6px;
+      border-left: 3px solid #ffcc00;
+      margin: 8px 0;
+      font-style: italic;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 8px 0;
+    }
+
+    table th {
+      background-color: #e0e7ff;
+      padding: 6px;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    table td {
+      padding: 5px 6px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Методы скользящих средних (Moving Averages)</h1>
+<div class="subtitle">Фундаментальные техники сглаживания и прогнозирования временных рядов</div>
+
+<div class="container">
+
+  <div class="block">
+    <h2>1. Простое скользящее среднее (SMA)</h2>
+    <p><strong>Simple Moving Average</strong> — среднее значение последних n наблюдений.</p>
+    
+    <div class="formula">
+      SMA_t = (y_t + y_(t-1) + ... + y_(t-n+1)) / n
+    </div>
+    
+    <p><strong>Свойства:</strong></p>
+    <ul>
+      <li>Все веса равны (1/n)</li>
+      <li>Задержка (lag) = (n-1)/2</li>
+      <li>Чем больше n, тем более гладкий ряд</li>
+      <li>Теряется n-1 первых наблюдений</li>
+    </ul>
+    
+    <p><strong>Применение:</strong></p>
+    <ul>
+      <li>Выявление тренда</li>
+      <li>Удаление шума и выбросов</li>
+      <li>Сглаживание данных</li>
+      <li>Базовый прогноз: ŷ_(t+1) = SMA_t</li>
+    </ul>
+    
+    <p><strong>Выбор окна (n):</strong></p>
+    <ul>
+      <li>Малое n (3-7): чувствительно к изменениям</li>
+      <li>Среднее n (10-50): баланс</li>
+      <li>Большое n (100+): очень гладко, сильная задержка</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>2. Взвешенное скользящее среднее (WMA)</h2>
+    <p><strong>Weighted Moving Average</strong> — скользящее среднее с неравными весами.</p>
+    
+    <div class="formula">
+      WMA_t = (w_1·y_t + w_2·y_(t-1) + ... + w_n·y_(t-n+1)) / Σw_i
+    </div>
+    
+    <p><strong>Линейные веса:</strong></p>
+    <ul>
+      <li>w_i = i (более свежие данные важнее)</li>
+      <li>Пример n=4: веса [4, 3, 2, 1]</li>
+      <li>WMA = (4y_t + 3y_(t-1) + 2y_(t-2) + y_(t-3)) / 10</li>
+    </ul>
+    
+    <p><strong>Преимущества над SMA:</strong></p>
+    <ul>
+      <li>Быстрее реагирует на изменения</li>
+      <li>Меньшая задержка</li>
+      <li>Более релевантный вес свежих данных</li>
+    </ul>
+    
+    <p><strong>Выбор весов:</strong></p>
+    <ul>
+      <li>Линейные: простота</li>
+      <li>Экспоненциальные: см. EMA</li>
+      <li>Кастомные: под конкретную задачу</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>3. Экспоненциальное скользящее среднее (EMA)</h2>
+    <p><strong>Exponential Moving Average</strong> — рекурсивное среднее с экспоненциальным затуханием весов.</p>
+    
+    <div class="formula">
+      EMA_t = α·y_t + (1-α)·EMA_(t-1)
+    </div>
+    
+    <p>где α = 2/(n+1) — сглаживающий коэффициент</p>
+    
+    <p><strong>Развёрнутая форма:</strong></p>
+    <div class="formula">
+      EMA_t = α·Σ(1-α)^i·y_(t-i)
+    </div>
+    
+    <p><strong>Свойства:</strong></p>
+    <ul>
+      <li>Веса убывают экспоненциально</li>
+      <li>Все прошлые значения учитываются</li>
+      <li>Не теряет первые наблюдения</li>
+      <li>Эффективное вычисление O(1)</li>
+    </ul>
+    
+    <p><strong>Параметр α:</strong></p>
+    <ul>
+      <li>α близко к 1: быстрая реакция, мало сглаживания</li>
+      <li>α близко к 0: медленная реакция, сильное сглаживание</li>
+      <li>Типичные: 0.1-0.3</li>
+      <li>Связь с SMA: α = 2/(n+1)</li>
+    </ul>
+    
+    <p><strong>Инициализация EMA_0:</strong></p>
+    <ul>
+      <li>EMA_0 = y_0</li>
+      <li>EMA_0 = среднее первых k точек</li>
+      <li>EMA_0 = SMA(первые n точек)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>4. Двойное и тройное EMA</h2>
+    <p><strong>Double Exponential Moving Average (DEMA):</strong></p>
+    <div class="formula">
+      DEMA_t = 2·EMA_t - EMA(EMA_t)
+    </div>
+    
+    <p><strong>Цель:</strong> Уменьшить задержку EMA</p>
+    <ul>
+      <li>Быстрее реагирует на изменения тренда</li>
+      <li>Меньше lag по сравнению с EMA</li>
+      <li>Популярен в техническом анализе</li>
+    </ul>
+    
+    <p><strong>Triple Exponential Moving Average (TEMA):</strong></p>
+    <div class="formula">
+      TEMA_t = 3·EMA_t - 3·EMA(EMA_t) + EMA(EMA(EMA_t))
+    </div>
+    
+    <p><strong>Преимущества TEMA:</strong></p>
+    <ul>
+      <li>Ещё меньшая задержка</li>
+      <li>Сохраняет сглаживание</li>
+      <li>Хорош для быстро меняющихся рядов</li>
+    </ul>
+    
+    <p><strong>Недостатки:</strong></p>
+    <ul>
+      <li>Более чувствителен к шуму</li>
+      <li>Может давать ложные сигналы</li>
+      <li>Сложнее настроить</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>5. Кумулятивное скользящее среднее (CMA)</h2>
+    <p><strong>Cumulative Moving Average</strong> — среднее всех значений от начала ряда.</p>
+    
+    <div class="formula">
+      CMA_t = (y_1 + y_2 + ... + y_t) / t
+    </div>
+    
+    <p><strong>Рекурсивная формула:</strong></p>
+    <div class="formula">
+      CMA_t = CMA_(t-1) + (y_t - CMA_(t-1)) / t
+    </div>
+    
+    <p><strong>Свойства:</strong></p>
+    <ul>
+      <li>Окно растёт с каждым шагом</li>
+      <li>Всё более стабильное среднее</li>
+      <li>Медленно реагирует на изменения</li>
+      <li>Вычисление за O(1) времени</li>
+    </ul>
+    
+    <p><strong>Применение:</strong></p>
+    <ul>
+      <li>Оценка среднего уровня ряда</li>
+      <li>Baseline для сравнения</li>
+      <li>Онлайн статистика</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>6. Центрированное скользящее среднее</h2>
+    <p><strong>Centered Moving Average (CMA)</strong> — среднее с симметричным окном вокруг текущей точки.</p>
+    
+    <div class="formula">
+      CMA_t = (y_(t-k) + ... + y_t + ... + y_(t+k)) / (2k+1)
+    </div>
+    
+    <p><strong>Особенности:</strong></p>
+    <ul>
+      <li>Нет задержки (centered)</li>
+      <li>Требует будущие значения</li>
+      <li>Не подходит для прогнозирования</li>
+      <li>Идеально для сглаживания</li>
+    </ul>
+    
+    <p><strong>Применение:</strong></p>
+    <ul>
+      <li>Удаление сезонности</li>
+      <li>Выделение тренда</li>
+      <li>Подготовка данных для анализа</li>
+      <li>Визуализация трендов</li>
+    </ul>
+    
+    <p><strong>Для чётного окна:</strong></p>
+    <p>При n=4: CMA_t = (0.5·y_(t-2) + y_(t-1) + y_t + y_(t+1) + 0.5·y_(t+2)) / 4</p>
+  </div>
+
+  <div class="block">
+    <h2>7. Реализация в Python</h2>
+    <p><strong>Простое скользящее среднее:</strong></p>
+    <pre><code>import numpy as np
+import pandas as pd
+
+# С pandas (проще)
+def sma_pandas(series, window):
+    return series.rolling(window=window).mean()
+
+# С NumPy
+def sma_numpy(arr, window):
+    return np.convolve(arr, np.ones(window), 'valid') / window
+
+# Использование
+df['SMA_5'] = df['value'].rolling(window=5).mean()
+df['SMA_20'] = df['value'].rolling(window=20).mean()
+</code></pre>
+
+    <p><strong>Взвешенное скользящее среднее:</strong></p>
+    <pre><code>def wma(series, window):
+    weights = np.arange(1, window + 1)
+    return series.rolling(window).apply(
+        lambda x: np.dot(x, weights) / weights.sum(),
+        raw=True
+    )
+
+# Использование
+df['WMA_10'] = wma(df['value'], window=10)
+</code></pre>
+
+    <p><strong>Экспоненциальное скользящее среднее:</strong></p>
+    <pre><code># С pandas
+def ema_pandas(series, span):
+    return series.ewm(span=span, adjust=False).mean()
+
+# Вручную
+def ema_manual(series, alpha):
+    ema = [series.iloc[0]]
+    for i in range(1, len(series)):
+        ema.append(alpha * series.iloc[i] + (1 - alpha) * ema[-1])
+    return pd.Series(ema, index=series.index)
+
+# Использование
+df['EMA_12'] = df['value'].ewm(span=12, adjust=False).mean()
+df['EMA_26'] = df['value'].ewm(span=26, adjust=False).mean()
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>8. MACD (Moving Average Convergence Divergence)</h2>
+    <p><strong>MACD</strong> — индикатор на основе разности двух EMA.</p>
+    
+    <div class="formula">
+      MACD = EMA_fast - EMA_slow
+      Signal = EMA(MACD, n_signal)
+      Histogram = MACD - Signal
+    </div>
+    
+    <p><strong>Стандартные параметры:</strong></p>
+    <ul>
+      <li>Fast period: 12</li>
+      <li>Slow period: 26</li>
+      <li>Signal period: 9</li>
+    </ul>
+    
+    <p><strong>Интерпретация:</strong></p>
+    <ul>
+      <li>MACD > 0: восходящий тренд</li>
+      <li>MACD < 0: нисходящий тренд</li>
+      <li>Пересечение MACD и Signal: сигнал</li>
+      <li>Histogram: сила тренда</li>
+    </ul>
+    
+    <p><strong>Реализация:</strong></p>
+    <pre><code>def macd(series, fast=12, slow=26, signal=9):
+    ema_fast = series.ewm(span=fast).mean()
+    ema_slow = series.ewm(span=slow).mean()
+    macd_line = ema_fast - ema_slow
+    signal_line = macd_line.ewm(span=signal).mean()
+    histogram = macd_line - signal_line
+    return macd_line, signal_line, histogram
+
+# Использование
+macd, signal, hist = macd(df['close'])
+df['MACD'] = macd
+df['Signal'] = signal
+df['Histogram'] = hist
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>9. Bollinger Bands</h2>
+    <p><strong>Bollinger Bands</strong> — полосы вокруг скользящего среднего на основе стандартного отклонения.</p>
+    
+    <div class="formula">
+      Middle Band = SMA(n)
+      Upper Band = SMA(n) + k·σ(n)
+      Lower Band = SMA(n) - k·σ(n)
+    </div>
+    
+    <p><strong>Параметры:</strong></p>
+    <ul>
+      <li>n = 20 (типичное окно)</li>
+      <li>k = 2 (стандартных отклонения)</li>
+    </ul>
+    
+    <p><strong>Интерпретация:</strong></p>
+    <ul>
+      <li>Узкие полосы → низкая волатильность</li>
+      <li>Широкие полосы → высокая волатильность</li>
+      <li>Цена у верхней полосы → перекупленность</li>
+      <li>Цена у нижней полосы → перепроданность</li>
+    </ul>
+    
+    <p><strong>Реализация:</strong></p>
+    <pre><code>def bollinger_bands(series, window=20, num_std=2):
+    sma = series.rolling(window=window).mean()
+    std = series.rolling(window=window).std()
+    upper = sma + num_std * std
+    lower = sma - num_std * std
+    return upper, sma, lower
+
+# Использование
+upper, middle, lower = bollinger_bands(df['close'])
+df['BB_Upper'] = upper
+df['BB_Middle'] = middle
+df['BB_Lower'] = lower
+
+# Bandwidth (мера волатильности)
+df['BB_Width'] = (upper - lower) / middle
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>10. Hull Moving Average (HMA)</h2>
+    <p><strong>Hull MA</strong> — быстрое и гладкое скользящее среднее.</p>
+    
+    <div class="formula">
+      HMA(n) = WMA(2·WMA(n/2) - WMA(n), √n)
+    </div>
+    
+    <p><strong>Алгоритм:</strong></p>
+    <ol>
+      <li>Вычислить WMA(n/2)</li>
+      <li>Вычислить WMA(n)</li>
+      <li>raw = 2·WMA(n/2) - WMA(n)</li>
+      <li>HMA = WMA(raw, √n)</li>
+    </ol>
+    
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Минимальная задержка</li>
+      <li>Хорошее сглаживание</li>
+      <li>Быстрая реакция на изменения</li>
+    </ul>
+    
+    <p><strong>Реализация:</strong></p>
+    <pre><code>def wma(series, period):
+    weights = np.arange(1, period + 1)
+    return series.rolling(period).apply(
+        lambda x: np.dot(x, weights) / weights.sum(), raw=True
+    )
+
+def hma(series, period):
+    half_length = period // 2
+    sqrt_length = int(np.sqrt(period))
+    
+    wma_half = wma(series, half_length)
+    wma_full = wma(series, period)
+    raw = 2 * wma_half - wma_full
+    
+    return wma(raw, sqrt_length)
+
+# Использование
+df['HMA'] = hma(df['close'], period=16)
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>11. Adaptive Moving Averages</h2>
+    <p><strong>Kaufman's Adaptive Moving Average (KAMA):</strong></p>
+    <p>Адаптируется к волатильности рынка.</p>
+    
+    <div class="formula">
+      KAMA_t = KAMA_(t-1) + SC·(Price_t - KAMA_(t-1))
+      SC = [ER·(fast - slow) + slow]²
+      ER = |Price_t - Price_(t-n)| / Σ|Price_i - Price_(i-1)|
+    </div>
+    
+    <p><strong>Параметры:</strong></p>
+    <ul>
+      <li>ER (Efficiency Ratio): эффективность движения</li>
+      <li>SC (Smoothing Constant): адаптивный коэффициент</li>
+      <li>fast = 2/(2+1) = 0.6667</li>
+      <li>slow = 2/(30+1) ≈ 0.0645</li>
+    </ul>
+    
+    <p><strong>Реализация:</strong></p>
+    <pre><code>def kama(series, period=10, fast=2, slow=30):
+    # Efficiency Ratio
+    change = abs(series - series.shift(period))
+    volatility = series.diff().abs().rolling(period).sum()
+    er = change / volatility
+    
+    # Smoothing Constant
+    fast_sc = 2 / (fast + 1)
+    slow_sc = 2 / (slow + 1)
+    sc = (er * (fast_sc - slow_sc) + slow_sc) ** 2
+    
+    # KAMA
+    kama = pd.Series(index=series.index, dtype=float)
+    kama.iloc[period-1] = series.iloc[period-1]
+    
+    for i in range(period, len(series)):
+        kama.iloc[i] = kama.iloc[i-1] + sc.iloc[i] * (series.iloc[i] - kama.iloc[i-1])
+    
+    return kama
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>12. Прогнозирование с MA</h2>
+    <p><strong>Наивный прогноз:</strong></p>
+    <div class="formula">
+      ŷ_(t+h) = MA_t
+    </div>
+    
+    <p><strong>Горизонт прогноза:</strong></p>
+    <ul>
+      <li>h = 1: следующий шаг</li>
+      <li>h > 1: все прогнозы одинаковы (flat forecast)</li>
+    </ul>
+    
+    <p><strong>Комбинация MA разного порядка:</strong></p>
+    <pre><code># Взвешенная комбинация
+def ma_ensemble(series, windows=[5, 10, 20], weights=None):
+    if weights is None:
+        weights = [1/len(windows)] * len(windows)
+    
+    forecast = 0
+    for window, weight in zip(windows, weights):
+        ma = series.rolling(window).mean()
+        forecast += weight * ma
+    
+    return forecast
+
+# Использование
+df['Ensemble_MA'] = ma_ensemble(df['value'], [5, 10, 20])
+</code></pre>
+    
+    <p><strong>Кросс-валидация для выбора окна:</strong></p>
+    <pre><code>from sklearn.model_selection import TimeSeriesSplit
+from sklearn.metrics import mean_squared_error
+
+def find_best_window(series, windows, n_splits=5):
+    tscv = TimeSeriesSplit(n_splits=n_splits)
+    best_window = None
+    best_score = float('inf')
+    
+    for window in windows:
+        scores = []
+        for train_idx, test_idx in tscv.split(series):
+            train = series.iloc[train_idx]
+            test = series.iloc[test_idx]
+            
+            # Прогноз
+            ma = train.rolling(window).mean()
+            forecast = ma.iloc[-1]
+            
+            # MSE
+            mse = mean_squared_error([forecast] * len(test), test)
+            scores.append(mse)
+        
+        avg_score = np.mean(scores)
+        if avg_score < best_score:
+            best_score = avg_score
+            best_window = window
+    
+    return best_window, best_score
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>13. Сезонная декомпозиция с MA</h2>
+    <p><strong>Классическая декомпозиция:</strong></p>
+    <ul>
+      <li>Аддитивная: Y_t = T_t + S_t + R_t</li>
+      <li>Мультипликативная: Y_t = T_t × S_t × R_t</li>
+    </ul>
+    
+    <p><strong>Шаги декомпозиции:</strong></p>
+    <ol>
+      <li>Вычислить тренд через CMA с окном = период сезонности</li>
+      <li>Detrend: Y_t - T_t (или Y_t / T_t)</li>
+      <li>Вычислить сезонные компоненты</li>
+      <li>Остаток: R_t = Y_t - T_t - S_t</li>
+    </ol>
+    
+    <p><strong>Реализация:</strong></p>
+    <pre><code>from statsmodels.tsa.seasonal import seasonal_decompose
+
+# Автоматическая декомпозиция
+result = seasonal_decompose(
+    df['value'], 
+    model='additive',  # или 'multiplicative'
+    period=12  # период сезонности
+)
+
+df['Trend'] = result.trend
+df['Seasonal'] = result.seasonal
+df['Residual'] = result.resid
+
+# Визуализация
+result.plot()
+</code></pre>
+    
+    <p><strong>Ручная декомпозиция:</strong></p>
+    <pre><code>def decompose_manual(series, period):
+    # Тренд через центрированное MA
+    trend = series.rolling(window=period, center=True).mean()
+    
+    # Detrend
+    detrended = series - trend
+    
+    # Сезонность (среднее для каждого сезона)
+    seasonal = detrended.groupby(
+        detrended.index % period
+    ).mean()
+    seasonal = seasonal.reindex(range(period))
+    seasonal_series = pd.Series(
+        [seasonal[i % period] for i in range(len(series))],
+        index=series.index
+    )
+    
+    # Остаток
+    residual = series - trend - seasonal_series
+    
+    return trend, seasonal_series, residual
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>14. Оценка качества сглаживания</h2>
+    <p><strong>Метрики сглаживания:</strong></p>
+    <ul>
+      <li><strong>Smoothness:</strong> Σ(ŷ_t - ŷ_(t-1))²</li>
+      <li><strong>Fit:</strong> Σ(y_t - ŷ_t)²</li>
+      <li><strong>Trade-off:</strong> баланс между smoothness и fit</li>
+    </ul>
+    
+    <p><strong>Кросс-валидация прогнозов:</strong></p>
+    <pre><code>def evaluate_ma(series, window, horizon=1):
+    errors = []
+    
+    for i in range(len(series) - window - horizon):
+        # Обучающая выборка
+        train = series.iloc[i:i+window]
+        
+        # Прогноз
+        forecast = train.mean()
+        
+        # Истинное значение
+        true = series.iloc[i+window+horizon-1]
+        
+        # Ошибка
+        errors.append(abs(true - forecast))
+    
+    return {
+        'MAE': np.mean(errors),
+        'RMSE': np.sqrt(np.mean(np.array(errors)**2)),
+        'MAPE': np.mean(np.array(errors) / series.iloc[window:-horizon]) * 100
+    }
+</code></pre>
+    
+    <p><strong>Диагностика остатков:</strong></p>
+    <pre><code>residuals = df['value'] - df['SMA_20']
+
+# Статистики
+print(f"Mean: {residuals.mean():.4f}")  # должно быть ~0
+print(f"Std: {residuals.std():.4f}")
+
+# Автокорреляция (должна быть минимальной)
+from statsmodels.graphics.tsaplots import plot_acf
+plot_acf(residuals.dropna())
+
+# Нормальность
+from scipy import stats
+_, p_value = stats.shapiro(residuals.dropna())
+print(f"Shapiro p-value: {p_value:.4f}")
+</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>15. Практические советы</h2>
+    <p><strong>Выбор типа MA:</strong></p>
+    <ul>
+      <li><strong>SMA:</strong> простота, понятность, стабильность</li>
+      <li><strong>EMA:</strong> быстрая реакция, меньше lag</li>
+      <li><strong>WMA:</strong> баланс между SMA и EMA</li>
+      <li><strong>HMA:</strong> минимальный lag, максимальная скорость</li>
+    </ul>
+    
+    <p><strong>Выбор окна:</strong></p>
+    <ul>
+      <li>Короткое (5-10): краткосрочные тренды</li>
+      <li>Среднее (20-50): среднесрочные тренды</li>
+      <li>Длинное (100-200): долгосрочные тренды</li>
+      <li>Grid search + CV для оптимизации</li>
+    </ul>
+    
+    <p><strong>Комбинирование MA:</strong></p>
+    <pre><code># Кроссовер стратегия
+def ma_crossover(fast_ma, slow_ma):
+    signal = pd.Series(0, index=fast_ma.index)
+    signal[fast_ma > slow_ma] = 1  # Buy signal
+    signal[fast_ma < slow_ma] = -1  # Sell signal
+    return signal
+
+# Golden Cross
+fast = df['close'].rolling(50).mean()
+slow = df['close'].rolling(200).mean()
+signals = ma_crossover(fast, slow)
+</code></pre>
+    
+    <p><strong>Обработка краёв ряда:</strong></p>
+    <ul>
+      <li>Padding: повторить первое/последнее значение</li>
+      <li>Reflection: зеркально отразить</li>
+      <li>Extrapolation: линейная экстраполяция</li>
+      <li>Уменьшить окно на краях</li>
+    </ul>
+    
+    <p><strong>Визуализация:</strong></p>
+    <pre><code>import matplotlib.pyplot as plt
+
+plt.figure(figsize=(14, 7))
+plt.plot(df.index, df['value'], label='Original', alpha=0.5)
+plt.plot(df.index, df['SMA_5'], label='SMA(5)')
+plt.plot(df.index, df['SMA_20'], label='SMA(20)')
+plt.plot(df.index, df['EMA_20'], label='EMA(20)')
+plt.legend()
+plt.title('Moving Averages Comparison')
+plt.show()
+</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>
