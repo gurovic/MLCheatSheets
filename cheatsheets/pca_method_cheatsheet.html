@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>PCA (Метод главных компонент) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📘 PCA (Метод главных компонент) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без математики • Полный охват идей<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: снизить размерность, сохранить максимум дисперсии</li>
+      <li><strong>Как работает</strong>: ищет новые оси (главные компоненты), вдоль которых данные варьируются сильнее всего</li>
+      <li><strong>Результат</strong>: новые признаки = линейные комбинации исходных</li>
+      <li><strong>Порядок важности</strong>: первая компонента объясняет больше всего дисперсии</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый код</h2>
+    <pre><code>from sklearn.decomposition import PCA
+
+pca = PCA(n_components=2)
+X_reduced = pca.fit_transform(X)
+
+# Объясненная дисперсия
+print(pca.explained_variance_ratio_)
+# [0.72, 0.23] → первые 2 компоненты → 95%</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th></tr>
+      <tr><td><code>n_components</code></td><td>Кол-во компонент (int) или порог дисперсии (0.95)</td></tr>
+      <tr><td><code>whiten</code></td><td>Нормировать компоненты (False/True)</td></tr>
+      <tr><td><code>svd_solver</code></td><td>'auto', 'full', 'arpack', 'randomized'</td></tr>
+      <tr><td><code>random_state</code></td><td>Для воспроизводимости</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Предобработка</h2>
+    <p>⚠️ <strong>Обязательно центрировать!</strong></p>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+X_pca = PCA(n_components=10).fit_transform(X_scaled)</code></pre>
+    <ul>
+      <li>PCA чувствителен к масштабу признаков</li>
+      <li>Используйте StandardScaler или MinMaxScaler</li>
+      <li>Центрирование встроено в PCA, но масштабирование — нет</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Выбор числа компонент</h2>
+    <p><strong>Метод 1: По порогу дисперсии</strong></p>
+    <pre><code>pca = PCA(n_components=0.95)  # 95% дисперсии
+pca.fit(X)
+print(pca.n_components_)  # сколько компонент</code></pre>
+    <p><strong>Метод 2: Elbow method</strong></p>
+    <pre><code>pca = PCA()
+pca.fit(X)
+plt.plot(pca.explained_variance_ratio_)
+plt.xlabel('Component')
+plt.ylabel('Variance Explained')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Интерпретация компонент</h2>
+    <pre><code># Веса исходных признаков
+components = pca.components_
+print(components[0])  # первая компонента
+
+# Визуализация весов
+import pandas as pd
+pd.DataFrame(
+    components,
+    columns=feature_names,
+    index=['PC1', 'PC2', 'PC3']
+)</code></pre>
+    <ul>
+      <li>Положительные веса → признак вносит вклад в направлении компоненты</li>
+      <li>Отрицательные веса → вклад в противоположном направлении</li>
+      <li>Большие по модулю → сильное влияние</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Обратное преобразование</h2>
+    <pre><code># Прямое преобразование
+X_reduced = pca.transform(X)
+
+# Обратное преобразование
+X_reconstructed = pca.inverse_transform(X_reduced)
+
+# Ошибка реконструкции
+error = np.mean((X - X_reconstructed)**2)
+print(f'Reconstruction error: {error}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Применения PCA</h2>
+    <ul>
+      <li><strong>Снижение размерности</strong>: 1000 признаков → 50 компонент</li>
+      <li><strong>Визуализация</strong>: 2-3 компоненты для 2D/3D графиков</li>
+      <li><strong>Удаление шума</strong>: отбросить последние компоненты</li>
+      <li><strong>Ускорение обучения</strong>: меньше признаков → быстрее</li>
+      <li><strong>Feature engineering</strong>: PCA как новые признаки</li>
+      <li><strong>Детекция аномалий</strong>: большая ошибка реконструкции</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Много коррелирующих признаков</li>
+          <li>Нужна визуализация</li>
+          <li>Переобучение из-за размерности</li>
+          <li>Линейные зависимости</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Нелинейные структуры (→ Kernel PCA, t-SNE)</li>
+          <li>Нужна интерпретируемость исходных признаков</li>
+          <li>Категориальные признаки без кодирования</li>
+          <li>Мало данных (≤100 строк)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Варианты и расширения</h2>
+    <table>
+      <tr><th>Метод</th><th>Особенность</th></tr>
+      <tr><td><code>IncrementalPCA</code></td><td>Для больших данных (батчами)</td></tr>
+      <tr><td><code>KernelPCA</code></td><td>Нелинейное снижение размерности</td></tr>
+      <tr><td><code>SparsePCA</code></td><td>Разреженные компоненты</td></tr>
+      <tr><td><code>TruncatedSVD</code></td><td>Не центрирует (для разреженных матриц)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Пайплайн с PCA</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier
+
+pipe = Pipeline([
+    ('scaler', StandardScaler()),
+    ('pca', PCA(n_components=0.95)),
+    ('clf', RandomForestClassifier())
+])
+
+pipe.fit(X_train, y_train)
+y_pred = pipe.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Частые ошибки</h2>
+    <ul>
+      <li>❌ <strong>Забыли масштабировать</strong> → доминирование больших значений</li>
+      <li>❌ <strong>Применили PCA до split</strong> → утечка данных</li>
+      <li>❌ <strong>fit_transform на test</strong> → используйте только transform</li>
+      <li>❌ <strong>Интерпретация как исходные признаки</strong> → это комбинации!</li>
+      <li>✅ <strong>Правильно</strong>: масштабирование → split → PCA на train → transform на test</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Удалить константные признаки</li>
+      <li>[ ] Закодировать категории (если есть)</li>
+      <li>[ ] Масштабировать данные (StandardScaler)</li>
+      <li>[ ] Разделить train/test</li>
+      <li>[ ] Выбрать число компонент (CV или график)</li>
+      <li>[ ] Проверить объясненную дисперсию</li>
+      <li>[ ] Сравнить качество с/без PCA</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Объяснение заказчику</h2>
+    <blockquote>
+      «Представьте 1000 характеристик клиента. PCA находит 20 самых важных "комбинаций" этих характеристик, которые объясняют 95% различий между клиентами. Мы работаем с 20 числами вместо 1000, сохраняя почти всю информацию».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

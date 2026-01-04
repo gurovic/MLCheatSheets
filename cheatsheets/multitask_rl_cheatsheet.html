@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Многозадачное обучение с подкреплением (Multi-task RL) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📘 Многозадачное RL (Multi-task Reinforcement Learning) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без математики • Полный охват идей<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: обучить агента решать несколько задач одновременно</li>
+      <li><strong>Идея</strong>: совместное обучение улучшает производительность на каждой задаче</li>
+      <li><strong>Преимущества</strong>: перенос знаний между задачами, эффективность данных</li>
+      <li><strong>Пример</strong>: робот учится ходить по разным поверхностям</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Отличие от обычного RL</h2>
+    <table>
+      <tr><th>Аспект</th><th>Single-task RL</th><th>Multi-task RL</th></tr>
+      <tr><td>Задачи</td><td>Одна</td><td>Несколько</td></tr>
+      <tr><td>Политика</td><td>Специализированная</td><td>Общая для всех задач</td></tr>
+      <tr><td>Обучение</td><td>Для одной среды</td><td>Для множества сред</td></tr>
+      <tr><td>Данные</td><td>Из одной задачи</td><td>Из всех задач</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Архитектуры</h2>
+    <p><strong>1. Shared trunk (общий ствол)</strong></p>
+    <ul>
+      <li>Общие слои для всех задач</li>
+      <li>Отдельные головы для каждой задачи</li>
+      <li>Самый популярный подход</li>
+    </ul>
+    <pre><code># Псевдокод
+shared_layers = [Dense(64), Dense(32)]
+task1_head = Dense(action_dim_1)
+task2_head = Dense(action_dim_2)
+
+# Прямой проход
+features = shared_layers(state)
+action1 = task1_head(features)
+action2 = task2_head(features)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Архитектуры (продолжение)</h2>
+    <p><strong>2. Task-conditional policy</strong></p>
+    <pre><code># Политика зависит от идентификатора задачи
+state_task = concat(state, task_id)
+action = policy(state_task)</code></pre>
+    <p><strong>3. Modular networks</strong></p>
+    <ul>
+      <li>Набор модулей (подсетей)</li>
+      <li>Динамическая композиция для каждой задачи</li>
+      <li>Примеры: PathNet, Neural Module Networks</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Методы совместного обучения</h2>
+    <p><strong>Способ 1: Mixed batches</strong></p>
+    <pre><code>for episode in range(num_episodes):
+    task = random.choice(tasks)
+    state = env[task].reset()
+    
+    while not done:
+        action = policy(state, task)
+        next_state, reward, done = env[task].step(action)
+        buffer.add(state, action, reward, task)
+    
+    # Обучение на смешанном батче
+    batch = buffer.sample()
+    update_policy(batch)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Методы совместного обучения (продолжение)</h2>
+    <p><strong>Способ 2: Distral (Distill & Transfer Learning)</strong></p>
+    <ul>
+      <li>Дистиллированная политика π₀ (центроид)</li>
+      <li>Специализированные политики πᵢ для каждой задачи</li>
+      <li>πᵢ близки к π₀ (регуляризация KL-дивергенцией)</li>
+    </ul>
+    <p><strong>Способ 3: Soft modules</strong></p>
+    <ul>
+      <li>Мягкая маршрутизация между модулями</li>
+      <li>Каждая задача использует свою комбинацию модулей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Negative transfer</td><td>Task-specific layers, регуляризация</td></tr>
+      <tr><td>Catastrophic forgetting</td><td>Experience replay, EWC</td></tr>
+      <tr><td>Разные награды</td><td>Нормализация наград, адаптивные веса</td></tr>
+      <tr><td>Несбалансированная сложность</td><td>Task prioritization, curriculum</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Negative Transfer</h2>
+    <p>Когда совместное обучение ухудшает результаты</p>
+    <p><strong>Причины:</strong></p>
+    <ul>
+      <li>Слишком разные задачи</li>
+      <li>Конфликтующие градиенты</li>
+      <li>Недостаточная ёмкость сети</li>
+    </ul>
+    <p><strong>Решения:</strong></p>
+    <pre><code># 1. Градиентная хирургия (PCGrad)
+# Проецировать конфликтующие градиенты
+
+# 2. Адаптивные веса задач
+task_weights = compute_task_weights(losses)
+total_loss = sum(w * loss for w, loss in 
+                 zip(task_weights, task_losses))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Benchmarks</h2>
+    <table>
+      <tr><th>Benchmark</th><th>Описание</th></tr>
+      <tr><td>Meta-World</td><td>50 робототехнических задач манипуляции</td></tr>
+      <tr><td>Procgen</td><td>16 процедурно генерируемых игр</td></tr>
+      <tr><td>Atari-57</td><td>57 игр Atari</td></tr>
+      <tr><td>DMControl</td><td>Continuous control задачи</td></tr>
+      <tr><td>CausalWorld</td><td>Причинно-следственные задачи</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Практический код (PyTorch)</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class MultiTaskPolicy(nn.Module):
+    def __init__(self, state_dim, action_dims, num_tasks):
+        super().__init__()
+        # Общий энкодер
+        self.shared = nn.Sequential(
+            nn.Linear(state_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, 64),
+            nn.ReLU()
+        )
+        # Головы для каждой задачи
+        self.heads = nn.ModuleList([
+            nn.Linear(64, action_dim) 
+            for action_dim in action_dims
+        ])
+    
+    def forward(self, state, task_id):
+        features = self.shared(state)
+        return self.heads[task_id](features)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Task Sampling Strategies</h2>
+    <p><strong>1. Uniform sampling</strong></p>
+    <pre><code>task = random.choice(tasks)</code></pre>
+    <p><strong>2. Proportional to loss</strong></p>
+    <pre><code>probs = softmax(task_losses)
+task = np.random.choice(tasks, p=probs)</code></pre>
+    <p><strong>3. Curriculum learning</strong></p>
+    <pre><code># Начать с простых, постепенно добавлять сложные
+active_tasks = get_current_curriculum_tasks(step)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Transfer Learning в Multi-task RL</h2>
+    <ul>
+      <li><strong>Forward transfer</strong>: знания из ранних задач помогают новым</li>
+      <li><strong>Backward transfer</strong>: новые задачи улучшают старые</li>
+      <li><strong>Zero-shot transfer</strong>: решение новых задач без дообучения</li>
+    </ul>
+    <pre><code># Оценка переноса
+baseline_performance = train_single_task()
+multitask_performance = train_multitask()
+
+transfer_gain = multitask_performance - baseline_performance</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Популярные алгоритмы</h2>
+    <ul>
+      <li><strong>Distral</strong>: дистиллированная политика + специализированные</li>
+      <li><strong>IMPALA</strong>: масштабируемый actor-critic для множества сред</li>
+      <li><strong>PopArt</strong>: адаптивная нормализация для разных наград</li>
+      <li><strong>CARE</strong>: контекстно-зависимые агрегаторы политик</li>
+      <li><strong>MT-SAC</strong>: Multi-Task Soft Actor-Critic</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Несколько связанных задач</li>
+          <li>Общие структуры в задачах</li>
+          <li>Нужна генерализация</li>
+          <li>Ограниченные данные на каждую задачу</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Совершенно разные задачи</li>
+          <li>Одна задача критична (→ single-task)</li>
+          <li>Мало вычислительных ресурсов</li>
+          <li>Требуется максимальная производительность на одной задаче</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Метрики</h2>
+    <table>
+      <tr><th>Метрика</th><th>Описание</th></tr>
+      <tr><td>Average performance</td><td>Среднее качество по всем задачам</td></tr>
+      <tr><td>Worst-case performance</td><td>Производительность на худшей задаче</td></tr>
+      <tr><td>Transfer ratio</td><td>Отношение multi-task к single-task</td></tr>
+      <tr><td>Forward transfer</td><td>Улучшение на новых задачах</td></tr>
+      <tr><td>Backward transfer</td><td>Изменение на старых после обучения новым</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить набор связанных задач</li>
+      <li>[ ] Выбрать архитектуру (shared trunk / modular)</li>
+      <li>[ ] Нормализовать награды для всех задач</li>
+      <li>[ ] Выбрать стратегию сэмплирования задач</li>
+      <li>[ ] Мониторить negative transfer</li>
+      <li>[ ] Сравнить с single-task baseline</li>
+      <li>[ ] Измерить forward/backward transfer</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Объяснение заказчику</h2>
+    <blockquote>
+      «Вместо обучения отдельного ИИ для каждой задачи, мы обучаем один универсальный ИИ, который может решать множество связанных задач. Это как человек: научившись водить один автомобиль, быстрее научится водить другой. ИИ переносит знания между задачами, что ускоряет обучение и улучшает качество».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

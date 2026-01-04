@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>LDA (Линейный дискриминантный анализ) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📘 LDA (Линейный дискриминантный анализ) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без математики • Полный охват идей<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: снизить размерность с учетом классов (supervised)</li>
+      <li><strong>Как работает</strong>: ищет направления, которые максимально разделяют классы</li>
+      <li><strong>Отличие от PCA</strong>: использует метки классов, PCA — нет</li>
+      <li><strong>Максимум компонент</strong>: min(n_features, n_classes - 1)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый код (снижение размерности)</h2>
+    <pre><code>from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+lda = LinearDiscriminantAnalysis(n_components=2)
+X_lda = lda.fit_transform(X_train, y_train)
+
+# Применить к тестовым данным
+X_test_lda = lda.transform(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код (классификация)</h2>
+    <pre><code>from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+lda = LinearDiscriminantAnalysis()
+lda.fit(X_train, y_train)
+
+y_pred = lda.predict(X_test)
+y_proba = lda.predict_proba(X_test)</code></pre>
+    <p>LDA — это одновременно:</p>
+    <ul>
+      <li>Метод снижения размерности</li>
+      <li>Линейный классификатор</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th></tr>
+      <tr><td><code>n_components</code></td><td>Число компонент (≤ n_classes - 1)</td></tr>
+      <tr><td><code>solver</code></td><td>'svd', 'lsqr', 'eigen'</td></tr>
+      <tr><td><code>shrinkage</code></td><td>Регуляризация (None, 'auto', float)</td></tr>
+      <tr><td><code>priors</code></td><td>Априорные вероятности классов</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. LDA vs PCA</h2>
+    <table>
+      <tr><th>Аспект</th><th>PCA</th><th>LDA</th></tr>
+      <tr><td>Тип</td><td>Unsupervised</td><td>Supervised</td></tr>
+      <tr><td>Использует метки</td><td>Нет</td><td>Да</td></tr>
+      <tr><td>Максимум компонент</td><td>n_features</td><td>n_classes - 1</td></tr>
+      <tr><td>Цель</td><td>Макс. дисперсия</td><td>Разделение классов</td></tr>
+      <tr><td>Может классифицировать</td><td>Нет</td><td>Да</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Предобработка</h2>
+    <p>✅ <strong>Масштабирование рекомендуется</strong></p>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+lda = LinearDiscriminantAnalysis(n_components=2)
+X_train_lda = lda.fit_transform(X_train_scaled, y_train)
+X_test_lda = lda.transform(X_test_scaled)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Предположения LDA</h2>
+    <ul>
+      <li><strong>Нормальное распределение</strong>: признаки для каждого класса ~ N(μ, Σ)</li>
+      <li><strong>Одинаковые ковариации</strong>: все классы имеют одинаковую матрицу ковариаций</li>
+      <li><strong>Линейная разделимость</strong>: классы разделимы линейной границей</li>
+    </ul>
+    <p>⚠️ Если предположения не выполняются → может работать хуже</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Применения</h2>
+    <ul>
+      <li><strong>Снижение размерности для классификации</strong>: сохраняет разделяемость</li>
+      <li><strong>Визуализация</strong>: 2D проекция с учетом классов</li>
+      <li><strong>Feature extraction</strong>: создание дискриминантных признаков</li>
+      <li><strong>Baseline классификатор</strong>: быстрый и интерпретируемый</li>
+      <li><strong>Распознавание лиц</strong>: Fisherfaces (LDA на изображениях)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Shrinkage (регуляризация)</h2>
+    <pre><code># Автоматический подбор регуляризации
+lda = LinearDiscriminantAnalysis(
+    solver='lsqr',
+    shrinkage='auto'
+)
+
+# Или ручная настройка
+lda = LinearDiscriminantAnalysis(
+    solver='lsqr',
+    shrinkage=0.5  # от 0 до 1
+)</code></pre>
+    <p>Помогает когда:</p>
+    <ul>
+      <li>Мало данных</li>
+      <li>Много признаков</li>
+      <li>Коррелирующие признаки</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Quadratic Discriminant Analysis (QDA)</h2>
+    <pre><code>from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
+qda = QuadraticDiscriminantAnalysis()
+qda.fit(X_train, y_train)
+y_pred = qda.predict(X_test)</code></pre>
+    <p><strong>Отличия от LDA</strong>:</p>
+    <ul>
+      <li>Разные ковариации для каждого класса</li>
+      <li>Квадратичная граница решения</li>
+      <li>Более гибкая, но требует больше данных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Визуализация LDA проекций</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+lda = LinearDiscriminantAnalysis(n_components=2)
+X_lda = lda.fit_transform(X, y)
+
+plt.scatter(X_lda[:, 0], X_lda[:, 1], c=y, cmap='viridis')
+plt.xlabel('LD1')
+plt.ylabel('LD2')
+plt.title('LDA projection')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Задача классификации</li>
+          <li>Малое число классов (2-10)</li>
+          <li>Предположения примерно выполняются</li>
+          <li>Нужна интерпретируемость</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Нелинейная разделимость (→ QDA, kernel methods)</li>
+          <li>Очень разные ковариации классов (→ QDA)</li>
+          <li>Много классов (&gt;100)</li>
+          <li>Несбалансированные классы</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Пайплайн с LDA</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier
+
+pipe = Pipeline([
+    ('scaler', StandardScaler()),
+    ('lda', LinearDiscriminantAnalysis(n_components=5)),
+    ('clf', RandomForestClassifier())
+])
+
+pipe.fit(X_train, y_train)
+y_pred = pipe.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Частые ошибки</h2>
+    <ul>
+      <li>❌ <strong>n_components &gt; n_classes - 1</strong> → ошибка</li>
+      <li>❌ <strong>Использовать без меток</strong> → LDA supervised метод!</li>
+      <li>❌ <strong>Не проверили предположения</strong> → низкое качество</li>
+      <li>❌ <strong>Применили к несбалансированным данным</strong> → используйте priors</li>
+      <li>✅ <strong>Правильно</strong>: масштабирование → проверка предположений → LDA</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Убедиться, что задача — классификация</li>
+      <li>[ ] Закодировать категориальные признаки</li>
+      <li>[ ] Масштабировать данные</li>
+      <li>[ ] Проверить предположения (нормальность, равные ковариации)</li>
+      <li>[ ] Выбрать n_components ≤ n_classes - 1</li>
+      <li>[ ] Сравнить с PCA и другими методами</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Объяснение заказчику</h2>
+    <blockquote>
+      «LDA находит "лучший угол зрения" на данные, при котором разные группы клиентов максимально далеки друг от друга. Это помогает и визуализировать группы, и предсказывать, к какой группе относится новый клиент».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -131,9 +131,9 @@
 1. [Пайплайны ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ml_pipelines_cheatsheet.html)
 
 ### **17. Специальные алгоритмы**
-1. Метод главных компонент (PCA)
-1. Линейный дискриминантный анализ (LDA)
-1. Канонический корреляционный анализ
+1. [Метод главных компонент (PCA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pca_method_cheatsheet.html)
+1. [Линейный дискриминантный анализ (LDA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lda_method_cheatsheet.html)
+1. [Канонический корреляционный анализ](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/canonical_correlation_analysis_method_cheatsheet.html)
 1. [Скрытые марковские модели (HMM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hmm_cheatsheet.html)
 1. [EM-алгоритм](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/em_algorithm_cheatsheet.html)
 
@@ -227,14 +227,14 @@
 1. [Policy Gradient методы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/policy_gradient_cheatsheet.html)
 1. [Actor-Critic методы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/actor_critic_cheatsheet.html)
 1. [PPO (Proximal Policy Optimization)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ppo_reinforcement_learning_cheatsheet.html)
-1. Многозадачное RL
-1. Иерархическое RL
+1. [Многозадачное RL](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multitask_rl_cheatsheet.html)
+1. [Иерархическое RL](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hierarchical_rl_cheatsheet.html)
 1. [Имитационное обучение (Imitation Learning)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/imitation_learning_cheatsheet.html)
 
 ### **7. Обработка естественного языка (NLP)**
 1. [Векторные представления слов (Word2Vec, GloVe, FastText)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/word_embeddings_cheatsheet.html)
 1. [RNN/LSTM для NLP](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rnn_lstm_nlp_cheatsheet.html)
-1. Transformer для NLP
+1. [Transformer для NLP](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transformer_nlp_cheatsheet.html)
 1. [BERT и его вариации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bert_finetuning_cheatsheet.html)
 1. [GPT-архитектуры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gpt_architectures_cheatsheet.html)
 1. [Prompt Engineering для LLM (ChatGPT, GPT-4, Claude)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/prompt_engineering_cheatsheet.html)
@@ -253,10 +253,10 @@
 
 ### **9. Обработка аудио и речь**
 1. [Спектрограммы и MFCC](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/audio_processing_spectrograms_mfcc_cheatsheet.html)
-1. Модели для распознавания речи (ASR)
-1. Модели для синтеза речи (TTS)
-1. Классификация звуков
-1. Source separation
+1. [Модели для распознавания речи (ASR)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/asr_models_cheatsheet.html)
+1. [Модели для синтеза речи (TTS)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tts_models_cheatsheet.html)
+1. [Классификация звуков](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/audio_classification_cheatsheet.html)
+1. [Source separation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/source_separation_cheatsheet.html)
 1. Audio generation
 
 ### **10. Мультимодальное обучение**

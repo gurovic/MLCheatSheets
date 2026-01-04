@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Канонический корреляционный анализ (CCA) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📘 Канонический корреляционный анализ (CCA) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без математики • Полный охват идей<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: найти связи между двумя наборами признаков (X и Y)</li>
+      <li><strong>Как работает</strong>: ищет линейные комбинации X и Y с максимальной корреляцией</li>
+      <li><strong>Результат</strong>: канонические переменные (компоненты) для обоих наборов</li>
+      <li><strong>Пример</strong>: связать демографию (возраст, доход) с покупками (категории товаров)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый код</h2>
+    <pre><code>from sklearn.cross_decomposition import CCA
+
+cca = CCA(n_components=2)
+cca.fit(X, Y)
+
+# Трансформировать оба набора
+X_c, Y_c = cca.transform(X, Y)
+
+# Канонические корреляции
+import numpy as np
+correlations = [np.corrcoef(X_c[:, i], Y_c[:, i])[0, 1] 
+                for i in range(2)]
+print(correlations)  # [0.85, 0.62]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th></tr>
+      <tr><td><code>n_components</code></td><td>Число канонических компонент</td></tr>
+      <tr><td><code>scale</code></td><td>Масштабировать данные (True/False)</td></tr>
+      <tr><td><code>max_iter</code></td><td>Макс. итераций (по умолчанию 500)</td></tr>
+      <tr><td><code>tol</code></td><td>Критерий сходимости (1e-6)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. CCA vs PCA vs LDA</h2>
+    <table>
+      <tr><th>Метод</th><th>Входные данные</th><th>Цель</th></tr>
+      <tr><td>PCA</td><td>X</td><td>Максимальная дисперсия</td></tr>
+      <tr><td>LDA</td><td>X, labels</td><td>Разделение классов</td></tr>
+      <tr><td>CCA</td><td>X, Y</td><td>Максимальная корреляция</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Применения</h2>
+    <ul>
+      <li><strong>Мультимодальные данные</strong>: связь текста и изображений</li>
+      <li><strong>Нейронаука</strong>: связь активности мозга и поведения</li>
+      <li><strong>Генетика</strong>: связь генотипа и фенотипа</li>
+      <li><strong>Маркетинг</strong>: связь характеристик клиента и покупок</li>
+      <li><strong>Финансы</strong>: связь экономических показателей</li>
+      <li><strong>Feature extraction</strong>: создание совместных признаков</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Предобработка</h2>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+# Масштабировать оба набора
+scaler_X = StandardScaler()
+scaler_Y = StandardScaler()
+
+X_scaled = scaler_X.fit_transform(X)
+Y_scaled = scaler_Y.fit_transform(Y)
+
+cca = CCA(n_components=3)
+X_c, Y_c = cca.fit_transform(X_scaled, Y_scaled)</code></pre>
+    <p>⚠️ Масштабирование критично для CCA!</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Интерпретация результатов</h2>
+    <pre><code># Веса (loadings) для первой компоненты
+print("X weights:", cca.x_weights_[:, 0])
+print("Y weights:", cca.y_weights_[:, 0])
+
+# Корреляции исходных признаков с компонентами
+X_c, Y_c = cca.transform(X, Y)
+X_loadings = np.corrcoef(X.T, X_c[:, 0].T)[:-1, -1]
+Y_loadings = np.corrcoef(Y.T, Y_c[:, 0].T)[:-1, -1]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Выбор числа компонент</h2>
+    <p><strong>Метод 1: По порогу корреляции</strong></p>
+    <pre><code># Вычислить канонические корреляции
+cca_full = CCA(n_components=min(X.shape[1], Y.shape[1]))
+X_c, Y_c = cca_full.fit_transform(X, Y)
+
+correlations = [np.corrcoef(X_c[:, i], Y_c[:, i])[0, 1] 
+                for i in range(X_c.shape[1])]
+
+# Выбрать компоненты с корреляцией > 0.3
+n_comp = sum(c > 0.3 for c in correlations)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Kernel CCA</h2>
+    <p>Нелинейное расширение CCA</p>
+    <pre><code># Нет прямой реализации в sklearn
+# Используйте библиотеки:
+# - mvlearn.embed.KCCA
+# - pyrcca (Regularized CCA)
+
+# Пример концепта:
+from sklearn.kernel_approximation import RBFSampler
+
+rbf = RBFSampler(gamma=1, n_components=100)
+X_rbf = rbf.fit_transform(X)
+Y_rbf = rbf.fit_transform(Y)
+
+cca = CCA(n_components=5)
+X_c, Y_c = cca.fit_transform(X_rbf, Y_rbf)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Regularized CCA</h2>
+    <p>Для случаев: мало данных или много признаков</p>
+    <pre><code># Использовать PLSCanonical с регуляризацией
+from sklearn.cross_decomposition import PLSCanonical
+
+pls = PLSCanonical(n_components=2)
+X_c, Y_c = pls.fit_transform(X, Y)
+
+# Или использовать pyrcca библиотеку
+# from pyrcca import CCA
+# cca = CCA(regularization=0.1)
+# cca.train([X, Y])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Визуализация</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+# График первой канонической компоненты
+axes[0].scatter(X_c[:, 0], Y_c[:, 0], alpha=0.5)
+axes[0].set_xlabel('X canonical 1')
+axes[0].set_ylabel('Y canonical 1')
+axes[0].set_title(f'Correlation: {correlations[0]:.3f}')
+
+# График канонических корреляций
+axes[1].bar(range(len(correlations)), correlations)
+axes[1].set_xlabel('Component')
+axes[1].set_ylabel('Correlation')
+axes[1].set_title('Canonical Correlations')
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Два набора связанных признаков</li>
+          <li>Изучение взаимосвязей</li>
+          <li>Достаточно данных (n &gt; p)</li>
+          <li>Линейные зависимости</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Один набор признаков (→ PCA)</li>
+          <li>Мало данных, много признаков (→ RCCA)</li>
+          <li>Нелинейные связи (→ Kernel CCA)</li>
+          <li>Задача классификации (→ LDA)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Статистическая значимость</h2>
+    <pre><code># Проверка значимости канонических корреляций
+# Используйте статистические тесты
+
+from scipy import stats
+
+# Для каждой компоненты
+n = len(X)
+p, q = X.shape[1], Y.shape[1]
+r = correlations[0]
+
+# Приближенный тест
+chi2 = -(n - 1 - 0.5*(p + q + 1)) * np.log(1 - r**2)
+df = p * q
+p_value = 1 - stats.chi2.cdf(chi2, df)
+print(f'p-value: {p_value}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Частые ошибки</h2>
+    <ul>
+      <li>❌ <strong>Забыли масштабировать</strong> → неправильные веса</li>
+      <li>❌ <strong>n &lt; p или n &lt; q</strong> → переобучение, используйте регуляризацию</li>
+      <li>❌ <strong>Слишком много компонент</strong> → шум</li>
+      <li>❌ <strong>Игнорирование мультиколлинеарности</strong> → нестабильность</li>
+      <li>✅ <strong>Правильно</strong>: масштабирование → выбор компонент → проверка значимости</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Связанные методы</h2>
+    <table>
+      <tr><th>Метод</th><th>Особенность</th></tr>
+      <tr><td><code>PLS</code></td><td>Partial Least Squares, предсказание Y</td></tr>
+      <tr><td><code>PLSCanonical</code></td><td>Каноническая версия PLS</td></tr>
+      <tr><td><code>Kernel CCA</code></td><td>Нелинейное расширение</td></tr>
+      <tr><td><code>RCCA</code></td><td>Regularized CCA</td></tr>
+      <tr><td><code>Deep CCA</code></td><td>Нейросетевая версия</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Убедиться, что есть два набора признаков</li>
+      <li>[ ] Проверить размерности: n &gt; max(p, q)</li>
+      <li>[ ] Масштабировать оба набора</li>
+      <li>[ ] Выбрать число компонент</li>
+      <li>[ ] Проверить канонические корреляции</li>
+      <li>[ ] Проверить статистическую значимость</li>
+      <li>[ ] Интерпретировать веса компонент</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Объяснение заказчику</h2>
+    <blockquote>
+      «CCA находит скрытые связи между двумя группами данных. Например, связывает демографические данные клиентов (возраст, доход, образование) с их покупательским поведением (категории, частота, суммы). Показывает, какие комбинации демографии наиболее связаны с какими паттернами покупок».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
