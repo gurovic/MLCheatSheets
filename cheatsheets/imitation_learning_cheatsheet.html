@@ -175,19 +175,37 @@
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Основная идея
-import numpy as np
+    <pre><code># GAIL Discriminator Training
 import torch
+import torch.nn as nn
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+class GailDiscriminator(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(state_dim + action_dim, 100),
+            nn.Tanh(),
+            nn.Linear(100, 1),
+            nn.Sigmoid()
+        )
+    
+    def forward(self, state, action):
+        return self.net(torch.cat([state, action], dim=1))
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+# Обучение дискриминатора
+discriminator = GailDiscriminator(4, 2)
+optimizer = torch.optim.Adam(discriminator.parameters())
+
+for _ in range(1000):
+    expert_sa = sample_expert_trajectories()
+    policy_sa = sample_policy_trajectories()
+    
+    loss = -(torch.log(discriminator(*expert_sa)).mean() + 
+             torch.log(1 - discriminator(*policy_sa)).mean())
+    
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()</code></pre>
   </div>
   <div class="block">
     <h2>🔷 2. Behavioral Cloning</h2>
@@ -203,19 +221,32 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Behavioral Cloning
+    <pre><code># DAgger Implementation
+import gym
 import numpy as np
-import torch
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+env = gym.make('CartPole-v1')
+policy = initialize_policy()
+dataset = []
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+for iteration in range(10):
+    states, actions = [], []
+    for _ in range(20):  # 20 эпизодов
+        state = env.reset()
+        done = False
+        while not done:
+            # Агент действует
+            agent_action = policy.predict(state)
+            # Эксперт корректирует
+            expert_action = expert_policy(state)
+            
+            states.append(state)
+            actions.append(expert_action)
+            
+            state, _, done, _ = env.step(agent_action)
+    
+    dataset.extend(list(zip(states, actions)))
+    policy.fit([s for s, a in dataset], [a for s, a in dataset])</code></pre>
   </div>
   <div class="block">
     <h2>🔷 3. Dataset Aggregation (DAgger)</h2>
@@ -231,19 +262,36 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Dataset Aggregation (DAgger)
-import numpy as np
+    <pre><code># Behavioral Cloning
 import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+# Простая политика для имитации
+class Policy(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(state_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, action_dim)
+        )
+    
+    def forward(self, state):
+        return self.net(state)
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+# Обучение на демонстрациях эксперта
+policy = Policy(state_dim=4, action_dim=2)
+optimizer = torch.optim.Adam(policy.parameters(), lr=1e-3)
+criterion = nn.MSELoss()
+
+for epoch in range(100):
+    for states, actions in expert_dataloader:
+        pred_actions = policy(states)
+        loss = criterion(pred_actions, actions)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()</code></pre>
   </div>
   <div class="block">
     <h2>🔷 4. Inverse Reinforcement Learning</h2>
@@ -259,19 +307,37 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Inverse Reinforcement Learning
-import numpy as np
+    <pre><code># GAIL Discriminator Training
 import torch
+import torch.nn as nn
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+class GailDiscriminator(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(state_dim + action_dim, 100),
+            nn.Tanh(),
+            nn.Linear(100, 1),
+            nn.Sigmoid()
+        )
+    
+    def forward(self, state, action):
+        return self.net(torch.cat([state, action], dim=1))
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+# Обучение дискриминатора
+discriminator = GailDiscriminator(4, 2)
+optimizer = torch.optim.Adam(discriminator.parameters())
+
+for _ in range(1000):
+    expert_sa = sample_expert_trajectories()
+    policy_sa = sample_policy_trajectories()
+    
+    loss = -(torch.log(discriminator(*expert_sa)).mean() + 
+             torch.log(1 - discriminator(*policy_sa)).mean())
+    
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()</code></pre>
   </div>
   <div class="block">
     <h2>🔷 5. Generative Adversarial Imitation Learning (GAIL)</h2>
@@ -287,19 +353,32 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Generative Adversarial Imitation Learning (GAIL)
+    <pre><code># DAgger Implementation
+import gym
 import numpy as np
-import torch
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+env = gym.make('CartPole-v1')
+policy = initialize_policy()
+dataset = []
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+for iteration in range(10):
+    states, actions = [], []
+    for _ in range(20):  # 20 эпизодов
+        state = env.reset()
+        done = False
+        while not done:
+            # Агент действует
+            agent_action = policy.predict(state)
+            # Эксперт корректирует
+            expert_action = expert_policy(state)
+            
+            states.append(state)
+            actions.append(expert_action)
+            
+            state, _, done, _ = env.step(agent_action)
+    
+    dataset.extend(list(zip(states, actions)))
+    policy.fit([s for s, a in dataset], [a for s, a in dataset])</code></pre>
   </div>
   <div class="block">
     <h2>🔷 6. Challenges</h2>
@@ -315,19 +394,36 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Challenges
-import numpy as np
+    <pre><code># Behavioral Cloning
 import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+# Простая политика для имитации
+class Policy(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(state_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, action_dim)
+        )
+    
+    def forward(self, state):
+        return self.net(state)
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+# Обучение на демонстрациях эксперта
+policy = Policy(state_dim=4, action_dim=2)
+optimizer = torch.optim.Adam(policy.parameters(), lr=1e-3)
+criterion = nn.MSELoss()
+
+for epoch in range(100):
+    for states, actions in expert_dataloader:
+        pred_actions = policy(states)
+        loss = criterion(pred_actions, actions)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()</code></pre>
   </div>
   <div class="block">
     <h2>🔷 7. Applications</h2>
@@ -343,19 +439,37 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Applications
-import numpy as np
+    <pre><code># GAIL Discriminator Training
 import torch
+import torch.nn as nn
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+class GailDiscriminator(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(state_dim + action_dim, 100),
+            nn.Tanh(),
+            nn.Linear(100, 1),
+            nn.Sigmoid()
+        )
+    
+    def forward(self, state, action):
+        return self.net(torch.cat([state, action], dim=1))
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+# Обучение дискриминатора
+discriminator = GailDiscriminator(4, 2)
+optimizer = torch.optim.Adam(discriminator.parameters())
+
+for _ in range(1000):
+    expert_sa = sample_expert_trajectories()
+    policy_sa = sample_policy_trajectories()
+    
+    loss = -(torch.log(discriminator(*expert_sa)).mean() + 
+             torch.log(1 - discriminator(*policy_sa)).mean())
+    
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()</code></pre>
   </div>
   <div class="block">
     <h2>🔷 8. Comparison with RL</h2>
@@ -371,19 +485,32 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Comparison with RL
+    <pre><code># DAgger Implementation
+import gym
 import numpy as np
-import torch
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+env = gym.make('CartPole-v1')
+policy = initialize_policy()
+dataset = []
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+for iteration in range(10):
+    states, actions = [], []
+    for _ in range(20):  # 20 эпизодов
+        state = env.reset()
+        done = False
+        while not done:
+            # Агент действует
+            agent_action = policy.predict(state)
+            # Эксперт корректирует
+            expert_action = expert_policy(state)
+            
+            states.append(state)
+            actions.append(expert_action)
+            
+            state, _, done, _ = env.step(agent_action)
+    
+    dataset.extend(list(zip(states, actions)))
+    policy.fit([s for s, a in dataset], [a for s, a in dataset])</code></pre>
   </div>
   <div class="block">
     <h2>🔷 9. Data Requirements</h2>
@@ -399,19 +526,36 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Data Requirements
-import numpy as np
+    <pre><code># Behavioral Cloning
 import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+# Простая политика для имитации
+class Policy(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(state_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, action_dim)
+        )
+    
+    def forward(self, state):
+        return self.net(state)
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+# Обучение на демонстрациях эксперта
+policy = Policy(state_dim=4, action_dim=2)
+optimizer = torch.optim.Adam(policy.parameters(), lr=1e-3)
+criterion = nn.MSELoss()
+
+for epoch in range(100):
+    for states, actions in expert_dataloader:
+        pred_actions = policy(states)
+        loss = criterion(pred_actions, actions)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()</code></pre>
   </div>
   <div class="block">
     <h2>🔷 10. Evaluation</h2>
@@ -427,19 +571,37 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Evaluation
-import numpy as np
+    <pre><code># GAIL Discriminator Training
 import torch
+import torch.nn as nn
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+class GailDiscriminator(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(state_dim + action_dim, 100),
+            nn.Tanh(),
+            nn.Linear(100, 1),
+            nn.Sigmoid()
+        )
+    
+    def forward(self, state, action):
+        return self.net(torch.cat([state, action], dim=1))
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+# Обучение дискриминатора
+discriminator = GailDiscriminator(4, 2)
+optimizer = torch.optim.Adam(discriminator.parameters())
+
+for _ in range(1000):
+    expert_sa = sample_expert_trajectories()
+    policy_sa = sample_policy_trajectories()
+    
+    loss = -(torch.log(discriminator(*expert_sa)).mean() + 
+             torch.log(1 - discriminator(*policy_sa)).mean())
+    
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()</code></pre>
   </div>
   <div class="block">
     <h2>🔷 11. Best Practices</h2>
@@ -455,19 +617,32 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Best Practices
+    <pre><code># DAgger Implementation
+import gym
 import numpy as np
-import torch
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+env = gym.make('CartPole-v1')
+policy = initialize_policy()
+dataset = []
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+for iteration in range(10):
+    states, actions = [], []
+    for _ in range(20):  # 20 эпизодов
+        state = env.reset()
+        done = False
+        while not done:
+            # Агент действует
+            agent_action = policy.predict(state)
+            # Эксперт корректирует
+            expert_action = expert_policy(state)
+            
+            states.append(state)
+            actions.append(expert_action)
+            
+            state, _, done, _ = env.step(agent_action)
+    
+    dataset.extend(list(zip(states, actions)))
+    policy.fit([s for s, a in dataset], [a for s, a in dataset])</code></pre>
   </div>
   <div class="block">
     <h2>🔷 12. Code Examples</h2>
@@ -483,19 +658,36 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Code Examples
-import numpy as np
+    <pre><code># Behavioral Cloning
 import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, TensorDataset
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+# Простая политика для имитации
+class Policy(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(state_dim, 128),
+            nn.ReLU(),
+            nn.Linear(128, action_dim)
+        )
+    
+    def forward(self, state):
+        return self.net(state)
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+# Обучение на демонстрациях эксперта
+policy = Policy(state_dim=4, action_dim=2)
+optimizer = torch.optim.Adam(policy.parameters(), lr=1e-3)
+criterion = nn.MSELoss()
+
+for epoch in range(100):
+    for states, actions in expert_dataloader:
+        pred_actions = policy(states)
+        loss = criterion(pred_actions, actions)
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()</code></pre>
   </div>
 </div>
 

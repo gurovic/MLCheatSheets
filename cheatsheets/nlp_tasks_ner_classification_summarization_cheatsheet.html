@@ -175,19 +175,25 @@
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Named Entity Recognition
-import numpy as np
-import torch
+    <pre><code># Token Classification (NER) fine-tuning
+from transformers import AutoTokenizer, AutoModelForTokenClassification, TrainingArguments, Trainer
+from datasets import load_dataset
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+dataset = load_dataset("conll2003")
+tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+model = AutoModelForTokenClassification.from_pretrained("bert-base-cased", num_labels=9)
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+def tokenize_and_align_labels(examples):
+    tokenized_inputs = tokenizer(examples["tokens"], truncation=True, is_split_into_words=True)
+    labels = []
+    for i, label in enumerate(examples["ner_tags"]):
+        word_ids = tokenized_inputs.word_ids(batch_index=i)
+        label_ids = [-100 if word_id is None else label[word_id] for word_id in word_ids]
+        labels.append(label_ids)
+    tokenized_inputs["labels"] = labels
+    return tokenized_inputs
+
+tokenized_datasets = dataset.map(tokenize_and_align_labels, batched=True)</code></pre>
   </div>
   <div class="block">
     <h2>🔷 2. NER Approaches</h2>
@@ -203,19 +209,22 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для NER Approaches
-import numpy as np
-import torch
+    <pre><code># Abstractive Summarization с T5
+from transformers import T5Tokenizer, T5ForConditionalGeneration
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+tokenizer = T5Tokenizer.from_pretrained('t5-small')
+model = T5ForConditionalGeneration.from_pretrained('t5-small')
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+article = "summarize: " + """
+The Paris Agreement is a legally binding international treaty on climate change. 
+It was adopted by 196 Parties at COP 21 in Paris in 2015 and entered into force in 2016.
+"""
+
+inputs = tokenizer(article, return_tensors='pt', max_length=512, truncation=True)
+summary_ids = model.generate(inputs['input_ids'], max_length=60, min_length=20)
+summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+
+print(f"Summary: {summary}")</code></pre>
   </div>
   <div class="block">
     <h2>🔷 3. Text Classification</h2>
@@ -231,19 +240,21 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Text Classification
-import numpy as np
-import torch
+    <pre><code># Text Classification с Transformers
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import Trainer, TrainingArguments
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
+model = AutoModelForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+# Пример текста
+text = "This movie is amazing! I loved every moment."
+inputs = tokenizer(text, return_tensors='pt', padding=True, truncation=True)
+
+# Предсказание
+outputs = model(**inputs)
+prediction = outputs.logits.argmax(-1)
+print(f"Sentiment: {'Positive' if prediction.item() == 1 else 'Negative'}")</code></pre>
   </div>
   <div class="block">
     <h2>🔷 4. Classification Models</h2>
@@ -259,19 +270,16 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Classification Models
-import numpy as np
-import torch
+    <pre><code># Named Entity Recognition с BERT
+from transformers import pipeline
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+ner_pipeline = pipeline("ner", model="dslim/bert-base-NER", aggregation_strategy="simple")
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+text = "Apple Inc. was founded by Steve Jobs in Cupertino, California."
+entities = ner_pipeline(text)
+
+for entity in entities:
+    print(f"{entity['word']}: {entity['entity_group']} (score: {entity['score']:.3f})")</code></pre>
   </div>
   <div class="block">
     <h2>🔷 5. Text Summarization</h2>
@@ -287,19 +295,25 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Text Summarization
-import numpy as np
-import torch
+    <pre><code># Token Classification (NER) fine-tuning
+from transformers import AutoTokenizer, AutoModelForTokenClassification, TrainingArguments, Trainer
+from datasets import load_dataset
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+dataset = load_dataset("conll2003")
+tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+model = AutoModelForTokenClassification.from_pretrained("bert-base-cased", num_labels=9)
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+def tokenize_and_align_labels(examples):
+    tokenized_inputs = tokenizer(examples["tokens"], truncation=True, is_split_into_words=True)
+    labels = []
+    for i, label in enumerate(examples["ner_tags"]):
+        word_ids = tokenized_inputs.word_ids(batch_index=i)
+        label_ids = [-100 if word_id is None else label[word_id] for word_id in word_ids]
+        labels.append(label_ids)
+    tokenized_inputs["labels"] = labels
+    return tokenized_inputs
+
+tokenized_datasets = dataset.map(tokenize_and_align_labels, batched=True)</code></pre>
   </div>
   <div class="block">
     <h2>🔷 6. Extractive Methods</h2>
@@ -315,19 +329,22 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Extractive Methods
-import numpy as np
-import torch
+    <pre><code># Abstractive Summarization с T5
+from transformers import T5Tokenizer, T5ForConditionalGeneration
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+tokenizer = T5Tokenizer.from_pretrained('t5-small')
+model = T5ForConditionalGeneration.from_pretrained('t5-small')
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+article = "summarize: " + """
+The Paris Agreement is a legally binding international treaty on climate change. 
+It was adopted by 196 Parties at COP 21 in Paris in 2015 and entered into force in 2016.
+"""
+
+inputs = tokenizer(article, return_tensors='pt', max_length=512, truncation=True)
+summary_ids = model.generate(inputs['input_ids'], max_length=60, min_length=20)
+summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+
+print(f"Summary: {summary}")</code></pre>
   </div>
   <div class="block">
     <h2>🔷 7. Abstractive Methods</h2>
@@ -343,19 +360,21 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Abstractive Methods
-import numpy as np
-import torch
+    <pre><code># Text Classification с Transformers
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import Trainer, TrainingArguments
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
+model = AutoModelForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+# Пример текста
+text = "This movie is amazing! I loved every moment."
+inputs = tokenizer(text, return_tensors='pt', padding=True, truncation=True)
+
+# Предсказание
+outputs = model(**inputs)
+prediction = outputs.logits.argmax(-1)
+print(f"Sentiment: {'Positive' if prediction.item() == 1 else 'Negative'}")</code></pre>
   </div>
   <div class="block">
     <h2>🔷 8. Evaluation Metrics</h2>
@@ -371,19 +390,16 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Evaluation Metrics
-import numpy as np
-import torch
+    <pre><code># Named Entity Recognition с BERT
+from transformers import pipeline
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+ner_pipeline = pipeline("ner", model="dslim/bert-base-NER", aggregation_strategy="simple")
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+text = "Apple Inc. was founded by Steve Jobs in Cupertino, California."
+entities = ner_pipeline(text)
+
+for entity in entities:
+    print(f"{entity['word']}: {entity['entity_group']} (score: {entity['score']:.3f})")</code></pre>
   </div>
   <div class="block">
     <h2>🔷 9. Fine-tuning BERT</h2>
@@ -399,19 +415,25 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Fine-tuning BERT
-import numpy as np
-import torch
+    <pre><code># Token Classification (NER) fine-tuning
+from transformers import AutoTokenizer, AutoModelForTokenClassification, TrainingArguments, Trainer
+from datasets import load_dataset
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+dataset = load_dataset("conll2003")
+tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+model = AutoModelForTokenClassification.from_pretrained("bert-base-cased", num_labels=9)
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+def tokenize_and_align_labels(examples):
+    tokenized_inputs = tokenizer(examples["tokens"], truncation=True, is_split_into_words=True)
+    labels = []
+    for i, label in enumerate(examples["ner_tags"]):
+        word_ids = tokenized_inputs.word_ids(batch_index=i)
+        label_ids = [-100 if word_id is None else label[word_id] for word_id in word_ids]
+        labels.append(label_ids)
+    tokenized_inputs["labels"] = labels
+    return tokenized_inputs
+
+tokenized_datasets = dataset.map(tokenize_and_align_labels, batched=True)</code></pre>
   </div>
   <div class="block">
     <h2>🔷 10. Data Preprocessing</h2>
@@ -427,19 +449,22 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Data Preprocessing
-import numpy as np
-import torch
+    <pre><code># Abstractive Summarization с T5
+from transformers import T5Tokenizer, T5ForConditionalGeneration
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+tokenizer = T5Tokenizer.from_pretrained('t5-small')
+model = T5ForConditionalGeneration.from_pretrained('t5-small')
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+article = "summarize: " + """
+The Paris Agreement is a legally binding international treaty on climate change. 
+It was adopted by 196 Parties at COP 21 in Paris in 2015 and entered into force in 2016.
+"""
+
+inputs = tokenizer(article, return_tensors='pt', max_length=512, truncation=True)
+summary_ids = model.generate(inputs['input_ids'], max_length=60, min_length=20)
+summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+
+print(f"Summary: {summary}")</code></pre>
   </div>
   <div class="block">
     <h2>🔷 11. Common Challenges</h2>
@@ -455,19 +480,21 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Common Challenges
-import numpy as np
-import torch
+    <pre><code># Text Classification с Transformers
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+from transformers import Trainer, TrainingArguments
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
+model = AutoModelForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=2)
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+# Пример текста
+text = "This movie is amazing! I loved every moment."
+inputs = tokenizer(text, return_tensors='pt', padding=True, truncation=True)
+
+# Предсказание
+outputs = model(**inputs)
+prediction = outputs.logits.argmax(-1)
+print(f"Sentiment: {'Positive' if prediction.item() == 1 else 'Negative'}")</code></pre>
   </div>
   <div class="block">
     <h2>🔷 12. Production Tips</h2>
@@ -483,19 +510,16 @@ print(f"Score: {score:.3f}")</code></pre>
       <li>Практические применения</li>
       <li>Метрики и оценка качества</li>
     </ul>
-    <pre><code># Пример кода для Production Tips
-import numpy as np
-import torch
+    <pre><code># Named Entity Recognition с BERT
+from transformers import pipeline
 
-# Реализация основного функционала
-model = initialize_model()
-model.train(X_train, y_train)
-predictions = model.predict(X_test)
+ner_pipeline = pipeline("ner", model="dslim/bert-base-NER", aggregation_strategy="simple")
 
-# Оценка качества
-from sklearn.metrics import accuracy_score
-score = accuracy_score(y_test, predictions)
-print(f"Score: {score:.3f}")</code></pre>
+text = "Apple Inc. was founded by Steve Jobs in Cupertino, California."
+entities = ner_pipeline(text)
+
+for entity in entities:
+    print(f"{entity['word']}: {entity['entity_group']} (score: {entity['score']:.3f})")</code></pre>
   </div>
 </div>
 

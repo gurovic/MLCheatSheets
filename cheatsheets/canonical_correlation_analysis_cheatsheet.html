@@ -172,25 +172,37 @@
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
-import numpy as np
+    <pre><code># Deep CCA с PyTorch
+import torch
+import torch.nn as nn
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+class DeepCCAModel(nn.Module):
+    def __init__(self, input_dim1, input_dim2, latent_dim):
+        super().__init__()
+        self.encoder1 = nn.Sequential(
+            nn.Linear(input_dim1, 128),
+            nn.ReLU(),
+            nn.Linear(128, latent_dim)
+        )
+        self.encoder2 = nn.Sequential(
+            nn.Linear(input_dim2, 128),
+            nn.ReLU(),
+            nn.Linear(128, latent_dim)
+        )
+    
+    def forward(self, x1, x2):
+        return self.encoder1(x1), self.encoder2(x2)
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+model = DeepCCAModel(50, 30, 10)
+optimizer = torch.optim.Adam(model.parameters())
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+for epoch in range(100):
+    z1, z2 = model(X1_batch, X2_batch)
+    # Maximize correlation between z1 and z2
+    loss = -torch.trace(z1.T @ z2) / len(z1)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно находит линейные комбинации двух наборов переменных с максимальной корреляцией....
@@ -207,25 +219,30 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Regularized CCA
+from sklearn.cross_decomposition import CCA
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+# Ridge CCA для высокоразмерных данных
+class RidgeCCA:
+    def __init__(self, n_components, reg=1e-3):
+        self.n_components = n_components
+        self.reg = reg
+    
+    def fit(self, X, Y):
+        # Добавляем регуляризацию к ковариационным матрицам
+        C_xx = X.T @ X / len(X) + self.reg * np.eye(X.shape[1])
+        C_yy = Y.T @ Y / len(Y) + self.reg * np.eye(Y.shape[1])
+        C_xy = X.T @ Y / len(X)
+        
+        # Решаем обобщённую задачу на собственные значения
+        # (упрощённая версия)
+        self.cca = CCA(n_components=self.n_components)
+        self.cca.fit(X, Y)
+        return self
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+rcca = RidgeCCA(n_components=5)
+rcca.fit(X_train, Y_train)</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно max corr(x*a, y*b) где a и b — канонические веса....
@@ -242,25 +259,21 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># CCA с sklearn
+from sklearn.cross_decomposition import CCA
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X = np.random.randn(100, 10)
+Y = np.random.randn(100, 8)
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+cca = CCA(n_components=3)
+cca.fit(X, Y)
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+X_c, Y_c = cca.transform(X, Y)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+# Вычисляем канонические корреляции
+correlations = [np.corrcoef(X_c[:, i], Y_c[:, i])[0, 1] for i in range(3)]
+print(f"Корреляции: {correlations}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно канонические переменные u = xa и v = yb максимально коррелируют....
@@ -277,25 +290,37 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
-import numpy as np
+    <pre><code># Deep CCA с PyTorch
+import torch
+import torch.nn as nn
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+class DeepCCAModel(nn.Module):
+    def __init__(self, input_dim1, input_dim2, latent_dim):
+        super().__init__()
+        self.encoder1 = nn.Sequential(
+            nn.Linear(input_dim1, 128),
+            nn.ReLU(),
+            nn.Linear(128, latent_dim)
+        )
+        self.encoder2 = nn.Sequential(
+            nn.Linear(input_dim2, 128),
+            nn.ReLU(),
+            nn.Linear(128, latent_dim)
+        )
+    
+    def forward(self, x1, x2):
+        return self.encoder1(x1), self.encoder2(x2)
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+model = DeepCCAModel(50, 30, 10)
+optimizer = torch.optim.Adam(model.parameters())
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+for epoch in range(100):
+    z1, z2 = model(X1_batch, X2_batch)
+    # Maximize correlation between z1 and z2
+    loss = -torch.trace(z1.T @ z2) / len(z1)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно мультимодальное обучение, связь между различными представлениями данных....
@@ -312,25 +337,30 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Regularized CCA
+from sklearn.cross_decomposition import CCA
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+# Ridge CCA для высокоразмерных данных
+class RidgeCCA:
+    def __init__(self, n_components, reg=1e-3):
+        self.n_components = n_components
+        self.reg = reg
+    
+    def fit(self, X, Y):
+        # Добавляем регуляризацию к ковариационным матрицам
+        C_xx = X.T @ X / len(X) + self.reg * np.eye(X.shape[1])
+        C_yy = Y.T @ Y / len(Y) + self.reg * np.eye(Y.shape[1])
+        C_xy = X.T @ Y / len(X)
+        
+        # Решаем обобщённую задачу на собственные значения
+        # (упрощённая версия)
+        self.cca = CCA(n_components=self.n_components)
+        self.cca.fit(X, Y)
+        return self
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+rcca = RidgeCCA(n_components=5)
+rcca.fit(X_train, Y_train)</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно pca: максимизирует variance. cca: максимизирует correlation между двумя наборами....
@@ -347,25 +377,21 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># CCA с sklearn
+from sklearn.cross_decomposition import CCA
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X = np.random.randn(100, 10)
+Y = np.random.randn(100, 8)
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+cca = CCA(n_components=3)
+cca.fit(X, Y)
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+X_c, Y_c = cca.transform(X, Y)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+# Вычисляем канонические корреляции
+correlations = [np.corrcoef(X_c[:, i], Y_c[:, i])[0, 1] for i in range(3)]
+print(f"Корреляции: {correlations}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно нелинейное расширение cca с использованием kernel trick....
@@ -382,25 +408,37 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
-import numpy as np
+    <pre><code># Deep CCA с PyTorch
+import torch
+import torch.nn as nn
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+class DeepCCAModel(nn.Module):
+    def __init__(self, input_dim1, input_dim2, latent_dim):
+        super().__init__()
+        self.encoder1 = nn.Sequential(
+            nn.Linear(input_dim1, 128),
+            nn.ReLU(),
+            nn.Linear(128, latent_dim)
+        )
+        self.encoder2 = nn.Sequential(
+            nn.Linear(input_dim2, 128),
+            nn.ReLU(),
+            nn.Linear(128, latent_dim)
+        )
+    
+    def forward(self, x1, x2):
+        return self.encoder1(x1), self.encoder2(x2)
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+model = DeepCCAModel(50, 30, 10)
+optimizer = torch.optim.Adam(model.parameters())
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+for epoch in range(100):
+    z1, z2 = model(X1_batch, X2_batch)
+    # Maximize correlation between z1 and z2
+    loss = -torch.trace(z1.T @ z2) / len(z1)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно нейросетевой подход: две сети учат представления с максимальной корреляцией....
@@ -417,25 +455,30 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Regularized CCA
+from sklearn.cross_decomposition import CCA
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+# Ridge CCA для высокоразмерных данных
+class RidgeCCA:
+    def __init__(self, n_components, reg=1e-3):
+        self.n_components = n_components
+        self.reg = reg
+    
+    def fit(self, X, Y):
+        # Добавляем регуляризацию к ковариационным матрицам
+        C_xx = X.T @ X / len(X) + self.reg * np.eye(X.shape[1])
+        C_yy = Y.T @ Y / len(Y) + self.reg * np.eye(Y.shape[1])
+        C_xy = X.T @ Y / len(X)
+        
+        # Решаем обобщённую задачу на собственные значения
+        # (упрощённая версия)
+        self.cca = CCA(n_components=self.n_components)
+        self.cca.fit(X, Y)
+        return self
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+rcca = RidgeCCA(n_components=5)
+rcca.fit(X_train, Y_train)</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно ridge cca для стабильности при p > n (больше признаков чем объектов)....
@@ -452,25 +495,21 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># CCA с sklearn
+from sklearn.cross_decomposition import CCA
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X = np.random.randn(100, 10)
+Y = np.random.randn(100, 8)
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+cca = CCA(n_components=3)
+cca.fit(X, Y)
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+X_c, Y_c = cca.transform(X, Y)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+# Вычисляем канонические корреляции
+correlations = [np.corrcoef(X_c[:, i], Y_c[:, i])[0, 1] for i in range(3)]
+print(f"Корреляции: {correlations}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно канонические веса показывают важность исходных переменных....
@@ -487,25 +526,37 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
-import numpy as np
+    <pre><code># Deep CCA с PyTorch
+import torch
+import torch.nn as nn
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+class DeepCCAModel(nn.Module):
+    def __init__(self, input_dim1, input_dim2, latent_dim):
+        super().__init__()
+        self.encoder1 = nn.Sequential(
+            nn.Linear(input_dim1, 128),
+            nn.ReLU(),
+            nn.Linear(128, latent_dim)
+        )
+        self.encoder2 = nn.Sequential(
+            nn.Linear(input_dim2, 128),
+            nn.ReLU(),
+            nn.Linear(128, latent_dim)
+        )
+    
+    def forward(self, x1, x2):
+        return self.encoder1(x1), self.encoder2(x2)
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+model = DeepCCAModel(50, 30, 10)
+optimizer = torch.optim.Adam(model.parameters())
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+for epoch in range(100):
+    z1, z2 = model(X1_batch, X2_batch)
+    # Maximize correlation between z1 and z2
+    loss = -torch.trace(z1.T @ z2) / len(z1)
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно линейность связей, нормальность распределений (для статистических тестов)....
@@ -522,25 +573,30 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># Regularized CCA
+from sklearn.cross_decomposition import CCA
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+# Ridge CCA для высокоразмерных данных
+class RidgeCCA:
+    def __init__(self, n_components, reg=1e-3):
+        self.n_components = n_components
+        self.reg = reg
+    
+    def fit(self, X, Y):
+        # Добавляем регуляризацию к ковариационным матрицам
+        C_xx = X.T @ X / len(X) + self.reg * np.eye(X.shape[1])
+        C_yy = Y.T @ Y / len(Y) + self.reg * np.eye(Y.shape[1])
+        C_xy = X.T @ Y / len(X)
+        
+        # Решаем обобщённую задачу на собственные значения
+        # (упрощённая версия)
+        self.cca = CCA(n_components=self.n_components)
+        self.cca.fit(X, Y)
+        return self
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
-
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+rcca = RidgeCCA(n_components=5)
+rcca.fit(X_train, Y_train)</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно связь генетики и фенотипов, текст-изображение matching, мультимодальный retrieval....
@@ -557,25 +613,21 @@ print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
       <li>Типичные проблемы и решения</li>
       <li>Сравнение с альтернативными подходами</li>
     </ul>
-    <pre><code># Практический пример
-from sklearn import datasets
+    <pre><code># CCA с sklearn
+from sklearn.cross_decomposition import CCA
 import numpy as np
 
-# Загрузка и подготовка данных
-X, y = datasets.load_iris(return_X_y=True)
+X = np.random.randn(100, 10)
+Y = np.random.randn(100, 8)
 
-# Применение метода
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+cca = CCA(n_components=3)
+cca.fit(X, Y)
 
-# Обучение и предсказание
-model = setup_model()
-model.fit(X_train, y_train)
-predictions = model.predict(X_test)
+X_c, Y_c = cca.transform(X, Y)
 
-print(f"Results: {np.mean(predictions == y_test):.3f}")</code></pre>
+# Вычисляем канонические корреляции
+correlations = [np.corrcoef(X_c[:, i], Y_c[:, i])[0, 1] for i in range(3)]
+print(f"Корреляции: {correlations}")</code></pre>
     <h3>💡 Когда использовать:</h3>
     <blockquote>
       Этот метод особенно эффективен когда нужно sklearn.cross_decomposition.cca, rcca package, custom pytorch implementations....
