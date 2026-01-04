@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Temporal Convolutional Networks (TCN) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⏱️ Temporal Convolutional Networks (TCN) Cheatsheet</h1>
+  <div class="subtitle">CNN для временных рядов • Альтернатива RNN • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое TCN</h2>
+    <ul>
+      <li><strong>Цель</strong>: обработка последовательностей с помощью CNN</li>
+      <li><strong>Преимущество</strong>: параллелизм + длинная память</li>
+      <li><strong>Ключевые компоненты</strong>: causal convolution + dilation</li>
+      <li><strong>Применение</strong>: временные ряды, аудио, текст</li>
+      <li><strong>Vs RNN</strong>: быстрее обучается, лучше масштабируется</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Ключевые концепции</h2>
+    <p><strong>1. Causal Convolution</strong>:</p>
+    <ul>
+      <li>Не использует будущие данные</li>
+      <li>Предсказание t зависит только от t и прошлого</li>
+      <li>Padding слева (не справа)</li>
+    </ul>
+    <p><strong>2. Dilated Convolution</strong>:</p>
+    <ul>
+      <li>Увеличение рецептивного поля</li>
+      <li>Dilation rate: 1, 2, 4, 8, 16...</li>
+      <li>Экспоненциальный рост охвата</li>
+    </ul>
+    <p><strong>3. Residual Connections</strong>:</p>
+    <ul>
+      <li>Skip connections для градиентов</li>
+      <li>Стабильное обучение глубоких сетей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Архитектура TCN</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class CausalConv1d(nn.Module):
+    def __init__(self, in_channels, out_channels, 
+                 kernel_size, dilation=1):
+        super().__init__()
+        self.padding = (kernel_size - 1) * dilation
+        self.conv = nn.Conv1d(
+            in_channels, out_channels,
+            kernel_size, padding=self.padding,
+            dilation=dilation
+        )
+    
+    def forward(self, x):
+        x = self.conv(x)
+        # Удаляем правый padding (будущее)
+        return x[:, :, :-self.padding]
+
+
+class ResidualBlock(nn.Module):
+    def __init__(self, channels, kernel_size, dilation):
+        super().__init__()
+        self.conv1 = CausalConv1d(
+            channels, channels, kernel_size, dilation
+        )
+        self.conv2 = CausalConv1d(
+            channels, channels, kernel_size, dilation
+        )
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(0.2)
+        
+    def forward(self, x):
+        residual = x
+        out = self.relu(self.conv1(x))
+        out = self.dropout(out)
+        out = self.relu(self.conv2(out))
+        out = self.dropout(out)
+        return self.relu(out + residual)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Полная реализация TCN</h2>
+    <pre><code>class TCN(nn.Module):
+    def __init__(self, input_size, output_size, 
+                 num_channels, kernel_size=3, dropout=0.2):
+        super().__init__()
+        layers = []
+        num_levels = len(num_channels)
+        
+        for i in range(num_levels):
+            dilation_size = 2 ** i
+            in_channels = input_size if i == 0 else num_channels[i-1]
+            out_channels = num_channels[i]
+            
+            layers.append(ResidualBlock(
+                out_channels if i > 0 else in_channels,
+                kernel_size,
+                dilation_size
+            ))
+            
+            if i == 0:
+                layers.insert(0, nn.Conv1d(
+                    input_size, out_channels, 1
+                ))
+        
+        self.network = nn.Sequential(*layers)
+        self.linear = nn.Linear(num_channels[-1], output_size)
+    
+    def forward(self, x):
+        # x: (batch, seq_len, features)
+        x = x.transpose(1, 2)  # (batch, features, seq_len)
+        x = self.network(x)
+        x = x.transpose(1, 2)  # (batch, seq_len, features)
+        return self.linear(x[:, -1, :])  # Последний шаг
+
+
+# Использование
+model = TCN(
+    input_size=10,        # Количество признаков
+    output_size=1,        # Регрессия
+    num_channels=[25, 25, 25, 25],  # Каналы на уровнях
+    kernel_size=3,
+    dropout=0.2
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Обучение модели</h2>
+    <pre><code>import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
+
+# Подготовка данных
+X_train_tensor = torch.FloatTensor(X_train)
+y_train_tensor = torch.FloatTensor(y_train)
+
+train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
+train_loader = DataLoader(train_dataset, batch_size=32, 
+                          shuffle=True)
+
+# Модель, оптимизатор, функция потерь
+model = TCN(input_size=10, output_size=1, 
+            num_channels=[32, 32, 32, 32])
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+criterion = nn.MSELoss()
+
+# Обучение
+num_epochs = 50
+model.train()
+
+for epoch in range(num_epochs):
+    total_loss = 0
+    for batch_x, batch_y in train_loader:
+        optimizer.zero_grad()
+        
+        # Forward pass
+        outputs = model(batch_x)
+        loss = criterion(outputs.squeeze(), batch_y)
+        
+        # Backward pass
+        loss.backward()
+        optimizer.step()
+        
+        total_loss += loss.item()
+    
+    if (epoch + 1) % 10 == 0:
+        avg_loss = total_loss / len(train_loader)
+        print(f'Epoch [{epoch+1}/{num_epochs}], '
+              f'Loss: {avg_loss:.4f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Предсказание</h2>
+    <pre><code># Предсказание
+model.eval()
+with torch.no_grad():
+    X_test_tensor = torch.FloatTensor(X_test)
+    predictions = model(X_test_tensor)
+    predictions = predictions.squeeze().numpy()
+
+# Оценка качества
+from sklearn.metrics import mean_squared_error, r2_score
+
+mse = mean_squared_error(y_test, predictions)
+r2 = r2_score(y_test, predictions)
+
+print(f'MSE: {mse:.4f}')
+print(f'R²: {r2:.4f}')
+
+# Визуализация
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(12, 6))
+plt.plot(y_test[:100], label='Истина', alpha=0.7)
+plt.plot(predictions[:100], label='Предсказание', alpha=0.7)
+plt.xlabel('Время')
+plt.ylabel('Значение')
+plt.title('TCN: Предсказания vs Истина')
+plt.legend()
+plt.grid(True)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Гиперпараметры TCN</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>num_channels</code></td><td>Каналы на уровнях</td><td>[25, 25, 25] - [64, 64, 64]</td></tr>
+      <tr><td><code>kernel_size</code></td><td>Размер ядра</td><td>3-7 (обычно 3)</td></tr>
+      <tr><td><code>dropout</code></td><td>Регуляризация</td><td>0.1-0.3</td></tr>
+      <tr><td><code>num_levels</code></td><td>Глубина сети</td><td>3-8 уровней</td></tr>
+      <tr><td><code>learning_rate</code></td><td>Скорость обучения</td><td>0.001-0.01</td></tr>
+    </table>
+    <p><strong>Рецептивное поле</strong>:</p>
+    <ul>
+      <li>RF = 1 + 2 × (kernel_size - 1) × Σ(2^i) для i=0..L-1</li>
+      <li>Пример: kernel_size=3, L=4 → RF = 31</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. TCN vs RNN/LSTM</h2>
+    <table>
+      <tr><th>Критерий</th><th>TCN</th><th>LSTM</th></tr>
+      <tr><td><strong>Скорость обучения</strong></td><td>✅ Быстрее</td><td>Медленнее</td></tr>
+      <tr><td><strong>Параллелизм</strong></td><td>✅ Полный</td><td>❌ Последовательный</td></tr>
+      <tr><td><strong>Длинная память</strong></td><td>✅ С dilations</td><td>✅ Встроенная</td></tr>
+      <tr><td><strong>Градиенты</strong></td><td>✅ Стабильные</td><td>⚠️ Могут исчезать</td></tr>
+      <tr><td><strong>Размер модели</strong></td><td>Больше</td><td>Меньше</td></tr>
+      <tr><td><strong>Inference</strong></td><td>⚡ Быстрый</td><td>Медленнее</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Готовая библиотека</h2>
+    <pre><code># Установка
+# pip install torch-tcn
+
+from tcn import TCN as TCNLayer
+
+class SimpleTCN(nn.Module):
+    def __init__(self, input_size, output_size, 
+                 num_channels, kernel_size=3):
+        super().__init__()
+        self.tcn = TCNLayer(
+            num_inputs=input_size,
+            num_channels=num_channels,
+            kernel_size=kernel_size,
+            dropout=0.2
+        )
+        self.linear = nn.Linear(num_channels[-1], output_size)
+    
+    def forward(self, x):
+        # x: (batch, seq_len, features)
+        x = x.transpose(1, 2)
+        y = self.tcn(x)
+        y = y.transpose(1, 2)
+        return self.linear(y[:, -1, :])
+
+# Использование
+model = SimpleTCN(
+    input_size=10,
+    output_size=1,
+    num_channels=[32, 32, 32, 32],
+    kernel_size=3
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Многошаговое прогнозирование</h2>
+    <pre><code>class MultiStepTCN(nn.Module):
+    def __init__(self, input_size, horizon, num_channels):
+        super().__init__()
+        self.horizon = horizon
+        self.tcn = TCN(
+            input_size=input_size,
+            output_size=horizon,  # Предсказываем все шаги
+            num_channels=num_channels
+        )
+    
+    def forward(self, x):
+        # Возвращает (batch, horizon)
+        return self.tcn(x)
+
+# Обучение
+model = MultiStepTCN(
+    input_size=10, 
+    horizon=24,  # Предсказываем 24 шага вперед
+    num_channels=[64, 64, 64, 64]
+)
+
+# Пример: прогноз на 24 часа вперед
+with torch.no_grad():
+    predictions = model(X_test_tensor)
+    # predictions: (batch_size, 24)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Применения TCN</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо подходит</h3>
+        <ul>
+          <li>Прогнозирование временных рядов</li>
+          <li>Классификация последовательностей</li>
+          <li>Обработка аудио сигналов</li>
+          <li>Детекция аномалий в потоках</li>
+          <li>Распознавание действий (video)</li>
+          <li>Обработка сенсорных данных IoT</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не рекомендуется</h3>
+        <ul>
+          <li>Очень длинные последовательности (>10k)</li>
+          <li>Задачи требующие переменную длину</li>
+          <li>Малые датасеты (переобучение)</li>
+          <li>Когда важна интерпретируемость</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Weight Normalization</h2>
+    <p>Стабилизация обучения:</p>
+    <pre><code>from torch.nn.utils import weight_norm
+
+class ImprovedTCN(nn.Module):
+    def __init__(self, input_size, output_size, 
+                 num_channels):
+        super().__init__()
+        
+        layers = []
+        for i, channels in enumerate(num_channels):
+            dilation = 2 ** i
+            in_ch = input_size if i == 0 else num_channels[i-1]
+            
+            # Weight normalization для стабильности
+            conv = weight_norm(nn.Conv1d(
+                in_ch, channels, kernel_size=3,
+                padding=(3-1)*dilation, dilation=dilation
+            ))
+            layers.append(conv)
+            layers.append(nn.ReLU())
+            layers.append(nn.Dropout(0.2))
+        
+        self.network = nn.Sequential(*layers)
+        self.fc = nn.Linear(num_channels[-1], output_size)
+    
+    def forward(self, x):
+        x = x.transpose(1, 2)
+        x = self.network(x)
+        x = x[:, :, -1]  # Последний временной шаг
+        return self.fc(x)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Нормализовать/масштабировать данные</li>
+      <li>[ ] Выбрать правильный kernel_size (обычно 3)</li>
+      <li>[ ] Рассчитать нужное рецептивное поле</li>
+      <li>[ ] Использовать weight normalization</li>
+      <li>[ ] Добавить dropout для регуляризации</li>
+      <li>[ ] Мониторить переобучение</li>
+      <li>[ ] Экспериментировать с количеством каналов</li>
+      <li>[ ] Сравнить с LSTM baseline</li>
+      <li>[ ] Визуализировать предсказания</li>
+      <li>[ ] Проверить на тестовых данных</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «TCN — это современная альтернатива LSTM для прогнозирования временных рядов, которая работает быстрее и эффективнее благодаря использованию сверточных нейронных сетей вместо рекуррентных».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

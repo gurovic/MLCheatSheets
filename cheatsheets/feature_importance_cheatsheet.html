@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Важность признаков (Feature Importance) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Важность признаков (Feature Importance) Cheatsheet</h1>
+  <div class="subtitle">Методы оценки влияния признаков • Интерпретация моделей • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Feature Importance</h2>
+    <ul>
+      <li><strong>Цель</strong>: определить, какие признаки важны для модели</li>
+      <li><strong>Применение</strong>: feature selection, интерпретация, отладка</li>
+      <li><strong>Типы</strong>: model-agnostic и model-specific</li>
+      <li><strong>Результат</strong>: ранжирование признаков по важности</li>
+      <li><strong>Использование</strong>: удаление шумовых признаков, объяснение решений</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Tree-based методы</h2>
+    <p><strong>MDI (Mean Decrease in Impurity)</strong>:</p>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Обучение модели
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+
+# Получение важности
+importances = rf.feature_importances_
+indices = np.argsort(importances)[::-1]
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.bar(range(X.shape[1]), importances[indices])
+plt.xticks(range(X.shape[1]), 
+           [feature_names[i] for i in indices], 
+           rotation=45)
+plt.xlabel('Признак')
+plt.ylabel('Важность')
+plt.title('Feature Importance (MDI)')
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Permutation Importance</h2>
+    <p>Model-agnostic метод - работает для любых моделей:</p>
+    <pre><code>from sklearn.inspection import permutation_importance
+
+# Вычисление permutation importance
+perm_importance = permutation_importance(
+    rf, X_test, y_test,
+    n_repeats=10,
+    random_state=42,
+    n_jobs=-1
+)
+
+# Получение результатов
+importances = perm_importance.importances_mean
+std = perm_importance.importances_std
+
+# Сортировка
+indices = np.argsort(importances)[::-1]
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.bar(range(len(importances)), 
+        importances[indices],
+        yerr=std[indices])
+plt.xticks(range(len(importances)), 
+           [feature_names[i] for i in indices],
+           rotation=45)
+plt.title('Permutation Importance')
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Линейные модели</h2>
+    <p>Для линейных моделей используем коэффициенты:</p>
+    <pre><code>from sklearn.linear_model import LogisticRegression, Lasso
+from sklearn.preprocessing import StandardScaler
+
+# ОБЯЗАТЕЛЬНО масштабировать данные!
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_train)
+
+# Обучение модели
+lr = LogisticRegression(penalty='l1', 
+                        solver='liblinear',
+                        C=1.0)
+lr.fit(X_scaled, y_train)
+
+# Получение коэффициентов
+coefs = np.abs(lr.coef_[0])
+indices = np.argsort(coefs)[::-1]
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.bar(range(len(coefs)), coefs[indices])
+plt.xticks(range(len(coefs)), 
+           [feature_names[i] for i in indices],
+           rotation=45)
+plt.title('Feature Importance (Linear Model Coefficients)')
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Градиентный бустинг</h2>
+    <p>XGBoost, LightGBM, CatBoost имеют встроенные методы:</p>
+    <pre><code>import xgboost as xgb
+
+# Обучение модели
+model = xgb.XGBClassifier(n_estimators=100, 
+                          random_state=42)
+model.fit(X_train, y_train)
+
+# Получение важности (несколько типов)
+# 1. Gain - среднее улучшение
+importance_gain = model.get_booster().get_score(
+    importance_type='gain'
+)
+
+# 2. Weight - количество использований
+importance_weight = model.get_booster().get_score(
+    importance_type='weight'
+)
+
+# 3. Cover - среднее покрытие
+importance_cover = model.get_booster().get_score(
+    importance_type='cover'
+)
+
+# Встроенная визуализация
+xgb.plot_importance(model, 
+                    importance_type='gain',
+                    max_num_features=20)
+plt.title('Feature Importance (XGBoost Gain)')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Drop Column Importance</h2>
+    <p>Удаление признака и измерение падения качества:</p>
+    <pre><code>from sklearn.model_selection import cross_val_score
+
+def drop_col_importance(model, X, y, cv=5):
+    """Вычисление важности через удаление столбцов"""
+    # Базовая оценка
+    base_score = cross_val_score(
+        model, X, y, cv=cv, 
+        scoring='accuracy'
+    ).mean()
+    
+    importances = []
+    for col_idx in range(X.shape[1]):
+        # Удаляем столбец
+        X_dropped = np.delete(X, col_idx, axis=1)
+        
+        # Оценка без признака
+        score = cross_val_score(
+            model, X_dropped, y, 
+            cv=cv, scoring='accuracy'
+        ).mean()
+        
+        # Разница = важность
+        importance = base_score - score
+        importances.append(importance)
+    
+    return np.array(importances)
+
+# Использование
+model = RandomForestClassifier(n_estimators=50)
+importances = drop_col_importance(model, X, y)
+
+# Визуализация
+indices = np.argsort(importances)[::-1]
+plt.bar(range(len(importances)), 
+        importances[indices])
+plt.xticks(range(len(importances)),
+           [feature_names[i] for i in indices],
+           rotation=45)
+plt.title('Drop Column Importance')
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Корреляция с целевой переменной</h2>
+    <p>Простой статистический метод:</p>
+    <pre><code>import pandas as pd
+import seaborn as sns
+
+# Создание DataFrame
+df = pd.DataFrame(X, columns=feature_names)
+df['target'] = y
+
+# Вычисление корреляции
+correlations = df.corr()['target'].drop('target')
+correlations = correlations.abs().sort_values(ascending=False)
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+correlations.plot(kind='bar')
+plt.xlabel('Признак')
+plt.ylabel('|Корреляция с целевой переменной|')
+plt.title('Feature Importance (Correlation)')
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# Тепловая карта
+plt.figure(figsize=(12, 8))
+sns.heatmap(df.corr(), annot=True, 
+            cmap='coolwarm', center=0)
+plt.title('Correlation Matrix')
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Univariate Feature Selection</h2>
+    <p>Статистические тесты для отбора признаков:</p>
+    <pre><code>from sklearn.feature_selection import (
+    SelectKBest, f_classif, chi2, mutual_info_classif
+)
+
+# Chi-square для неотрицательных данных
+selector_chi2 = SelectKBest(chi2, k=10)
+selector_chi2.fit(X_train, y_train)
+scores_chi2 = selector_chi2.scores_
+
+# F-statistic (ANOVA)
+selector_f = SelectKBest(f_classif, k=10)
+selector_f.fit(X_train, y_train)
+scores_f = selector_f.scores_
+
+# Mutual Information
+selector_mi = SelectKBest(mutual_info_classif, k=10)
+selector_mi.fit(X_train, y_train)
+scores_mi = selector_mi.scores_
+
+# Сравнение методов
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+for ax, scores, title in zip(
+    axes, 
+    [scores_chi2, scores_f, scores_mi],
+    ['Chi-square', 'F-statistic', 'Mutual Info']
+):
+    indices = np.argsort(scores)[::-1]
+    ax.bar(range(len(scores)), scores[indices])
+    ax.set_title(title)
+    ax.set_xticks(range(len(scores)))
+    ax.set_xticklabels(
+        [feature_names[i] for i in indices],
+        rotation=45, ha='right'
+    )
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Скорость</th><th>Model-agnostic</th><th>Плюсы</th></tr>
+      <tr><td><strong>MDI</strong></td><td>⚡⚡⚡</td><td>❌</td><td>Быстро, встроено</td></tr>
+      <tr><td><strong>Permutation</strong></td><td>⚡</td><td>✅</td><td>Универсально</td></tr>
+      <tr><td><strong>Drop Column</strong></td><td>⚡</td><td>✅</td><td>Точно, интуитивно</td></tr>
+      <tr><td><strong>Коэффициенты</strong></td><td>⚡⚡⚡</td><td>❌</td><td>Для линейных моделей</td></tr>
+      <tr><td><strong>Корреляция</strong></td><td>⚡⚡⚡</td><td>✅</td><td>Быстрая оценка</td></tr>
+      <tr><td><strong>Univariate</strong></td><td>⚡⚡</td><td>✅</td><td>Без обучения модели</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Рекурсивное устранение признаков (RFE)</h2>
+    <pre><code>from sklearn.feature_selection import RFE, RFECV
+
+# RFE - выбор фиксированного числа признаков
+rfe = RFE(estimator=RandomForestClassifier(
+              n_estimators=50, random_state=42
+          ),
+          n_features_to_select=10)
+rfe.fit(X_train, y_train)
+
+# Получение рангов признаков
+rankings = rfe.ranking_
+
+# RFECV - автоматический выбор через CV
+rfecv = RFECV(
+    estimator=RandomForestClassifier(
+        n_estimators=50, random_state=42
+    ),
+    step=1,
+    cv=5,
+    scoring='accuracy',
+    n_jobs=-1
+)
+rfecv.fit(X_train, y_train)
+
+print(f"Оптимальное число признаков: {rfecv.n_features_}")
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(range(1, len(rfecv.cv_results_['mean_test_score']) + 1),
+         rfecv.cv_results_['mean_test_score'])
+plt.xlabel('Число признаков')
+plt.ylabel('Cross-validation score')
+plt.title('RFECV: выбор оптимального числа признаков')
+plt.grid(True)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Лучшие практики</h3>
+        <ul>
+          <li>Используйте несколько методов для сравнения</li>
+          <li>Масштабируйте данные для линейных моделей</li>
+          <li>Permutation importance на test set</li>
+          <li>Проверяйте корреляцию между признаками</li>
+          <li>Используйте кросс-валидацию</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Частые ошибки</h3>
+        <ul>
+          <li>Использование только одного метода</li>
+          <li>Не масштабировать данные</li>
+          <li>Оценка важности на train set</li>
+          <li>Игнорирование коррелированных признаков</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Борьба с мультиколлинеарностью</h2>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+# Проверка VIF (Variance Inflation Factor)
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+def calculate_vif(df):
+    """Вычисление VIF для каждого признака"""
+    vif_data = pd.DataFrame()
+    vif_data["feature"] = df.columns
+    vif_data["VIF"] = [
+        variance_inflation_factor(df.values, i) 
+        for i in range(len(df.columns))
+    ]
+    return vif_data.sort_values('VIF', ascending=False)
+
+# Использование
+df_features = pd.DataFrame(X, columns=feature_names)
+vif_results = calculate_vif(df_features)
+print(vif_results)
+
+# Удаление признаков с высоким VIF (>10)
+high_vif_features = vif_results[vif_results['VIF'] > 10]['feature'].values
+X_reduced = df_features.drop(columns=high_vif_features)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Проверить корреляцию признаков между собой</li>
+      <li>[ ] Использовать несколько методов оценки важности</li>
+      <li>[ ] Масштабировать данные (для линейных моделей)</li>
+      <li>[ ] Оценивать важность на тестовых данных</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Проверить стабильность через бутстрэп</li>
+      <li>[ ] Удалить признаки с нулевой важностью</li>
+      <li>[ ] Проверить улучшение качества после отбора</li>
+      <li>[ ] Документировать выбранные признаки</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Feature Importance показывает, какие факторы наиболее влияют на предсказания модели — например, в модели кредитного скоринга это может показать, что зарплата и кредитная история важнее возраста и пола».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

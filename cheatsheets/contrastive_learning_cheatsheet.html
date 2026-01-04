@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Contrastive Learning Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔄 Contrastive Learning Cheatsheet</h1>
+  <div class="subtitle">SimCLR, MoCo, BYOL • Самообучение без меток • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы Contrastive Learning</h2>
+    <ul>
+      <li><strong>Цель</strong>: научить модель различать похожие и непохожие объекты</li>
+      <li><strong>Идея</strong>: положительные пары близко, отрицательные далеко в пространстве признаков</li>
+      <li><strong>Без меток</strong>: self-supervised обучение</li>
+      <li><strong>Применение</strong>: CV, NLP, audio, multimodal</li>
+      <li><strong>Результат</strong>: качественные embedding'и</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Принцип работы</h2>
+    <p><strong>Положительные пары</strong>:</p>
+    <ul>
+      <li>Augmented версии одного изображения</li>
+      <li>Разные ракурсы одного объекта</li>
+      <li>Предложение и его перефразировка</li>
+    </ul>
+    <p><strong>Отрицательные пары</strong>:</p>
+    <ul>
+      <li>Разные изображения из датасета</li>
+      <li>Другие объекты в батче</li>
+      <li>Случайные примеры</li>
+    </ul>
+    <p><strong>Функция потерь</strong>:</p>
+    <ul>
+      <li>NT-Xent (Normalized Temperature-scaled Cross Entropy)</li>
+      <li>InfoNCE Loss</li>
+      <li>Triplet Loss</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. SimCLR Framework</h2>
+    <pre><code>import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torchvision.transforms as transforms
+
+class SimCLR(nn.Module):
+    def __init__(self, base_encoder, projection_dim=128):
+        super().__init__()
+        self.encoder = base_encoder
+        
+        # Projection head
+        # ResNet-50 выход: 2048
+        self.projection = nn.Sequential(
+            nn.Linear(2048, 2048),
+            nn.ReLU(),
+            nn.Linear(2048, projection_dim)
+        )
+    
+    def forward(self, x):
+        h = self.encoder(x)
+        z = self.projection(h)
+        return F.normalize(z, dim=1)
+
+
+# Data augmentation - КЛЮЧЕВОЙ компонент
+def get_simclr_augmentation():
+    return transforms.Compose([
+        transforms.RandomResizedCrop(224, scale=(0.2, 1.0)),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomApply([
+            transforms.ColorJitter(0.4, 0.4, 0.4, 0.1)
+        ], p=0.8),
+        transforms.RandomGrayscale(p=0.2),
+        transforms.GaussianBlur(kernel_size=23),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=[0.485, 0.456, 0.406],
+            std=[0.229, 0.224, 0.225]
+        )
+    ])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. NT-Xent Loss</h2>
+    <pre><code>class NTXentLoss(nn.Module):
+    def __init__(self, temperature=0.5):
+        super().__init__()
+        self.temperature = temperature
+    
+    def forward(self, z_i, z_j):
+        """
+        z_i, z_j: (batch_size, projection_dim)
+        Положительные пары: (z_i[k], z_j[k])
+        """
+        batch_size = z_i.shape[0]
+        
+        # Объединяем оба представления
+        z = torch.cat([z_i, z_j], dim=0)  # (2*batch, dim)
+        
+        # Вычисляем косинусное сходство
+        sim = F.cosine_similarity(
+            z.unsqueeze(1), z.unsqueeze(0), dim=2
+        )  # (2*batch, 2*batch)
+        
+        # Применяем температуру
+        sim = sim / self.temperature
+        
+        # Маска для положительных пар
+        # Для каждого i положительный - i+batch или i-batch
+        positive_mask = torch.zeros_like(sim, dtype=torch.bool)
+        for i in range(batch_size):
+            positive_mask[i, i + batch_size] = True
+            positive_mask[i + batch_size, i] = True
+        
+        # Маска для самих себя (диагональ)
+        identity_mask = torch.eye(2 * batch_size, 
+                                   device=z.device, 
+                                   dtype=torch.bool)
+        
+        # Логиты для всех отрицательных пар
+        negatives = sim.masked_fill(identity_mask, -9e15)
+        
+        # Логиты для положительных пар
+        positives = sim[positive_mask].view(2 * batch_size, 1)
+        
+        # NT-Xent loss
+        logits = torch.cat([positives, negatives], dim=1)
+        labels = torch.zeros(2 * batch_size, 
+                            device=z.device, 
+                            dtype=torch.long)
+        
+        loss = F.cross_entropy(logits, labels)
+        return loss</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Обучение SimCLR</h2>
+    <pre><code>from torchvision import models
+
+# Создание модели
+base_encoder = models.resnet50(pretrained=False)
+base_encoder.fc = nn.Identity()  # Удаляем последний FC слой
+
+model = SimCLR(base_encoder, projection_dim=128)
+model = model.cuda()
+
+# Оптимизатор
+optimizer = torch.optim.Adam(
+    model.parameters(), 
+    lr=0.0003, 
+    weight_decay=1e-6
+)
+
+# Loss
+criterion = NTXentLoss(temperature=0.5)
+
+# Augmentation
+augment = get_simclr_augmentation()
+
+# Training loop
+model.train()
+for epoch in range(100):
+    for images, _ in dataloader:
+        # Создаем две augmented версии
+        images_i = torch.stack([augment(img) for img in images])
+        images_j = torch.stack([augment(img) for img in images])
+        
+        images_i = images_i.cuda()
+        images_j = images_j.cuda()
+        
+        # Forward pass
+        z_i = model(images_i)
+        z_j = model(images_j)
+        
+        # Loss
+        loss = criterion(z_i, z_j)
+        
+        # Backward pass
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    
+    print(f'Epoch {epoch}, Loss: {loss.item():.4f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. MoCo (Momentum Contrast)</h2>
+    <pre><code>class MoCo(nn.Module):
+    def __init__(self, base_encoder, dim=128, 
+                 K=65536, m=0.999, T=0.07):
+        super().__init__()
+        self.K = K  # Размер очереди
+        self.m = m  # Momentum для обновления
+        self.T = T  # Temperature
+        
+        # Encoder query
+        self.encoder_q = base_encoder
+        self.encoder_q.fc = nn.Sequential(
+            nn.Linear(2048, 2048),
+            nn.ReLU(),
+            nn.Linear(2048, dim)
+        )
+        
+        # Encoder key (momentum encoder)
+        self.encoder_k = base_encoder
+        self.encoder_k.fc = nn.Sequential(
+            nn.Linear(2048, 2048),
+            nn.ReLU(),
+            nn.Linear(2048, dim)
+        )
+        
+        # Копируем параметры
+        for param_q, param_k in zip(
+            self.encoder_q.parameters(),
+            self.encoder_k.parameters()
+        ):
+            param_k.data.copy_(param_q.data)
+            param_k.requires_grad = False
+        
+        # Очередь отрицательных примеров
+        self.register_buffer(
+            "queue", 
+            torch.randn(dim, K)
+        )
+        self.queue = F.normalize(self.queue, dim=0)
+        self.register_buffer("queue_ptr", torch.zeros(1, dtype=torch.long))
+    
+    @torch.no_grad()
+    def _momentum_update_key_encoder(self):
+        """Momentum update для key encoder"""
+        for param_q, param_k in zip(
+            self.encoder_q.parameters(),
+            self.encoder_k.parameters()
+        ):
+            param_k.data = param_k.data * self.m + \
+                          param_q.data * (1. - self.m)
+    
+    @torch.no_grad()
+    def _dequeue_and_enqueue(self, keys):
+        """Обновление очереди"""
+        batch_size = keys.shape[0]
+        ptr = int(self.queue_ptr)
+        
+        # Добавляем в очередь
+        self.queue[:, ptr:ptr + batch_size] = keys.T
+        ptr = (ptr + batch_size) % self.K
+        
+        self.queue_ptr[0] = ptr
+    
+    def forward(self, im_q, im_k):
+        # Query
+        q = self.encoder_q(im_q)
+        q = F.normalize(q, dim=1)
+        
+        # Key
+        with torch.no_grad():
+            self._momentum_update_key_encoder()
+            k = self.encoder_k(im_k)
+            k = F.normalize(k, dim=1)
+        
+        # Positive logits
+        l_pos = torch.einsum('nc,nc->n', [q, k]).unsqueeze(-1)
+        
+        # Negative logits
+        l_neg = torch.einsum('nc,ck->nk', [q, self.queue.clone().detach()])
+        
+        # Logits: (N, 1+K)
+        logits = torch.cat([l_pos, l_neg], dim=1) / self.T
+        
+        # Labels
+        labels = torch.zeros(logits.shape[0], dtype=torch.long).cuda()
+        
+        # Update queue
+        self._dequeue_and_enqueue(k)
+        
+        return logits, labels</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. BYOL (Bootstrap Your Own Latent)</h2>
+    <p>Без отрицательных примеров!</p>
+    <pre><code>class BYOL(nn.Module):
+    def __init__(self, base_encoder, projection_dim=256, 
+                 hidden_dim=4096, moving_average_decay=0.996):
+        super().__init__()
+        self.moving_average_decay = moving_average_decay
+        
+        # Online network
+        self.online_encoder = base_encoder
+        self.online_projector = nn.Sequential(
+            nn.Linear(2048, hidden_dim),
+            nn.BatchNorm1d(hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, projection_dim)
+        )
+        self.online_predictor = nn.Sequential(
+            nn.Linear(projection_dim, hidden_dim),
+            nn.BatchNorm1d(hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, projection_dim)
+        )
+        
+        # Target network (EMA of online)
+        self.target_encoder = base_encoder
+        self.target_projector = nn.Sequential(
+            nn.Linear(2048, hidden_dim),
+            nn.BatchNorm1d(hidden_dim),
+            nn.ReLU(),
+            nn.Linear(hidden_dim, projection_dim)
+        )
+        
+        # Копируем параметры
+        self.target_encoder.load_state_dict(
+            self.online_encoder.state_dict()
+        )
+        self.target_projector.load_state_dict(
+            self.online_projector.state_dict()
+        )
+        
+        # Замораживаем target
+        for param in self.target_encoder.parameters():
+            param.requires_grad = False
+        for param in self.target_projector.parameters():
+            param.requires_grad = False
+    
+    @torch.no_grad()
+    def update_moving_average(self):
+        """EMA update для target network"""
+        for online, target in zip(
+            self.online_encoder.parameters(),
+            self.target_encoder.parameters()
+        ):
+            target.data = self.moving_average_decay * target.data + \
+                         (1 - self.moving_average_decay) * online.data
+        
+        for online, target in zip(
+            self.online_projector.parameters(),
+            self.target_projector.parameters()
+        ):
+            target.data = self.moving_average_decay * target.data + \
+                         (1 - self.moving_average_decay) * online.data
+    
+    def forward(self, x1, x2):
+        # Online network
+        online_proj_1 = self.online_projector(
+            self.online_encoder(x1)
+        )
+        online_proj_2 = self.online_projector(
+            self.online_encoder(x2)
+        )
+        
+        online_pred_1 = self.online_predictor(online_proj_1)
+        online_pred_2 = self.online_predictor(online_proj_2)
+        
+        # Target network
+        with torch.no_grad():
+            target_proj_1 = self.target_projector(
+                self.target_encoder(x1)
+            )
+            target_proj_2 = self.target_projector(
+                self.target_encoder(x2)
+            )
+        
+        # Loss: mean squared error + normalize
+        loss_1 = 2 - 2 * F.cosine_similarity(
+            online_pred_1, target_proj_2.detach(), dim=-1
+        ).mean()
+        loss_2 = 2 - 2 * F.cosine_similarity(
+            online_pred_2, target_proj_1.detach(), dim=-1
+        ).mean()
+        
+        loss = (loss_1 + loss_2) / 2
+        return loss</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Отриц. примеры</th><th>Momentum</th><th>Особенность</th></tr>
+      <tr><td><strong>SimCLR</strong></td><td>✅ Batch</td><td>❌</td><td>Большой batch size</td></tr>
+      <tr><td><strong>MoCo</strong></td><td>✅ Queue</td><td>✅</td><td>Очередь примеров</td></tr>
+      <tr><td><strong>BYOL</strong></td><td>❌</td><td>✅</td><td>Только positive pairs</td></tr>
+      <tr><td><strong>SwAV</strong></td><td>❌</td><td>❌</td><td>Clustering online</td></tr>
+      <tr><td><strong>Barlow Twins</strong></td><td>❌</td><td>❌</td><td>Redundancy reduction</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Linear Evaluation</h2>
+    <p>Оценка качества learned representations:</p>
+    <pre><code># Замораживаем encoder
+for param in model.encoder.parameters():
+    param.requires_grad = False
+
+# Добавляем linear classifier
+classifier = nn.Linear(2048, num_classes).cuda()
+
+# Обучаем только classifier
+optimizer = torch.optim.SGD(
+    classifier.parameters(), 
+    lr=0.1, 
+    momentum=0.9
+)
+
+# Обучение
+for epoch in range(100):
+    for images, labels in train_loader:
+        images = images.cuda()
+        labels = labels.cuda()
+        
+        # Получаем features (frozen encoder)
+        with torch.no_grad():
+            features = model.encoder(images)
+        
+        # Классификация
+        outputs = classifier(features)
+        loss = F.cross_entropy(outputs, labels)
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+
+# Оценка точности
+model.eval()
+classifier.eval()
+correct = 0
+total = 0
+
+with torch.no_grad():
+    for images, labels in test_loader:
+        images = images.cuda()
+        labels = labels.cuda()
+        
+        features = model.encoder(images)
+        outputs = classifier(features)
+        _, predicted = outputs.max(1)
+        
+        total += labels.size(0)
+        correct += (predicted == labels).sum().item()
+
+accuracy = 100. * correct / total
+print(f'Linear Evaluation Accuracy: {accuracy:.2f}%')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Data Augmentation стратегии</h2>
+    <p>Критичны для качества!</p>
+    <pre><code># Сильные augmentations для contrastive learning
+strong_augment = transforms.Compose([
+    transforms.RandomResizedCrop(224, scale=(0.08, 1.0)),
+    transforms.RandomHorizontalFlip(p=0.5),
+    
+    # Color jittering
+    transforms.RandomApply([
+        transforms.ColorJitter(
+            brightness=0.4,
+            contrast=0.4,
+            saturation=0.4,
+            hue=0.1
+        )
+    ], p=0.8),
+    
+    # Grayscale
+    transforms.RandomGrayscale(p=0.2),
+    
+    # Gaussian blur
+    transforms.RandomApply([
+        transforms.GaussianBlur(
+            kernel_size=23, 
+            sigma=(0.1, 2.0)
+        )
+    ], p=0.5),
+    
+    # Solarization (для SwAV, BYOL)
+    transforms.RandomSolarize(threshold=128, p=0.2),
+    
+    transforms.ToTensor(),
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    )
+])
+
+# Композиция двух разных augmentations
+def get_two_augmentations(image):
+    return strong_augment(image), strong_augment(image)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Применения</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо работает</h3>
+        <ul>
+          <li>Предобучение на unlabeled data</li>
+          <li>Few-shot learning</li>
+          <li>Transfer learning</li>
+          <li>Image retrieval</li>
+          <li>Обнаружение аномалий</li>
+          <li>Multimodal learning (CLIP)</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Сложности</h3>
+        <ul>
+          <li>Требует много GPU памяти</li>
+          <li>Большой batch size критичен</li>
+          <li>Долгое обучение (100+ эпох)</li>
+          <li>Чувствительность к augmentations</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Практические советы</h2>
+    <ul>
+      <li><strong>Batch size</strong>: SimCLR нужен большой (256-4096)</li>
+      <li><strong>Temperature</strong>: 0.1-0.5, влияет на hard negatives</li>
+      <li><strong>Optimizer</strong>: LARS или AdamW с weight decay</li>
+      <li><strong>Learning rate</strong>: Linear warmup + cosine decay</li>
+      <li><strong>Augmentations</strong>: критически важны, экспериментируйте</li>
+      <li><strong>Projection head</strong>: не сохраняем после обучения</li>
+      <li><strong>Эпохи</strong>: 100-1000 для хороших результатов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать подходящий метод (SimCLR, MoCo, BYOL)</li>
+      <li>[ ] Настроить сильные augmentations</li>
+      <li>[ ] Использовать большой batch size (если возможно)</li>
+      <li>[ ] Выбрать правильную температуру</li>
+      <li>[ ] Настроить learning rate schedule</li>
+      <li>[ ] Обучать достаточно долго (100+ эпох)</li>
+      <li>[ ] Провести linear evaluation</li>
+      <li>[ ] Сравнить с supervised baseline</li>
+      <li>[ ] Fine-tune на downstream задаче</li>
+      <li>[ ] Мониторить качество embeddings</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Contrastive Learning позволяет обучить нейросеть находить хорошие представления данных без размеченных примеров — модель учится понимать, что два разных ракурса одного объекта похожи, а разные объекты различны».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

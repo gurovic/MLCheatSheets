@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Self-Supervised Learning Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎓 Self-Supervised Learning Cheatsheet</h1>
+  <div class="subtitle">Обучение без меток • Pretext задачи • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Self-Supervised Learning</h2>
+    <ul>
+      <li><strong>Цель</strong>: учиться на неразмеченных данных</li>
+      <li><strong>Идея</strong>: создать задачу из самих данных (pretext task)</li>
+      <li><strong>Результат</strong>: хорошие представления для downstream задач</li>
+      <li><strong>Преимущество</strong>: не нужна разметка</li>
+      <li><strong>Применение</strong>: CV, NLP, audio, video</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы pretext задач</h2>
+    <p><strong>Computer Vision</strong>:</p>
+    <ul>
+      <li><strong>Rotation Prediction</strong>: угол поворота (0°, 90°, 180°, 270°)</li>
+      <li><strong>Jigsaw Puzzles</strong>: собрать правильный порядок патчей</li>
+      <li><strong>Colorization</strong>: раскрасить grayscale изображение</li>
+      <li><strong>Inpainting</strong>: восстановить закрытые области</li>
+      <li><strong>Contrastive</strong>: различать augmentations</li>
+    </ul>
+    <p><strong>NLP</strong>:</p>
+    <ul>
+      <li><strong>Masked Language Model</strong>: предсказать замаскированные слова (BERT)</li>
+      <li><strong>Next Sentence Prediction</strong>: связаны ли предложения</li>
+      <li><strong>Autoregressive</strong>: предсказать следующее слово (GPT)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Rotation Prediction</h2>
+    <pre><code>import torch
+import torch.nn as nn
+import torchvision.transforms as transforms
+from torchvision import models
+
+class RotationPredictor(nn.Module):
+    def __init__(self, base_encoder):
+        super().__init__()
+        self.encoder = base_encoder
+        # 4 класса: 0°, 90°, 180°, 270°
+        self.classifier = nn.Linear(2048, 4)
+    
+    def forward(self, x):
+        features = self.encoder(x)
+        return self.classifier(features)
+
+# Data augmentation с поворотами
+class RotationDataset(torch.utils.data.Dataset):
+    def __init__(self, images):
+        self.images = images
+        self.transform = transforms.Compose([
+            transforms.Resize(256),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            )
+        ])
+    
+    def __len__(self):
+        return len(self.images)
+    
+    def __getitem__(self, idx):
+        image = self.images[idx]
+        image = self.transform(image)
+        
+        # Случайный поворот
+        rotation = torch.randint(0, 4, (1,)).item()
+        
+        # Поворот изображения
+        if rotation == 1:  # 90°
+            image = torch.rot90(image, k=1, dims=[1, 2])
+        elif rotation == 2:  # 180°
+            image = torch.rot90(image, k=2, dims=[1, 2])
+        elif rotation == 3:  # 270°
+            image = torch.rot90(image, k=3, dims=[1, 2])
+        
+        return image, rotation
+
+# Обучение
+model = RotationPredictor(models.resnet50(pretrained=False))
+model = model.cuda()
+
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+model.train()
+for epoch in range(100):
+    for images, rotations in dataloader:
+        images = images.cuda()
+        rotations = rotations.cuda()
+        
+        outputs = model(images)
+        loss = criterion(outputs, rotations)
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    
+    print(f'Epoch {epoch}, Loss: {loss.item():.4f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Jigsaw Puzzles</h2>
+    <pre><code>import random
+
+class JigsawDataset(torch.utils.data.Dataset):
+    def __init__(self, images, num_patches=9, num_permutations=100):
+        self.images = images
+        self.num_patches = num_patches  # 3x3 = 9 патчей
+        self.patch_per_side = int(num_patches ** 0.5)
+        
+        # Предопределенные перестановки
+        self.permutations = self._generate_permutations(
+            num_permutations
+        )
+        
+        self.transform = transforms.Compose([
+            transforms.Resize(255),
+            transforms.CenterCrop(225),  # 225 = 75*3
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            )
+        ])
+    
+    def _generate_permutations(self, n):
+        """Генерация n разных перестановок"""
+        perms = []
+        base = list(range(self.num_patches))
+        for _ in range(n):
+            perm = base.copy()
+            random.shuffle(perm)
+            perms.append(perm)
+        return perms
+    
+    def __len__(self):
+        return len(self.images)
+    
+    def __getitem__(self, idx):
+        image = self.transform(self.images[idx])
+        
+        # Разбиваем на патчи
+        patch_size = 75
+        patches = []
+        for i in range(self.patch_per_side):
+            for j in range(self.patch_per_side):
+                patch = image[
+                    :,
+                    i*patch_size:(i+1)*patch_size,
+                    j*patch_size:(j+1)*patch_size
+                ]
+                patches.append(patch)
+        
+        # Выбираем случайную перестановку
+        perm_idx = random.randint(0, len(self.permutations) - 1)
+        permutation = self.permutations[perm_idx]
+        
+        # Переставляем патчи
+        permuted_patches = [patches[i] for i in permutation]
+        
+        # Объединяем обратно
+        rows = []
+        for i in range(self.patch_per_side):
+            row_patches = permuted_patches[
+                i*self.patch_per_side:(i+1)*self.patch_per_side
+            ]
+            rows.append(torch.cat(row_patches, dim=2))
+        
+        permuted_image = torch.cat(rows, dim=1)
+        
+        return permuted_image, perm_idx
+
+
+class JigsawModel(nn.Module):
+    def __init__(self, base_encoder, num_permutations=100):
+        super().__init__()
+        self.encoder = base_encoder
+        self.classifier = nn.Linear(2048, num_permutations)
+    
+    def forward(self, x):
+        features = self.encoder(x)
+        return self.classifier(features)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Colorization</h2>
+    <pre><code>class ColorizationModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        
+        # Encoder (принимает grayscale L channel)
+        self.encoder = models.resnet18(pretrained=False)
+        self.encoder.conv1 = nn.Conv2d(
+            1, 64, kernel_size=7, stride=2, padding=3, bias=False
+        )
+        self.encoder.fc = nn.Identity()
+        
+        # Decoder (предсказывает ab channels)
+        self.decoder = nn.Sequential(
+            nn.ConvTranspose2d(512, 256, 4, 2, 1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(256, 128, 4, 2, 1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(128, 64, 4, 2, 1),
+            nn.ReLU(),
+            nn.ConvTranspose2d(64, 2, 4, 2, 1),  # 2 channels (ab)
+            nn.Tanh()
+        )
+    
+    def forward(self, x):
+        # x: grayscale (B, 1, H, W)
+        features = self.encoder(x)
+        features = features.view(features.size(0), 512, 1, 1)
+        ab = self.decoder(features)  # (B, 2, H, W)
+        return ab
+
+# Подготовка данных (RGB -> LAB)
+from skimage import color
+
+def rgb_to_lab(rgb_image):
+    """Конвертация RGB -> LAB"""
+    lab = color.rgb2lab(rgb_image)
+    L = lab[:, :, 0]
+    ab = lab[:, :, 1:]
+    return L, ab
+
+# Training
+model = ColorizationModel().cuda()
+criterion = nn.MSELoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+for epoch in range(100):
+    for rgb_images in dataloader:
+        # Конвертация в LAB
+        L_channels = []
+        ab_channels = []
+        
+        for img in rgb_images:
+            L, ab = rgb_to_lab(img.numpy().transpose(1, 2, 0))
+            L_channels.append(torch.FloatTensor(L).unsqueeze(0))
+            ab_channels.append(torch.FloatTensor(ab).permute(2, 0, 1))
+        
+        L = torch.stack(L_channels).cuda()
+        ab_true = torch.stack(ab_channels).cuda()
+        
+        # Forward
+        ab_pred = model(L)
+        loss = criterion(ab_pred, ab_true)
+        
+        # Backward
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    
+    print(f'Epoch {epoch}, Loss: {loss.item():.4f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Context Prediction</h2>
+    <pre><code>class ContextPredictionModel(nn.Module):
+    def __init__(self, base_encoder):
+        super().__init__()
+        self.encoder = base_encoder
+        
+        # Две ветви для двух патчей
+        self.branch1 = nn.Linear(2048, 512)
+        self.branch2 = nn.Linear(2048, 512)
+        
+        # Предсказание положения
+        # 8 возможных положений вокруг центрального патча
+        self.classifier = nn.Linear(1024, 8)
+    
+    def forward(self, patch_center, patch_context):
+        # Энкодим оба патча
+        feat_center = self.encoder(patch_center)
+        feat_context = self.encoder(patch_context)
+        
+        # Проекции
+        z_center = self.branch1(feat_center)
+        z_context = self.branch2(feat_context)
+        
+        # Конкатенация
+        combined = torch.cat([z_center, z_context], dim=1)
+        
+        # Предсказание положения
+        return self.classifier(combined)
+
+
+class ContextDataset(torch.utils.data.Dataset):
+    def __init__(self, images, patch_size=64):
+        self.images = images
+        self.patch_size = patch_size
+        self.transform = transforms.Compose([
+            transforms.Resize(256),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            )
+        ])
+        
+        # 8 позиций вокруг центра
+        self.positions = [
+            (-1, -1), (-1, 0), (-1, 1),
+            (0, -1),           (0, 1),
+            (1, -1),  (1, 0),  (1, 1)
+        ]
+    
+    def __getitem__(self, idx):
+        image = self.transform(self.images[idx])
+        
+        # Центральный патч
+        h, w = image.shape[1:]
+        center_y = h // 2
+        center_x = w // 2
+        ps = self.patch_size
+        
+        patch_center = image[
+            :,
+            center_y-ps//2:center_y+ps//2,
+            center_x-ps//2:center_x+ps//2
+        ]
+        
+        # Случайная позиция контекстного патча
+        pos_idx = random.randint(0, 7)
+        dy, dx = self.positions[pos_idx]
+        
+        # Контекстный патч
+        context_y = center_y + dy * ps
+        context_x = center_x + dx * ps
+        
+        patch_context = image[
+            :,
+            context_y-ps//2:context_y+ps//2,
+            context_x-ps//2:context_x+ps//2
+        ]
+        
+        return (patch_center, patch_context), pos_idx</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Masked Autoencoder (MAE)</h2>
+    <p>Современный подход для Vision (Facebook AI, 2021):</p>
+    <pre><code>class MaskedAutoencoder(nn.Module):
+    def __init__(self, image_size=224, patch_size=16, 
+                 embed_dim=768, mask_ratio=0.75):
+        super().__init__()
+        self.patch_size = patch_size
+        self.mask_ratio = mask_ratio
+        
+        num_patches = (image_size // patch_size) ** 2
+        
+        # Patch embedding
+        self.patch_embed = nn.Conv2d(
+            3, embed_dim, 
+            kernel_size=patch_size, 
+            stride=patch_size
+        )
+        
+        # Positional embeddings
+        self.pos_embed = nn.Parameter(
+            torch.zeros(1, num_patches, embed_dim)
+        )
+        
+        # Encoder (Vision Transformer)
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=embed_dim, 
+            nhead=12,
+            dim_feedforward=embed_dim*4
+        )
+        self.encoder = nn.TransformerEncoder(
+            encoder_layer, 
+            num_layers=12
+        )
+        
+        # Decoder
+        decoder_layer = nn.TransformerDecoderLayer(
+            d_model=embed_dim,
+            nhead=12,
+            dim_feedforward=embed_dim*4
+        )
+        self.decoder = nn.TransformerDecoder(
+            decoder_layer,
+            num_layers=8
+        )
+        
+        # Reconstruction head
+        self.head = nn.Linear(
+            embed_dim, 
+            patch_size * patch_size * 3
+        )
+    
+    def random_masking(self, x):
+        """Random masking патчей"""
+        N, L, D = x.shape  # batch, length, dim
+        
+        len_keep = int(L * (1 - self.mask_ratio))
+        
+        # Случайное перемешивание
+        noise = torch.rand(N, L, device=x.device)
+        ids_shuffle = torch.argsort(noise, dim=1)
+        ids_restore = torch.argsort(ids_shuffle, dim=1)
+        
+        # Берем только unmask патчи для encoder
+        ids_keep = ids_shuffle[:, :len_keep]
+        x_masked = torch.gather(
+            x, dim=1, 
+            index=ids_keep.unsqueeze(-1).repeat(1, 1, D)
+        )
+        
+        # Создаем маску
+        mask = torch.ones([N, L], device=x.device)
+        mask[:, :len_keep] = 0
+        mask = torch.gather(mask, dim=1, index=ids_restore)
+        
+        return x_masked, mask, ids_restore
+    
+    def forward(self, x):
+        # Patch embedding
+        x = self.patch_embed(x)  # (B, D, H/p, W/p)
+        x = x.flatten(2).transpose(1, 2)  # (B, N, D)
+        
+        # Add positional embedding
+        x = x + self.pos_embed
+        
+        # Random masking
+        x, mask, ids_restore = self.random_masking(x)
+        
+        # Encoder (только unmask патчи)
+        x = self.encoder(x)
+        
+        # Decoder (все патчи)
+        # Добавляем mask tokens
+        mask_tokens = nn.Parameter(
+            torch.zeros(1, 1, x.shape[-1])
+        ).to(x.device)
+        
+        # Восстанавливаем полную последовательность
+        x_full = torch.cat([x, mask_tokens.repeat(
+            x.shape[0], ids_restore.shape[1] - x.shape[1], 1
+        )], dim=1)
+        
+        x_full = torch.gather(
+            x_full, dim=1,
+            index=ids_restore.unsqueeze(-1).repeat(1, 1, x.shape[2])
+        )
+        
+        # Decoder
+        x = self.decoder(x_full, x)
+        
+        # Reconstruction
+        x = self.head(x)
+        
+        return x, mask</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Домен</th><th>Сложность</th><th>Качество</th></tr>
+      <tr><td><strong>Rotation</strong></td><td>CV</td><td>Низкая</td><td>Средне</td></tr>
+      <tr><td><strong>Jigsaw</strong></td><td>CV</td><td>Средняя</td><td>Хорошо</td></tr>
+      <tr><td><strong>Colorization</strong></td><td>CV</td><td>Средняя</td><td>Хорошо</td></tr>
+      <tr><td><strong>Contrastive</strong></td><td>CV/NLP</td><td>Высокая</td><td>Отлично</td></tr>
+      <tr><td><strong>MAE</strong></td><td>CV</td><td>Высокая</td><td>Отлично</td></tr>
+      <tr><td><strong>Masked LM</strong></td><td>NLP</td><td>Средняя</td><td>Отлично</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Transfer к downstream задачам</h2>
+    <pre><code># 1. Feature extraction (freeze encoder)
+pretrained_encoder = model.encoder
+for param in pretrained_encoder.parameters():
+    param.requires_grad = False
+
+classifier = nn.Sequential(
+    pretrained_encoder,
+    nn.Linear(2048, num_classes)
+).cuda()
+
+# 2. Fine-tuning (train all)
+pretrained_encoder = model.encoder
+classifier = nn.Sequential(
+    pretrained_encoder,
+    nn.Linear(2048, num_classes)
+).cuda()
+
+# Обучаем все параметры
+optimizer = torch.optim.Adam(
+    classifier.parameters(), 
+    lr=0.0001  # Меньший LR
+)
+
+# 3. Progressive unfreezing
+# Постепенно размораживаем слои
+layers = list(pretrained_encoder.children())
+
+# Сначала только последние слои
+for layer in layers[:-2]:
+    for param in layer.parameters():
+        param.requires_grad = False
+
+# Обучение
+for epoch in range(10):
+    # train...
+    pass
+
+# Разморозка следующих слоев
+for layer in layers[:-4]:
+    for param in layer.parameters():
+        param.requires_grad = False</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Практические советы</h2>
+    <ul>
+      <li><strong>Выбор pretext задачи</strong>: зависит от домена и данных</li>
+      <li><strong>Augmentations</strong>: критичны для качества</li>
+      <li><strong>Batch size</strong>: больше = лучше (особенно для contrastive)</li>
+      <li><strong>Обучение</strong>: долго (100-1000 эпох)</li>
+      <li><strong>Оценка</strong>: linear probe + fine-tuning</li>
+      <li><strong>Данные</strong>: чем больше unlabeled, тем лучше</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Применения</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо работает</h3>
+        <ul>
+          <li>Предобучение на больших unlabeled датасетах</li>
+          <li>Transfer learning для малых датасетов</li>
+          <li>Few-shot learning</li>
+          <li>Domain adaptation</li>
+          <li>Representation learning</li>
+          <li>Anomaly detection</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Ограничения</h3>
+        <ul>
+          <li>Требует много вычислительных ресурсов</li>
+          <li>Долгое обучение</li>
+          <li>Нужен большой unlabeled датасет</li>
+          <li>Сложно подобрать pretext задачу</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Современные frameworks</h2>
+    <pre><code># Lightly AI - готовая библиотека
+# pip install lightly
+
+from lightly.models import SimCLR
+from lightly.transforms import SimCLRTransform
+
+# Создание модели
+model = SimCLR(
+    backbone='resnet-18',
+    num_ftrs=512,
+    out_dim=128
+)
+
+# Augmentations
+transform = SimCLRTransform(
+    input_size=224,
+    cj_prob=0.8,
+    cj_bright=0.4,
+    cj_contrast=0.4,
+    cj_sat=0.4,
+    cj_hue=0.1
+)
+
+# Solo-learn - мульти-метод фреймворк
+# pip install solo-learn
+
+from solo.methods import BarlowTwins, BYOL, SimCLR
+
+model = BarlowTwins(
+    backbone="resnet18",
+    proj_hidden_dim=2048,
+    proj_output_dim=2048,
+    lamb=0.0051
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать подходящую pretext задачу</li>
+      <li>[ ] Подготовить большой unlabeled датасет</li>
+      <li>[ ] Настроить сильные augmentations</li>
+      <li>[ ] Использовать достаточно большой batch size</li>
+      <li>[ ] Обучать достаточно долго (100+ эпох)</li>
+      <li>[ ] Оценить качество через linear probe</li>
+      <li>[ ] Fine-tune на целевой задаче</li>
+      <li>[ ] Сравнить с supervised baseline</li>
+      <li>[ ] Экспериментировать с разными pretext задачами</li>
+      <li>[ ] Мониторить качество representations</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Self-Supervised Learning позволяет модели учиться на неразмеченных данных, решая специальные задачи вроде предсказания поворота изображения или восстановления цвета — это дает хорошие базовые знания, которые потом можно применить для реальных задач».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
