@@ -71,7 +71,7 @@
 
 ### **8. Работа с временными рядами (классические методы)**
 1. [ARIMA / SARIMA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_cheatsheet.html)
-1. Экспоненциальное сглаживание
+1. [Экспоненциальное сглаживание](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/exponential_smoothing_cheatsheet.html)
 1. Методы на основе скользящих средних
 1. Feature Engineering для временных рядов
 1. [Валидация временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_validation_cheatsheet.html)
@@ -84,7 +84,7 @@
 1. Статистические методы
 
 ### **10. Рекомендательные системы (классические)**
-1. Коллаборативная фильтрация
+1. [Коллаборативная фильтрация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/collaborative_filtering_cheatsheet.html)
 1. Контентная фильтрация
 1. Матричная факторизация (SVD)
 1. ALS (Alternating Least Squares)
@@ -97,6 +97,7 @@
 1. Особенности и тонкости настройки
 
 ### **12. Статистические методы**
+1. [Статистические методы для ML (Bootstrap, тесты)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/statistical_methods_cheatsheet.html)
 1. Линейные модели (GLM)
 1. Множественная регрессия
 1. Дисперсионный анализ (ANOVA)
@@ -108,7 +109,7 @@
 1. Создание полиномиальных признаков
 1. Взаимодействия признаков
 1. Биннинг (дискретизация)
-1. Target Encoding
+1. [Target Encoding](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/target_encoding_cheatsheet.html)
 1. Дата-специфичные признаки (временные, текстовые)
 
 ### **14. Работа с несбалансированными данными**
@@ -120,7 +121,7 @@
 ### **15. Интерпретация моделей**
 1. Важность признаков
 1. [SHAP значения](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/shap_cheatsheet.html)
-1. LIME
+1. [LIME](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lime_cheatsheet.html)
 1. Частичные зависимости
 1. Surrogate models
 
@@ -153,7 +154,7 @@
 1. Теория информации в ML
 
 ### **20. Инструменты и библиотеки**
-1. Scikit-learn полный обзор
+1. [Scikit-learn полный обзор](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/sklearn_overview_cheatsheet.html)
 1. Pandas для ML
 1. NumPy для ML
 1. Matplotlib/Seaborn для визуализации
@@ -161,7 +162,7 @@
 
 ### **21. Дополнительные темы**
 1. [Active Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/active_learning_cheatsheet.html)
-1. Transfer Learning (классические подходы)
+1. [Transfer Learning (классические подходы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transfer_learning_cheatsheet.html)
 1. Multi-task Learning
 1. Multi-output модели
 1. Квантильная регрессия
@@ -483,6 +484,7 @@
 11. Autoencoder-based (неглубокие)
 
 ### **12. Полуавтоматическое обучение (Semi-supervised)**
+11. [Semi-supervised Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/semi_supervised_learning_cheatsheet.html)
 11. Self-training
 11. Co-training
 11. Label propagation
@@ -535,6 +537,7 @@
 11. Неметрические критерии (интерпретируемость, скорость)
 
 ### **19. Автоматическое ML (AutoML)**
+11. [AutoML: полный обзор](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/automl_cheatsheet.html)
 11. Hyperparameter optimization (Grid, Random, Bayesian)
 11. Neural Architecture Search (классические подходы)
 11. Automated feature engineering
@@ -608,7 +611,7 @@
 21. Fairness в ML
 21. Adversarial robustness (классические атаки)
 21. Differential privacy
-21. Federated learning (алгоритмические аспекты)
+21. [Federated Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/federated_learning_cheatsheet.html)
 21. Explainability и accountability
 
 ### **30. Квантовое машинное обучение**

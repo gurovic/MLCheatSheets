@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Коллаборативная фильтрация Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎬 Коллаборативная фильтрация Cheatsheet</h1>
+  <div class="subtitle">Рекомендательные системы • User-based и Item-based • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое коллаборативная фильтрация?</h2>
+    <ul>
+      <li><strong>Определение</strong>: метод создания рекомендаций на основе поведения пользователей</li>
+      <li><strong>Идея</strong>: похожие пользователи любят похожие вещи</li>
+      <li><strong>Данные</strong>: матрица пользователь-товар с рейтингами</li>
+      <li><strong>Типы</strong>: User-based, Item-based, Model-based</li>
+      <li><strong>Применение</strong>: Netflix, Amazon, Spotify</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы коллаборативной фильтрации</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Когда использовать</th></tr>
+      <tr>
+        <td><strong>User-based</strong></td>
+        <td>Находит похожих пользователей</td>
+        <td>Мало пользователей, много товаров</td>
+      </tr>
+      <tr>
+        <td><strong>Item-based</strong></td>
+        <td>Находит похожие товары</td>
+        <td>Много пользователей, мало товаров</td>
+      </tr>
+      <tr>
+        <td><strong>Model-based</strong></td>
+        <td>Матричная факторизация (SVD, ALS)</td>
+        <td>Большие данные, масштабируемость</td>
+      </tr>
+      <tr>
+        <td><strong>Memory-based</strong></td>
+        <td>Использует всю матрицу</td>
+        <td>Малые данные, простота</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. User-based CF</h2>
+    <p>Находит похожих пользователей и рекомендует то, что понравилось им:</p>
+    <pre><code>import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Матрица user-item (пользователи x товары)
+# Строки - пользователи, столбцы - товары
+ratings = np.array([
+    [5, 3, 0, 1],
+    [4, 0, 0, 1],
+    [1, 1, 0, 5],
+    [0, 1, 5, 4]
+])
+
+# Вычисляем similarity между пользователями
+user_similarity = cosine_similarity(ratings)
+
+# Для user 0 находим похожих
+user_id = 0
+similar_users = np.argsort(user_similarity[user_id])[::-1][1:]
+
+# Предсказание рейтинга для item 2
+item_id = 2
+numerator = 0
+denominator = 0
+
+for similar_user in similar_users:
+    if ratings[similar_user, item_id] > 0:
+        sim = user_similarity[user_id, similar_user]
+        numerator += sim * ratings[similar_user, item_id]
+        denominator += sim
+
+predicted_rating = numerator / denominator if denominator > 0 else 0
+print(f"Predicted rating: {predicted_rating:.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Item-based CF</h2>
+    <p>Находит похожие товары на те, что понравились пользователю:</p>
+    <pre><code>import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Транспонируем для item similarity
+# Строки теперь товары, столбцы - пользователи
+ratings_T = ratings.T
+
+# Similarity между товарами
+item_similarity = cosine_similarity(ratings_T)
+
+def predict_item_based(user_id, item_id, ratings, item_sim):
+    # Находим товары, которые user уже оценил
+    rated_items = np.where(ratings[user_id] > 0)[0]
+    
+    numerator = 0
+    denominator = 0
+    
+    for rated_item in rated_items:
+        if rated_item != item_id:
+            sim = item_sim[item_id, rated_item]
+            numerator += sim * ratings[user_id, rated_item]
+            denominator += abs(sim)
+    
+    return numerator / denominator if denominator > 0 else 0
+
+# Предсказание
+prediction = predict_item_based(0, 2, ratings, item_similarity)
+print(f"Predicted rating: {prediction:.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Метрики сходства</h2>
+    <table>
+      <tr><th>Метрика</th><th>Формула/Описание</th><th>Когда использовать</th></tr>
+      <tr>
+        <td><strong>Cosine</strong></td>
+        <td>cos(θ) = A·B / (||A|| ||B||)</td>
+        <td>Самая популярная</td>
+      </tr>
+      <tr>
+        <td><strong>Pearson</strong></td>
+        <td>Корреляция Пирсона</td>
+        <td>Учитывает средние значения</td>
+      </tr>
+      <tr>
+        <td><strong>Jaccard</strong></td>
+        <td>|A ∩ B| / |A ∪ B|</td>
+        <td>Бинарные данные</td>
+      </tr>
+      <tr>
+        <td><strong>Euclidean</strong></td>
+        <td>sqrt(Σ(a-b)²)</td>
+        <td>Расстояние в пространстве</td>
+      </tr>
+    </table>
+    <pre><code>from sklearn.metrics.pairwise import (
+    cosine_similarity,
+    euclidean_distances
+)
+from scipy.stats import pearsonr
+
+# Cosine similarity
+cos_sim = cosine_similarity(ratings)
+
+# Pearson correlation
+def pearson_similarity(ratings):
+    n_users = ratings.shape[0]
+    sim_matrix = np.zeros((n_users, n_users))
+    
+    for i in range(n_users):
+        for j in range(n_users):
+            if i != j:
+                # Общие оцененные товары
+                mask = (ratings[i] > 0) & (ratings[j] > 0)
+                if mask.sum() > 0:
+                    corr, _ = pearsonr(ratings[i][mask], 
+                                       ratings[j][mask])
+                    sim_matrix[i,j] = corr
+    
+    return sim_matrix</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Библиотека Surprise</h2>
+    <p>Специализированная библиотека для рекомендаций:</p>
+    <pre><code># Установка
+# pip install scikit-surprise
+
+from surprise import Dataset, Reader
+from surprise import KNNBasic, SVD
+from surprise.model_selection import cross_validate
+import pandas as pd
+
+# Загрузка данных
+# Формат: user_id, item_id, rating
+df = pd.DataFrame({
+    'user_id': [1, 1, 1, 2, 2, 3, 3, 3],
+    'item_id': [1, 2, 3, 1, 3, 2, 3, 4],
+    'rating': [5, 3, 4, 4, 5, 2, 4, 3]
+})
+
+reader = Reader(rating_scale=(1, 5))
+data = Dataset.load_from_df(df[['user_id', 'item_id', 'rating']], 
+                             reader)
+
+# User-based CF
+sim_options = {
+    'name': 'cosine',
+    'user_based': True
+}
+algo = KNNBasic(sim_options=sim_options)
+
+# Кросс-валидация
+cross_validate(algo, data, measures=['RMSE', 'MAE'], cv=5)
+
+# Обучение на всех данных
+trainset = data.build_full_trainset()
+algo.fit(trainset)
+
+# Предсказание
+user_id = 1
+item_id = 4
+prediction = algo.predict(user_id, item_id)
+print(f"Predicted rating: {prediction.est:.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Item-based с Surprise</h2>
+    <pre><code>from surprise import KNNBasic
+
+# Item-based CF
+sim_options = {
+    'name': 'cosine',
+    'user_based': False  # Item-based
+}
+
+algo = KNNBasic(k=40, sim_options=sim_options)
+algo.fit(trainset)
+
+# Получение похожих товаров
+inner_id = trainset.to_inner_iid(item_id)
+neighbors = algo.get_neighbors(inner_id, k=10)
+
+# Конвертация обратно в внешние ID
+similar_items = [trainset.to_raw_iid(inner_id) 
+                 for inner_id in neighbors]
+print(f"Similar items to {item_id}: {similar_items}")
+
+# KNNWithMeans - учитывает средние рейтинги
+from surprise import KNNWithMeans
+
+algo = KNNWithMeans(k=40, sim_options=sim_options)
+algo.fit(trainset)
+
+# KNNBaseline - с baseline estimates
+from surprise import KNNBaseline
+
+algo = KNNBaseline(k=40, sim_options=sim_options)
+algo.fit(trainset)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Матричная факторизация (SVD)</h2>
+    <p>Model-based подход, разлагает матрицу на латентные факторы:</p>
+    <pre><code>from surprise import SVD
+from surprise.model_selection import GridSearchCV
+
+# SVD (Singular Value Decomposition)
+algo = SVD(
+    n_factors=100,     # количество латентных факторов
+    n_epochs=20,       # эпох обучения
+    lr_all=0.005,      # learning rate
+    reg_all=0.02       # регуляризация
+)
+
+algo.fit(trainset)
+prediction = algo.predict(user_id, item_id)
+
+# Grid Search для подбора параметров
+param_grid = {
+    'n_factors': [50, 100, 150],
+    'n_epochs': [20, 30],
+    'lr_all': [0.002, 0.005],
+    'reg_all': [0.02, 0.1]
+}
+
+gs = GridSearchCV(SVD, param_grid, measures=['rmse'], cv=3)
+gs.fit(data)
+
+print(f"Best RMSE: {gs.best_score['rmse']:.3f}")
+print(f"Best params: {gs.best_params['rmse']}")
+
+# Лучшая модель
+best_algo = gs.best_estimator['rmse']
+best_algo.fit(trainset)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. SVD++ и NMF</h2>
+    <pre><code>from surprise import SVDpp, NMF
+
+# SVD++ - учитывает implicit feedback
+svdpp = SVDpp(
+    n_factors=20,
+    n_epochs=20,
+    lr_all=0.007,
+    reg_all=0.02
+)
+svdpp.fit(trainset)
+
+# NMF (Non-negative Matrix Factorization)
+# Все факторы неотрицательные - лучше интерпретация
+nmf = NMF(
+    n_factors=15,
+    n_epochs=50,
+    biased=True
+)
+nmf.fit(trainset)
+
+# Получение латентных факторов
+user_factors = nmf.pu  # user factors
+item_factors = nmf.qi  # item factors
+
+# Предсказание вручную
+user_inner_id = trainset.to_inner_uid(user_id)
+item_inner_id = trainset.to_inner_iid(item_id)
+
+predicted = (user_factors[user_inner_id] @ 
+             item_factors[item_inner_id].T)
+print(f"Manual prediction: {predicted:.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Implicit Feedback</h2>
+    <p>Когда есть только факт взаимодействия (клики, просмотры), без явных рейтингов:</p>
+    <pre><code># pip install implicit
+
+import implicit
+from scipy.sparse import csr_matrix
+
+# Матрица user-item (разреженная)
+# Значения - количество взаимодействий
+user_items = csr_matrix(ratings)
+
+# ALS (Alternating Least Squares)
+model = implicit.als.AlternatingLeastSquares(
+    factors=50,
+    regularization=0.01,
+    iterations=15
+)
+
+# Обучение (транспонируем для implicit)
+model.fit(user_items.T)
+
+# Рекомендации для пользователя
+user_id = 0
+recommendations = model.recommend(
+    user_id, 
+    user_items[user_id],
+    N=10,  # топ-10
+    filter_already_liked_items=True
+)
+
+for item_id, score in recommendations:
+    print(f"Item {item_id}: score {score:.3f}")
+
+# Похожие товары
+similar_items = model.similar_items(item_id, N=10)
+
+# BM25 для текстовых данных
+model = implicit.bm25.BM25Recommender(K1=100, B=0.8)
+model.fit(user_items.T)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. LightFM - гибридные рекомендации</h2>
+    <pre><code># pip install lightfm
+
+from lightfm import LightFM
+from lightfm.data import Dataset
+from lightfm.evaluation import precision_at_k
+
+# Создание датасета
+dataset = Dataset()
+dataset.fit(users=user_ids, items=item_ids)
+
+# Построение матрицы взаимодействий
+(interactions, weights) = dataset.build_interactions(
+    [(user, item, rating) for user, item, rating in data]
+)
+
+# Модель (комбинирует CF и content-based)
+model = LightFM(
+    loss='warp',  # WARP loss для implicit
+    no_components=30
+)
+
+# Обучение
+model.fit(interactions, epochs=10, num_threads=4)
+
+# Предсказания
+scores = model.predict(user_ids, item_ids)
+
+# С features (гибридная фильтрация)
+# User features
+user_features_matrix = dataset.build_user_features([
+    (user_id, ['age:25-34', 'gender:M'])
+    for user_id in user_ids
+])
+
+# Item features
+item_features_matrix = dataset.build_item_features([
+    (item_id, ['category:electronics', 'brand:samsung'])
+    for item_id in item_ids
+])
+
+model.fit(
+    interactions,
+    user_features=user_features_matrix,
+    item_features=item_features_matrix,
+    epochs=10
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Проблема холодного старта</h2>
+    <p>Новые пользователи или товары без истории:</p>
+    <ul>
+      <li><strong>Новый пользователь</strong>:
+        <ul>
+          <li>Запросить первичные предпочтения</li>
+          <li>Использовать демографические данные</li>
+          <li>Показывать популярные товары</li>
+          <li>Гибридный подход (content-based)</li>
+        </ul>
+      </li>
+      <li><strong>Новый товар</strong>:
+        <ul>
+          <li>Content-based фильтрация</li>
+          <li>Показывать похожим пользователям</li>
+          <li>A/B тестирование</li>
+          <li>Использовать метаданные товара</li>
+        </ul>
+      </li>
+    </ul>
+    <pre><code># Гибридный подход
+def hybrid_recommendation(user_id, n=10):
+    # Если пользователь новый
+    if user_history[user_id].sum() < 3:
+        # Показываем популярные
+        popular = ratings.sum(axis=0).argsort()[::-1]
+        return popular[:n]
+    else:
+        # Коллаборативная фильтрация
+        return collaborative_filter(user_id, n)
+
+# Популярные товары как baseline
+def popular_items(ratings, n=10):
+    item_counts = (ratings > 0).sum(axis=0)
+    popular = item_counts.argsort()[::-1]
+    return popular[:n]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Метрики оценки</h2>
+    <pre><code>from surprise import accuracy
+from surprise.model_selection import train_test_split
+
+# Разделение данных
+trainset, testset = train_test_split(data, test_size=0.2)
+
+algo.fit(trainset)
+predictions = algo.test(testset)
+
+# RMSE и MAE
+rmse = accuracy.rmse(predictions)
+mae = accuracy.mae(predictions)
+
+# Precision@K и Recall@K
+from collections import defaultdict
+
+def precision_recall_at_k(predictions, k=10, threshold=3.5):
+    user_est_true = defaultdict(list)
+    for uid, _, true_r, est, _ in predictions:
+        user_est_true[uid].append((est, true_r))
+    
+    precisions = {}
+    recalls = {}
+    
+    for uid, user_ratings in user_est_true.items():
+        # Сортировка по предсказанному рейтингу
+        user_ratings.sort(key=lambda x: x[0], reverse=True)
+        
+        # Топ-K предсказаний
+        n_rel = sum((true_r >= threshold) for (_, true_r) in user_ratings)
+        n_rec_k = sum((est >= threshold) for (est, _) in user_ratings[:k])
+        n_rel_and_rec_k = sum(((true_r >= threshold) and (est >= threshold))
+                              for (est, true_r) in user_ratings[:k])
+        
+        precisions[uid] = n_rel_and_rec_k / n_rec_k if n_rec_k != 0 else 0
+        recalls[uid] = n_rel_and_rec_k / n_rel if n_rel != 0 else 0
+    
+    return precisions, recalls
+
+precisions, recalls = precision_recall_at_k(predictions, k=10)
+print(f"Precision@10: {sum(precisions.values())/len(precisions):.3f}")
+print(f"Recall@10: {sum(recalls.values())/len(recalls):.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Diversity и Serendipity</h2>
+    <p>Разнообразие рекомендаций:</p>
+    <pre><code>import numpy as np
+
+def diversity(recommendations, item_similarity):
+    """Среднее расстояние между рекомендованными товарами"""
+    n = len(recommendations)
+    if n <= 1:
+        return 0
+    
+    total_dissim = 0
+    count = 0
+    
+    for i in range(n):
+        for j in range(i+1, n):
+            # 1 - similarity = dissimilarity
+            dissim = 1 - item_similarity[recommendations[i], 
+                                         recommendations[j]]
+            total_dissim += dissim
+            count += 1
+    
+    return total_dissim / count
+
+def serendipity(recommendations, user_profile, item_similarity):
+    """Неожиданность рекомендаций"""
+    serendipity_score = 0
+    
+    for rec_item in recommendations:
+        # Насколько товар непохож на то, что user уже видел
+        max_sim = max([item_similarity[rec_item, profile_item] 
+                       for profile_item in user_profile])
+        serendipity_score += (1 - max_sim)
+    
+    return serendipity_score / len(recommendations)
+
+# Балансировка accuracy и diversity
+def rerank_for_diversity(recommendations, scores, item_sim, lambda_=0.5):
+    """MMR (Maximal Marginal Relevance) reranking"""
+    reranked = []
+    candidates = list(recommendations)
+    
+    # Первый - самый релевантный
+    best_idx = np.argmax([scores[i] for i in candidates])
+    reranked.append(candidates.pop(best_idx))
+    
+    while candidates:
+        mmr_scores = []
+        for item in candidates:
+            # Relevance - lambda * max_similarity_to_selected
+            relevance = scores[item]
+            max_sim = max([item_sim[item, selected] 
+                          for selected in reranked])
+            mmr = lambda_ * relevance - (1 - lambda_) * max_sim
+            mmr_scores.append(mmr)
+        
+        best_idx = np.argmax(mmr_scores)
+        reranked.append(candidates.pop(best_idx))
+    
+    return reranked</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Масштабирование и оптимизация</h2>
+    <ul>
+      <li><strong>Разреженные матрицы</strong>: используйте scipy.sparse</li>
+      <li><strong>Предвычисления</strong>: кэшируйте similarity matrices</li>
+      <li><strong>Approximate NN</strong>: Annoy, FAISS для быстрого поиска</li>
+      <li><strong>Батчинг</strong>: обрабатывайте пользователей батчами</li>
+      <li><strong>Sampling</strong>: negative sampling для implicit feedback</li>
+      <li><strong>Incremental updates</strong>: обновление без полного переобучения</li>
+    </ul>
+    <pre><code># FAISS для быстрого поиска похожих
+# pip install faiss-cpu
+
+import faiss
+import numpy as np
+
+# Создание индекса
+dimension = item_embeddings.shape[1]
+index = faiss.IndexFlatL2(dimension)
+index.add(item_embeddings.astype('float32'))
+
+# Быстрый поиск k ближайших
+k = 10
+distances, indices = index.search(
+    query_embedding.reshape(1, -1).astype('float32'), 
+    k
+)
+
+# Approximate search (быстрее на больших данных)
+index = faiss.IndexIVFFlat(
+    faiss.IndexFlatL2(dimension), 
+    dimension, 
+    100  # количество кластеров
+)
+index.train(item_embeddings.astype('float32'))
+index.add(item_embeddings.astype('float32'))
+index.nprobe = 10  # количество кластеров для поиска
+
+distances, indices = index.search(query_embedding, k)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Онлайн обучение</h2>
+    <pre><code># Инкрементальное обновление
+class IncrementalCF:
+    def __init__(self, n_factors=20, learning_rate=0.01):
+        self.n_factors = n_factors
+        self.lr = learning_rate
+        self.user_factors = {}
+        self.item_factors = {}
+    
+    def update(self, user_id, item_id, rating):
+        # Инициализация если новый
+        if user_id not in self.user_factors:
+            self.user_factors[user_id] = np.random.randn(self.n_factors) * 0.01
+        if item_id not in self.item_factors:
+            self.item_factors[item_id] = np.random.randn(self.n_factors) * 0.01
+        
+        # Предсказание
+        pred = self.user_factors[user_id] @ self.item_factors[item_id]
+        error = rating - pred
+        
+        # SGD update
+        user_update = error * self.item_factors[item_id]
+        item_update = error * self.user_factors[user_id]
+        
+        self.user_factors[user_id] += self.lr * user_update
+        self.item_factors[item_id] += self.lr * item_update
+    
+    def predict(self, user_id, item_id):
+        if user_id not in self.user_factors or item_id not in self.item_factors:
+            return 0  # или средний рейтинг
+        return self.user_factors[user_id] @ self.item_factors[item_id]
+
+# Использование
+model = IncrementalCF()
+for user, item, rating in new_interactions:
+    model.update(user, item, rating)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Лучшие практики</h2>
+    <ul>
+      <li><strong>Нормализация</strong>: учитывайте bias пользователей и товаров</li>
+      <li><strong>Временной фактор</strong>: свежие взаимодействия важнее</li>
+      <li><strong>Implicit vs Explicit</strong>: выбирайте правильный подход</li>
+      <li><strong>Валидация</strong>: временная валидация (не случайная)</li>
+      <li><strong>Холодный старт</strong>: гибридный подход</li>
+      <li><strong>Diversity</strong>: избегайте filter bubble</li>
+      <li><strong>A/B тесты</strong>: проверяйте метрики бизнеса</li>
+      <li><strong>Мониторинг</strong>: отслеживайте качество в production</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо подходит</h3>
+        <ul>
+          <li>Много пользователей и истории взаимодействий</li>
+          <li>Товары/контент похожи по природе</li>
+          <li>Важна персонализация</li>
+          <li>E-commerce, стриминг, новости</li>
+          <li>Есть explicit или implicit feedback</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо подходит</h3>
+        <ul>
+          <li>Новая платформа (холодный старт)</li>
+          <li>Очень разнородный контент</li>
+          <li>Мало данных о взаимодействиях</li>
+          <li>Нужна объяснимость рекомендаций</li>
+          <li>Критична актуальность (trending)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Чек-лист реализации</h2>
+    <ul>
+      <li>[ ] Собрать данные о взаимодействиях</li>
+      <li>[ ] Выбрать тип CF (user/item/model-based)</li>
+      <li>[ ] Обработать разреженность данных</li>
+      <li>[ ] Выбрать метрику similarity</li>
+      <li>[ ] Реализовать baseline (популярные товары)</li>
+      <li>[ ] Обучить модель CF</li>
+      <li>[ ] Настроить гиперпараметры</li>
+      <li>[ ] Решить проблему холодного старта</li>
+      <li>[ ] Добавить diversity в рекомендации</li>
+      <li>[ ] Валидация на исторических данных</li>
+      <li>[ ] A/B тест в production</li>
+      <li>[ ] Настроить мониторинг метрик</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Коллаборативная фильтрация — это как сарафанное радио в цифровом мире: система анализирует, что нравится похожим на вас пользователям, и рекомендует вам то, что с высокой вероятностью понравится. Именно так работают рекомендации Netflix и Amazon».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

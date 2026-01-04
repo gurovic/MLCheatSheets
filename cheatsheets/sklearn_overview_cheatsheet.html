@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Scikit-learn полный обзор Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔧 Scikit-learn: Полный обзор Cheatsheet</h1>
+  <div class="subtitle">Для начинающих и опытных • Все модули и методы • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Scikit-learn?</h2>
+    <ul>
+      <li><strong>Библиотека</strong>: самая популярная для ML в Python</li>
+      <li><strong>Функциональность</strong>: классификация, регрессия, кластеризация, снижение размерности</li>
+      <li><strong>Интерфейс</strong>: единообразный API для всех моделей</li>
+      <li><strong>Интеграция</strong>: NumPy, SciPy, Matplotlib</li>
+      <li><strong>Установка</strong>: <code>pip install scikit-learn</code></li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Универсальный API</h2>
+    <p>Все модели следуют одному паттерну:</p>
+    <pre><code>from sklearn.xxx import ModelName
+
+# Создание модели
+model = ModelName(param1=value1, param2=value2)
+
+# Обучение
+model.fit(X_train, y_train)
+
+# Предсказание
+y_pred = model.predict(X_test)
+
+# Оценка (для классификации/регрессии)
+score = model.score(X_test, y_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Основные модули</h2>
+    <table>
+      <tr><th>Модуль</th><th>Назначение</th></tr>
+      <tr><td><code>sklearn.linear_model</code></td><td>Линейные модели</td></tr>
+      <tr><td><code>sklearn.tree</code></td><td>Деревья решений</td></tr>
+      <tr><td><code>sklearn.ensemble</code></td><td>Ансамбли</td></tr>
+      <tr><td><code>sklearn.svm</code></td><td>SVM</td></tr>
+      <tr><td><code>sklearn.neighbors</code></td><td>Методы соседей</td></tr>
+      <tr><td><code>sklearn.naive_bayes</code></td><td>Наивный Байес</td></tr>
+      <tr><td><code>sklearn.cluster</code></td><td>Кластеризация</td></tr>
+      <tr><td><code>sklearn.decomposition</code></td><td>Снижение размерности</td></tr>
+      <tr><td><code>sklearn.preprocessing</code></td><td>Предобработка</td></tr>
+      <tr><td><code>sklearn.model_selection</code></td><td>Валидация и отбор</td></tr>
+      <tr><td><code>sklearn.metrics</code></td><td>Метрики качества</td></tr>
+      <tr><td><code>sklearn.pipeline</code></td><td>Пайплайны</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Классификация</h2>
+    <pre><code>from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+
+# Логистическая регрессия
+lr = LogisticRegression(max_iter=1000)
+lr.fit(X_train, y_train)
+
+# Случайный лес
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+
+# Предсказание вероятностей
+proba = rf.predict_proba(X_test)
+
+# Метрики
+from sklearn.metrics import accuracy_score, f1_score
+print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
+print(f"F1: {f1_score(y_test, y_pred, average='macro')}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Регрессия</h2>
+    <pre><code>from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.tree import DecisionTreeRegressor
+
+# Линейная регрессия
+lr = LinearRegression()
+lr.fit(X_train, y_train)
+
+# Ridge регрессия с регуляризацией
+ridge = Ridge(alpha=1.0)
+ridge.fit(X_train, y_train)
+
+# Градиентный бустинг
+gb = GradientBoostingRegressor(n_estimators=100, random_state=42)
+gb.fit(X_train, y_train)
+
+# Метрики
+from sklearn.metrics import mean_squared_error, r2_score
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f"MSE: {mse:.3f}, R²: {r2:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Предобработка данных</h2>
+    <pre><code>from sklearn.preprocessing import (
+    StandardScaler, MinMaxScaler, RobustScaler,
+    LabelEncoder, OneHotEncoder, OrdinalEncoder
+)
+
+# Масштабирование числовых признаков
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+# Кодирование категориальных признаков
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+y_encoded = le.fit_transform(y)
+
+# One-Hot encoding
+from sklearn.preprocessing import OneHotEncoder
+ohe = OneHotEncoder(sparse=False, handle_unknown='ignore')
+X_encoded = ohe.fit_transform(X_cat)
+
+# Импутация пропусков
+from sklearn.impute import SimpleImputer
+imputer = SimpleImputer(strategy='mean')
+X_imputed = imputer.fit_transform(X)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Разделение данных</h2>
+    <pre><code>from sklearn.model_selection import train_test_split
+
+# Простое разделение
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, 
+    test_size=0.2,    # 20% на тест
+    random_state=42,  # для воспроизводимости
+    stratify=y        # сохранить пропорции классов
+)
+
+# Разделение на 3 набора
+X_temp, X_test, y_temp, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+X_train, X_val, y_train, y_val = train_test_split(
+    X_temp, y_temp, test_size=0.25, random_state=42
+)
+# Итог: 60% train, 20% val, 20% test</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Кросс-валидация</h2>
+    <pre><code>from sklearn.model_selection import (
+    cross_val_score, cross_validate, KFold, StratifiedKFold
+)
+
+# Простая кросс-валидация
+scores = cross_val_score(
+    model, X, y, 
+    cv=5,           # 5 фолдов
+    scoring='accuracy'
+)
+print(f"Scores: {scores}")
+print(f"Mean: {scores.mean():.3f} (+/- {scores.std():.3f})")
+
+# Детальная кросс-валидация
+cv_results = cross_validate(
+    model, X, y,
+    cv=5,
+    scoring=['accuracy', 'precision', 'recall'],
+    return_train_score=True
+)
+
+# Кастомная разбивка
+kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+for train_idx, val_idx in kf.split(X, y):
+    X_train, X_val = X[train_idx], X[val_idx]
+    y_train, y_val = y[train_idx], y[val_idx]
+    # обучение и валидация</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Поиск гиперпараметров</h2>
+    <pre><code>from sklearn.model_selection import GridSearchCV, RandomizedSearchCV
+
+# Grid Search - перебор всех комбинаций
+param_grid = {
+    'n_estimators': [50, 100, 200],
+    'max_depth': [3, 5, 7, None],
+    'min_samples_split': [2, 5, 10]
+}
+
+grid_search = GridSearchCV(
+    RandomForestClassifier(random_state=42),
+    param_grid,
+    cv=5,
+    scoring='f1_weighted',
+    n_jobs=-1,  # использовать все ядра
+    verbose=1
+)
+
+grid_search.fit(X_train, y_train)
+print(f"Best params: {grid_search.best_params_}")
+print(f"Best score: {grid_search.best_score_:.3f}")
+
+# Лучшая модель
+best_model = grid_search.best_estimator_
+
+# Random Search - случайный поиск (быстрее)
+from scipy.stats import randint
+param_dist = {
+    'n_estimators': randint(50, 200),
+    'max_depth': [3, 5, 7, None]
+}
+
+random_search = RandomizedSearchCV(
+    RandomForestClassifier(random_state=42),
+    param_dist,
+    n_iter=20,  # количество итераций
+    cv=5,
+    random_state=42
+)
+random_search.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Pipeline (Пайплайны)</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.ensemble import RandomForestClassifier
+
+# Создание пайплайна
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('pca', PCA(n_components=10)),
+    ('classifier', RandomForestClassifier(random_state=42))
+])
+
+# Обучение всего пайплайна
+pipeline.fit(X_train, y_train)
+
+# Предсказание
+y_pred = pipeline.predict(X_test)
+
+# Доступ к компонентам
+scaler = pipeline.named_steps['scaler']
+pca = pipeline.named_steps['pca']
+
+# Пайплайн с GridSearch
+param_grid = {
+    'pca__n_components': [5, 10, 15],
+    'classifier__n_estimators': [50, 100],
+    'classifier__max_depth': [3, 5, None]
+}
+
+grid = GridSearchCV(pipeline, param_grid, cv=5)
+grid.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Кластеризация</h2>
+    <pre><code>from sklearn.cluster import (
+    KMeans, DBSCAN, AgglomerativeClustering,
+    MeanShift, SpectralClustering
+)
+from sklearn.mixture import GaussianMixture
+
+# K-means
+kmeans = KMeans(n_clusters=3, random_state=42)
+labels = kmeans.fit_predict(X)
+
+# DBSCAN (не нужно указывать количество кластеров)
+dbscan = DBSCAN(eps=0.5, min_samples=5)
+labels = dbscan.fit_predict(X)
+
+# Gaussian Mixture Model
+gmm = GaussianMixture(n_components=3, random_state=42)
+labels = gmm.fit_predict(X)
+proba = gmm.predict_proba(X)  # вероятности принадлежности
+
+# Метрики кластеризации
+from sklearn.metrics import silhouette_score, davies_bouldin_score
+sil_score = silhouette_score(X, labels)
+db_score = davies_bouldin_score(X, labels)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Снижение размерности</h2>
+    <pre><code>from sklearn.decomposition import PCA, TruncatedSVD, NMF
+from sklearn.manifold import TSNE
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+# PCA - главные компоненты
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X)
+print(f"Explained variance: {pca.explained_variance_ratio_}")
+
+# t-SNE - визуализация
+tsne = TSNE(n_components=2, random_state=42)
+X_tsne = tsne.fit_transform(X)
+
+# LDA - с учетом меток
+lda = LinearDiscriminantAnalysis(n_components=2)
+X_lda = lda.fit_transform(X, y)
+
+# Выбор числа компонент в PCA
+pca_full = PCA()
+pca_full.fit(X)
+cumsum = np.cumsum(pca_full.explained_variance_ratio_)
+n_components = np.argmax(cumsum >= 0.95) + 1  # 95% дисперсии</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Отбор признаков</h2>
+    <pre><code>from sklearn.feature_selection import (
+    SelectKBest, f_classif, mutual_info_classif,
+    RFE, SelectFromModel, VarianceThreshold
+)
+
+# SelectKBest - K лучших признаков
+selector = SelectKBest(f_classif, k=10)
+X_selected = selector.fit_transform(X, y)
+selected_features = selector.get_support(indices=True)
+
+# RFE - рекурсивное удаление признаков
+from sklearn.ensemble import RandomForestClassifier
+rfe = RFE(
+    estimator=RandomForestClassifier(random_state=42),
+    n_features_to_select=10
+)
+X_selected = rfe.fit_transform(X, y)
+
+# SelectFromModel - на основе важности признаков
+selector = SelectFromModel(
+    RandomForestClassifier(random_state=42),
+    threshold='median'
+)
+selector.fit(X, y)
+X_selected = selector.transform(X)
+
+# Удаление признаков с низкой дисперсией
+vt = VarianceThreshold(threshold=0.1)
+X_filtered = vt.fit_transform(X)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Ансамбли</h2>
+    <pre><code>from sklearn.ensemble import (
+    RandomForestClassifier, GradientBoostingClassifier,
+    AdaBoostClassifier, VotingClassifier, StackingClassifier,
+    BaggingClassifier
+)
+
+# Random Forest
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+
+# Gradient Boosting
+gb = GradientBoostingClassifier(n_estimators=100, random_state=42)
+
+# Voting Classifier - голосование
+voting = VotingClassifier(
+    estimators=[
+        ('lr', LogisticRegression()),
+        ('rf', RandomForestClassifier()),
+        ('svc', SVC(probability=True))
+    ],
+    voting='soft'  # 'hard' или 'soft' (по вероятностям)
+)
+voting.fit(X_train, y_train)
+
+# Stacking - мета-модель
+stacking = StackingClassifier(
+    estimators=[
+        ('rf', RandomForestClassifier()),
+        ('gb', GradientBoostingClassifier())
+    ],
+    final_estimator=LogisticRegression()
+)
+stacking.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Обработка несбалансированных данных</h2>
+    <pre><code>from sklearn.utils.class_weight import compute_class_weight
+from imblearn.over_sampling import SMOTE
+from imblearn.under_sampling import RandomUnderSampler
+
+# Веса классов
+class_weights = compute_class_weight(
+    'balanced',
+    classes=np.unique(y_train),
+    y=y_train
+)
+weights_dict = dict(zip(np.unique(y_train), class_weights))
+
+# Использование весов в модели
+model = RandomForestClassifier(class_weight='balanced')
+# или
+model = RandomForestClassifier(class_weight=weights_dict)
+
+# SMOTE (требует imblearn)
+# pip install imbalanced-learn
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Сохранение и загрузка моделей</h2>
+    <pre><code>import pickle
+import joblib
+
+# Способ 1: pickle
+with open('model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+with open('model.pkl', 'rb') as f:
+    loaded_model = pickle.load(f)
+
+# Способ 2: joblib (лучше для больших моделей)
+joblib.dump(model, 'model.joblib')
+loaded_model = joblib.load('model.joblib')
+
+# Сохранение пайплайна
+joblib.dump(pipeline, 'pipeline.joblib')
+loaded_pipeline = joblib.load('pipeline.joblib')
+
+# Предсказание с загруженной моделью
+predictions = loaded_model.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Метрики классификации</h2>
+    <pre><code>from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score,
+    f1_score, roc_auc_score, confusion_matrix,
+    classification_report, roc_curve
+)
+
+# Базовые метрики
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred, average='weighted')
+recall = recall_score(y_test, y_pred, average='weighted')
+f1 = f1_score(y_test, y_pred, average='weighted')
+
+# Матрица ошибок
+cm = confusion_matrix(y_test, y_pred)
+
+# Полный отчет
+report = classification_report(y_test, y_pred)
+print(report)
+
+# ROC AUC
+y_proba = model.predict_proba(X_test)[:, 1]
+auc = roc_auc_score(y_test, y_proba)
+
+# ROC кривая
+fpr, tpr, thresholds = roc_curve(y_test, y_proba)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Метрики регрессии</h2>
+    <pre><code>from sklearn.metrics import (
+    mean_squared_error, mean_absolute_error,
+    r2_score, mean_absolute_percentage_error
+)
+import numpy as np
+
+# MSE и RMSE
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+
+# MAE
+mae = mean_absolute_error(y_test, y_pred)
+
+# R² (коэффициент детерминации)
+r2 = r2_score(y_test, y_pred)
+
+# MAPE
+mape = mean_absolute_percentage_error(y_test, y_pred)
+
+print(f"RMSE: {rmse:.3f}")
+print(f"MAE: {mae:.3f}")
+print(f"R²: {r2:.3f}")
+print(f"MAPE: {mape:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Калибровка моделей</h2>
+    <pre><code>from sklearn.calibration import CalibratedClassifierCV
+from sklearn.calibration import calibration_curve
+
+# Калибровка модели
+calibrated = CalibratedClassifierCV(
+    base_estimator=model,
+    method='sigmoid',  # 'sigmoid' или 'isotonic'
+    cv=5
+)
+calibrated.fit(X_train, y_train)
+
+# Оценка калибровки
+y_proba = calibrated.predict_proba(X_test)[:, 1]
+fraction_of_positives, mean_predicted_value = calibration_curve(
+    y_test, y_proba, n_bins=10
+)
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.plot(mean_predicted_value, fraction_of_positives, 's-')
+plt.plot([0, 1], [0, 1], 'k--')
+plt.xlabel('Mean predicted probability')
+plt.ylabel('Fraction of positives')
+plt.title('Calibration curve')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Важность признаков</h2>
+    <pre><code># Для деревьев и ансамблей
+model = RandomForestClassifier(random_state=42)
+model.fit(X_train, y_train)
+
+# Важность признаков
+importances = model.feature_importances_
+indices = np.argsort(importances)[::-1]
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.figure(figsize=(10, 6))
+plt.bar(range(X.shape[1]), importances[indices])
+plt.xlabel('Feature')
+plt.ylabel('Importance')
+plt.title('Feature Importances')
+plt.show()
+
+# Для линейных моделей - коэффициенты
+lr = LogisticRegression()
+lr.fit(X_train, y_train)
+coefficients = lr.coef_[0]
+
+# Пермутационная важность (универсальная)
+from sklearn.inspection import permutation_importance
+result = permutation_importance(
+    model, X_test, y_test, 
+    n_repeats=10, random_state=42
+)
+print(f"Importances: {result.importances_mean}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 21. Работа с текстом</h2>
+    <pre><code>from sklearn.feature_extraction.text import (
+    CountVectorizer, TfidfVectorizer, HashingVectorizer
+)
+
+# Bag of Words
+vectorizer = CountVectorizer(
+    max_features=1000,
+    ngram_range=(1, 2),  # униграммы и биграммы
+    stop_words='english'
+)
+X = vectorizer.fit_transform(texts)
+
+# TF-IDF
+tfidf = TfidfVectorizer(
+    max_features=1000,
+    ngram_range=(1, 2),
+    min_df=2,  # минимальное количество документов
+    max_df=0.8  # максимальная доля документов
+)
+X_tfidf = tfidf.fit_transform(texts)
+
+# Полный пайплайн для текста
+from sklearn.pipeline import Pipeline
+from sklearn.naive_bayes import MultinomialNB
+
+text_clf = Pipeline([
+    ('tfidf', TfidfVectorizer()),
+    ('clf', MultinomialNB())
+])
+text_clf.fit(texts_train, y_train)
+y_pred = text_clf.predict(texts_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 22. Дополнительные утилиты</h2>
+    <pre><code># Генерация синтетических данных
+from sklearn.datasets import (
+    make_classification, make_regression,
+    make_blobs, make_moons
+)
+
+X, y = make_classification(
+    n_samples=1000,
+    n_features=20,
+    n_informative=15,
+    n_redundant=5,
+    random_state=42
+)
+
+# Загрузка встроенных датасетов
+from sklearn.datasets import (
+    load_iris, load_wine, load_breast_cancer,
+    load_boston, load_diabetes
+)
+
+iris = load_iris()
+X, y = iris.data, iris.target
+
+# Валидационные кривые
+from sklearn.model_selection import validation_curve
+
+train_scores, val_scores = validation_curve(
+    model, X, y,
+    param_name="max_depth",
+    param_range=range(1, 11),
+    cv=5
+)
+
+# Кривые обучения
+from sklearn.model_selection import learning_curve
+
+train_sizes, train_scores, val_scores = learning_curve(
+    model, X, y,
+    train_sizes=np.linspace(0.1, 1.0, 10),
+    cv=5
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 23. Лучшие практики</h2>
+    <ul>
+      <li><strong>Всегда масштабируйте данные</strong> для линейных моделей, SVM, k-NN</li>
+      <li><strong>Используйте пайплайны</strong> для предотвращения утечки данных</li>
+      <li><strong>Установите random_state</strong> для воспроизводимости</li>
+      <li><strong>Применяйте кросс-валидацию</strong> для надежной оценки</li>
+      <li><strong>Используйте GridSearchCV</strong> для поиска гиперпараметров</li>
+      <li><strong>Проверяйте на overfitting</strong> - сравнивайте train и test scores</li>
+      <li><strong>Сохраняйте модели</strong> с помощью joblib</li>
+      <li><strong>Документируйте параметры</strong> и результаты экспериментов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 24. Частые ошибки</h2>
+    <div class="good-vs-bad">
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Масштабирование после разделения данных</li>
+          <li>Использование test set для подбора параметров</li>
+          <li>Забывать про stratify при несбалансированных классах</li>
+          <li>Не проверять на overfitting</li>
+          <li>Использовать accuracy для несбалансированных данных</li>
+          <li>Не обрабатывать пропущенные значения</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Масштабирование в пайплайне</li>
+          <li>Использование кросс-валидации</li>
+          <li>Стратифицированное разделение данных</li>
+          <li>Мониторинг метрик на train и validation</li>
+          <li>Выбор правильных метрик для задачи</li>
+          <li>Использование SimpleImputer для пропусков</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 25. Чек-лист для проекта</h2>
+    <ul>
+      <li>[ ] Загрузка и изучение данных</li>
+      <li>[ ] Обработка пропусков</li>
+      <li>[ ] Кодирование категориальных признаков</li>
+      <li>[ ] Разделение на train/test с stratify</li>
+      <li>[ ] Масштабирование числовых признаков</li>
+      <li>[ ] Создание базовой модели (baseline)</li>
+      <li>[ ] Выбор метрик для оценки</li>
+      <li>[ ] Кросс-валидация</li>
+      <li>[ ] Отбор признаков</li>
+      <li>[ ] Подбор гиперпараметров</li>
+      <li>[ ] Проверка на overfitting</li>
+      <li>[ ] Создание финального пайплайна</li>
+      <li>[ ] Сохранение модели</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Scikit-learn — это как швейцарский нож для машинного обучения. Он предоставляет единый интерфейс для решения практически любых задач: от простой классификации до сложных ансамблей, с встроенными инструментами для оценки качества и оптимизации моделей».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

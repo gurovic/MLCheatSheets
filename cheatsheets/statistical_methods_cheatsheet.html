@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>📊 Статистические методы для ML Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 Статистические методы для ML</h1>
+  <div class="subtitle">Bootstrap • Статистические тесты • Проверка гипотез<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое статистические методы в ML?</h2>
+    <ul>
+      <li><strong>Цель</strong>: обоснование выводов и сравнение моделей</li>
+      <li><strong>Bootstrap</strong>: оценка неопределенности</li>
+      <li><strong>Тесты</strong>: проверка гипотез о данных и моделях</li>
+      <li><strong>P-value</strong>: вероятность случайного результата</li>
+      <li><strong>Применение</strong>: валидация, feature selection, A/B тесты</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 2. Bootstrap</h2>
+    <pre><code>import numpy as np
+from sklearn.utils import resample
+
+# Данные
+X = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+
+# Bootstrap resampling
+n_iterations = 1000
+bootstrapped_means = []
+
+for i in range(n_iterations):
+    # Resample with replacement
+    sample = resample(X, n_samples=len(X), random_state=i)
+    bootstrapped_means.append(sample.mean())
+
+# Confidence interval
+ci_lower = np.percentile(bootstrapped_means, 2.5)
+ci_upper = np.percentile(bootstrapped_means, 97.5)
+
+print(f"Mean: {np.mean(X):.2f}")
+print(f"95% CI: [{ci_lower:.2f}, {ci_upper:.2f}]")
+
+# Bootstrap для модели
+from sklearn.ensemble import RandomForestClassifier
+
+def bootstrap_model(model, X, y, n_iterations=100):
+    scores = []
+    for i in range(n_iterations):
+        X_boot, y_boot = resample(X, y, random_state=i)
+        model.fit(X_boot, y_boot)
+        score = model.score(X, y)
+        scores.append(score)
+    return scores
+
+scores = bootstrap_model(RandomForestClassifier(), X_train, y_train)
+print(f"Model score: {np.mean(scores):.3f} ± {np.std(scores):.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 3. T-тест</h2>
+    <pre><code>from scipy import stats
+
+# Одновыборочный t-тест
+# H0: среднее = expected_mean
+t_stat, p_value = stats.ttest_1samp(data, popmean=expected_mean)
+
+# Двухвыборочный t-тест
+# Сравнение двух групп
+model_A_scores = [0.85, 0.87, 0.86, 0.88, 0.84]
+model_B_scores = [0.90, 0.91, 0.89, 0.92, 0.90]
+
+t_stat, p_value = stats.ttest_ind(model_A_scores, model_B_scores)
+print(f"T-statistic: {t_stat:.3f}")
+print(f"P-value: {p_value:.3f}")
+
+if p_value < 0.05:
+    print("Модели статистически различны")
+else:
+    print("Нет статистически значимых различий")
+
+# Paired t-тест (на тех же данных)
+# Например, кросс-валидация на тех же фолдах
+t_stat, p_value = stats.ttest_rel(model_A_scores, model_B_scores)
+print(f"Paired t-test p-value: {p_value:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 4. Mann-Whitney U тест</h2>
+    <p>Непараметрический аналог t-теста:</p>
+    <pre><code>from scipy.stats import mannwhitneyu
+
+# Не требует нормальности распределения
+u_stat, p_value = mannwhitneyu(
+    model_A_scores, 
+    model_B_scores,
+    alternative='two-sided'
+)
+
+print(f"U-statistic: {u_stat:.3f}")
+print(f"P-value: {p_value:.3f}")
+
+# Wilcoxon signed-rank test (парный)
+from scipy.stats import wilcoxon
+
+w_stat, p_value = wilcoxon(model_A_scores, model_B_scores)
+print(f"Wilcoxon p-value: {p_value:.3f}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 5. Chi-square тест</h2>
+    <pre><code>from scipy.stats import chi2_contingency
+
+# Тест независимости категориальных переменных
+contingency_table = np.array([
+    [25, 35],  # группа A: success, fail
+    [40, 20]   # группа B: success, fail
+])
+
+chi2, p_value, dof, expected = chi2_contingency(contingency_table)
+
+print(f"Chi2: {chi2:.3f}")
+print(f"P-value: {p_value:.3f}")
+print(f"Degrees of freedom: {dof}")
+
+# Feature selection с chi2
+from sklearn.feature_selection import chi2, SelectKBest
+
+selector = SelectKBest(chi2, k=10)
+X_selected = selector.fit_transform(X, y)
+selected_features = selector.get_support(indices=True)
+print(f"Selected features: {selected_features}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 6. ANOVA</h2>
+    <pre><code>from scipy.stats import f_oneway
+
+# Сравнение более двух групп
+model_A_scores = [0.85, 0.87, 0.86]
+model_B_scores = [0.90, 0.91, 0.89]
+model_C_scores = [0.88, 0.89, 0.87]
+
+f_stat, p_value = f_oneway(
+    model_A_scores,
+    model_B_scores,
+    model_C_scores
+)
+
+print(f"F-statistic: {f_stat:.3f}")
+print(f"P-value: {p_value:.3f}")
+
+# ANOVA для feature selection
+from sklearn.feature_selection import f_classif
+
+f_values, p_values = f_classif(X, y)
+print(f"F-values: {f_values}")
+print(f"P-values: {p_values}")
+
+# Выбор значимых признаков
+significant = p_values < 0.05
+print(f"Significant features: {np.where(significant)[0]}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 7. McNemar's тест</h2>
+    <p>Сравнение классификаторов на тех же данных:</p>
+    <pre><code>from statsmodels.stats.contingency_tables import mcnemar
+
+# Предсказания двух моделей
+y_pred_A = model_A.predict(X_test)
+y_pred_B = model_B.predict(X_test)
+
+# Contingency table
+correct_A = (y_pred_A == y_test)
+correct_B = (y_pred_B == y_test)
+
+n_01 = np.sum(correct_A & ~correct_B)  # A right, B wrong
+n_10 = np.sum(~correct_A & correct_B)  # A wrong, B right
+
+table = np.array([[np.sum(correct_A & correct_B), n_01],
+                  [n_10, np.sum(~correct_A & ~correct_B)]])
+
+result = mcnemar(table, exact=True)
+print(f"McNemar p-value: {result.pvalue:.3f}")
+
+if result.pvalue < 0.05:
+    print("Модели статистически различны")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 8. Permutation тест</h2>
+    <pre><code>from sklearn.model_selection import permutation_test_score
+
+# Проверка значимости модели
+model = RandomForestClassifier(n_estimators=100)
+
+score, perm_scores, p_value = permutation_test_score(
+    model, X, y,
+    scoring='accuracy',
+    cv=5,
+    n_permutations=1000,
+    random_state=42
+)
+
+print(f"Score: {score:.3f}")
+print(f"P-value: {p_value:.3f}")
+print(f"Mean permutation score: {perm_scores.mean():.3f}")
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.hist(perm_scores, bins=20, alpha=0.7)
+plt.axvline(score, color='red', linestyle='--', label='Actual score')
+plt.xlabel('Score')
+plt.ylabel('Frequency')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 9. Multiple Testing Correction</h2>
+    <pre><code>from statsmodels.stats.multitest import multipletests
+
+# Множественное тестирование
+p_values = [0.01, 0.04, 0.03, 0.05, 0.10, 0.02]
+
+# Bonferroni correction
+reject, p_corrected, _, _ = multipletests(
+    p_values, 
+    alpha=0.05, 
+    method='bonferroni'
+)
+
+print(f"Bonferroni corrected: {p_corrected}")
+print(f"Reject H0: {reject}")
+
+# FDR (Benjamini-Hochberg)
+reject, p_corrected, _, _ = multipletests(
+    p_values,
+    alpha=0.05,
+    method='fdr_bh'
+)
+
+print(f"FDR corrected: {p_corrected}")
+print(f"Reject H0: {reject}")</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить гипотезу (H0 и H1)</li>
+      <li>[ ] Выбрать подходящий тест</li>
+      <li>[ ] Проверить предпосылки теста</li>
+      <li>[ ] Вычислить статистику и p-value</li>
+      <li>[ ] Интерпретировать результат</li>
+      <li>[ ] Учесть множественное тестирование</li>
+      <li>[ ] Использовать Bootstrap для CI</li>
+    </ul>
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Статистические методы — это математический способ ответить на вопрос: "Действительно ли одна модель лучше другой, или это случайность?" Они дают нам уверенность в выводах».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

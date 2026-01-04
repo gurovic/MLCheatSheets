@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>🌐 Federated Learning Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🌐 Federated Learning</h1>
+  <div class="subtitle">Распределенное обучение • Privacy • Edge Computing<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Federated Learning?</h2>
+    <ul>
+      <li><strong>Определение</strong>: обучение без централизации данных</li>
+      <li><strong>Идея</strong>: модель к данным, а не данные к модели</li>
+      <li><strong>Privacy</strong>: данные остаются на устройствах</li>
+      <li><strong>Применение</strong>: мобильные устройства, медицина, IoT</li>
+      <li><strong>Примеры</strong>: Google Gboard, Apple Siri</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Архитектура FL</h2>
+    <p>Основные компоненты:</p>
+    <ol>
+      <li><strong>Central Server</strong>: координирует обучение</li>
+      <li><strong>Clients</strong>: локальные устройства с данными</li>
+      <li><strong>Global Model</strong>: агрегированная модель</li>
+      <li><strong>Local Models</strong>: обучаются на клиентах</li>
+      <li><strong>Communication</strong>: обмен параметрами</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Federated Averaging (FedAvg)</h2>
+    <pre><code>import numpy as np
+from sklearn.linear_model import SGDClassifier
+
+def federated_averaging(clients_data, n_rounds=10, 
+                       local_epochs=5):
+    # Инициализация глобальной модели
+    global_model = SGDClassifier(warm_start=True)
+    
+    # Инициализация на некоторых данных
+    X_init, y_init = clients_data[0]
+    global_model.fit(X_init[:10], y_init[:10])
+    
+    for round_num in range(n_rounds):
+        print(f"Round {round_num + 1}/{n_rounds}")
+        
+        # Локальные модели
+        local_models = []
+        sample_sizes = []
+        
+        for X_client, y_client in clients_data:
+            # Копируем веса глобальной модели
+            local_model = SGDClassifier(warm_start=True)
+            local_model.coef_ = global_model.coef_.copy()
+            local_model.intercept_ = global_model.intercept_.copy()
+            local_model.classes_ = global_model.classes_
+            
+            # Локальное обучение
+            for epoch in range(local_epochs):
+                local_model.partial_fit(
+                    X_client, y_client, 
+                    classes=np.unique(y_client)
+                )
+            
+            local_models.append(local_model)
+            sample_sizes.append(len(X_client))
+        
+        # Агрегация весов (weighted average)
+        total_samples = sum(sample_sizes)
+        global_weights = np.zeros_like(global_model.coef_)
+        global_intercept = np.zeros_like(global_model.intercept_)
+        
+        for model, n_samples in zip(local_models, sample_sizes):
+            weight = n_samples / total_samples
+            global_weights += weight * model.coef_
+            global_intercept += weight * model.intercept_
+        
+        # Обновление глобальной модели
+        global_model.coef_ = global_weights
+        global_model.intercept_ = global_intercept
+    
+    return global_model</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Flower Framework</h2>
+    <pre><code># pip install flwr
+
+import flwr as fl
+from sklearn.linear_model import LogisticRegression
+
+# Определение клиента
+class FlowerClient(fl.client.NumPyClient):
+    def __init__(self, X, y):
+        self.X = X
+        self.y = y
+        self.model = LogisticRegression()
+    
+    def get_parameters(self, config):
+        return [self.model.coef_, self.model.intercept_]
+    
+    def set_parameters(self, parameters):
+        self.model.coef_ = parameters[0]
+        self.model.intercept_ = parameters[1]
+    
+    def fit(self, parameters, config):
+        self.set_parameters(parameters)
+        self.model.fit(self.X, self.y)
+        return self.get_parameters(config), len(self.X), {}
+    
+    def evaluate(self, parameters, config):
+        self.set_parameters(parameters)
+        loss = 1 - self.model.score(self.X, self.y)
+        return loss, len(self.X), {"accuracy": self.model.score(self.X, self.y)}
+
+# Запуск клиента
+fl.client.start_numpy_client(
+    server_address="localhost:8080",
+    client=FlowerClient(X_client, y_client)
+)
+
+# Сервер
+strategy = fl.server.strategy.FedAvg(
+    min_available_clients=2,
+    min_fit_clients=2
+)
+
+fl.server.start_server(
+    server_address="0.0.0.0:8080",
+    config=fl.server.ServerConfig(num_rounds=10),
+    strategy=strategy
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Differential Privacy</h2>
+    <pre><code># Добавление шума для privacy
+def add_gaussian_noise(params, noise_scale=0.1):
+    noisy_params = []
+    for param in params:
+        noise = np.random.normal(0, noise_scale, param.shape)
+        noisy_params.append(param + noise)
+    return noisy_params
+
+# Клиппинг градиентов
+def clip_gradients(gradients, max_norm=1.0):
+    total_norm = np.sqrt(sum(np.sum(g**2) for g in gradients))
+    clip_coef = max_norm / (total_norm + 1e-6)
+    
+    if clip_coef < 1:
+        gradients = [g * clip_coef for g in gradients]
+    
+    return gradients
+
+# FL с DP
+def fedavg_with_dp(clients_data, n_rounds=10, 
+                   noise_scale=0.1, clip_norm=1.0):
+    global_model = SGDClassifier(warm_start=True)
+    
+    for round_num in range(n_rounds):
+        local_updates = []
+        
+        for X_client, y_client in clients_data:
+            local_model = train_local(X_client, y_client)
+            
+            # Вычисляем update (разницу весов)
+            update = local_model.coef_ - global_model.coef_
+            
+            # Клиппинг
+            update_clipped = clip_gradients([update], clip_norm)[0]
+            
+            # Добавляем шум
+            update_noisy = add_gaussian_noise([update_clipped], noise_scale)[0]
+            
+            local_updates.append(update_noisy)
+        
+        # Агрегация
+        avg_update = np.mean(local_updates, axis=0)
+        global_model.coef_ += avg_update
+    
+    return global_model</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Проблемы FL</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Non-IID данные</td><td>Персонализация, FedProx</td></tr>
+      <tr><td>Communication overhead</td><td>Compression, quantization</td></tr>
+      <tr><td>Stragglers</td><td>Асинхронное обучение</td></tr>
+      <tr><td>Privacy leakage</td><td>Differential privacy, secure aggregation</td></tr>
+      <tr><td>Model poisoning</td><td>Byzantine-robust aggregation</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Персонализация</h2>
+    <pre><code># Локальная адаптация глобальной модели
+def personalized_fl(global_model, X_local, y_local, 
+                   adaptation_steps=5):
+    # Копируем глобальную модель
+    personal_model = clone(global_model)
+    
+    # Fine-tune на локальных данных
+    for step in range(adaptation_steps):
+        personal_model.partial_fit(X_local, y_local)
+    
+    return personal_model
+
+# Interpolation между глобальной и локальной
+def interpolate_models(global_model, local_model, alpha=0.5):
+    # alpha=0: полностью глобальная
+    # alpha=1: полностью локальная
+    
+    interpolated_weights = (
+        alpha * local_model.coef_ + 
+        (1 - alpha) * global_model.coef_
+    )
+    
+    model = clone(global_model)
+    model.coef_ = interpolated_weights
+    return model</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Когда использовать FL</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо подходит</h3>
+        <ul>
+          <li>Данные распределены и приватны</li>
+          <li>Нельзя централизовать данные (GDPR)</li>
+          <li>Edge computing / IoT</li>
+          <li>Медицинские данные</li>
+          <li>Персональные устройства</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не подходит</h3>
+        <ul>
+          <li>Данные можно централизовать</li>
+          <li>Малое количество клиентов</li>
+          <li>Сильно non-IID данные</li>
+          <li>Ограниченная коммуникация</li>
+          <li>Нужна высокая точность</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить клиентов и их данные</li>
+      <li>[ ] Выбрать стратегию агрегации</li>
+      <li>[ ] Настроить communication rounds</li>
+      <li>[ ] Добавить privacy (DP)</li>
+      <li>[ ] Обработать non-IID данные</li>
+      <li>[ ] Оптимизировать communication</li>
+      <li>[ ] Обеспечить безопасность</li>
+      <li>[ ] Мониторить convergence</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Federated Learning — это как командная работа, где каждый учится на своих данных локально, а затем делится только знаниями (параметрами модели), но не самими данными. Это позволяет обучать мощные модели, сохраняя приватность».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

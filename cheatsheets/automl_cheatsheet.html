@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>AutoML: Полный обзор Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🤖 AutoML: Автоматизация машинного обучения Cheatsheet</h1>
+  <div class="subtitle">Полный обзор • Популярные фреймворки • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое AutoML?</h2>
+    <ul>
+      <li><strong>Определение</strong>: автоматизация процесса машинного обучения</li>
+      <li><strong>Цель</strong>: снизить барьер входа в ML, ускорить разработку</li>
+      <li><strong>Автоматизирует</strong>: выбор моделей, гиперпараметры, feature engineering</li>
+      <li><strong>Для кого</strong>: data scientists и разработчики</li>
+      <li><strong>Преимущества</strong>: экономия времени, базовые решения, эксперименты</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Что автоматизируется?</h2>
+    <table>
+      <tr><th>Этап</th><th>Описание</th></tr>
+      <tr><td><strong>Предобработка</strong></td><td>Обработка пропусков, кодирование категорий</td></tr>
+      <tr><td><strong>Feature Engineering</strong></td><td>Создание новых признаков</td></tr>
+      <tr><td><strong>Выбор модели</strong></td><td>Автоматический перебор алгоритмов</td></tr>
+      <tr><td><strong>Подбор параметров</strong></td><td>Оптимизация гиперпараметров</td></tr>
+      <tr><td><strong>Архитектура</strong></td><td>Поиск архитектуры нейросетей (NAS)</td></tr>
+      <tr><td><strong>Ансамбли</strong></td><td>Создание ансамблей моделей</td></tr>
+      <tr><td><strong>Валидация</strong></td><td>Кросс-валидация и оценка</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Auto-sklearn</h2>
+    <p>Автоматизация на основе scikit-learn:</p>
+    <pre><code># Установка
+# pip install auto-sklearn
+
+from autosklearn.classification import AutoSklearnClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
+
+# Разделение данных
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# AutoML модель
+automl = AutoSklearnClassifier(
+    time_left_for_this_task=3600,  # 1 час
+    per_run_time_limit=300,         # 5 минут на модель
+    n_jobs=-1,
+    memory_limit=8192,              # МБ
+    ensemble_size=50
+)
+
+# Обучение
+automl.fit(X_train, y_train)
+
+# Предсказание
+y_pred = automl.predict(X_test)
+print(f"Accuracy: {accuracy_score(y_test, y_pred):.3f}")
+
+# Статистика
+print(automl.sprint_statistics())
+print(automl.show_models())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. TPOT (Tree-based Pipeline Optimization)</h2>
+    <pre><code># Установка
+# pip install tpot
+
+from tpot import TPOTClassifier
+from sklearn.model_selection import train_test_split
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# TPOT использует генетические алгоритмы
+tpot = TPOTClassifier(
+    generations=5,           # поколения эволюции
+    population_size=50,      # размер популяции
+    cv=5,                    # кросс-валидация
+    random_state=42,
+    verbosity=2,
+    n_jobs=-1,
+    max_time_mins=60,        # максимальное время
+    max_eval_time_mins=5     # время на одну модель
+)
+
+# Обучение
+tpot.fit(X_train, y_train)
+
+# Оценка
+print(f"Score: {tpot.score(X_test, y_test):.3f}")
+
+# Экспорт лучшего пайплайна
+tpot.export('tpot_pipeline.py')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. H2O AutoML</h2>
+    <pre><code># Установка
+# pip install h2o
+
+import h2o
+from h2o.automl import H2OAutoML
+
+# Инициализация H2O
+h2o.init()
+
+# Загрузка данных в H2O
+train = h2o.H2OFrame(df_train)
+test = h2o.H2OFrame(df_test)
+
+# Определение колонок
+x = train.columns
+y = 'target'
+x.remove(y)
+
+# AutoML
+aml = H2OAutoML(
+    max_runtime_secs=3600,       # 1 час
+    max_models=20,               # макс. моделей
+    seed=42,
+    nfolds=5,                    # кросс-валидация
+    sort_metric='AUC'
+)
+
+# Обучение
+aml.train(x=x, y=y, training_frame=train)
+
+# Leaderboard - рейтинг моделей
+lb = aml.leaderboard
+print(lb)
+
+# Лучшая модель
+best_model = aml.leader
+
+# Предсказание
+preds = best_model.predict(test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. PyCaret</h2>
+    <pre><code># Установка
+# pip install pycaret
+
+from pycaret.classification import *
+
+# Инициализация
+clf_setup = setup(
+    data=df,
+    target='target',
+    session_id=42,
+    train_size=0.8,
+    normalize=True,
+    transformation=True,
+    ignore_features=['id'],
+    silent=True,
+    verbose=False
+)
+
+# Сравнение всех моделей
+best_models = compare_models(n_select=3)
+
+# Создание модели
+best = create_model('xgboost')
+
+# Тюнинг
+tuned = tune_model(best, n_iter=50)
+
+# Ансамбль
+ensemble = ensemble_model(tuned, method='Bagging')
+
+# Оценка
+evaluate_model(ensemble)
+
+# Финализация и сохранение
+final = finalize_model(ensemble)
+save_model(final, 'my_model')
+
+# Предсказание
+predictions = predict_model(final, data=test_df)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. MLBox</h2>
+    <pre><code># Установка
+# pip install mlbox
+
+from mlbox.preprocessing import Reader, Drift_thresholder
+from mlbox.optimisation import Optimiser
+from mlbox.prediction import Predictor
+
+# Загрузка данных
+paths = ["train.csv", "test.csv"]
+target_name = "target"
+
+rd = Reader(sep=",")
+df = rd.train_test_split(paths, target_name)
+
+# Удаление признаков с дрейфом
+dft = Drift_thresholder()
+df = dft.fit_transform(df)
+
+# Оптимизация (AutoML)
+opt = Optimiser(
+    scoring='accuracy',
+    n_folds=5
+)
+
+# Поиск лучших параметров
+best_params = opt.optimise(
+    space={'ne__numerical_strategy': {"search": "choice", 
+                                       "space": [0, 'mean']}},
+    df=df,
+    max_evals=40
+)
+
+# Предсказание
+prd = Predictor()
+prd.fit_predict(best_params, df)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. AutoKeras (для нейросетей)</h2>
+    <pre><code># Установка
+# pip install autokeras
+
+import autokeras as ak
+
+# Классификация изображений
+clf = ak.ImageClassifier(
+    max_trials=10,          # количество попыток
+    overwrite=True,
+    directory='autokeras',
+    project_name='image_classification'
+)
+
+# Обучение
+clf.fit(x_train, y_train, epochs=10)
+
+# Оценка
+clf.evaluate(x_test, y_test)
+
+# Экспорт модели
+model = clf.export_model()
+
+# Классификация текста
+text_clf = ak.TextClassifier(max_trials=10)
+text_clf.fit(x_train, y_train, epochs=10)
+
+# Табличные данные
+structured_clf = ak.StructuredDataClassifier(max_trials=10)
+structured_clf.fit(x_train, y_train)
+
+# Регрессия
+reg = ak.StructuredDataRegressor(max_trials=10)
+reg.fit(x_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Google AutoML Tables</h2>
+    <p>Облачный сервис от Google (платный):</p>
+    <pre><code># Установка Google Cloud SDK и библиотеки
+# pip install google-cloud-automl
+
+from google.cloud import automl_v1beta1 as automl
+
+# Создание клиента
+client = automl.TablesClient(project='project-id', region='us-central1')
+
+# Создание датасета
+dataset = client.create_dataset(
+    dataset_display_name='my_dataset'
+)
+
+# Импорт данных
+client.import_data(
+    dataset=dataset,
+    gcs_input_uris='gs://bucket/data.csv'
+)
+
+# Обучение модели
+model = client.create_model(
+    'my_model',
+    dataset=dataset,
+    train_budget_milli_node_hours=1000,  # ~1 час
+    optimization_objective='MAXIMIZE_AU_ROC'
+)
+
+# Предсказание
+response = client.predict(
+    model_name=model.name,
+    inputs={'feature1': value1, 'feature2': value2}
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Сравнение фреймворков</h2>
+    <table>
+      <tr><th>Фреймворк</th><th>Плюсы</th><th>Минусы</th></tr>
+      <tr>
+        <td><strong>Auto-sklearn</strong></td>
+        <td>Мощный, научный подход</td>
+        <td>Медленный, сложная установка</td>
+      </tr>
+      <tr>
+        <td><strong>TPOT</strong></td>
+        <td>Генетические алгоритмы, экспорт кода</td>
+        <td>Долгое обучение</td>
+      </tr>
+      <tr>
+        <td><strong>H2O AutoML</strong></td>
+        <td>Быстрый, масштабируемый</td>
+        <td>Свой формат данных</td>
+      </tr>
+      <tr>
+        <td><strong>PyCaret</strong></td>
+        <td>Простой, интерактивный</td>
+        <td>Меньше контроля</td>
+      </tr>
+      <tr>
+        <td><strong>AutoKeras</strong></td>
+        <td>Для нейросетей, Keras API</td>
+        <td>Только DL</td>
+      </tr>
+      <tr>
+        <td><strong>MLBox</strong></td>
+        <td>Дрейф данных, feature engineering</td>
+        <td>Меньше популярен</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Байесовская оптимизация</h2>
+    <p>Современный метод подбора гиперпараметров:</p>
+    <pre><code># Установка
+# pip install scikit-optimize
+
+from skopt import BayesSearchCV
+from skopt.space import Real, Integer, Categorical
+from sklearn.ensemble import RandomForestClassifier
+
+# Пространство поиска
+search_spaces = {
+    'n_estimators': Integer(10, 200),
+    'max_depth': Integer(3, 15),
+    'min_samples_split': Integer(2, 20),
+    'min_samples_leaf': Integer(1, 10),
+    'max_features': Categorical(['sqrt', 'log2', None])
+}
+
+# Байесовская оптимизация
+opt = BayesSearchCV(
+    RandomForestClassifier(random_state=42),
+    search_spaces,
+    n_iter=50,          # количество итераций
+    cv=5,
+    n_jobs=-1,
+    random_state=42
+)
+
+opt.fit(X_train, y_train)
+print(f"Best score: {opt.best_score_:.3f}")
+print(f"Best params: {opt.best_params_}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Optuna</h2>
+    <p>Продвинутый фреймворк для оптимизации:</p>
+    <pre><code># Установка
+# pip install optuna
+
+import optuna
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
+
+def objective(trial):
+    # Параметры для оптимизации
+    n_estimators = trial.suggest_int('n_estimators', 10, 200)
+    max_depth = trial.suggest_int('max_depth', 2, 32)
+    min_samples_split = trial.suggest_int('min_samples_split', 2, 20)
+    
+    # Модель
+    model = RandomForestClassifier(
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        min_samples_split=min_samples_split,
+        random_state=42
+    )
+    
+    # Оценка
+    score = cross_val_score(
+        model, X_train, y_train, 
+        cv=5, scoring='f1_weighted'
+    ).mean()
+    
+    return score
+
+# Создание исследования
+study = optuna.create_study(
+    direction='maximize',
+    sampler=optuna.samplers.TPESampler(seed=42)
+)
+
+# Оптимизация
+study.optimize(objective, n_trials=100)
+
+# Лучшие параметры
+print(f"Best value: {study.best_value:.3f}")
+print(f"Best params: {study.best_params}")
+
+# Визуализация
+optuna.visualization.plot_optimization_history(study)
+optuna.visualization.plot_param_importances(study)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Hyperopt</h2>
+    <pre><code># Установка
+# pip install hyperopt
+
+from hyperopt import hp, fmin, tpe, Trials, STATUS_OK
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.model_selection import cross_val_score
+
+# Пространство поиска
+space = {
+    'n_estimators': hp.choice('n_estimators', range(50, 200)),
+    'max_depth': hp.choice('max_depth', range(3, 15)),
+    'learning_rate': hp.loguniform('learning_rate', -5, 0),
+    'subsample': hp.uniform('subsample', 0.5, 1.0)
+}
+
+def objective(params):
+    model = GradientBoostingClassifier(
+        n_estimators=int(params['n_estimators']),
+        max_depth=int(params['max_depth']),
+        learning_rate=params['learning_rate'],
+        subsample=params['subsample'],
+        random_state=42
+    )
+    
+    score = cross_val_score(
+        model, X_train, y_train, cv=5
+    ).mean()
+    
+    # Hyperopt минимизирует, поэтому возвращаем -score
+    return {'loss': -score, 'status': STATUS_OK}
+
+# Оптимизация
+trials = Trials()
+best = fmin(
+    fn=objective,
+    space=space,
+    algo=tpe.suggest,   # Tree-structured Parzen Estimator
+    max_evals=100,
+    trials=trials
+)
+
+print(f"Best params: {best}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Neural Architecture Search (NAS)</h2>
+    <p>Автоматический поиск архитектуры нейросетей:</p>
+    <pre><code># AutoKeras для NAS
+import autokeras as ak
+
+# Поиск архитектуры
+input_node = ak.ImageInput()
+output_node = ak.ImageBlock(
+    block_type='resnet',
+    normalize=True,
+    augment=True
+)(input_node)
+output_node = ak.ClassificationHead()(output_node)
+
+clf = ak.AutoModel(
+    inputs=input_node,
+    outputs=output_node,
+    max_trials=10
+)
+
+clf.fit(x_train, y_train, epochs=10)
+
+# Или Keras Tuner
+from kerastuner import HyperModel, RandomSearch
+import tensorflow as tf
+
+class MyHyperModel(HyperModel):
+    def build(self, hp):
+        model = tf.keras.Sequential()
+        
+        # Подбираем количество слоев и нейронов
+        for i in range(hp.Int('num_layers', 1, 5)):
+            model.add(tf.keras.layers.Dense(
+                units=hp.Int(f'units_{i}', 32, 512, step=32),
+                activation='relu'
+            ))
+        
+        model.add(tf.keras.layers.Dense(10, activation='softmax'))
+        
+        model.compile(
+            optimizer='adam',
+            loss='sparse_categorical_crossentropy',
+            metrics=['accuracy']
+        )
+        return model
+
+tuner = RandomSearch(
+    MyHyperModel(),
+    objective='val_accuracy',
+    max_trials=10
+)
+
+tuner.search(x_train, y_train, epochs=5, validation_split=0.2)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Feature Engineering автоматизация</h2>
+    <pre><code># Featuretools - автоматическое создание признаков
+# pip install featuretools
+
+import featuretools as ft
+import pandas as pd
+
+# Создание EntitySet
+es = ft.EntitySet(id='data')
+
+# Добавление датафрейма
+es = es.add_dataframe(
+    dataframe_name='transactions',
+    dataframe=transactions_df,
+    index='transaction_id',
+    time_index='timestamp'
+)
+
+es = es.add_dataframe(
+    dataframe_name='customers',
+    dataframe=customers_df,
+    index='customer_id'
+)
+
+# Связь между таблицами
+es = es.add_relationship('customers', 'customer_id',
+                         'transactions', 'customer_id')
+
+# Автоматическая генерация признаков
+feature_matrix, feature_defs = ft.dfs(
+    entityset=es,
+    target_dataframe_name='customers',
+    max_depth=2,
+    verbose=True
+)
+
+print(f"Generated {len(feature_defs)} features")
+print(feature_matrix.head())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Автоматическая обработка данных</h2>
+    <pre><code># DataPrep - автоматическая предобработка
+# pip install dataprep
+
+from dataprep.eda import create_report, plot, plot_correlation
+
+# Автоматический EDA отчет
+create_report(df).show_browser()
+
+# Визуализация признака
+plot(df, 'column_name')
+
+# Корреляции
+plot_correlation(df)
+
+# Sklearn ColumnTransformer - автоматическая обработка
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+
+# Определение типов колонок
+numeric_features = df.select_dtypes(include=['int64', 'float64']).columns
+categorical_features = df.select_dtypes(include=['object']).columns
+
+# Пайплайн для числовых
+numeric_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='median')),
+    ('scaler', StandardScaler())
+])
+
+# Пайплайн для категориальных
+categorical_transformer = Pipeline(steps=[
+    ('imputer', SimpleImputer(strategy='most_frequent')),
+    ('onehot', OneHotEncoder(handle_unknown='ignore'))
+])
+
+# Объединение
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', numeric_transformer, numeric_features),
+        ('cat', categorical_transformer, categorical_features)
+    ]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Когда использовать AutoML</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо использовать</h3>
+        <ul>
+          <li>Быстрое прототипирование</li>
+          <li>Базовая модель (baseline)</li>
+          <li>Малый опыт в ML</li>
+          <li>Ограниченное время</li>
+          <li>Стандартные задачи (классификация, регрессия)</li>
+          <li>Табличные данные</li>
+          <li>Исследование возможностей данных</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не подходит</h3>
+        <ul>
+          <li>Нестандартные задачи</li>
+          <li>Специфичные требования</li>
+          <li>Необходим глубокий контроль</li>
+          <li>Очень большие данные (если не H2O)</li>
+          <li>Критичная производительность</li>
+          <li>Кастомные метрики</li>
+          <li>Интерпретируемость важнее точности</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Лучшие практики AutoML</h2>
+    <ul>
+      <li><strong>Предобработка</strong>: очистить данные перед AutoML</li>
+      <li><strong>Время</strong>: дать достаточно времени для поиска</li>
+      <li><strong>Валидация</strong>: проверить результаты на hold-out set</li>
+      <li><strong>Интерпретация</strong>: понять, что делает модель</li>
+      <li><strong>Baseline</strong>: использовать как отправную точку</li>
+      <li><strong>Итерация</strong>: дорабатывать вручную лучшие модели</li>
+      <li><strong>Ресурсы</strong>: контролировать вычислительные затраты</li>
+      <li><strong>Документация</strong>: сохранять параметры и результаты</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Ограничения AutoML</h2>
+    <ul>
+      <li><strong>Черный ящик</strong>: не всегда понятно, что происходит</li>
+      <li><strong>Вычислительные ресурсы</strong>: может быть дорого</li>
+      <li><strong>Время</strong>: иногда долгое обучение</li>
+      <li><strong>Переобучение</strong>: может переобучиться на валидации</li>
+      <li><strong>Специфика домена</strong>: не учитывает доменные знания</li>
+      <li><strong>Кастомизация</strong>: сложно добавить свои компоненты</li>
+      <li><strong>Воспроизводимость</strong>: не всегда легко воспроизвести</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Workflow с AutoML</h2>
+    <ol>
+      <li><strong>Анализ данных</strong>: EDA, понимание данных</li>
+      <li><strong>Очистка</strong>: обработка пропусков, выбросов</li>
+      <li><strong>Разделение</strong>: train/val/test split</li>
+      <li><strong>AutoML</strong>: запуск автоматического обучения</li>
+      <li><strong>Анализ результатов</strong>: изучение лучших моделей</li>
+      <li><strong>Валидация</strong>: проверка на test set</li>
+      <li><strong>Доработка</strong>: ручная оптимизация при необходимости</li>
+      <li><strong>Feature engineering</strong>: добавление доменных признаков</li>
+      <li><strong>Повторный запуск</strong>: AutoML с новыми признаками</li>
+      <li><strong>Финализация</strong>: выбор и сохранение модели</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 21. Метрики и мониторинг</h2>
+    <pre><code># Большинство AutoML фреймворков поддерживают кастомные метрики
+
+# PyCaret - кастомная метрика
+from pycaret.classification import setup, compare_models
+
+def custom_metric(y_true, y_pred):
+    # Ваша метрика
+    return score
+
+setup(data=df, target='target', 
+      custom_metric=custom_metric)
+
+# Optuna - несколько метрик
+def multi_objective(trial):
+    # ... параметры ...
+    model = ...
+    
+    accuracy = ...
+    f1 = ...
+    
+    return accuracy, f1  # несколько целей
+
+study = optuna.create_study(directions=['maximize', 'maximize'])
+study.optimize(multi_objective, n_trials=100)
+
+# Мониторинг через Weights & Biases
+import wandb
+from wandb.keras import WandbCallback
+
+wandb.init(project="automl-experiment")
+# логирование метрик
+wandb.log({"accuracy": accuracy, "loss": loss})</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 22. Продакшн и деплой</h2>
+    <pre><code># Экспорт модели из AutoML
+# TPOT
+tpot.export('best_pipeline.py')
+
+# PyCaret
+save_model(model, 'my_automl_model')
+
+# H2O
+h2o.save_model(model, path="./models/")
+
+# Загрузка и использование
+# PyCaret
+from pycaret.classification import load_model, predict_model
+
+model = load_model('my_automl_model')
+predictions = predict_model(model, data=new_data)
+
+# H2O
+loaded_model = h2o.load_model("./models/model_name")
+predictions = loaded_model.predict(h2o_test_frame)
+
+# Упаковка в Docker
+# Dockerfile
+FROM python:3.9
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY model.pkl .
+COPY app.py .
+CMD ["python", "app.py"]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 23. Выбор AutoML фреймворка</h2>
+    <p><strong>Для начинающих</strong>: PyCaret (простой интерфейс)</p>
+    <p><strong>Для табличных данных</strong>: H2O AutoML или Auto-sklearn</p>
+    <p><strong>Для нейросетей</strong>: AutoKeras или Keras Tuner</p>
+    <p><strong>Для гибкости</strong>: Optuna или Hyperopt</p>
+    <p><strong>Для больших данных</strong>: H2O AutoML</p>
+    <p><strong>Для research</strong>: Auto-sklearn или TPOT</p>
+    <p><strong>Для продакшна</strong>: H2O или PyCaret</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 24. Чек-лист AutoML проекта</h2>
+    <ul>
+      <li>[ ] Провести EDA и понять данные</li>
+      <li>[ ] Очистить данные от явных ошибок</li>
+      <li>[ ] Разделить на train/val/test</li>
+      <li>[ ] Выбрать AutoML фреймворк</li>
+      <li>[ ] Определить метрику оптимизации</li>
+      <li>[ ] Установить время/ресурсы для поиска</li>
+      <li>[ ] Запустить AutoML</li>
+      <li>[ ] Проанализировать найденные модели</li>
+      <li>[ ] Проверить на test set</li>
+      <li>[ ] Интерпретировать результаты</li>
+      <li>[ ] Добавить доменные знания</li>
+      <li>[ ] Повторить с улучшениями</li>
+      <li>[ ] Сохранить и задокументировать</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «AutoML — это как опытный ассистент, который автоматически тестирует сотни комбинаций алгоритмов и настроек, находя оптимальное решение для ваших данных. Это экономит недели ручной работы и дает качественный результат быстро».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
