@@ -28,54 +28,508 @@
   <div class="subtitle">Практический фокус • 📅 Январь 2026</div>
 
   <div class="block">
-    <h2>🔷 Silhouette Score</h2>
+    <h2>🔷 1. Типы метрик кластеризации</h2>
+    <ul>
+      <li><strong>Внутренние метрики</strong>: оценка без истинных меток
+        <ul>
+          <li>Silhouette Score</li>
+          <li>Davies-Bouldin Index</li>
+          <li>Calinski-Harabasz Index</li>
+          <li>Inertia / Within-cluster sum of squares</li>
+        </ul>
+      </li>
+      <li><strong>Внешние метрики</strong>: требуют истинные метки
+        <ul>
+          <li>Adjusted Rand Index (ARI)</li>
+          <li>Adjusted Mutual Information (AMI)</li>
+          <li>Normalized Mutual Information (NMI)</li>
+          <li>Fowlkes-Mallows Index</li>
+          <li>Homogeneity, Completeness, V-measure</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Silhouette Score</h2>
     <p><strong>Диапазон</strong>: [-1, 1], выше = лучше</p>
-    <pre><code>from sklearn.metrics import silhouette_score
+    <p><strong>Формула</strong>: s = (b - a) / max(a, b)</p>
+    <ul>
+      <li>a: среднее расстояние до точек своего кластера</li>
+      <li>b: среднее расстояние до точек ближайшего другого кластера</li>
+    </ul>
+    <pre><code>from sklearn.metrics import silhouette_score, silhouette_samples
+import matplotlib.pyplot as plt
+
+# Общий score
 score = silhouette_score(X, labels)
-# > 0.7: отлично, 0.5-0.7: хорошо, < 0.25: плохо</code></pre>
+print(f"Silhouette Score: {score:.3f}")
+
+# Интерпретация:
+# > 0.7: отлично, четкие кластеры
+# 0.5-0.7: хорошее качество
+# 0.25-0.5: средне, есть перекрытия
+# < 0.25: плохо, неправильная кластеризация
+
+# Silhouette для каждой точки
+sample_scores = silhouette_samples(X, labels)
+
+# Визуализация silhouette plot
+def plot_silhouette(X, labels):
+    n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    y_lower = 10
+    
+    for i in range(n_clusters):
+        cluster_scores = sample_scores[labels == i]
+        cluster_scores.sort()
+        
+        size = cluster_scores.shape[0]
+        y_upper = y_lower + size
+        
+        ax.fill_betweenx(np.arange(y_lower, y_upper),
+                        0, cluster_scores,
+                        alpha=0.7, label=f'Cluster {i}')
+        
+        y_lower = y_upper + 10
+    
+    ax.set_xlabel('Silhouette Coefficient')
+    ax.set_ylabel('Cluster')
+    ax.axvline(x=score, color='red', linestyle='--',
+              label=f'Mean: {score:.3f}')
+    ax.legend()
+    ax.set_title('Silhouette Plot')
+    plt.show()
+
+plot_silhouette(X, labels)</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 Davies-Bouldin Index</h2>
+    <h2>🔷 3. Davies-Bouldin Index</h2>
     <p><strong>Диапазон</strong>: [0, ∞), ниже = лучше</p>
+    <p><strong>Идея</strong>: отношение внутри-кластерных расстояний к между-кластерным</p>
     <pre><code>from sklearn.metrics import davies_bouldin_score
+
 db = davies_bouldin_score(X, labels)
-# < 0.5: отлично, > 1.0: плохо</code></pre>
+print(f"Davies-Bouldin Index: {db:.3f}")
+
+# Интерпретация:
+# < 0.5: отлично
+# 0.5-1.0: хорошо
+# 1.0-2.0: приемлемо
+# > 2.0: плохо
+
+# Сравнение для разного числа кластеров
+from sklearn.cluster import KMeans
+
+db_scores = []
+K_range = range(2, 11)
+
+for k in K_range:
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    labels = kmeans.fit_predict(X)
+    db = davies_bouldin_score(X, labels)
+    db_scores.append(db)
+
+plt.figure(figsize=(10, 5))
+plt.plot(K_range, db_scores, marker='o', linewidth=2)
+plt.xlabel('Number of Clusters')
+plt.ylabel('Davies-Bouldin Index')
+plt.title('Davies-Bouldin Index vs Number of Clusters')
+plt.grid(alpha=0.3)
+plt.show()
+
+optimal_k = K_range[np.argmin(db_scores)]
+print(f"Optimal K (lowest DB): {optimal_k}")</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 Calinski-Harabasz Index</h2>
+    <h2>🔷 4. Calinski-Harabasz Index</h2>
     <p><strong>Диапазон</strong>: [0, ∞), выше = лучше</p>
+    <p><strong>Также называется</strong>: Variance Ratio Criterion</p>
     <pre><code>from sklearn.metrics import calinski_harabasz_score
-ch = calinski_harabasz_score(X, labels)</code></pre>
+
+ch = calinski_harabasz_score(X, labels)
+print(f"Calinski-Harabasz: {ch:.1f}")
+
+# Интерпретация:
+# Чем выше, тем плотнее и лучше разделены кластеры
+# Зависит от размера данных и числа кластеров
+
+# Сравнение разных алгоритмов
+from sklearn.cluster import DBSCAN, AgglomerativeClustering
+
+algorithms = {
+    'K-Means': KMeans(n_clusters=3),
+    'DBSCAN': DBSCAN(eps=0.5),
+    'Hierarchical': AgglomerativeClustering(n_clusters=3)
+}
+
+results = {}
+for name, algo in algorithms.items():
+    labels = algo.fit_predict(X)
+    if len(set(labels)) > 1:  # Больше 1 кластера
+        ch = calinski_harabasz_score(X, labels)
+        results[name] = ch
+    else:
+        results[name] = 0
+
+# Визуализация
+plt.figure(figsize=(10, 5))
+plt.bar(results.keys(), results.values(), alpha=0.7)
+plt.ylabel('Calinski-Harabasz Score')
+plt.title('Algorithm Comparison')
+plt.xticks(rotation=15)
+plt.grid(axis='y', alpha=0.3)
+plt.show()</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 Adjusted Rand Index (ARI)</h2>
-    <p>Требует истинные метки. Диапазон: [-1, 1]</p>
+    <h2>🔷 5. Adjusted Rand Index (ARI)</h2>
+    <p><strong>Требует</strong>: истинные метки. <strong>Диапазон</strong>: [-1, 1]</p>
     <pre><code>from sklearn.metrics import adjusted_rand_score
+
 ari = adjusted_rand_score(true_labels, pred_labels)
-# 1.0: идеально, > 0.9: отлично</code></pre>
+print(f"ARI: {ari:.3f}")
+
+# Интерпретация:
+# 1.0: идеальное совпадение
+# > 0.9: отличное
+# 0.5-0.9: хорошее
+# 0.0: случайное совпадение
+# < 0.0: хуже случайного
+
+# Сравнение с Rand Index
+from sklearn.metrics import rand_score
+
+rand = rand_score(true_labels, pred_labels)
+print(f"Rand Index: {rand:.3f}")
+print(f"ARI: {ari:.3f}")
+
+# ARI корректирует на случайные совпадения</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 Elbow Method</h2>
-    <pre><code>inertias = []
-for k in range(2, 11):
-    kmeans = KMeans(n_clusters=k)
+    <h2>🔷 6. Mutual Information метрики</h2>
+    <pre><code>from sklearn.metrics import (
+    adjusted_mutual_info_score,
+    normalized_mutual_info_score,
+    mutual_info_score
+)
+
+# Adjusted Mutual Information (скорректированная)
+ami = adjusted_mutual_info_score(true_labels, pred_labels)
+
+# Normalized Mutual Information
+nmi = normalized_mutual_info_score(true_labels, pred_labels)
+
+# Mutual Information (сырая)
+mi = mutual_info_score(true_labels, pred_labels)
+
+print(f"AMI: {ami:.3f}")
+print(f"NMI: {nmi:.3f}")
+print(f"MI: {mi:.3f}")
+
+# Все в диапазоне [0, 1] (или [-1, 1] для AMI)
+# Выше = лучше совпадение с истинными метками</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Homogeneity, Completeness, V-measure</h2>
+    <pre><code>from sklearn.metrics import (
+    homogeneity_score,
+    completeness_score,
+    v_measure_score,
+    homogeneity_completeness_v_measure
+)
+
+# Homogeneity: каждый кластер содержит только один класс
+homogeneity = homogeneity_score(true_labels, pred_labels)
+
+# Completeness: все члены класса в одном кластере
+completeness = completeness_score(true_labels, pred_labels)
+
+# V-measure: гармоническое среднее homogeneity и completeness
+v_measure = v_measure_score(true_labels, pred_labels)
+
+# Или все сразу:
+h, c, v = homogeneity_completeness_v_measure(
+    true_labels, pred_labels
+)
+
+print(f"Homogeneity: {h:.3f}")
+print(f"Completeness: {c:.3f}")
+print(f"V-measure: {v:.3f}")
+
+# Все в диапазоне [0, 1], выше = лучше</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Elbow Method и Inertia</h2>
+    <pre><code>from sklearn.cluster import KMeans
+
+# Inertia: сумма квадратов расстояний до центроидов
+inertias = []
+silhouettes = []
+K_range = range(2, 11)
+
+for k in K_range:
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
     kmeans.fit(X)
     inertias.append(kmeans.inertia_)
-# Ищем "локоть" на графике</code></pre>
+    silhouettes.append(silhouette_score(X, kmeans.labels_))
+
+# Визуализация Elbow Method
+fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+
+# Inertia
+axes[0].plot(K_range, inertias, marker='o', linewidth=2)
+axes[0].set_xlabel('Number of Clusters (K)')
+axes[0].set_ylabel('Inertia')
+axes[0].set_title('Elbow Method')
+axes[0].grid(alpha=0.3)
+
+# Silhouette
+axes[1].plot(K_range, silhouettes, marker='s', 
+            linewidth=2, color='green')
+axes[1].set_xlabel('Number of Clusters (K)')
+axes[1].set_ylabel('Silhouette Score')
+axes[1].set_title('Silhouette Score vs K')
+axes[1].grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+# Поиск оптимального K
+# 1. По Elbow (визуально)
+# 2. По максимальному Silhouette
+optimal_k_silhouette = K_range[np.argmax(silhouettes)]
+print(f"Optimal K (max silhouette): {optimal_k_silhouette}")</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 Полная оценка</h2>
-    <pre><code>def evaluate_clustering(X, labels):
-    print(f"Silhouette: {silhouette_score(X, labels):.3f}")
-    print(f"Davies-Bouldin: {davies_bouldin_score(X, labels):.3f}")
-    print(f"Calinski-Harabasz: {calinski_harabasz_score(X, labels):.1f}")
-    print(f"Кластеров: {len(set(labels))}")
-    print(f"Шума: {list(labels).count(-1)}")</code></pre>
+    <h2>🔷 9. Сравнительная таблица метрик</h2>
+    <table style="font-size: 0.75em;">
+      <tr>
+        <th>Метрика</th>
+        <th>Требует метки</th>
+        <th>Диапазон</th>
+        <th>Интерпретация</th>
+        <th>Когда использовать</th>
+      </tr>
+      <tr>
+        <td>Silhouette</td>
+        <td>Нет</td>
+        <td>[-1, 1]</td>
+        <td>Выше = лучше</td>
+        <td>Общая оценка качества</td>
+      </tr>
+      <tr>
+        <td>Davies-Bouldin</td>
+        <td>Нет</td>
+        <td>[0, ∞)</td>
+        <td>Ниже = лучше</td>
+        <td>Сравнение разных K</td>
+      </tr>
+      <tr>
+        <td>Calinski-Harabasz</td>
+        <td>Нет</td>
+        <td>[0, ∞)</td>
+        <td>Выше = лучше</td>
+        <td>Плотность кластеров</td>
+      </tr>
+      <tr>
+        <td>ARI</td>
+        <td>Да</td>
+        <td>[-1, 1]</td>
+        <td>Выше = лучше</td>
+        <td>Сравнение с ground truth</td>
+      </tr>
+      <tr>
+        <td>AMI/NMI</td>
+        <td>Да</td>
+        <td>[0, 1]</td>
+        <td>Выше = лучше</td>
+        <td>Информационное сходство</td>
+      </tr>
+      <tr>
+        <td>V-measure</td>
+        <td>Да</td>
+        <td>[0, 1]</td>
+        <td>Выше = лучше</td>
+        <td>Баланс homogeneity/completeness</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Комплексная оценка кластеризации</h2>
+    <pre><code>def comprehensive_evaluation(X, labels, true_labels=None):
+    """Полная оценка качества кластеризации"""
+    
+    n_clusters = len(set(labels)) - (1 if -1 in labels else 0)
+    n_noise = list(labels).count(-1)
+    
+    print("=" * 50)
+    print("ОЦЕНКА КЛАСТЕРИЗАЦИИ")
+    print("=" * 50)
+    
+    # Базовая информация
+    print(f"\nБазовая информация:")
+    print(f"  Количество кластеров: {n_clusters}")
+    print(f"  Количество шумовых точек: {n_noise}")
+    print(f"  Размер каждого кластера:")
+    for i in set(labels):
+        if i != -1:
+            count = list(labels).count(i)
+            print(f"    Кластер {i}: {count} точек")
+    
+    # Внутренние метрики
+    if n_clusters > 1:
+        print(f"\nВнутренние метрики (без меток):")
+        
+        sil = silhouette_score(X, labels)
+        print(f"  Silhouette Score: {sil:.3f}")
+        if sil > 0.7:
+            print(f"    → Отлично!")
+        elif sil > 0.5:
+            print(f"    → Хорошо")
+        elif sil > 0.25:
+            print(f"    → Средне")
+        else:
+            print(f"    → Плохо")
+        
+        db = davies_bouldin_score(X, labels)
+        print(f"  Davies-Bouldin Index: {db:.3f}")
+        if db < 0.5:
+            print(f"    → Отлично!")
+        elif db < 1.0:
+            print(f"    → Хорошо")
+        else:
+            print(f"    → Нуждается в улучшении")
+        
+        ch = calinski_harabasz_score(X, labels)
+        print(f"  Calinski-Harabasz Index: {ch:.1f}")
+        print(f"    → Выше = лучше")
+    
+    # Внешние метрики (если есть истинные метки)
+    if true_labels is not None:
+        print(f"\nВнешние метрики (с метками):")
+        
+        ari = adjusted_rand_score(true_labels, labels)
+        print(f"  ARI: {ari:.3f}")
+        
+        ami = adjusted_mutual_info_score(true_labels, labels)
+        print(f"  AMI: {ami:.3f}")
+        
+        nmi = normalized_mutual_info_score(true_labels, labels)
+        print(f"  NMI: {nmi:.3f}")
+        
+        h, c, v = homogeneity_completeness_v_measure(
+            true_labels, labels
+        )
+        print(f"  Homogeneity: {h:.3f}")
+        print(f"  Completeness: {c:.3f}")
+        print(f"  V-measure: {v:.3f}")
+    
+    print("=" * 50)
+
+# Использование
+comprehensive_evaluation(X, labels, true_labels)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Выбор оптимального числа кластеров</h2>
+    <pre><code>def find_optimal_clusters(X, max_k=10):
+    """Поиск оптимального K несколькими методами"""
+    
+    metrics = {
+        'k': [],
+        'inertia': [],
+        'silhouette': [],
+        'davies_bouldin': [],
+        'calinski_harabasz': []
+    }
+    
+    for k in range(2, max_k + 1):
+        kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+        labels = kmeans.fit_predict(X)
+        
+        metrics['k'].append(k)
+        metrics['inertia'].append(kmeans.inertia_)
+        metrics['silhouette'].append(silhouette_score(X, labels))
+        metrics['davies_bouldin'].append(davies_bouldin_score(X, labels))
+        metrics['calinski_harabasz'].append(calinski_harabasz_score(X, labels))
+    
+    # Визуализация
+    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    
+    # Inertia
+    axes[0, 0].plot(metrics['k'], metrics['inertia'], 
+                   marker='o', linewidth=2)
+    axes[0, 0].set_title('Inertia (Elbow Method)')
+    axes[0, 0].set_xlabel('K')
+    axes[0, 0].set_ylabel('Inertia')
+    axes[0, 0].grid(alpha=0.3)
+    
+    # Silhouette
+    axes[0, 1].plot(metrics['k'], metrics['silhouette'],
+                   marker='s', linewidth=2, color='green')
+    axes[0, 1].set_title('Silhouette Score')
+    axes[0, 1].set_xlabel('K')
+    axes[0, 1].set_ylabel('Score')
+    axes[0, 1].grid(alpha=0.3)
+    
+    # Davies-Bouldin
+    axes[1, 0].plot(metrics['k'], metrics['davies_bouldin'],
+                   marker='^', linewidth=2, color='red')
+    axes[1, 0].set_title('Davies-Bouldin Index')
+    axes[1, 0].set_xlabel('K')
+    axes[1, 0].set_ylabel('Index (lower=better)')
+    axes[1, 0].grid(alpha=0.3)
+    
+    # Calinski-Harabasz
+    axes[1, 1].plot(metrics['k'], metrics['calinski_harabasz'],
+                   marker='d', linewidth=2, color='purple')
+    axes[1, 1].set_title('Calinski-Harabasz Index')
+    axes[1, 1].set_xlabel('K')
+    axes[1, 1].set_ylabel('Index (higher=better)')
+    axes[1, 1].grid(alpha=0.3)
+    
+    plt.tight_layout()
+    plt.show()
+    
+    # Рекомендации
+    k_silhouette = metrics['k'][np.argmax(metrics['silhouette'])]
+    k_db = metrics['k'][np.argmin(metrics['davies_bouldin'])]
+    k_ch = metrics['k'][np.argmax(metrics['calinski_harabasz'])]
+    
+    print("Рекомендуемое K:")
+    print(f"  По Silhouette: {k_silhouette}")
+    print(f"  По Davies-Bouldin: {k_db}")
+    print(f"  По Calinski-Harabasz: {k_ch}")
+    
+    return metrics
+
+# Использование
+metrics = find_optimal_clusters(X, max_k=10)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Чек-лист оценки кластеризации</h2>
+    <ol>
+      <li>✅ Проверить базовые характеристики (число кластеров, размеры)</li>
+      <li>✅ Вычислить Silhouette Score (>0.5 хорошо)</li>
+      <li>✅ Проверить Davies-Bouldin Index (<1.0 хорошо)</li>
+      <li>✅ Рассчитать Calinski-Harabasz Index</li>
+      <li>✅ Использовать Elbow Method для выбора K</li>
+      <li>✅ Визуализировать Silhouette plot</li>
+      <li>✅ Если есть метки - вычислить ARI, AMI, V-measure</li>
+      <li>✅ Сравнить несколько значений K</li>
+      <li>✅ Визуализировать кластеры (PCA/t-SNE)</li>
+      <li>✅ Проверить стабильность (разные random_state)</li>
+    </ol>
   </div>
 
 </div>

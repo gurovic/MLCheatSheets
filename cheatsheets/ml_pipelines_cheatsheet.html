@@ -99,4 +99,59 @@ def create_pipeline(use_pca=False):
     return Pipeline(steps)</code></pre></div>
 <div class="block"><h2>9. Преимущества Pipeline</h2><ul><li>Избегает data leakage</li><li>Упрощает код</li><li>Легко сохранить/загрузить</li><li>Grid search проще</li><li>Воспроизводимость</li></ul></div>
 <div class="block"><h2>10. Чек-лист</h2><ul><li>[ ] Использовать Pipeline для всех проектов</li><li>[ ] Включить препроцессинг в Pipeline</li><li>[ ] Сохранять вместе с моделью</li><li>[ ] Тестировать на новых данных</li><li>[ ] Документировать шаги</li></ul></div>
-</div></body></html>
+</div>
+
+<div class="block">
+<h2>11. Сохранение и загрузка Pipeline</h2>
+<pre><code>import joblib
+
+# Сохранение trained pipeline
+joblib.dump(pipeline, 'model_pipeline.pkl')
+
+# Загрузка
+loaded_pipeline = joblib.load('model_pipeline.pkl')
+
+# Использование
+predictions = loaded_pipeline.predict(new_data)
+
+# Версионирование моделей
+import datetime
+timestamp = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+filename = f'pipeline_v{timestamp}.pkl'
+joblib.dump(pipeline, filename)</code></pre>
+</div>
+
+<div class="block">
+<h2>12. Debugging Pipeline</h2>
+<pre><code># Проверка промежуточных результатов
+from sklearn import set_config
+set_config(display='diagram')
+pipeline  # В Jupyter покажет диаграмму
+
+# Получение промежуточных результатов
+X_transformed = pipeline.named_steps['scaler'].transform(X_train)
+
+# Доступ к trained моделям
+model = pipeline.named_steps['classifier']
+print(f"Model params: {model.get_params()}")
+
+# Проверка каждого шага
+for name, transform in pipeline.steps[:-1]:
+    X_train = transform.fit_transform(X_train, y_train)
+    print(f"After {name}: shape = {X_train.shape}")</code></pre>
+</div>
+
+<div class="block">
+<h2>13. Best Practices</h2>
+<ul>
+<li>Всегда используйте Pipeline для production</li>
+<li>Применяйте ColumnTransformer для разных типов признаков</li>
+<li>Используйте make_pipeline для прототипирования</li>
+<li>Сохраняйте весь pipeline, не только модель</li>
+<li>Тестируйте pipeline на новых данных</li>
+<li>Версионируйте сохраненные модели</li>
+<li>Документируйте каждый шаг pipeline</li>
+</ul>
+</div>
+
+</body></html>

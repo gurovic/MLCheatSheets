@@ -109,6 +109,29 @@
       font-size: 0.88em;
     }
 
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 6px 0;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border: 1px solid #e0e7ff;
+    }
+
+    th {
+      background-color: #1a5fb4;
+      color: white;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
     @media print {
       .container { column-gap: 12px; }
       .block { box-shadow: none; }
@@ -126,24 +149,460 @@
   <div class="subtitle">Байесовский непараметрический метод • Практический фокус<br>📅 Январь 2026</div>
 
   <div class="block">
-    <h2>🔷 1. Суть</h2>
-    <p>Распределение над функциями. Каждая функция — реализация GP. Полностью определяется mean function и covariance function (kernel). Предсказания — нормальное распределение с mean и variance.</p>
+    <h2>🔷 1. Основы Gaussian Processes</h2>
+    <p><strong>Gaussian Process (GP)</strong>: вероятностный непараметрический метод для регрессии и классификации</p>
+    <ul>
+      <li><strong>Определение</strong>: распределение над функциями, где любое конечное подмножество точек имеет многомерное нормальное распределение</li>
+      <li><strong>Mean function</strong>: m(x) = E[f(x)], часто принимается равным 0</li>
+      <li><strong>Covariance function (kernel)</strong>: k(x, x') = E[(f(x)-m(x))(f(x')-m(x'))]</li>
+      <li><strong>Обозначение</strong>: f(x) ~ GP(m(x), k(x,x'))</li>
+      <li><strong>Преимущество</strong>: предсказания включают uncertainty (дисперсию)</li>
+    </ul>
+    <blockquote>
+      💡 GP - мощный байесовский метод, особенно эффективный при малом количестве данных
+    </blockquote>
   </div>
 
   <div class="block">
-    <h2>🔷 2. Код</h2>
+    <h2>🔷 2. Базовый пример регрессии</h2>
     <pre><code>from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Генерация данных
+X_train = np.array([[1], [3], [5], [6], [8]])
+y_train = np.sin(X_train).ravel()
+
+# Определение kernel
+kernel = C(1.0, (1e-3, 1e3)) * RBF(length_scale=1.0, 
+                                   length_scale_bounds=(1e-2, 1e2))
+
+# Создание модели
+gp = GaussianProcessRegressor(
+    kernel=kernel,
+    n_restarts_optimizer=10,
+    alpha=1e-2  # noise level
+)
+
+# Обучение
+gp.fit(X_train, y_train)
+
+# Предсказание с uncertainty
+X_test = np.linspace(0, 10, 100).reshape(-1, 1)
+y_pred, sigma = gp.predict(X_test, return_std=True)
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.plot(X_test, y_pred, 'b-', label='Prediction')
+plt.fill_between(X_test.ravel(),
+                y_pred - 1.96*sigma,
+                y_pred + 1.96*sigma,
+                alpha=0.3, label='95% confidence')
+plt.scatter(X_train, y_train, c='red', s=100, 
+           label='Training data')
+plt.xlabel('X')
+plt.ylabel('y')
+plt.title('Gaussian Process Regression')
+plt.legend()
+plt.grid(alpha=0.3)
+plt.show()
+
+print(f"Learned kernel: {gp.kernel_}")
+print(f"Log-marginal-likelihood: {gp.log_marginal_likelihood():.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Kernel functions (ядра)</h2>
+    <p><strong>Kernel</strong> определяет сходство между точками:</p>
+    <pre><code>from sklearn.gaussian_process.kernels import (
+    RBF, Matern, RationalQuadratic, 
+    ExpSineSquared, DotProduct, WhiteKernel
+)
+
+# 1. RBF (Radial Basis Function) / Squared Exponential
+# Гладкие функции
+rbf = RBF(length_scale=1.0)
+
+# 2. Matern kernel
+# Контроль гладкости через параметр nu
+matern = Matern(length_scale=1.0, nu=1.5)
+# nu=0.5: не дифференцируема (Ornstein-Uhlenbeck)
+# nu=1.5: один раз дифференцируема
+# nu=2.5: два раза дифференцируема
+# nu→∞: сходится к RBF
+
+# 3. Rational Quadratic
+# Смесь RBF с разными length scales
+rq = RationalQuadratic(length_scale=1.0, alpha=1.0)
+
+# 4. Exp-Sine-Squared (периодические функции)
+periodic = ExpSineSquared(length_scale=1.0, 
+                         periodicity=1.0)
+
+# 5. Dot Product (линейная регрессия)
+linear = DotProduct(sigma_0=1.0)
+
+# 6. White Kernel (шум)
+white = WhiteKernel(noise_level=0.1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Композиции kernels</h2>
+    <pre><code># Сложение kernels (суммирование функций)
+kernel_sum = RBF(length_scale=1.0) + WhiteKernel(noise_level=0.1)
+
+# Умножение kernels (модуляция)
+kernel_product = C(1.0) * RBF(length_scale=1.0)
+
+# Сложная композиция
+# Тренд + периодичность + шум
+kernel_complex = (
+    C(1.0) * RBF(length_scale=10.0)  # долгосрочный тренд
+    + C(1.0) * RBF(length_scale=1.0)  # краткосрочная вариация
+    * ExpSineSquared(length_scale=1.0, periodicity=1.0)  # периодика
+    + WhiteKernel(noise_level=0.01)  # шум
+)
+
+# Применение
+gp = GaussianProcessRegressor(kernel=kernel_complex)
+gp.fit(X_train, y_train)
+
+# Визуализация компонентов
+fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+
+kernels = {
+    'RBF': RBF(length_scale=1.0),
+    'Matern': Matern(length_scale=1.0, nu=1.5),
+    'Periodic': ExpSineSquared(length_scale=1.0, periodicity=1.0),
+    'RationalQuadratic': RationalQuadratic(length_scale=1.0)
+}
+
+for idx, (name, kernel) in enumerate(kernels.items()):
+    gp = GaussianProcessRegressor(kernel=kernel)
+    gp.fit(X_train, y_train)
+    y_pred, sigma = gp.predict(X_test, return_std=True)
+    
+    ax = axes[idx//2, idx%2]
+    ax.plot(X_test, y_pred, label='Mean')
+    ax.fill_between(X_test.ravel(), 
+                    y_pred - 1.96*sigma,
+                    y_pred + 1.96*sigma,
+                    alpha=0.3)
+    ax.scatter(X_train, y_train, c='red', s=50)
+    ax.set_title(name)
+    ax.legend()
+    ax.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Гиперпараметры и оптимизация</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>kernel</code></td><td>Функция ковариации</td><td>RBF для начала</td></tr>
+      <tr><td><code>alpha</code></td><td>Уровень шума</td><td>1e-10 до 1.0</td></tr>
+      <tr><td><code>optimizer</code></td><td>Метод оптимизации</td><td>'fmin_l_bfgs_b'</td></tr>
+      <tr><td><code>n_restarts_optimizer</code></td><td>Число перезапусков</td><td>10-20</td></tr>
+      <tr><td><code>normalize_y</code></td><td>Нормализация целевой переменной</td><td>True для разных масштабов</td></tr>
+    </table>
+    <pre><code># Подбор гиперпараметров
+from sklearn.model_selection import cross_val_score
+
+# Тестирование разных kernels
+kernels = [
+    RBF(length_scale=1.0),
+    Matern(length_scale=1.0, nu=1.5),
+    RationalQuadratic(length_scale=1.0)
+]
+
+for kernel in kernels:
+    gp = GaussianProcessRegressor(kernel=kernel,
+                                  n_restarts_optimizer=10)
+    scores = cross_val_score(gp, X_train, y_train, 
+                            cv=5, scoring='neg_mean_squared_error')
+    print(f"{kernel}: MSE = {-scores.mean():.4f} ± {scores.std():.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. GP для классификации</h2>
+    <pre><code>from sklearn.gaussian_process import GaussianProcessClassifier
 from sklearn.gaussian_process.kernels import RBF
 
-kernel = RBF(length_scale=1.0)
-gp = GaussianProcessRegressor(kernel=kernel)
-gp.fit(X_train, y_train)
-y_pred, sigma = gp.predict(X_test, return_std=True)</code></pre>
+# Генерация данных для классификации
+from sklearn.datasets import make_classification
+X, y = make_classification(n_samples=100, n_features=2,
+                          n_redundant=0, n_informative=2,
+                          random_state=42)
+
+# Модель
+kernel = C(1.0) * RBF(length_scale=1.0)
+gpc = GaussianProcessClassifier(kernel=kernel, 
+                                n_restarts_optimizer=20)
+
+# Обучение
+gpc.fit(X, y)
+
+# Предсказание с вероятностями
+y_pred = gpc.predict(X_test)
+y_proba = gpc.predict_proba(X_test)
+
+# Визуализация границы решения
+xx, yy = np.meshgrid(np.linspace(X[:, 0].min()-1, X[:, 0].max()+1, 100),
+                     np.linspace(X[:, 1].min()-1, X[:, 1].max()+1, 100))
+
+Z = gpc.predict_proba(np.c_[xx.ravel(), yy.ravel()])[:, 1]
+Z = Z.reshape(xx.shape)
+
+plt.figure(figsize=(10, 6))
+plt.contourf(xx, yy, Z, levels=20, cmap='RdBu', alpha=0.6)
+plt.colorbar(label='P(y=1)')
+plt.scatter(X[:, 0], X[:, 1], c=y, cmap='RdBu',
+           edgecolors='black', linewidths=1.5)
+plt.title('GP Classification')
+plt.xlabel('Feature 1')
+plt.ylabel('Feature 2')
+plt.show()</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 3. Применение</h2>
-    <p>Регрессия с неопределенностью. Байесовская оптимизация. Малое количество данных. Нужна количественная оценка неопределенности.</p>
+    <h2>🔷 7. Байесовская оптимизация</h2>
+    <p><strong>Применение GP</strong>: оптимизация дорогих black-box функций</p>
+    <pre><code>from sklearn.gaussian_process import GaussianProcessRegressor
+from scipy.optimize import minimize
+from scipy.stats import norm
+
+# Целевая функция (дорогая для вычисления)
+def objective(x):
+    return -(x**2 * np.sin(5*x) + 0.5*x)
+
+# Acquisition function (Expected Improvement)
+def expected_improvement(X, gp, best_y, xi=0.01):
+    mu, sigma = gp.predict(X, return_std=True)
+    sigma = sigma.reshape(-1, 1)
+    
+    imp = mu - best_y - xi
+    Z = imp / sigma
+    ei = imp * norm.cdf(Z) + sigma * norm.pdf(Z)
+    ei[sigma == 0.0] = 0.0
+    
+    return ei
+
+# Байесовская оптимизация
+X_init = np.array([[0.0], [0.5], [1.0]])
+y_init = objective(X_init).reshape(-1)
+
+kernel = C(1.0) * Matern(length_scale=0.5, nu=2.5)
+gp = GaussianProcessRegressor(kernel=kernel, 
+                              n_restarts_optimizer=10)
+
+X_sample = X_init.copy()
+y_sample = y_init.copy()
+
+n_iter = 10
+for i in range(n_iter):
+    gp.fit(X_sample, y_sample)
+    best_y = np.max(y_sample)
+    
+    # Поиск следующей точки для оценки
+    X_next = None
+    max_ei = -np.inf
+    
+    for x_try in np.linspace(0, 2, 100).reshape(-1, 1):
+        ei = expected_improvement(x_try, gp, best_y)
+        if ei > max_ei:
+            max_ei = ei
+            X_next = x_try
+    
+    # Оценка функции в найденной точке
+    y_next = objective(X_next)
+    
+    X_sample = np.vstack([X_sample, X_next])
+    y_sample = np.append(y_sample, y_next)
+    
+    print(f"Iteration {i+1}: x={X_next[0,0]:.3f}, y={y_next[0]:.3f}")
+
+print(f"Optimal: x={X_sample[np.argmax(y_sample)]}, y={np.max(y_sample):.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Sparse GP (для больших данных)</h2>
+    <pre><code># Для больших данных используем approximations
+# Например, с библиотекой GPy или GPflow
+
+# Inducing points approach
+# Выбираем подмножество точек для аппроксимации
+
+from sklearn.cluster import KMeans
+
+def select_inducing_points(X, n_inducing=50):
+    """Выбор inducing points с помощью k-means"""
+    kmeans = KMeans(n_clusters=n_inducing, random_state=42)
+    kmeans.fit(X)
+    return kmeans.cluster_centers_
+
+# Пример с большими данными
+X_large = np.random.randn(10000, 5)
+y_large = np.sin(X_large).sum(axis=1) + np.random.randn(10000)*0.1
+
+# Выбор inducing points
+X_inducing = select_inducing_points(X_large, n_inducing=100)
+
+# Можно использовать subset для обучения
+indices = np.random.choice(len(X_large), 1000, replace=False)
+X_subset = X_large[indices]
+y_subset = y_large[indices]
+
+kernel = C(1.0) * RBF(length_scale=1.0)
+gp = GaussianProcessRegressor(kernel=kernel)
+gp.fit(X_subset, y_subset)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Multitask GP</h2>
+    <pre><code># GP для связанных задач
+# Используем корреляцию между задачами
+
+# Пример с 2 задачами
+def generate_multitask_data(n_samples=50):
+    X = np.random.uniform(0, 10, (n_samples, 1))
+    
+    # Две связанные функции
+    y1 = np.sin(X).ravel() + np.random.randn(n_samples)*0.1
+    y2 = np.sin(X + 0.5).ravel() + np.random.randn(n_samples)*0.1
+    
+    return X, y1, y2
+
+X, y1, y2 = generate_multitask_data()
+
+# Обучение отдельных моделей
+gp1 = GaussianProcessRegressor(kernel=RBF())
+gp2 = GaussianProcessRegressor(kernel=RBF())
+
+gp1.fit(X, y1)
+gp2.fit(X, y2)
+
+# Предсказание
+X_test = np.linspace(0, 10, 100).reshape(-1, 1)
+y1_pred, sigma1 = gp1.predict(X_test, return_std=True)
+y2_pred, sigma2 = gp2.predict(X_test, return_std=True)
+
+# Визуализация обеих задач
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+for ax, y_train, y_pred, sigma, title in [
+    (ax1, y1, y1_pred, sigma1, 'Task 1'),
+    (ax2, y2, y2_pred, sigma2, 'Task 2')
+]:
+    ax.plot(X_test, y_pred, 'b-')
+    ax.fill_between(X_test.ravel(),
+                   y_pred - 1.96*sigma,
+                   y_pred + 1.96*sigma,
+                   alpha=0.3)
+    ax.scatter(X, y_train, c='red', s=30)
+    ax.set_title(title)
+    ax.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Uncertainty</th><th>Гибкость</th><th>Скорость</th><th>Интерпретируемость</th></tr>
+      <tr><td>GP</td><td>✅ Да (Bayesian)</td><td>Высокая</td><td>O(n³)</td><td>Средняя</td></tr>
+      <tr><td>Random Forest</td><td>⚠️ Эмпирическая</td><td>Высокая</td><td>Быстро</td><td>Низкая</td></tr>
+      <tr><td>Neural Network</td><td>❌ Нет (без Bayesian NN)</td><td>Очень высокая</td><td>Средне</td><td>Низкая</td></tr>
+      <tr><td>SVR</td><td>❌ Нет</td><td>Средняя</td><td>O(n²-n³)</td><td>Низкая</td></tr>
+      <tr><td>Linear Regression</td><td>✅ Да</td><td>Низкая</td><td>Быстро</td><td>Высокая</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать GP</h2>
+    <blockquote>
+      <strong>Используйте GP когда:</strong>
+      <ul>
+        <li>Мало данных (10-1000 точек)</li>
+        <li>Нужна оценка неопределенности</li>
+        <li>Важна интерпретируемость через kernel</li>
+        <li>Дорогие эксперименты (Bayesian optimization)</li>
+        <li>Гладкие функции</li>
+      </ul>
+      <strong>НЕ используйте когда:</strong>
+      <ul>
+        <li>Очень большие данные (>10,000 точек)</li>
+        <li>Высокая размерность (>20 признаков)</li>
+        <li>Нужна максимальная скорость inference</li>
+        <li>Негладкие, разрывные функции</li>
+      </ul>
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Диагностика и валидация</h2>
+    <pre><code># Оценка качества модели
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Cross-validation
+from sklearn.model_selection import cross_val_score
+
+scores = cross_val_score(gp, X_train, y_train,
+                        cv=5, scoring='neg_mean_squared_error')
+print(f"CV MSE: {-scores.mean():.4f} ± {scores.std():.4f}")
+
+# Анализ residuals
+y_pred_train = gp.predict(X_train)
+residuals = y_train - y_pred_train
+
+plt.figure(figsize=(12, 4))
+
+plt.subplot(1, 3, 1)
+plt.scatter(y_pred_train, residuals)
+plt.axhline(y=0, color='r', linestyle='--')
+plt.xlabel('Predicted')
+plt.ylabel('Residuals')
+plt.title('Residual Plot')
+plt.grid(alpha=0.3)
+
+plt.subplot(1, 3, 2)
+plt.hist(residuals, bins=20, edgecolor='black')
+plt.xlabel('Residuals')
+plt.ylabel('Frequency')
+plt.title('Residual Distribution')
+plt.grid(alpha=0.3)
+
+plt.subplot(1, 3, 3)
+from scipy import stats
+stats.probplot(residuals, dist="norm", plot=plt)
+plt.title('Q-Q Plot')
+plt.grid(alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+# Log marginal likelihood
+print(f"Log-marginal-likelihood: {gp.log_marginal_likelihood():.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист использования</h2>
+    <ol>
+      <li>✅ Проверить размер данных (<1000 точек?)</li>
+      <li>✅ Стандартизировать признаки</li>
+      <li>✅ Выбрать подходящий kernel (RBF для начала)</li>
+      <li>✅ Установить bounds для гиперпараметров kernel</li>
+      <li>✅ Выбрать alpha (уровень шума)</li>
+      <li>✅ Использовать n_restarts_optimizer=10-20</li>
+      <li>✅ Обучить модель и проверить learned kernel</li>
+      <li>✅ Визуализировать predictions с uncertainty</li>
+      <li>✅ Оценить log-marginal-likelihood</li>
+      <li>✅ Проверить residuals на нормальность</li>
+      <li>✅ Cross-validation для финальной оценки</li>
+    </ol>
   </div>
 
 </div>
