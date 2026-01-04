@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Детекция объектов Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📦 Детекция объектов Cheatsheet</h1>
+  <div class="subtitle">Faster R-CNN • SSD • RetinaNet • EfficientDet<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Задача детекции</h2>
+    <p><strong>Object Detection</strong> — нахождение объектов и их bounding boxes на изображении.</p>
+    
+    <p><strong>Выход модели:</strong></p>
+    <ul>
+      <li><strong>Bounding box</strong>: (x, y, w, h) или (x1, y1, x2, y2)</li>
+      <li><strong>Класс объекта</strong>: "человек", "машина", и т.д.</li>
+      <li><strong>Confidence score</strong>: вероятность детекции</li>
+    </ul>
+    
+    <p><strong>Метрики:</strong></p>
+    <ul>
+      <li><strong>mAP</strong> (mean Average Precision) — основная</li>
+      <li><strong>IoU</strong> (Intersection over Union) — перекрытие боксов</li>
+      <li><strong>FPS</strong> — скорость работы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Семейства алгоритмов</h2>
+    <table>
+      <tr><th>Тип</th><th>Алгоритмы</th><th>Особенность</th></tr>
+      <tr><td><strong>Two-stage</strong></td><td>R-CNN, Fast R-CNN, Faster R-CNN</td><td>Высокая точность, медленно</td></tr>
+      <tr><td><strong>One-stage</strong></td><td>YOLO, SSD, RetinaNet</td><td>Быстро, lower accuracy</td></tr>
+      <tr><td><strong>Anchor-free</strong></td><td>CenterNet, FCOS</td><td>Без anchor boxes</td></tr>
+      <tr><td><strong>Transformer</strong></td><td>DETR, Deformable DETR</td><td>Современный подход</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Faster R-CNN</h2>
+    <p><strong>Архитектура:</strong></p>
+    <ol>
+      <li><strong>Backbone</strong>: ResNet/VGG для извлечения признаков</li>
+      <li><strong>RPN</strong> (Region Proposal Network): генерация предложений</li>
+      <li><strong>RoI Pooling</strong>: выравнивание размера регионов</li>
+      <li><strong>Head</strong>: классификация + регрессия bbox</li>
+    </ol>
+    
+    <p><strong>Region Proposal Network (RPN):</strong></p>
+    <ul>
+      <li>Скользящее окно по feature map</li>
+      <li>9 anchor boxes разных размеров/соотношений</li>
+      <li>Бинарная классификация: объект/фон</li>
+      <li>Регрессия bbox для уточнения</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Faster R-CNN код</h2>
+    <pre><code>import torchvision
+from torchvision.models.detection import fasterrcnn_resnet50_fpn
+
+# Загрузка предобученной модели
+model = fasterrcnn_resnet50_fpn(pretrained=True)
+model.eval()
+
+# Inference
+import torch
+from PIL import Image
+import torchvision.transforms as T
+
+image = Image.open('image.jpg')
+transform = T.Compose([T.ToTensor()])
+image_tensor = transform(image)
+
+with torch.no_grad():
+    predictions = model([image_tensor])
+
+# Результаты
+boxes = predictions[0]['boxes']     # координаты
+labels = predictions[0]['labels']   # классы
+scores = predictions[0]['scores']   # уверенность
+
+# Фильтрация по threshold
+threshold = 0.5
+keep = scores > threshold
+boxes = boxes[keep]
+labels = labels[keep]
+scores = scores[keep]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Обучение Faster R-CNN</h2>
+    <pre><code>from torchvision.models.detection import fasterrcnn_resnet50_fpn
+from torch.utils.data import DataLoader
+
+# Модель с количеством классов
+num_classes = 91  # COCO: 80 + background
+model = fasterrcnn_resnet50_fpn(
+    pretrained=True,
+    num_classes=num_classes
+)
+
+# Замена head для своих классов
+num_classes = 10  # ваши классы + background
+in_features = model.roi_heads.box_predictor.cls_score.in_features
+model.roi_heads.box_predictor = FastRCNNPredictor(in_features, num_classes)
+
+# Optimizer
+params = [p for p in model.parameters() if p.requires_grad]
+optimizer = torch.optim.SGD(
+    params,
+    lr=0.005,
+    momentum=0.9,
+    weight_decay=0.0005
+)
+
+# Training loop
+model.train()
+for epoch in range(num_epochs):
+    for images, targets in dataloader:
+        # targets = [{'boxes': ..., 'labels': ...}, ...]
+        
+        loss_dict = model(images, targets)
+        losses = sum(loss for loss in loss_dict.values())
+        
+        optimizer.zero_grad()
+        losses.backward()
+        optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. SSD (Single Shot Detector)</h2>
+    <p><strong>Основная идея:</strong> детекция на разных масштабах feature maps.</p>
+    
+    <p><strong>Архитектура:</strong></p>
+    <ul>
+      <li><strong>Base network</strong>: VGG16 или ResNet</li>
+      <li><strong>Multi-scale feature maps</strong>: 6 разных размеров</li>
+      <li><strong>Default boxes</strong>: anchor boxes разных размеров</li>
+      <li><strong>Prediction heads</strong>: классификация + bbox на каждом уровне</li>
+    </ul>
+    
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Быстрее Faster R-CNN (59 FPS vs 7 FPS)</li>
+      <li>Детекция объектов разных размеров</li>
+      <li>Простая архитектура</li>
+    </ul>
+    
+    <p><strong>Недостатки:</strong></p>
+    <ul>
+      <li>Хуже на малых объектах</li>
+      <li>Требует много anchor boxes</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. SSD код</h2>
+    <pre><code>import torchvision
+from torchvision.models.detection import ssd300_vgg16
+
+# Предобученная модель
+model = ssd300_vgg16(pretrained=True)
+model.eval()
+
+# Inference
+predictions = model([image_tensor])
+
+# Для обучения
+model = ssd300_vgg16(
+    pretrained=True,
+    num_classes=num_classes
+)
+
+# Замена head
+in_channels = model.head.classification_head.in_channels
+num_anchors = model.head.classification_head.num_anchors
+
+model.head.classification_head = SSDClassificationHead(
+    in_channels=in_channels,
+    num_anchors=num_anchors,
+    num_classes=num_classes
+)
+
+# Training как в Faster R-CNN
+optimizer = torch.optim.SGD(
+    model.parameters(),
+    lr=0.001,
+    momentum=0.9,
+    weight_decay=0.0005
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. RetinaNet</h2>
+    <p><strong>Focal Loss</strong> — решает проблему class imbalance:</p>
+    <pre><code>FL(p_t) = -(1 - p_t)^γ * log(p_t)
+
+где:
+- p_t - вероятность правильного класса
+- γ - focusing parameter (обычно 2)</code></pre>
+    
+    <p><strong>Архитектура:</strong></p>
+    <ul>
+      <li><strong>Backbone</strong>: ResNet + FPN (Feature Pyramid Network)</li>
+      <li><strong>Two subnetworks</strong>: классификация и bbox регрессия</li>
+      <li><strong>Anchor boxes</strong>: 9 на каждой позиции</li>
+    </ul>
+    
+    <p><strong>Feature Pyramid Network (FPN):</strong></p>
+    <ul>
+      <li>Комбинирует низкоуровневые и высокоуровневые признаки</li>
+      <li>Top-down pathway + lateral connections</li>
+      <li>Улучшает детекцию малых объектов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. RetinaNet код</h2>
+    <pre><code># Требует установки detectron2
+# pip install detectron2
+
+from detectron2 import model_zoo
+from detectron2.engine import DefaultPredictor
+from detectron2.config import get_cfg
+
+# Конфигурация
+cfg = get_cfg()
+cfg.merge_from_file(
+    model_zoo.get_config_file(
+        "COCO-Detection/retinanet_R_50_FPN_3x.yaml"
+    )
+)
+cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(
+    "COCO-Detection/retinanet_R_50_FPN_3x.yaml"
+)
+cfg.MODEL.RETINANET.SCORE_THRESH_TEST = 0.5
+
+# Predictor
+predictor = DefaultPredictor(cfg)
+
+# Inference
+import cv2
+image = cv2.imread('image.jpg')
+predictions = predictor(image)
+
+# Результаты
+instances = predictions['instances']
+boxes = instances.pred_boxes.tensor.cpu().numpy()
+scores = instances.scores.cpu().numpy()
+classes = instances.pred_classes.cpu().numpy()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Non-Maximum Suppression (NMS)</h2>
+    <p><strong>NMS</strong> — удаление дублирующихся детекций:</p>
+    
+    <p><strong>Алгоритм:</strong></p>
+    <ol>
+      <li>Сортировать boxes по confidence score</li>
+      <li>Выбрать box с максимальным score</li>
+      <li>Удалить все boxes с IoU > threshold (0.5)</li>
+      <li>Повторить для оставшихся</li>
+    </ol>
+    
+    <pre><code>from torchvision.ops import nms
+
+# Применение NMS
+keep_indices = nms(
+    boxes,              # (N, 4)
+    scores,             # (N,)
+    iou_threshold=0.5
+)
+
+boxes = boxes[keep_indices]
+scores = scores[keep_indices]
+labels = labels[keep_indices]
+
+# Soft-NMS (более мягкое удаление)
+from torchvision.ops import batched_nms
+
+keep = batched_nms(
+    boxes,
+    scores,
+    labels,
+    iou_threshold=0.5
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. IoU (Intersection over Union)</h2>
+    <p><strong>IoU</strong> — метрика перекрытия bbox:</p>
+    <pre><code>IoU = Area(A ∩ B) / Area(A ∪ B)
+
+# Реализация
+def calculate_iou(box1, box2):
+    # box format: [x1, y1, x2, y2]
+    x1 = max(box1[0], box2[0])
+    y1 = max(box1[1], box2[1])
+    x2 = min(box1[2], box2[2])
+    y2 = min(box1[3], box2[3])
+    
+    intersection = max(0, x2 - x1) * max(0, y2 - y1)
+    
+    area1 = (box1[2] - box1[0]) * (box1[3] - box1[1])
+    area2 = (box2[2] - box2[0]) * (box2[3] - box2[1])
+    union = area1 + area2 - intersection
+    
+    return intersection / union if union > 0 else 0
+
+# PyTorch версия
+from torchvision.ops import box_iou
+
+iou_matrix = box_iou(boxes1, boxes2)  # (N, M)</code></pre>
+    
+    <p><strong>Варианты IoU:</strong></p>
+    <ul>
+      <li><strong>GIoU</strong> (Generalized): учитывает расстояние между боксами</li>
+      <li><strong>DIoU</strong> (Distance): добавляет расстояние центров</li>
+      <li><strong>CIoU</strong> (Complete): + aspect ratio</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. mAP метрика</h2>
+    <p><strong>mean Average Precision</strong> — основная метрика детекции:</p>
+    
+    <p><strong>Вычисление:</strong></p>
+    <ol>
+      <li>Для каждого класса:
+        <ul>
+          <li>Сортировать детекции по confidence</li>
+          <li>Вычислить Precision и Recall</li>
+          <li>Построить PR-кривую</li>
+          <li>AP = площадь под кривой</li>
+        </ul>
+      </li>
+      <li>mAP = среднее AP по всем классам</li>
+    </ol>
+    
+    <p><strong>mAP варианты:</strong></p>
+    <ul>
+      <li><strong>mAP@0.5</strong>: IoU threshold = 0.5</li>
+      <li><strong>mAP@0.75</strong>: IoU threshold = 0.75</li>
+      <li><strong>mAP@[0.5:0.95]</strong>: среднее по IoU от 0.5 до 0.95</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Data Augmentation</h2>
+    <p><strong>Специальные аугментации</strong> для детекции:</p>
+    <pre><code>import albumentations as A
+
+transform = A.Compose([
+    # Geometric
+    A.HorizontalFlip(p=0.5),
+    A.RandomRotate90(p=0.5),
+    A.ShiftScaleRotate(
+        shift_limit=0.0625,
+        scale_limit=0.1,
+        rotate_limit=15,
+        p=0.5
+    ),
+    
+    # Color
+    A.RandomBrightnessContrast(p=0.3),
+    A.HueSaturationValue(p=0.3),
+    
+    # Blur/Noise
+    A.GaussianBlur(p=0.2),
+    A.GaussNoise(p=0.2),
+    
+    # Cutout/Mixup
+    A.CoarseDropout(
+        max_holes=8,
+        max_height=32,
+        max_width=32,
+        p=0.2
+    ),
+    
+    # Normalize
+    A.Normalize(mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225])
+], bbox_params=A.BboxParams(
+    format='pascal_voc',  # [x1, y1, x2, y2]
+    label_fields=['class_labels']
+))
+
+# Применение
+transformed = transform(
+    image=image,
+    bboxes=bboxes,
+    class_labels=labels
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. EfficientDet</h2>
+    <p><strong>Эффективная архитектура</strong> на базе EfficientNet:</p>
+    
+    <p><strong>Ключевые идеи:</strong></p>
+    <ul>
+      <li><strong>BiFPN</strong> (Bidirectional FPN): эффективное слияние признаков</li>
+      <li><strong>Compound scaling</strong>: совместное масштабирование backbone, BiFPN, head</li>
+      <li><strong>EfficientNet backbone</strong>: эффективная сверточная сеть</li>
+    </ul>
+    
+    <p><strong>Варианты:</strong></p>
+    <table>
+      <tr><th>Модель</th><th>Параметры</th><th>mAP</th><th>FPS</th></tr>
+      <tr><td>EfficientDet-D0</td><td>3.9M</td><td>33.8</td><td>98</td></tr>
+      <tr><td>EfficientDet-D3</td><td>12.0M</td><td>45.8</td><td>15</td></tr>
+      <tr><td>EfficientDet-D7</td><td>52.0M</td><td>52.2</td><td>5</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Anchor boxes</h2>
+    <p><strong>Anchor boxes</strong> — предопределенные bbox разных размеров:</p>
+    
+    <p><strong>Параметры:</strong></p>
+    <ul>
+      <li><strong>Sizes</strong>: [32, 64, 128, 256, 512] пикселей</li>
+      <li><strong>Aspect ratios</strong>: [0.5, 1.0, 2.0]</li>
+      <li><strong>Scales</strong>: [1.0, 1.26, 1.59]</li>
+    </ul>
+    
+    <p><strong>Генерация anchors:</strong></p>
+    <pre><code>import torch
+
+def generate_anchors(sizes, ratios, scales):
+    anchors = []
+    for size in sizes:
+        for ratio in ratios:
+            h = size / torch.sqrt(torch.tensor(ratio))
+            w = size * torch.sqrt(torch.tensor(ratio))
+            
+            for scale in scales:
+                anchors.append([
+                    -w * scale / 2,
+                    -h * scale / 2,
+                    w * scale / 2,
+                    h * scale / 2
+                ])
+    
+    return torch.tensor(anchors)
+
+# Пример
+sizes = [32, 64, 128]
+ratios = [0.5, 1.0, 2.0]
+scales = [1.0, 1.26, 1.59]
+
+anchors = generate_anchors(sizes, ratios, scales)
+# Shape: (27, 4) - 3 sizes × 3 ratios × 3 scales</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Практические рекомендации</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Лучшие практики</h3>
+        <ul>
+          <li><strong>Начните с Faster R-CNN</strong> для высокой точности</li>
+          <li><strong>YOLO/SSD</strong> для real-time приложений</li>
+          <li><strong>Transfer learning</strong> с COCO предобучением</li>
+          <li><strong>Data augmentation</strong> обязательна</li>
+          <li><strong>NMS threshold</strong>: 0.5 для плотных сцен</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>⚠️ Частые ошибки</h3>
+        <ul>
+          <li>Неправильный формат bbox (x,y,w,h vs x1,y1,x2,y2)</li>
+          <li>Забыли нормализовать координаты</li>
+          <li>Слишком высокий confidence threshold</li>
+          <li>Не учли aspect ratio изображений</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Inference optimization</h2>
+    <p><strong>Ускорение inference:</strong></p>
+    <ul>
+      <li><strong>TensorRT</strong>: оптимизация для NVIDIA GPU</li>
+      <li><strong>ONNX</strong>: универсальный формат</li>
+      <li><strong>Pruning</strong>: удаление весов</li>
+      <li><strong>Quantization</strong>: FP16 или INT8</li>
+      <li><strong>Batch inference</strong>: обработка нескольких изображений</li>
+    </ul>
+    
+    <pre><code># Экспорт в ONNX
+torch.onnx.export(
+    model,
+    dummy_input,
+    'model.onnx',
+    input_names=['image'],
+    output_names=['boxes', 'labels', 'scores'],
+    dynamic_axes={
+        'image': {0: 'batch_size'},
+        'boxes': {0: 'batch_size'},
+    }
+)
+
+# TensorRT оптимизация
+import tensorrt as trt
+# ... TensorRT conversion code ...</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрали алгоритм (Faster R-CNN / SSD / YOLO)</li>
+      <li>[ ] Подготовили данные в нужном формате</li>
+      <li>[ ] Применили data augmentation</li>
+      <li>[ ] Использовали transfer learning</li>
+      <li>[ ] Настроили anchor boxes под свою задачу</li>
+      <li>[ ] Подобрали NMS threshold</li>
+      <li>[ ] Настроили confidence threshold</li>
+      <li>[ ] Вычислили mAP на валидации</li>
+      <li>[ ] Оптимизировали для inference (ONNX/TensorRT)</li>
+      <li>[ ] Протестировали на edge cases</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Детекция объектов — это как научить компьютер находить и обводить рамками нужные объекты на фото. Faster R-CNN работает точнее, но медленнее (для качественного анализа), а YOLO быстрее, но чуть менее точен (для видео в реальном времени)».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Сегментация изображений Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎨 Сегментация изображений Cheatsheet</h1>
+  <div class="subtitle">U-Net • DeepLab • Mask R-CNN • Semantic & Instance Segmentation<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Типы сегментации</h2>
+    <table>
+      <tr><th>Тип</th><th>Задача</th><th>Выход</th></tr>
+      <tr><td><strong>Semantic</strong></td><td>Классификация каждого пикселя</td><td>Маска классов</td></tr>
+      <tr><td><strong>Instance</strong></td><td>Разделение экземпляров объектов</td><td>Маска для каждого объекта</td></tr>
+      <tr><td><strong>Panoptic</strong></td><td>Semantic + Instance</td><td>Комбинированная маска</td></tr>
+    </table>
+    
+    <p><strong>Semantic Segmentation:</strong></p>
+    <ul>
+      <li>Все пиксели "человек" = один класс</li>
+      <li>Не различает отдельных людей</li>
+      <li>Пример: дорога, небо, здания</li>
+    </ul>
+    
+    <p><strong>Instance Segmentation:</strong></p>
+    <ul>
+      <li>Каждый человек = отдельная маска</li>
+      <li>Отличает объекты одного класса</li>
+      <li>Пример: person_1, person_2, ...</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. U-Net архитектура</h2>
+    <p><strong>Классическая архитектура</strong> для semantic segmentation:</p>
+    
+    <p><strong>Структура:</strong></p>
+    <ol>
+      <li><strong>Encoder (downsampling)</strong>:
+        <ul>
+          <li>Сверточные слои + MaxPooling</li>
+          <li>Извлечение признаков</li>
+          <li>Уменьшение размера</li>
+        </ul>
+      </li>
+      <li><strong>Decoder (upsampling)</strong>:
+        <ul>
+          <li>Транспонированные свертки</li>
+          <li>Восстановление размера</li>
+          <li>Skip connections с encoder</li>
+        </ul>
+      </li>
+    </ol>
+    
+    <p><strong>Skip Connections:</strong></p>
+    <ul>
+      <li>Соединяют encoder и decoder</li>
+      <li>Сохраняют пространственную информацию</li>
+      <li>Ключевая особенность U-Net</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. U-Net код</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class UNet(nn.Module):
+    def __init__(self, in_channels=3, num_classes=21):
+        super().__init__()
+        
+        # Encoder
+        self.enc1 = self.conv_block(in_channels, 64)
+        self.enc2 = self.conv_block(64, 128)
+        self.enc3 = self.conv_block(128, 256)
+        self.enc4 = self.conv_block(256, 512)
+        
+        # Bottleneck
+        self.bottleneck = self.conv_block(512, 1024)
+        
+        # Decoder
+        self.up4 = nn.ConvTranspose2d(1024, 512, 2, stride=2)
+        self.dec4 = self.conv_block(1024, 512)
+        
+        self.up3 = nn.ConvTranspose2d(512, 256, 2, stride=2)
+        self.dec3 = self.conv_block(512, 256)
+        
+        self.up2 = nn.ConvTranspose2d(256, 128, 2, stride=2)
+        self.dec2 = self.conv_block(256, 128)
+        
+        self.up1 = nn.ConvTranspose2d(128, 64, 2, stride=2)
+        self.dec1 = self.conv_block(128, 64)
+        
+        # Output
+        self.out = nn.Conv2d(64, num_classes, 1)
+        
+        self.pool = nn.MaxPool2d(2)
+    
+    def conv_block(self, in_ch, out_ch):
+        return nn.Sequential(
+            nn.Conv2d(in_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(out_ch, out_ch, 3, padding=1),
+            nn.BatchNorm2d(out_ch),
+            nn.ReLU(inplace=True)
+        )
+    
+    def forward(self, x):
+        # Encoder
+        enc1 = self.enc1(x)
+        enc2 = self.enc2(self.pool(enc1))
+        enc3 = self.enc3(self.pool(enc2))
+        enc4 = self.enc4(self.pool(enc3))
+        
+        # Bottleneck
+        bottleneck = self.bottleneck(self.pool(enc4))
+        
+        # Decoder with skip connections
+        dec4 = self.up4(bottleneck)
+        dec4 = torch.cat([dec4, enc4], dim=1)
+        dec4 = self.dec4(dec4)
+        
+        dec3 = self.up3(dec4)
+        dec3 = torch.cat([dec3, enc3], dim=1)
+        dec3 = self.dec3(dec3)
+        
+        dec2 = self.up2(dec3)
+        dec2 = torch.cat([dec2, enc2], dim=1)
+        dec2 = self.dec2(dec2)
+        
+        dec1 = self.up1(dec2)
+        dec1 = torch.cat([dec1, enc1], dim=1)
+        dec1 = self.dec1(dec1)
+        
+        return self.out(dec1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Обучение U-Net</h2>
+    <pre><code># Модель и оптимизатор
+model = UNet(in_channels=3, num_classes=21)
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+
+# Loss functions
+criterion = nn.CrossEntropyLoss()
+
+# Или Dice Loss для несбалансированных классов
+class DiceLoss(nn.Module):
+    def forward(self, pred, target):
+        smooth = 1.
+        pred = torch.softmax(pred, dim=1)
+        
+        intersection = (pred * target).sum(dim=(2, 3))
+        union = pred.sum(dim=(2, 3)) + target.sum(dim=(2, 3))
+        
+        dice = (2. * intersection + smooth) / (union + smooth)
+        return 1 - dice.mean()
+
+# Training loop
+model.train()
+for epoch in range(num_epochs):
+    for images, masks in dataloader:
+        # masks shape: (B, H, W) с классами 0..num_classes-1
+        
+        optimizer.zero_grad()
+        outputs = model(images)  # (B, num_classes, H, W)
+        
+        loss = criterion(outputs, masks)
+        loss.backward()
+        optimizer.step()
+    
+    print(f"Epoch {epoch}, Loss: {loss.item():.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Функции потерь</h2>
+    <p><strong>Cross Entropy Loss:</strong></p>
+    <pre><code># Стандартная для semantic segmentation
+criterion = nn.CrossEntropyLoss()</code></pre>
+    
+    <p><strong>Weighted Cross Entropy:</strong></p>
+    <pre><code># Для несбалансированных классов
+class_weights = torch.tensor([0.1, 1.0, 2.0, ...])
+criterion = nn.CrossEntropyLoss(weight=class_weights)</code></pre>
+    
+    <p><strong>Dice Loss:</strong></p>
+    <pre><code># Для малых объектов
+dice_loss = DiceLoss()</code></pre>
+    
+    <p><strong>Focal Loss:</strong></p>
+    <pre><code># Для сильно несбалансированных данных
+class FocalLoss(nn.Module):
+    def __init__(self, alpha=0.25, gamma=2):
+        super().__init__()
+        self.alpha = alpha
+        self.gamma = gamma
+    
+    def forward(self, pred, target):
+        ce_loss = F.cross_entropy(pred, target, reduction='none')
+        pt = torch.exp(-ce_loss)
+        focal_loss = self.alpha * (1-pt)**self.gamma * ce_loss
+        return focal_loss.mean()</code></pre>
+    
+    <p><strong>Комбинированная:</strong></p>
+    <pre><code># CE + Dice
+loss = 0.5 * ce_loss + 0.5 * dice_loss</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. DeepLab v3+</h2>
+    <p><strong>Современная архитектура</strong> для semantic segmentation:</p>
+    
+    <p><strong>Ключевые компоненты:</strong></p>
+    <ul>
+      <li><strong>Atrous Convolution</strong> (Dilated): увеличение receptive field</li>
+      <li><strong>ASPP</strong> (Atrous Spatial Pyramid Pooling): multi-scale контекст</li>
+      <li><strong>Encoder-Decoder</strong>: ResNet/Xception backbone</li>
+    </ul>
+    
+    <p><strong>Atrous Convolution:</strong></p>
+    <pre><code># Обычная свертка
+conv = nn.Conv2d(in_ch, out_ch, kernel_size=3, padding=1)
+
+# Atrous свертка с dilation=2
+atrous_conv = nn.Conv2d(
+    in_ch, out_ch,
+    kernel_size=3,
+    padding=2,
+    dilation=2  # увеличивает receptive field
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. DeepLab код</h2>
+    <pre><code>import torch
+import torchvision
+
+# Предобученная DeepLab v3
+model = torchvision.models.segmentation.deeplabv3_resnet50(
+    pretrained=True,
+    num_classes=21  # PASCAL VOC
+)
+
+# Замена для своих классов
+model.classifier[4] = nn.Conv2d(256, num_classes, 1)
+
+# Inference
+model.eval()
+with torch.no_grad():
+    output = model(image)['out']  # (B, num_classes, H, W)
+    pred = output.argmax(1)  # (B, H, W)
+
+# Обучение
+optimizer = torch.optim.SGD(
+    model.parameters(),
+    lr=0.01,
+    momentum=0.9,
+    weight_decay=1e-4
+)
+
+for images, masks in dataloader:
+    outputs = model(images)['out']
+    loss = criterion(outputs, masks)
+    
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Mask R-CNN</h2>
+    <p><strong>Instance Segmentation</strong> — расширение Faster R-CNN:</p>
+    
+    <p><strong>Архитектура:</strong></p>
+    <ol>
+      <li><strong>Backbone</strong>: ResNet + FPN</li>
+      <li><strong>RPN</strong>: Region Proposal Network</li>
+      <li><strong>RoI Align</strong>: точное выравнивание (не pooling!)</li>
+      <li><strong>Heads</strong>:
+        <ul>
+          <li>Classification head</li>
+          <li>Box regression head</li>
+          <li><strong>Mask head</strong>: FCN для маски</li>
+        </ul>
+      </li>
+    </ol>
+    
+    <p><strong>RoI Align vs RoI Pooling:</strong></p>
+    <ul>
+      <li><strong>RoI Pooling</strong>: квантование координат → потеря точности</li>
+      <li><strong>RoI Align</strong>: билинейная интерполяция → точные маски</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Mask R-CNN код</h2>
+    <pre><code>import torchvision
+from torchvision.models.detection import maskrcnn_resnet50_fpn
+
+# Предобученная модель
+model = maskrcnn_resnet50_fpn(pretrained=True)
+model.eval()
+
+# Inference
+with torch.no_grad():
+    predictions = model([image_tensor])
+
+# Результаты
+boxes = predictions[0]['boxes']      # (N, 4)
+labels = predictions[0]['labels']    # (N,)
+scores = predictions[0]['scores']    # (N,)
+masks = predictions[0]['masks']      # (N, 1, H, W)
+
+# Фильтрация по threshold
+threshold = 0.5
+keep = scores > threshold
+masks = masks[keep, 0] > 0.5  # бинарные маски
+
+# Обучение на своих данных
+model = maskrcnn_resnet50_fpn(
+    pretrained=True,
+    num_classes=num_classes
+)
+
+# Заменить heads
+in_features = model.roi_heads.box_predictor.cls_score.in_features
+model.roi_heads.box_predictor = FastRCNNPredictor(
+    in_features,
+    num_classes
+)
+
+in_features_mask = model.roi_heads.mask_predictor.conv5_mask.in_channels
+model.roi_heads.mask_predictor = MaskRCNNPredictor(
+    in_features_mask,
+    256,
+    num_classes
+)
+
+# Training
+params = [p for p in model.parameters() if p.requires_grad]
+optimizer = torch.optim.SGD(
+    params,
+    lr=0.005,
+    momentum=0.9,
+    weight_decay=0.0005
+)
+
+for images, targets in dataloader:
+    # targets = [{'boxes': ..., 'labels': ..., 'masks': ...}]
+    loss_dict = model(images, targets)
+    losses = sum(loss for loss in loss_dict.values())
+    
+    optimizer.zero_grad()
+    losses.backward()
+    optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Метрики</h2>
+    <p><strong>IoU (Intersection over Union):</strong></p>
+    <pre><code>def calculate_iou(pred_mask, gt_mask):
+    intersection = (pred_mask & gt_mask).sum()
+    union = (pred_mask | gt_mask).sum()
+    return intersection / union if union > 0 else 0</code></pre>
+    
+    <p><strong>Dice Coefficient:</strong></p>
+    <pre><code>def dice_coefficient(pred_mask, gt_mask):
+    intersection = (pred_mask & gt_mask).sum()
+    return (2. * intersection) / (pred_mask.sum() + gt_mask.sum())</code></pre>
+    
+    <p><strong>Pixel Accuracy:</strong></p>
+    <pre><code>def pixel_accuracy(pred, target):
+    correct = (pred == target).sum()
+    total = target.numel()
+    return correct / total</code></pre>
+    
+    <p><strong>Mean IoU:</strong></p>
+    <pre><code>def mean_iou(pred, target, num_classes):
+    ious = []
+    for cls in range(num_classes):
+        pred_cls = (pred == cls)
+        target_cls = (target == cls)
+        iou = calculate_iou(pred_cls, target_cls)
+        ious.append(iou)
+    return np.mean(ious)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Post-processing</h2>
+    <p><strong>CRF (Conditional Random Fields)</strong> — уточнение границ:</p>
+    <pre><code># pip install pydensecrf
+import pydensecrf.densecrf as dcrf
+
+def apply_crf(image, probabilities):
+    # probabilities: (num_classes, H, W)
+    d = dcrf.DenseCRF2D(W, H, num_classes)
+    
+    # Unary potential
+    U = -np.log(probabilities)
+    U = U.reshape((num_classes, -1))
+    d.setUnaryEnergy(U)
+    
+    # Pairwise potentials
+    d.addPairwiseGaussian(sxy=3, compat=3)
+    d.addPairwiseBilateral(
+        sxy=80, srgb=13,
+        rgbim=image,
+        compat=10
+    )
+    
+    # Inference
+    Q = d.inference(5)
+    Q = np.array(Q).reshape((num_classes, H, W))
+    
+    return Q.argmax(0)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Data Augmentation</h2>
+    <pre><code>import albumentations as A
+
+transform = A.Compose([
+    # Geometric (одинаково для image и mask!)
+    A.HorizontalFlip(p=0.5),
+    A.VerticalFlip(p=0.5),
+    A.RandomRotate90(p=0.5),
+    A.ShiftScaleRotate(
+        shift_limit=0.1,
+        scale_limit=0.1,
+        rotate_limit=45,
+        p=0.5
+    ),
+    
+    # Elastic transform
+    A.ElasticTransform(
+        alpha=120,
+        sigma=120 * 0.05,
+        alpha_affine=120 * 0.03,
+        p=0.3
+    ),
+    
+    # Crop
+    A.RandomCrop(height=512, width=512),
+    
+    # Color (только для image!)
+    A.RandomBrightnessContrast(p=0.3),
+    A.HueSaturationValue(p=0.3),
+    A.GaussianBlur(p=0.2),
+    
+    # Normalize
+    A.Normalize()
+])
+
+# Применение
+transformed = transform(image=image, mask=mask)
+aug_image = transformed['image']
+aug_mask = transformed['mask']</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Semantic Segmentation в реальном времени</h2>
+    <p><strong>Легкие архитектуры:</strong></p>
+    <table>
+      <tr><th>Модель</th><th>Параметры</th><th>mIoU</th><th>FPS</th></tr>
+      <tr><td>ENet</td><td>0.4M</td><td>58.3</td><td>76</td></tr>
+      <tr><td>ICNet</td><td>6.7M</td><td>69.5</td><td>30</td></tr>
+      <tr><td>BiSeNet</td><td>13.3M</td><td>74.8</td><td>72</td></tr>
+      <tr><td>Fast-SCNN</td><td>1.1M</td><td>68.0</td><td>123</td></tr>
+    </table>
+    
+    <pre><code># Пример: сегментация видео
+import cv2
+
+model = load_fast_model()  # легкая модель
+cap = cv2.VideoCapture(0)
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+    
+    # Предобработка
+    input_tensor = preprocess(frame)
+    
+    # Inference
+    with torch.no_grad():
+        output = model(input_tensor)
+        mask = output.argmax(1)[0].cpu().numpy()
+    
+    # Визуализация
+    colored_mask = colorize_mask(mask)
+    result = cv2.addWeighted(frame, 0.7, colored_mask, 0.3, 0)
+    
+    cv2.imshow('Segmentation', result)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+cap.release()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Transfer Learning</h2>
+    <p><strong>Предобученные модели:</strong></p>
+    <ul>
+      <li><strong>ImageNet</strong>: только backbone</li>
+      <li><strong>COCO</strong>: полная модель для instance seg</li>
+      <li><strong>Cityscapes</strong>: urban scenes</li>
+      <li><strong>ADE20K</strong>: 150 классов indoor/outdoor</li>
+    </ul>
+    
+    <pre><code># Fine-tuning стратегия
+model = deeplabv3_resnet50(pretrained=True)
+
+# Заморозить backbone
+for param in model.backbone.parameters():
+    param.requires_grad = False
+
+# Разморозить batch norm в backbone
+for module in model.backbone.modules():
+    if isinstance(module, nn.BatchNorm2d):
+        module.requires_grad_(True)
+
+# Обучить только decoder
+optimizer = torch.optim.Adam([
+    {'params': model.classifier.parameters(), 'lr': 1e-3},
+    {'params': model.backbone.parameters(), 'lr': 1e-5}
+])
+
+# После нескольких эпох - разморозить все
+for param in model.parameters():
+    param.requires_grad = True
+
+optimizer = torch.optim.Adam(
+    model.parameters(),
+    lr=1e-4
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Визуализация результатов</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+
+def visualize_segmentation(image, mask, pred_mask):
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+    
+    # Original image
+    axes[0].imshow(image)
+    axes[0].set_title('Original')
+    axes[0].axis('off')
+    
+    # Ground truth
+    axes[1].imshow(mask, cmap='tab20')
+    axes[1].set_title('Ground Truth')
+    axes[1].axis('off')
+    
+    # Prediction
+    axes[2].imshow(pred_mask, cmap='tab20')
+    axes[2].set_title('Prediction')
+    axes[2].axis('off')
+    
+    plt.tight_layout()
+    plt.show()
+
+def overlay_mask(image, mask, alpha=0.5):
+    """Наложить маску на изображение"""
+    colored_mask = colorize_mask(mask)
+    return cv2.addWeighted(image, 1-alpha, colored_mask, alpha, 0)
+
+def colorize_mask(mask):
+    """Раскрасить маску классов"""
+    h, w = mask.shape
+    colored = np.zeros((h, w, 3), dtype=np.uint8)
+    
+    # Палитра цветов для классов
+    palette = [
+        [128, 64, 128],   # road
+        [244, 35, 232],   # sidewalk
+        [70, 70, 70],     # building
+        # ... добавить больше цветов
+    ]
+    
+    for cls_id, color in enumerate(palette):
+        colored[mask == cls_id] = color
+    
+    return colored</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Best Practices</h3>
+        <ul>
+          <li><strong>U-Net</strong> — для медицинских изображений</li>
+          <li><strong>DeepLab</strong> — для outdoor scenes</li>
+          <li><strong>Mask R-CNN</strong> — для instance segmentation</li>
+          <li><strong>Transfer learning</strong> обязателен</li>
+          <li><strong>Data augmentation</strong> критично важна</li>
+          <li>Используйте <strong>mixed precision</strong> для ускорения</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>⚠️ Частые ошибки</h3>
+        <ul>
+          <li>Не нормализовали маски (должны быть 0..num_classes-1)</li>
+          <li>Неправильный размер маски относительно изображения</li>
+          <li>Забыли про class imbalance</li>
+          <li>Аугментация только для image, не для mask</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Оптимизация inference</h2>
+    <pre><code># 1. TorchScript
+model.eval()
+scripted = torch.jit.script(model)
+scripted.save('model_scripted.pt')
+
+# 2. ONNX export
+torch.onnx.export(
+    model,
+    dummy_input,
+    'segmentation.onnx',
+    input_names=['image'],
+    output_names=['mask'],
+    dynamic_axes={'image': {0: 'batch', 2: 'height', 3: 'width'}}
+)
+
+# 3. TensorRT (fastest)
+import tensorrt as trt
+# ... TensorRT conversion ...
+
+# 4. Quantization (INT8)
+from torch.quantization import quantize_dynamic
+quantized_model = quantize_dynamic(
+    model,
+    {nn.Conv2d, nn.Linear},
+    dtype=torch.qint8
+)
+
+# 5. Pruning
+from torch.nn.utils import prune
+for module in model.modules():
+    if isinstance(module, nn.Conv2d):
+        prune.l1_unstructured(module, name='weight', amount=0.3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрали тип сегментации (semantic/instance)</li>
+      <li>[ ] Подготовили маски в правильном формате</li>
+      <li>[ ] Выбрали архитектуру (U-Net/DeepLab/Mask R-CNN)</li>
+      <li>[ ] Применили transfer learning</li>
+      <li>[ ] Настроили data augmentation для image+mask</li>
+      <li>[ ] Выбрали подходящую loss function</li>
+      <li>[ ] Учли class imbalance (weighted loss)</li>
+      <li>[ ] Вычислили mIoU и Dice на валидации</li>
+      <li>[ ] Применили post-processing (CRF)</li>
+      <li>[ ] Оптимизировали для inference</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Сегментация — это когда мы раскрашиваем каждый пиксель изображения в цвет его класса. Semantic segmentation говорит "это дорога, это машина", а instance segmentation уточняет "это первая машина, это вторая машина". Как автоматическая раскраска по номерам, но для реальных фото».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

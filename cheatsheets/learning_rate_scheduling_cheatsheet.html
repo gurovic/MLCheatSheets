@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Learning Rate Scheduling Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📈 Learning Rate Scheduling Cheatsheet</h1>
+  <div class="subtitle">Step Decay • Cosine Annealing • Warmup • OneCycleLR<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Зачем нужен Scheduling?</h2>
+    <p><strong>Learning Rate Scheduling</strong> — изменение скорости обучения во время тренировки.</p>
+    
+    <p><strong>Проблема фиксированного lr:</strong></p>
+    <ul>
+      <li>Большой lr → быстрая сходимость, но нестабильность</li>
+      <li>Маленький lr → медленное обучение</li>
+      <li>Оптимум где-то посередине меняется со временем</li>
+    </ul>
+    
+    <p><strong>Преимущества scheduling:</strong></p>
+    <ul>
+      <li>Быстрое обучение в начале</li>
+      <li>Стабильная сходимость в конце</li>
+      <li>Лучшая генерализация</li>
+      <li>Выход из локальных минимумов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные типы schedulers</h2>
+    <table>
+      <tr><th>Scheduler</th><th>Описание</th><th>Применение</th></tr>
+      <tr><td><strong>StepLR</strong></td><td>Снижение каждые N эпох</td><td>Базовый подход</td></tr>
+      <tr><td><strong>ExponentialLR</strong></td><td>Экспоненциальное снижение</td><td>Постепенное затухание</td></tr>
+      <tr><td><strong>CosineAnnealingLR</strong></td><td>Косинусоидальное снижение</td><td>Современный стандарт</td></tr>
+      <tr><td><strong>ReduceLROnPlateau</strong></td><td>При остановке улучшения</td><td>Adaptive</td></tr>
+      <tr><td><strong>OneCycleLR</strong></td><td>Одна фаза подъема и спуска</td><td>Быстрая сходимость</td></tr>
+      <tr><td><strong>WarmupLR</strong></td><td>Постепенное увеличение</td><td>Начало обучения</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Step Decay (StepLR)</h2>
+    <p><strong>Снижение lr каждые N эпох</strong>:</p>
+    <pre><code>lr_new = lr * gamma^(epoch // step_size)</code></pre>
+    
+    <pre><code>import torch.optim as optim
+
+optimizer = optim.SGD(model.parameters(), lr=0.1)
+
+# Снижение на 10x каждые 30 эпох
+scheduler = optim.lr_scheduler.StepLR(
+    optimizer,
+    step_size=30,
+    gamma=0.1
+)
+
+# Training loop
+for epoch in range(num_epochs):
+    train_one_epoch()
+    scheduler.step()  # обновить lr
+
+# Эволюция lr:
+# Эпохи 0-29: lr = 0.1
+# Эпохи 30-59: lr = 0.01
+# Эпохи 60-89: lr = 0.001</code></pre>
+    
+    <p><strong>MultiStepLR</strong> — снижение на заданных эпохах:</p>
+    <pre><code>scheduler = optim.lr_scheduler.MultiStepLR(
+    optimizer,
+    milestones=[30, 60, 90],
+    gamma=0.1
+)
+
+# lr меняется только на эпохах 30, 60, 90</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Exponential Decay</h2>
+    <p><strong>Плавное экспоненциальное снижение</strong>:</p>
+    <pre><code>lr_new = lr * gamma^epoch</code></pre>
+    
+    <pre><code># PyTorch
+scheduler = optim.lr_scheduler.ExponentialLR(
+    optimizer,
+    gamma=0.95  # снижение на 5% каждую эпоху
+)
+
+# Пример с gamma=0.95:
+# Эпоха 0: lr = 0.1
+# Эпоха 10: lr = 0.0599
+# Эпоха 20: lr = 0.0358
+# Эпоха 50: lr = 0.0077
+
+# TensorFlow
+lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+    initial_learning_rate=0.1,
+    decay_steps=1000,
+    decay_rate=0.96
+)
+
+optimizer = tf.keras.optimizers.Adam(learning_rate=lr_schedule)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Cosine Annealing</h2>
+    <p><strong>Плавное косинусоидальное снижение</strong>:</p>
+    <pre><code>lr_t = lr_min + 0.5 * (lr_max - lr_min) * (1 + cos(π * t / T))</code></pre>
+    
+    <pre><code># PyTorch
+scheduler = optim.lr_scheduler.CosineAnnealingLR(
+    optimizer,
+    T_max=100,      # период в эпохах
+    eta_min=1e-6    # минимальный lr
+)
+
+# С рестартами (SGDR)
+scheduler = optim.lr_scheduler.CosineAnnealingWarmRestarts(
+    optimizer,
+    T_0=10,         # первый период
+    T_mult=2,       # умножение периода после рестарта
+    eta_min=1e-6
+)
+
+# TensorFlow
+lr_schedule = tf.keras.optimizers.schedules.CosineDecay(
+    initial_learning_rate=0.1,
+    decay_steps=1000,
+    alpha=0.0
+)</code></pre>
+    
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Плавное снижение без скачков</li>
+      <li>Хорошая сходимость в конце</li>
+      <li>Популярен в computer vision</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. ReduceLROnPlateau</h2>
+    <p><strong>Adaptive scheduler</strong> — снижает lr когда метрика не улучшается:</p>
+    <pre><code>scheduler = optim.lr_scheduler.ReduceLROnPlateau(
+    optimizer,
+    mode='min',          # 'min' для loss, 'max' для accuracy
+    factor=0.1,          # уменьшение в 10 раз
+    patience=10,         # ждать 10 эпох без улучшения
+    verbose=True,
+    threshold=1e-4,      # минимальное улучшение
+    cooldown=0,          # эпохи после снижения
+    min_lr=1e-6          # минимальный lr
+)
+
+# Training loop
+for epoch in range(num_epochs):
+    train_loss = train_one_epoch()
+    val_loss = validate()
+    
+    # Передать метрику scheduler
+    scheduler.step(val_loss)
+    
+    print(f"Epoch {epoch}: lr = {optimizer.param_groups[0]['lr']}")</code></pre>
+    
+    <p><strong>Когда использовать:</strong></p>
+    <ul>
+      <li>Неизвестно оптимальное расписание</li>
+      <li>Нужна адаптация к данным</li>
+      <li>Не критична скорость обучения</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. OneCycleLR</h2>
+    <p><strong>Super-convergence</strong> — быстрое обучение за один цикл:</p>
+    
+    <p><strong>Фазы:</strong></p>
+    <ol>
+      <li><strong>Warmup (0-30%)</strong>: lr растет от min до max</li>
+      <li><strong>Annealing (30-100%)</strong>: lr падает до min</li>
+    </ol>
+    
+    <pre><code>scheduler = optim.lr_scheduler.OneCycleLR(
+    optimizer,
+    max_lr=0.1,             # максимальный lr
+    epochs=100,
+    steps_per_epoch=len(dataloader),
+    pct_start=0.3,          # % эпох на warmup
+    anneal_strategy='cos',  # 'cos' или 'linear'
+    div_factor=25,          # initial_lr = max_lr / div_factor
+    final_div_factor=1e4    # final_lr = max_lr / final_div_factor
+)
+
+# Вызывать КАЖДУЮ ИТЕРАЦИЮ, не эпоху!
+for epoch in range(num_epochs):
+    for batch in dataloader:
+        optimizer.zero_grad()
+        loss = model(batch)
+        loss.backward()
+        optimizer.step()
+        scheduler.step()  # каждую итерацию!</code></pre>
+    
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Очень быстрая сходимость</li>
+      <li>Меньше эпох нужно</li>
+      <li>Регуляризация через высокий lr</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Warmup</h2>
+    <p><strong>Постепенное увеличение lr</strong> в начале обучения:</p>
+    
+    <p><strong>Зачем нужен:</strong></p>
+    <ul>
+      <li>Стабилизация в начале (особенно для Adam)</li>
+      <li>Критично для больших batch size</li>
+      <li>Обязателен для Transformers</li>
+    </ul>
+    
+    <pre><code># Linear warmup
+class LinearWarmupScheduler:
+    def __init__(self, optimizer, warmup_epochs, total_epochs, base_lr):
+        self.optimizer = optimizer
+        self.warmup_epochs = warmup_epochs
+        self.total_epochs = total_epochs
+        self.base_lr = base_lr
+    
+    def step(self, epoch):
+        if epoch < self.warmup_epochs:
+            # Linear warmup
+            lr = self.base_lr * (epoch + 1) / self.warmup_epochs
+        else:
+            # Cosine decay после warmup
+            progress = (epoch - self.warmup_epochs) / (self.total_epochs - self.warmup_epochs)
+            lr = 0.5 * self.base_lr * (1 + math.cos(math.pi * progress))
+        
+        for param_group in self.optimizer.param_groups:
+            param_group['lr'] = lr
+
+# Использование
+scheduler = LinearWarmupScheduler(optimizer, warmup_epochs=5, total_epochs=100, base_lr=0.001)
+
+for epoch in range(100):
+    train_one_epoch()
+    scheduler.step(epoch)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Комбинированные schedulers</h2>
+    <p><strong>Warmup + Cosine Annealing</strong> — популярная комбинация:</p>
+    <pre><code># PyTorch встроенный
+from torch.optim.lr_scheduler import SequentialLR, LinearLR, CosineAnnealingLR
+
+# Warmup scheduler
+warmup_scheduler = LinearLR(
+    optimizer,
+    start_factor=0.01,  # начать с lr/100
+    end_factor=1.0,
+    total_iters=5
+)
+
+# Main scheduler
+main_scheduler = CosineAnnealingLR(
+    optimizer,
+    T_max=95,
+    eta_min=1e-6
+)
+
+# Объединение
+scheduler = SequentialLR(
+    optimizer,
+    schedulers=[warmup_scheduler, main_scheduler],
+    milestones=[5]  # переключение после 5 эпох
+)
+
+for epoch in range(100):
+    train_one_epoch()
+    scheduler.step()</code></pre>
+    
+    <p><strong>Transformers (BERT-style):</strong></p>
+    <pre><code>from transformers import get_linear_schedule_with_warmup
+
+scheduler = get_linear_schedule_with_warmup(
+    optimizer,
+    num_warmup_steps=10000,
+    num_training_steps=100000
+)
+
+# Вызывать каждый шаг
+for step in range(num_training_steps):
+    optimizer.step()
+    scheduler.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Cyclical Learning Rates</h2>
+    <p><strong>Циклическое изменение lr</strong> между min и max:</p>
+    <pre><code>scheduler = optim.lr_scheduler.CyclicLR(
+    optimizer,
+    base_lr=0.001,      # минимум
+    max_lr=0.1,         # максимум
+    step_size_up=2000,  # шагов на подъем
+    mode='triangular',  # 'triangular', 'triangular2', 'exp_range'
+    cycle_momentum=True
+)
+
+# Вызывать каждую итерацию
+for epoch in range(num_epochs):
+    for batch in dataloader:
+        optimizer.step()
+        scheduler.step()
+
+# Modes:
+# - triangular: постоянная амплитуда
+# - triangular2: половинная амплитуда каждый цикл
+# - exp_range: экспоненциальное снижение</code></pre>
+    
+    <p><strong>Leslie Smith's 1cycle:</strong></p>
+    <ul>
+      <li>Один большой цикл вместо множества малых</li>
+      <li>Faster training</li>
+      <li>Better generalization</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Polynomial Decay</h2>
+    <p><strong>Полиномиальное снижение</strong>:</p>
+    <pre><code>lr_t = (lr - lr_end) * (1 - t/T)^power + lr_end
+
+# PyTorch реализация
+class PolynomialLRDecay:
+    def __init__(self, optimizer, max_decay_steps, end_lr=0.0001, power=1.0):
+        self.optimizer = optimizer
+        self.max_decay_steps = max_decay_steps
+        self.end_lr = end_lr
+        self.power = power
+        self.base_lr = optimizer.param_groups[0]['lr']
+    
+    def step(self, step):
+        if step > self.max_decay_steps:
+            lr = self.end_lr
+        else:
+            lr = (self.base_lr - self.end_lr) * \
+                 ((1 - step / self.max_decay_steps) ** self.power) + \
+                 self.end_lr
+        
+        for param_group in self.optimizer.param_groups:
+            param_group['lr'] = lr
+
+# TensorFlow
+lr_schedule = tf.keras.optimizers.schedules.PolynomialDecay(
+    initial_learning_rate=0.1,
+    decay_steps=10000,
+    end_learning_rate=0.0001,
+    power=1.0
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Learning Rate Finder</h2>
+    <p><strong>Поиск оптимального lr</strong> перед обучением:</p>
+    <pre><code># pip install torch-lr-finder
+from torch_lr_finder import LRFinder
+
+model = YourModel()
+optimizer = optim.SGD(model.parameters(), lr=1e-7)
+criterion = nn.CrossEntropyLoss()
+
+lr_finder = LRFinder(model, optimizer, criterion)
+
+# Range test
+lr_finder.range_test(train_loader, end_lr=1, num_iter=100)
+
+# График
+lr_finder.plot()  # показать график loss vs lr
+
+# Лучший lr
+lr = lr_finder.suggest_lr()
+print(f"Suggested lr: {lr}")
+
+# Сброс модели
+lr_finder.reset()
+
+# Использовать найденный lr
+optimizer = optim.SGD(model.parameters(), lr=lr)</code></pre>
+    
+    <p><strong>Как читать график:</strong></p>
+    <ul>
+      <li>Начало: loss снижается → хорошо</li>
+      <li>Оптимум: самое быстрое снижение</li>
+      <li>Конец: loss растет → слишком большой lr</li>
+      <li><strong>Выбор</strong>: 1/10 от максимального стабильного lr</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Практический пример</h2>
+    <pre><code># Полный pipeline с warmup + cosine
+import torch
+import math
+
+class WarmupCosineScheduler:
+    def __init__(self, optimizer, warmup_epochs, total_epochs, 
+                 min_lr=1e-6, max_lr=0.001):
+        self.optimizer = optimizer
+        self.warmup_epochs = warmup_epochs
+        self.total_epochs = total_epochs
+        self.min_lr = min_lr
+        self.max_lr = max_lr
+    
+    def step(self, epoch):
+        if epoch < self.warmup_epochs:
+            # Linear warmup
+            lr = self.min_lr + (self.max_lr - self.min_lr) * \
+                 epoch / self.warmup_epochs
+        else:
+            # Cosine annealing
+            progress = (epoch - self.warmup_epochs) / \
+                      (self.total_epochs - self.warmup_epochs)
+            lr = self.min_lr + 0.5 * (self.max_lr - self.min_lr) * \
+                 (1 + math.cos(math.pi * progress))
+        
+        for param_group in self.optimizer.param_groups:
+            param_group['lr'] = lr
+        
+        return lr
+
+# Использование
+model = YourModel()
+optimizer = optim.AdamW(model.parameters(), lr=0.001)
+scheduler = WarmupCosineScheduler(
+    optimizer,
+    warmup_epochs=10,
+    total_epochs=100,
+    max_lr=0.001,
+    min_lr=1e-6
+)
+
+# Training
+for epoch in range(100):
+    lr = scheduler.step(epoch)
+    
+    for batch in train_loader:
+        optimizer.zero_grad()
+        loss = train_step(batch)
+        loss.backward()
+        optimizer.step()
+    
+    print(f"Epoch {epoch}: lr={lr:.6f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Рекомендации по выбору</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Лучшие практики</h3>
+        <ul>
+          <li><strong>ResNet/CNN</strong>: StepLR или CosineAnnealing</li>
+          <li><strong>Transformers</strong>: Warmup + Linear decay</li>
+          <li><strong>Быстрое обучение</strong>: OneCycleLR</li>
+          <li><strong>Неизвестная задача</strong>: ReduceLROnPlateau</li>
+          <li><strong>Большой batch</strong>: Обязательный warmup</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>⚠️ Частые ошибки</h3>
+        <ul>
+          <li>Забыли вызвать <code>scheduler.step()</code></li>
+          <li>OneCycleLR вызывают раз в эпоху (нужно каждую итерацию!)</li>
+          <li>Нет warmup для больших моделей</li>
+          <li>Слишком агрессивное снижение lr</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Мониторинг lr</h2>
+    <pre><code># Логирование lr в TensorBoard
+from torch.utils.tensorboard import SummaryWriter
+
+writer = SummaryWriter()
+
+for epoch in range(num_epochs):
+    # Training
+    train_one_epoch()
+    
+    # Получить текущий lr
+    current_lr = optimizer.param_groups[0]['lr']
+    
+    # Логировать
+    writer.add_scalar('Learning Rate', current_lr, epoch)
+    
+    # Update scheduler
+    scheduler.step()
+
+writer.close()
+
+# Вывод в консоль
+print(f"Epoch {epoch}: lr = {optimizer.param_groups[0]['lr']:.6f}")
+
+# Для нескольких param groups
+for i, param_group in enumerate(optimizer.param_groups):
+    print(f"Group {i}: lr = {param_group['lr']:.6f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Разные lr для разных слоев</h2>
+    <pre><code># Дискриминативное обучение
+optimizer = optim.AdamW([
+    {'params': model.backbone.parameters(), 'lr': 1e-5},
+    {'params': model.head.parameters(), 'lr': 1e-3}
+])
+
+# Применить разные schedulers
+backbone_scheduler = optim.lr_scheduler.StepLR(
+    optimizer,
+    step_size=30,
+    gamma=0.1
+)
+
+# Или использовать Lambda для точного контроля
+lambda1 = lambda epoch: 0.95 ** epoch
+lambda2 = lambda epoch: 0.90 ** epoch
+
+scheduler = optim.lr_scheduler.LambdaLR(
+    optimizer,
+    lr_lambda=[lambda1, lambda2]
+)
+
+# BERT-style: разные lr по слоям
+def get_optimizer_grouped_parameters(model, base_lr=2e-5):
+    no_decay = ['bias', 'LayerNorm.weight']
+    
+    optimizer_grouped_parameters = [
+        # Encoder layers с decay
+        {
+            'params': [p for n, p in model.encoder.named_parameters() 
+                      if not any(nd in n for nd in no_decay)],
+            'lr': base_lr,
+            'weight_decay': 0.01
+        },
+        # Encoder layers без decay
+        {
+            'params': [p for n, p in model.encoder.named_parameters() 
+                      if any(nd in n for nd in no_decay)],
+            'lr': base_lr,
+            'weight_decay': 0.0
+        },
+        # Head с большим lr
+        {
+            'params': model.head.parameters(),
+            'lr': base_lr * 10
+        }
+    ]
+    
+    return optimizer_grouped_parameters
+
+params = get_optimizer_grouped_parameters(model)
+optimizer = optim.AdamW(params)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Советы и трюки</h2>
+    <ul>
+      <li><strong>Warmup duration</strong>:
+        <ul>
+          <li>Small models: 5-10 эпох</li>
+          <li>Transformers: 10% от total steps</li>
+          <li>Large batch: больше warmup</li>
+        </ul>
+      </li>
+      <li><strong>Min lr</strong>:
+        <ul>
+          <li>Обычно 1e-6 до 1e-5</li>
+          <li>Никогда не 0 (может застрять)</li>
+        </ul>
+      </li>
+      <li><strong>Restart</strong>:
+        <ul>
+          <li>Cosine with restarts помогает выходить из локальных минимумов</li>
+          <li>Полезно для длительного обучения</li>
+        </ul>
+      </li>
+      <li><strong>Сохранение</strong>:
+        <ul>
+          <li>Сохраняйте состояние scheduler!</li>
+          <li><code>torch.save(scheduler.state_dict(), 'scheduler.pt')</code></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист</h2>
+    <ul>
+      <li>[ ] Использовали LR Finder для начального lr</li>
+      <li>[ ] Выбрали подходящий scheduler для задачи</li>
+      <li>[ ] Добавили warmup для больших моделей/batch</li>
+      <li>[ ] Правильно вызываете <code>scheduler.step()</code></li>
+      <li>[ ] Логируете lr в TensorBoard/Wandb</li>
+      <li>[ ] Сохраняете состояние scheduler при checkpoint</li>
+      <li>[ ] Проверили что lr не слишком быстро падает</li>
+      <li>[ ] Учли особенности архитектуры (Transformers, ResNet...)</li>
+      <li>[ ] Мониторите loss/accuracy vs lr</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Learning rate scheduling — это как педаль газа при обучении модели. Начинаем с большой скорости чтобы быстро двигаться, потом постепенно замедляемся для точной "парковки" в оптимуме. Это позволяет обучить модель быстрее и качественнее».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
