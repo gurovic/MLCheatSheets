@@ -10,7 +10,6 @@
 1. [Обработка выбросов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/outliers_handling_cheatsheet.html)
 1. [Кодирование категориальных признаков](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/categorical_encoding_cheatsheet.html)
 1. [Масштабирование и нормализация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/scaling_normalization_cheatsheet.html)
-1. [Feature Engineering (подробно)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_engineering_detailed_cheatsheet.html)
 1. [Выбор признаков (Feature Selection)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_selection_cheatsheet.html)
 1. [Снижение размерности (Dimensionality Reduction)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dimensionality_reduction_cheatsheet.html)
 1. [Балансировка классов (Imbalanced Data)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/imbalanced_data_cheatsheet.html)
@@ -22,8 +21,6 @@
 1. [k-ближайших соседей (k-NN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/knn_cheatsheet.html)
 1. [Деревья решений для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/decision_trees_cheatsheet.html)
 1. [Случайный лес для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/random_forest_cheatsheet.html)
-1. [Градиентный бустинг для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/boosting_cheatsheet.html)
-1. [XGBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/xgboost_cheatsheet.html) / [LightGBM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lightgbm_cheatsheet.html) / [CatBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/catboost_cheatsheet.html)
 1. [Ансамбли методов (Voting, Stacking)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ensemble_methods_cheatsheet.html)
 
 ### **3. Регрессия**
@@ -32,7 +29,6 @@
 1. [Ридж, Лассо, ElasticNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ridge_lasso_elasticnet_cheatsheet.html)
 1. [Деревья решений для регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/decision_trees_regression_cheatsheet.html)
 1. [Случайный лес для регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/random_forest_regression_cheatsheet.html)
-1. [Градиентный бустинг для регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gradient_boosting_regression_cheatsheet.html)
 1. [Методы регуляризации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/regularization_methods_cheatsheet.html)
 1. [Непараметрическая регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/nonparametric_regression_cheatsheet.html)
 
@@ -64,7 +60,7 @@
 1. [Статистические тесты для сравнения моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/statistical_tests_cheatsheet.html)
 
 ### **7. Поиск гиперпараметров**
-1. [Grid Search / Random Search / Bayesian Optimization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hyperparameter_tuning_cheatsheet.html)
+1. [Grid Search / Random Search](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hyperparameter_tuning_cheatsheet.html)
 1. [Bayesian Optimization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bayesian_optimization_cheatsheet.html)
 1. [Optuna / Hyperopt](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/optuna_hyperopt_cheatsheet.html)
 1. [Стратегии поиска гиперпараметров](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hyperparameter_strategies_cheatsheet.html)
@@ -90,6 +86,8 @@
 1. [ALS (Alternating Least Squares)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/als_recommender_cheatsheet.html)
 
 ### **11. Градиентный бустинг**
+1. [Градиентный бустинг для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/boosting_cheatsheet.html)
+1. [Градиентный бустинг для регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gradient_boosting_regression_cheatsheet.html)
 1. [XGBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/xgboost_cheatsheet.html)
 1. [LightGBM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lightgbm_cheatsheet.html)
 1. [CatBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/catboost_cheatsheet.html)
@@ -104,8 +102,9 @@
 1. [Bootstrap](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bootstrap_methods_cheatsheet.html)
 1. Статистическая проверка гипотез
 
-### **13. Проектирование признаков**
-1. [Feature Engineering](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_engineering_cheatsheet.html)
+### **13. Проектирование признаков (Feature Engineering)**
+1. [Feature Engineering (основы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_engineering_cheatsheet.html)
+1. [Feature Engineering (подробно)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_engineering_detailed_cheatsheet.html)
 1. Создание полиномиальных признаков
 1. Взаимодействия признаков
 1. Биннинг (дискретизация)
@@ -127,8 +126,7 @@
 
 ### **16. Производственные аспекты**
 1. Сериализация моделей
-1. [Мониторинг дрейфа данных](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/concept_drift_cheatsheet.html)
-1. [Концептуальный дрейф](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/concept_drift_cheatsheet.html)
+1. [Дрейф данных и концептуальный дрейф](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/concept_drift_cheatsheet.html)
 1. [Пайплайны ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ml_pipelines_cheatsheet.html)
 
 ### **17. Специальные алгоритмы**
@@ -158,7 +156,6 @@
 1. Pandas для ML
 1. NumPy для ML
 1. Matplotlib/Seaborn для визуализации
-1. [ML-пайплайны](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ml_pipelines_cheatsheet.html)
 
 ### **21. Дополнительные темы**
 1. [Active Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/active_learning_cheatsheet.html)
@@ -412,7 +409,7 @@
 1. Ансамбли линейных моделей
 1. Диверсификация ансамблей
 
-### **4. Снижение размерности (нелинейное)**
+### **4. Продвинутые методы снижения размерности**
 1. [Manifold learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/manifold_learning_cheatsheet.html)
 1. Isomap
 1. LLE (Locally Linear Embedding)
@@ -443,7 +440,6 @@
 1. Коллаборативная фильтрация (user-based, item-based)
 1. Матричная факторизация (SVD, NMF)
 1. ALS (Alternating Least Squares)
-1. [Контентная фильтрация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/content_based_filtering_cheatsheet.html)
 1. Гибридные системы
 1. Context-aware рекомендации
 1. Sequence-aware рекомендации
@@ -474,16 +470,7 @@
 11. Binning и discretization
 11. Target encoding (без нейросетей)
 
-### **11. Обнаружение аномалий (классические методы)**
-11. Статистические методы (z-score, IQR)
-11. One-class SVM
-11. Isolation Forest
-11. Local Outlier Factor
-11. [Elliptic Envelope](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/elliptic_envelope_cheatsheet.html)
-11. Clustering-based аномалии
-11. Autoencoder-based (неглубокие)
-
-### **12. Полуавтоматическое обучение (Semi-supervised)**
+### **11. Полуавтоматическое обучение (Semi-supervised)**
 11. [Semi-supervised Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/semi_supervised_learning_cheatsheet.html)
 11. Self-training
 11. Co-training
@@ -492,30 +479,14 @@
 11. Pseudo-labeling
 11. Generative models (без глубоких)
 
-### **13. Активное обучение (Active Learning)**
-11. [Active Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/active_learning_cheatsheet.html)
-11. Стратегии запросов (uncertainty, diversity)
-11. Query-by-committee
-11. Expected model change
-11. Pool-based sampling
-11. Stream-based sampling
-11. Cost-sensitive active learning
-
-### **14. Трансферное обучение (без нейросетей)**
-11. Instance transfer
-11. Feature representation transfer
-11. Parameter transfer
-11. Relational knowledge transfer
-11. Domain adaptation (традиционные методы)
-
-### **15. Мета-обучение (Meta-learning)**
+### **12. Мета-обучение (Meta-learning)**
 11. Model-agnostic meta-learning (MAML)
 11. Metric-based (Siamese networks, Matching networks)
 11. Optimization-based meta-learning
 11. Few-shot learning (традиционные подходы)
 11. Meta-features и meta-learning
 
-### **16. Онлайн обучение и streaming ML**
+### **13. Онлайн обучение и streaming ML**
 11. Online algorithms (SGD, Perceptron)
 11. Concept drift detection
 11. Adaptive windowing
@@ -523,20 +494,20 @@
 11. Reservoir sampling
 11. Hoeffding trees
 
-### **17. Обучение на несбалансированных данных**
+### **14. Обучение на несбалансированных данных**
 11. Sampling методы (undersampling, oversampling)
 11. SMOTE и его варианты
 11. Cost-sensitive learning
 11. Threshold moving
 11. Метрики для несбалансированных данных
 
-### **18. Выбор и сравнение моделей**
+### **15. Выбор и сравнение моделей**
 11. Статистические тесты (t-test, McNemar)
 11. Кривые обучения и валидации
 11. Bias-variance decomposition
 11. Неметрические критерии (интерпретируемость, скорость)
 
-### **19. Автоматическое ML (AutoML)**
+### **16. Автоматическое ML (AutoML)**
 11. [AutoML: полный обзор](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/automl_cheatsheet.html)
 11. Hyperparameter optimization (Grid, Random, Bayesian)
 11. Neural Architecture Search (классические подходы)
@@ -544,7 +515,7 @@
 11. Automated pipeline construction
 11. Meta-learning для AutoML
 
-### **20. Интерпретируемость и Explainable AI**
+### **17. Интерпретируемость и Explainable AI**
 21. LIME и SHAP (для любых моделей)
 21. Partial dependence plots
 21. Individual conditional expectation
@@ -552,46 +523,46 @@
 21. Counterfactual explanations
 21. Feature importance (разные методы)
 
-### **21. Многозадачное обучение (Multi-task)**
+### **18. Многозадачное обучение (Multi-task)**
 21. Shared representation learning
 21. Task clustering
 21. Multi-output models
 21. Hierarchical multi-task
 
-### **22. Мультимодальное обучение (классическое)**
+### **19. Мультимодальное обучение (классическое)**
 21. Early fusion и late fusion
 21. Canonical correlation analysis (CCA)
 21. Kernel CCA
 21. Multi-view learning
 21. Co-training
 
-### **23. Обучение с ограничениями**
+### **20. Обучение с ограничениями**
 21. Constrained optimization в ML
 21. Fairness constraints
 21. Monotonic constraints
 21. Shape constraints
 
-### **24. Непараметрическая статистика и ML**
+### **21. Непараметрическая статистика и ML**
 21. Kernel methods (SVM, kernel PCA)
 21. k-NN и его варианты
 21. Local regression (LOESS)
 21. Splines и smoothing
 
-### **25. Комбинаторная оптимизация и ML**
+### **22. Комбинаторная оптимизация и ML**
 21. Генетические алгоритмы
 21. Эволюционные стратегии
 21. Swarm intelligence (PSO, ant colony)
 21. Simulated annealing
 21. Tabu search
 
-### **26. Математические основы ML**
+### **23. Математические основы ML**
 21. Теория вероятностей для ML
 21. Линейная алгебра и оптимизация
 21. Информационная теория в ML
 21. Теория графов для ML
 21. Теория решений
 
-### **27. Промышленное ML и MLOps**
+### **24. Промышленное ML и MLOps**
 21. Мониторинг моделей
 21. Концептуальный дрейф
 21. A/B тестирование ML моделей
@@ -599,7 +570,7 @@
 21. Feature stores
 21. CI/CD для ML
 
-### **28. Специализированные прикладные области**
+### **25. Специализированные прикладные области**
 21. Биоинформатика и computational biology
 21. Computational chemistry
 21. Астрофизика и космология
@@ -607,39 +578,39 @@
 21. Цифровая гуманитаристика
 21. Computational social science
 
-### **29. Этика, безопасность и приватность**
+### **26. Этика, безопасность и приватность**
 21. Fairness в ML
 21. Adversarial robustness (классические атаки)
 21. Differential privacy
 21. [Federated Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/federated_learning_cheatsheet.html)
 21. Explainability и accountability
 
-### **30. Квантовое машинное обучение**
+### **27. Квантовое машинное обучение**
 31. Квантовые алгоритмы для ML
 31. Квантовые нейронные сети
 31. Квантовое усиление классических алгоритмов
 
-### **31. Нейро-символьное ИИ**
+### **28. Нейро-символьное ИИ**
 31. Гибридные нейро-символьные системы
 31. Rule-based системы с ML
 31. Логический вывод с обучением
 
-### **32. Композиционное и структурное обучение**
+### **29. Композиционное и структурное обучение**
 31. Grammatical inference
 31. Inductive logic programming
 31. Program synthesis
 
-### **33. Материаловедение и ML**
+### **30. Материаловедение и ML**
 31. Материальные информатики
 31. Свойства материалов и ML
 31. Дизайн материалов
 
-### **34. Компьютерная безопасность и ML**
+### **31. Компьютерная безопасность и ML**
 31. Обнаружение вторжений
 31. Malware detection
 31. Fraud detection
 
-### **35. Финансовое ML**
+### **32. Финансовое ML**
 31. Алгоритмический трейдинг
 31. Кредитный скоринг
 31. Risk management
