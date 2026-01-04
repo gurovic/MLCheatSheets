@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>CURE Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>💊 CURE Cheatsheet</h1>
+  <div class="subtitle">Clustering Using Representatives • Произвольные формы • Выбросоустойчивость<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть метода</h2>
+    <ul>
+      <li><strong>Multiple representatives</strong>: кластер представлен несколькими точками, а не одним центроидом</li>
+      <li><strong>Shrinking</strong>: представители "усаживаются" к центру кластера (параметр α)</li>
+      <li><strong>Иерархический</strong>: агломеративная кластеризация с особой метрикой расстояния</li>
+      <li><strong>Устойчивость к выбросам</strong>: случайная выборка + усадка точек</li>
+      <li><strong>Произвольная форма</strong>: не ограничен сферическими кластерами</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый код (Python)</h2>
+    <pre><code># CURE нет в sklearn, используем pyclustering
+from pyclustering.cluster.cure import cure
+from pyclustering.utils import read_sample
+from pyclustering.samples.definitions import FCPS_SAMPLES
+
+# Загрузить данные
+sample = read_sample(FCPS_SAMPLES.SAMPLE_LSUN)
+
+# Создать CURE instance
+cure_instance = cure(
+    data=sample,
+    number_cluster=3,      # число кластеров
+    number_represent=5,    # представители на кластер
+    compression=0.5        # коэфф. усадки (α)
+)
+
+# Кластеризация
+cure_instance.process()
+clusters = cure_instance.get_clusters()
+representors = cure_instance.get_representors()
+
+print(f"Найдено кластеров: {len(clusters)}")
+print(f"Представителей: {len(representors)}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Совет</th></tr>
+      <tr><td><code>number_cluster</code></td><td>Число кластеров</td><td>3-10 обычно</td></tr>
+      <tr><td><code>number_represent</code></td><td>Представителей на кластер</td><td>5-10 для хорошего покрытия</td></tr>
+      <tr><td><code>compression</code></td><td>α (0-1): усадка к центру</td><td>0.3-0.7, меньше = меньше усадка</td></tr>
+      <tr><td><code>ccore</code></td><td>Использовать C++ ядро</td><td>True для скорости</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Алгоритм работы</h2>
+    <ol>
+      <li><strong>Случайная выборка</strong>: взять случайную подвыборку данных (для больших датасетов)</li>
+      <li><strong>Инициализация</strong>: каждая точка — отдельный кластер</li>
+      <li><strong>Выбор представителей</strong>: для каждого кластера выбрать c наиболее удалённых точек от центроида</li>
+      <li><strong>Усадка (shrinking)</strong>: сдвинуть представителей к центроиду на α: p' = p + α·(centroid - p)</li>
+      <li><strong>Слияние</strong>: объединять ближайшие кластеры (расстояние = мин расстояние между представителями)</li>
+      <li><strong>Повторение 3-5</strong>: пока не достигнуто число кластеров</li>
+      <li><strong>Назначение</strong>: назначить все точки к ближайшему кластеру (по представителям)</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Параметры детально</h2>
+    <p><strong>number_represent (c)</strong>:</p>
+    <ul>
+      <li>Больше c → лучше покрытие кластера → точнее</li>
+      <li>Меньше c → быстрее, но хуже для сложных форм</li>
+      <li>Рекомендация: 5-10 для большинства задач</li>
+    </ul>
+    <p><strong>compression (α)</strong>:</p>
+    <ul>
+      <li>α = 0: представители на границе кластера (устойчивость к выбросам++)</li>
+      <li>α = 1: все представители в центре (как K-means)</li>
+      <li>α = 0.3-0.5: хороший баланс</li>
+    </ul>
+    <p><strong>Расстояние между кластерами</strong>:</p>
+    <ul>
+      <li>dist(C1, C2) = min(dist(p1, p2)) для p1 ∈ Rep(C1), p2 ∈ Rep(C2)</li>
+      <li>Минимальное расстояние между представителями</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Выбор параметров</h2>
+    <p><strong>Подбор через метрики</strong>:</p>
+    <pre><code>from sklearn.metrics import silhouette_score
+import numpy as np
+
+best_score = -1
+best_params = None
+
+for n_clust in [3, 4, 5, 6]:
+    for n_rep in [5, 7, 10]:
+        for alpha in [0.3, 0.5, 0.7]:
+            cure_inst = cure(
+                data=X.tolist(),
+                number_cluster=n_clust,
+                number_represent=n_rep,
+                compression=alpha
+            )
+            cure_inst.process()
+            clusters = cure_inst.get_clusters()
+            
+            # Создать метки
+            labels = np.zeros(len(X))
+            for i, cluster in enumerate(clusters):
+                labels[cluster] = i
+            
+            if len(np.unique(labels)) > 1:
+                score = silhouette_score(X, labels)
+                if score > best_score:
+                    best_score = score
+                    best_params = (n_clust, n_rep, alpha)
+
+print(f"Best: n={best_params[0]}, c={best_params[1]}, α={best_params[2]}")
+print(f"Score: {best_score:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Предобработка данных</h2>
+    <p>✅ <strong>Масштабирование важно</strong></p>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</code></pre>
+    <p>✅ <strong>Обработка выбросов</strong></p>
+    <ul>
+      <li>CURE устойчив к выбросам благодаря random sampling + shrinking</li>
+      <li>Но крайние выбросы лучше удалить предварительно</li>
+    </ul>
+    <p>✅ <strong>Снижение размерности</strong></p>
+    <ul>
+      <li>PCA для >20 признаков ускоряет работу</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Кластеры произвольной формы</li>
+          <li>Данные с выбросами</li>
+          <li>Разные размеры кластеров</li>
+          <li>Средний размер данных (10K-100K)</li>
+          <li>Нелинейные границы</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень большие данные (&gt;1M)</li>
+          <li>Высокая размерность (&gt;50)</li>
+          <li>Нужна очень быстрая работа</li>
+          <li>Неясное число кластеров</li>
+          <li>Только сферические кластеры (используйте K-means)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Медленная работа</td><td>Уменьшить number_represent, использовать sampling</td></tr>
+      <tr><td>Плохое качество</td><td>Увеличить number_represent, подобрать compression</td></tr>
+      <tr><td>Выбросы влияют</td><td>Уменьшить compression (α), предобработка</td></tr>
+      <tr><td>Не находит формы</td><td>Увеличить number_represent, уменьшить α</td></tr>
+      <tr><td>Память заканчивается</td><td>Random sampling, уменьшить размер данных</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Визуализация</h2>
+    <pre><code>import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+
+# 2D проекция
+pca = PCA(n_components=2)
+X_2d = pca.fit_transform(X)
+
+# Получить кластеры и представителей
+cure_inst.process()
+clusters = cure_inst.get_clusters()
+representors = cure_inst.get_representors()
+
+# Создать метки
+labels = np.zeros(len(X))
+for i, cluster in enumerate(clusters):
+    for idx in cluster:
+        labels[idx] = i
+
+# Точки
+plt.scatter(X_2d[:, 0], X_2d[:, 1], 
+            c=labels, cmap='viridis', alpha=0.6, s=30)
+
+# Представители
+for i, reps in enumerate(representors):
+    rep_2d = X_2d[reps]
+    plt.scatter(rep_2d[:, 0], rep_2d[:, 1],
+                c='red', marker='*', s=200,
+                edgecolors='black', linewidths=1.5)
+    
+    # Соединить представителей кластера
+    for j in range(len(reps)):
+        for k in range(j+1, len(reps)):
+            plt.plot([rep_2d[j, 0], rep_2d[k, 0]],
+                     [rep_2d[j, 1], rep_2d[k, 1]],
+                     'r-', alpha=0.3, linewidth=1)
+
+plt.title(f'CURE: {len(clusters)} кластеров')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Преимущества CURE</th><th>Недостатки CURE</th></tr>
+      <tr><td><strong>K-means</strong></td><td>Произвольные формы, устойчивость к выбросам</td><td>Медленнее, нужно задать K</td></tr>
+      <tr><td><strong>DBSCAN</strong></td><td>Детерминированный, нет ε и min_samples</td><td>Нужно задать K</td></tr>
+      <tr><td><strong>Hierarchical</strong></td><td>Лучше для несферических кластеров</td><td>Сложнее настройка</td></tr>
+      <tr><td><strong>BIRCH</strong></td><td>Лучше находит сложные формы</td><td>Медленнее, меньше масштабируемость</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Метрики оценки</h2>
+    <pre><code>from sklearn.metrics import (
+    silhouette_score,
+    davies_bouldin_score,
+    calinski_harabasz_score
+)
+
+# Создать метки из кластеров
+labels = np.zeros(len(X))
+for i, cluster in enumerate(clusters):
+    for idx in cluster:
+        labels[idx] = i
+
+n_clusters = len(np.unique(labels))
+
+if n_clusters > 1:
+    sil = silhouette_score(X, labels)
+    db = davies_bouldin_score(X, labels)
+    ch = calinski_harabasz_score(X, labels)
+    
+    print(f"Кластеров: {n_clusters}")
+    print(f"Silhouette: {sil:.3f}")
+    print(f"Davies-Bouldin: {db:.3f}")
+    print(f"Calinski-Harabasz: {ch:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Применения</h2>
+    <p><strong>Spatial data</strong>:</p>
+    <ul>
+      <li>Географическая кластеризация (города, регионы)</li>
+      <li>Астрономические данные</li>
+    </ul>
+    <p><strong>Биология</strong>:</p>
+    <ul>
+      <li>Анализ генов с выбросами</li>
+      <li>Таксономия</li>
+    </ul>
+    <p><strong>Маркетинг</strong>:</p>
+    <ul>
+      <li>Сегментация клиентов</li>
+      <li>Анализ поведения с аномалиями</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Продвинутые техники</h2>
+    <p><strong>Иерархический CURE</strong>:</p>
+    <ul>
+      <li>Можно остановить слияние на любом уровне</li>
+      <li>Получить дендрограмму кластеров</li>
+    </ul>
+    <p><strong>Параллельный CURE</strong>:</p>
+    <ul>
+      <li>Разделить данные на партиции</li>
+      <li>Применить CURE к каждой партиции</li>
+      <li>Объединить представителей</li>
+      <li>Финальная кластеризация представителей</li>
+    </ul>
+    <p><strong>Адаптивное число представителей</strong>:</p>
+    <pre><code># Больше представителей для больших кластеров
+def adaptive_representatives(cluster_size):
+    return max(5, min(15, cluster_size // 10))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Установить pyclustering: pip install pyclustering</li>
+      <li>[ ] Масштабировать данные</li>
+      <li>[ ] Определить число кластеров</li>
+      <li>[ ] Выбрать number_represent (5-10)</li>
+      <li>[ ] Установить compression (0.3-0.7)</li>
+      <li>[ ] Обработать выбросы если нужно</li>
+      <li>[ ] Оценить качество (silhouette)</li>
+      <li>[ ] Визуализировать представителей</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «CURE представляет каждую группу несколькими характерными точками, а не одним центром. Это позволяет находить группы любой формы и делает метод устойчивым к аномальным данным. Особенно хорош для данных со сложной геометрией».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Установка pyclustering</h2>
+    <pre><code># Установка
+pip install pyclustering
+
+# Или с conda
+conda install -c conda-forge pyclustering
+
+# Проверка
+from pyclustering.cluster.cure import cure
+print("pyclustering установлен успешно!")</code></pre>
+    <p><strong>Альтернатива</strong>: Реализация CURE вручную</p>
+    <ul>
+      <li>Использовать scipy.cluster.hierarchy для агломеративной кластеризации</li>
+      <li>Реализовать свою метрику расстояния с представителями</li>
+      <li>Добавить логику shrinking</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
