@@ -59,9 +59,9 @@
 1. [Manifold learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/manifold_learning_cheatsheet.html)
 1. [Isomap](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/isomap_cheatsheet.html)
 1. [LLE (Locally Linear Embedding)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/lle_cheatsheet.html)
-1. MDS (Multidimensional Scaling)
-1. Spectral embedding
-1. Kernel PCA
+1. [MDS (Multidimensional Scaling)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mds_cheatsheet.html)
+1. [Spectral embedding](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/spectral_embedding_cheatsheet.html)
+1. [Kernel PCA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/kernel_pca_cheatsheet.html)
 
 ### **6. Оценка моделей и валидация**
 1. [Метрики классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/classification_metrics_cheatsheet.html)
@@ -72,18 +72,18 @@
 1. [Кривые обучения](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/learning_curves_cheatsheet.html)
 1. [Калибровка моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_calibration_cheatsheet.html)
 1. [Статистические тесты для сравнения моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/statistical_tests_cheatsheet.html)
-1. Статистические тесты (t-test, McNemar)
-1. Кривые обучения и валидации
-1. Bias-variance decomposition
-1. Неметрические критерии (интерпретируемость, скорость)
+1. [Статистические тесты (t-test, McNemar)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/statistical_tests_t_test_mcnemar_cheatsheet.html)
+1. [Кривые обучения и валидации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/learning_validation_curves_cheatsheet.html)
+1. [Bias-variance decomposition](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bias_variance_decomposition_cheatsheet.html)
+1. [Неметрические критерии (интерпретируемость, скорость)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/non_metric_criteria_cheatsheet.html)
 
 ### **7. Поиск гиперпараметров**
 1. [Grid Search / Random Search](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hyperparameter_tuning_cheatsheet.html)
 1. [Bayesian Optimization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bayesian_optimization_cheatsheet.html)
 1. [Optuna / Hyperopt](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/optuna_hyperopt_cheatsheet.html)
 1. [Стратегии поиска гиперпараметров](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hyperparameter_strategies_cheatsheet.html)
-1. Байесовская оптимизация гиперпараметров
-1. Байесовские нейронные сети
+1. [Байесовская оптимизация гиперпараметров](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bayesian_hyperparameter_optimization_cheatsheet.html)
+1. [Байесовские нейронные сети](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bayesian_neural_networks_cheatsheet.html)
 
 ### **8. Работа с временными рядами (классические методы)**
 1. [ARIMA / SARIMA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_cheatsheet.html)
@@ -92,7 +92,7 @@
 1. [Feature Engineering для временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_feature_engineering_cheatsheet.html)
 1. [Валидация временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_validation_cheatsheet.html)
 1. [Prophet и современные методы временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/prophet_time_series_cheatsheet.html)
-1. State space models
+1. [State space models](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/state_space_models_cheatsheet.html)
 1. Kalman filters
 1. Сезонная декомпозиция
 1. Теория временных рядов Box-Jenkins

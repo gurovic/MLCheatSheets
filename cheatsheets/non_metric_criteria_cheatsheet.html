@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><title>Неметрические критерии Cheatsheet</title>
+<style>@media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}@media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}.container{column-count:3;column-gap:20px;max-width:100%}.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-left:1px solid #e0e7ff}p,ul,ol{font-size:0.92em;margin:0.6em 0}ul,ol{padding-left:18px}li{margin-bottom:4px}code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}pre code{padding:0;background:none;white-space:pre-wrap}table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}td{padding:4px 6px;border-bottom:1px solid #f0f4ff}tr:nth-child(even){background-color:# f8fbff}blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}</style></head>
+<body><div class="container"><h1>📏 Неметрические критерии Cheatsheet</h1>
+<div class="subtitle">Интерпретируемость • Скорость • Практичность<br>📅 4 января 2026</div>
+
+<div class="block"><h2>🔷 1. Зачем нужны неметрические критерии</h2>
+<ul><li><strong>Метрики</strong> (MSE, accuracy) — не все</li>
+<li><strong>Практика</strong>: скорость, память, интерпретируемость</li>
+<li><strong>Бизнес</strong>: стоимость ошибок, доверие пользователей</li>
+<li><strong>Регуляция</strong>: GDPR требует объяснимости</li></ul></div>
+
+<div class="block"><h2>🔷 2. Интерпретируемость</h2>
+<p><strong>Определение</strong>: насколько понятны решения модели</p>
+<table><tr><th>Модель</th><th>Интерпретируемость</th><th>Комментарий</th></tr>
+<tr><td>Linear Regression</td><td>★★★★★</td><td>Коэффициенты = влияние</td></tr>
+<tr><td>Decision Tree (малое)</td><td>★★★★☆</td><td>Правила понятны</td></tr>
+<tr><td>Random Forest</td><td>★★☆☆☆</td><td>Много деревьев</td></tr>
+<tr><td>Gradient Boosting</td><td>★☆☆☆☆</td><td>Сложный ансамбль</td></tr>
+<tr><td>Neural Networks</td><td>☆☆☆☆☆</td><td>"Черный ящик"</td></tr></table></div>
+
+<div class="block"><h2>🔷 3. Методы повышения интерпретируемости</h2>
+<pre><code># SHAP values
+import shap
+explainer = shap.Explainer(model)
+shap_values = explainer(X_test)
+shap.plots.waterfall(shap_values[0])
+
+# Feature importance
+import matplotlib.pyplot as plt
+importances = model.feature_importances_
+indices = np.argsort(importances)[::-1]
+plt.barh(range(10), importances[indices[:10]])
+plt.yticks(range(10), [features[i] for i in indices[:10]])
+plt.show()</code></pre></div>
+
+<div class="block"><h2>🔷 4. Скорость обучения</h2>
+<table><tr><th>Модель</th><th>Время (относительное)</th><th>Размер данных</th></tr>
+<tr><td>Linear Regression</td><td>Очень быстро (1x)</td><td>До миллионов</td></tr>
+<tr><td>Logistic Regression</td><td>Быстро (2x)</td><td>До миллионов</td></tr>
+<tr><td>Random Forest</td><td>Средне (50x)</td><td>До 100K</td></tr>
+<tr><td>XGBoost</td><td>Средне (40x)</td><td>До 1M</td></tr>
+<tr><td>Deep Neural Net</td><td>Медленно (500x)</td><td>До миллионов</td></tr>
+<tr><td>SVM (kernel)</td><td>Очень медленно (1000x)</td><td>До 10K</td></tr></table></div>
+
+<div class="block"><h2>🔷 5. Скорость предсказания</h2>
+<pre><code>import time
+
+# Измерение времени предсказания
+start = time.time()
+predictions = model.predict(X_test)
+end = time.time()
+latency_ms = (end - start) * 1000 / len(X_test)
+print(f"Latency: {latency_ms:.2f} ms per sample")
+
+# Throughput
+throughput = len(X_test) / (end - start)
+print(f"Throughput: {throughput:.0f} samples/sec")</code></pre>
+<p><strong>Требования</strong>:</p>
+<ul><li>Real-time: &lt;100ms</li>
+<li>Interactive: &lt;1s</li>
+<li>Batch: минуты/часы OK</li></ul></div>
+
+<div class="block"><h2>🔷 6. Потребление памяти</h2>
+<pre><code>import sys
+
+# Размер модели в памяти
+model_size_mb = sys.getsizeof(model) / (1024**2)
+print(f"Model size: {model_size_mb:.2f} MB")
+
+# Для больших моделей
+import joblib
+joblib.dump(model, 'model.pkl')
+file_size = os.path.getsize('model.pkl') / (1024**2)
+print(f"File size: {file_size:.2f} MB")</code></pre>
+<table><tr><th>Модель</th><th>Размер (типичный)</th></tr>
+<tr><td>Linear model</td><td>&lt;1 MB</td></tr>
+<tr><td>Random Forest (100 trees)</td><td>10-100 MB</td></tr>
+<tr><td>XGBoost</td><td>5-50 MB</td></tr>
+<tr><td>Neural Network</td><td>10-1000 MB</td></tr></table></div>
+
+<div class="block"><h2>🔷 7. Простота развертывания</h2>
+<p><strong>Критерии</strong>:</p>
+<ul><li>Зависимости (количество библиотек)</li>
+<li>Совместимость (версии Python, OS)</li>
+<li>Размер docker образа</li>
+<li>Возможность экспорта (ONNX, PMML)</li></ul>
+<pre><code># Экспорт в ONNX
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
+
+initial_type = [('float_input', FloatTensorType([None, n_features]))]
+onx = convert_sklearn(model, initial_types=initial_type)
+with open("model.onnx", "wb") as f:
+    f.write(onx.SerializeToString())</code></pre></div>
+
+<div class="block"><h2>🔷 8. Устойчивость</h2>
+<p><strong>Виды устойчивости</strong>:</p>
+<ul><li><strong>К шуму</strong>: небольшие изменения входа</li>
+<li><strong>К выбросам</strong>: аномальные значения</li>
+<li><strong>К изменениям данных</strong>: concept drift</li></ul>
+<pre><code># Тест устойчивости к шуму
+noise_levels = [0.01, 0.05, 0.1, 0.2]
+for noise in noise_levels:
+    X_noisy = X_test + np.random.normal(0, noise, X_test.shape)
+    accuracy_noisy = model.score(X_noisy, y_test)
+    print(f"Noise {noise}: accuracy {accuracy_noisy:.3f}")</code></pre></div>
+
+<div class="block"><h2>🔷 9. Стоимость ошибок</h2>
+<p><strong>Не все ошибки равны</strong>:</p>
+<table><tr><th>Область</th><th>False Positive</th><th>False Negative</th></tr>
+<tr><td>Спам-фильтр</td><td>Потеря письма</td><td>Спам в inbox</td></tr>
+<tr><td>Медицина</td><td>Ложная тревога</td><td>Пропуск болезни</td></tr>
+<tr><td>Кредит</td><td>Отказ хорошему</td><td>Кредит плохому</td></tr>
+<tr><td>Fraud</td><td>Блокировка клиента</td><td>Пропуск мошенника</td></tr></table>
+<pre><code># Custom scoring с весами
+from sklearn.metrics import make_scorer
+
+def custom_score(y_true, y_pred):
+    fp_cost = 1  # False Positive
+    fn_cost = 10  # False Negative (дороже!)
+    fp = ((y_pred == 1) & (y_true == 0)).sum()
+    fn = ((y_pred == 0) & (y_true == 1)).sum()
+    return -(fp * fp_cost + fn * fn_cost)
+
+scorer = make_scorer(custom_score)</code></pre></div>
+
+<div class="block"><h2>🔷 10. Fairness (справедливость)</h2>
+<p><strong>Метрики fairness</strong>:</p>
+<ul><li>Demographic parity</li>
+<li>Equal opportunity</li>
+<li>Equalized odds</li></ul>
+<pre><code>from fairlearn.metrics import demographic_parity_difference
+
+# Проверка справедливости по полу
+dp = demographic_parity_difference(
+    y_true, y_pred, sensitive_features=gender
+)
+print(f"Demographic parity: {dp:.3f}")
+# Цель: близко к 0</code></pre></div>
+
+<div class="block"><h2>🔷 11. Мониторинг в продакшене</h2>
+<pre><code>import time
+
+class MonitoredModel:
+    def __init__(self, model):
+        self.model = model
+        self.predictions_count = 0
+        self.total_latency = 0
+        
+    def predict(self, X):
+        start = time.time()
+        pred = self.model.predict(X)
+        latency = time.time() - start
+        
+        self.predictions_count += len(X)
+        self.total_latency += latency
+        
+        # Log метрики
+        avg_latency = self.total_latency / self.predictions_count
+        if avg_latency > 0.1:  # Threshold
+            print(f"WARNING: High latency {avg_latency:.3f}s")
+        
+        return pred</code></pre></div>
+
+<div class="block"><h2>🔷 12. Trade-offs</h2>
+<table><tr><th>Критерий 1</th><th>vs</th><th>Критерий 2</th></tr>
+<tr><td>Accuracy</td><td>↔️</td><td>Interpretability</td></tr>
+<tr><td>Скорость обучения</td><td>↔️</td><td>Accuracy</td></tr>
+<tr><td>Скорость предсказания</td><td>↔️</td><td>Accuracy</td></tr>
+<tr><td>Размер модели</td><td>↔️</td><td>Accuracy</td></tr>
+<tr><td>Простота</td><td>↔️</td><td>Гибкость</td></tr></table></div>
+
+<div class="block"><h2>🔷 13. Матрица выбора модели</h2>
+<table><tr><th>Приоритет</th><th>Рекомендуемая модель</th></tr>
+<tr><td>Интерпретируемость</td><td>Linear/Logistic Regression, Decision Tree</td></tr>
+<tr><td>Скорость обучения</td><td>Linear models, Naive Bayes</td></tr>
+<tr><td>Скорость предсказания</td><td>Linear models, small trees</td></tr>
+<tr><td>Точность (табличные)</td><td>XGBoost, LightGBM</td></tr>
+<tr><td>Точность (изображения)</td><td>CNN, Vision Transformers</td></tr>
+<tr><td>Малые данные</td><td>Linear models, k-NN</td></tr></table></div>
+
+<div class="block"><h2>🔷 14. Чек-лист оценки модели</h2>
+<ul><li>[ ] Точность: MSE, accuracy, F1</li>
+<li>[ ] Скорость обучения: секунды/минуты?</li>
+<li>[ ] Скорость предсказания: мс на объект</li>
+<li>[ ] Размер модели: МБ, влезет на устройство?</li>
+<li>[ ] Интерпретируемость: нужна ли?</li>
+<li>[ ] Устойчивость: к шуму, выбросам</li>
+<li>[ ] Fairness: проверена ли?</li>
+<li>[ ] Стоимость ошибок: учтена ли?</li>
+<li>[ ] Простота развертывания: зависимости?</li></ul></div>
+
+<div class="block"><h2>🔷 15. Заключение</h2>
+<blockquote>«Неметрические критерии часто важнее метрик. Модель с accuracy 95% но временем ответа 10 секунд бесполезна 
+для real-time приложения. Модель с F1=0.98 но невозможностью объяснить решения не пройдет аудит. 
+Выбирайте модель, учитывая весь контекст задачи, а не только цифры на валидации».</blockquote></div>
+
+</div></body></html>

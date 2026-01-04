@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><title>Байесовские нейронные сети</title>
+<style>@media screen{body{font-family:Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}.container{column-count:3;column-gap:20px;max-width:100%}.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}p,ul,ol{font-size:0.92em;margin:0.6em 0}ul,ol{padding-left:18px}li{margin-bottom:4px}code{font-family:Consolas,monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}pre code{padding:0;background:none;white-space:pre-wrap}table{width:100%;border-collapse:collapse;font-size:0.82em;margin:6px 0}th{background-color:#e6f0ff;text-align:left;padding:4px 6px;font-weight:600}td{padding:4px 6px;border-bottom:1px solid #f0f4ff}tr:nth-child(even){background-color:#f8fbff}blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}</style></head>
+<body><div class="container"><h1>🎲 Байесовские нейронные сети</h1>
+<div class="subtitle">Uncertainty • Вероятностные веса • Robustness<br>📅 4 января 2026</div>
+
+<div class="block"><h2>🔷 1. Суть</h2><ul>
+<li><strong>Цель</strong>: неопределенность в предсказаниях нейросети</li>
+<li><strong>Идея</strong>: веса — не числа, а распределения</li>
+<li><strong>Отличие от обычных NN</strong>: выдают mean + uncertainty</li>
+<li><strong>Применение</strong>: медицина, финансы, autonomous vehicles</li>
+<li><strong>Типы uncertainty</strong>: aleatoric (шум данных) и epistemic (неуверенность модели)</li></ul></div>
+
+<div class="block"><h2>🔷 2. Обычные NN vs Байесовские</h2>
+<table><tr><th>Аспект</th><th>Обычные NN</th><th>Байесовские NN</th></tr>
+<tr><td>Веса</td><td>Фиксированные числа</td><td>Распределения P(w)</td></tr>
+<tr><td>Выход</td><td>Одно значение</td><td>Распределение</td></tr>
+<tr><td>Uncertainty</td><td>Нет</td><td>Да</td></tr>
+<tr><td>Обучение</td><td>Градиентный спуск</td><td>Variational Inference</td></tr>
+<tr><td>Скорость</td><td>Быстро</td><td>Медленнее</td></tr>
+<tr><td>Robustness</td><td>Средняя</td><td>Выше</td></tr></table></div>
+
+<div class="block"><h2>🔷 3. Математическая основа</h2>
+<p><strong>Байесовский подход</strong>:</p>
+<pre><code>P(w|D) = P(D|w) * P(w) / P(D)
+
+где:
+- P(w|D): posterior (веса после данных)
+- P(D|w): likelihood (вероятность данных)
+- P(w): prior (априорное распределение)
+- P(D): evidence (нормализация)</code></pre>
+<p><strong>Предсказание</strong>:</p>
+<pre><code>P(y|x, D) = ∫ P(y|x, w) P(w|D) dw
+
+Интегрируем по всем возможным весам</code></pre></div>
+
+<div class="block"><h2>🔷 4. Variational Inference</h2>
+<p><strong>Проблема</strong>: точный posterior P(w|D) вычислить невозможно</p>
+<p><strong>Решение</strong>: приблизить его q(w|θ)</p>
+<pre><code># Минимизируем KL-дивергенцию
+KL(q(w|θ) || P(w|D))
+
+# Эквивалентно максимизации ELBO:
+ELBO = E_q[log P(D|w)] - KL(q(w|θ) || P(w))
+       ↑ data fit         ↑ regularization</code></pre></div>
+
+<div class="block"><h2>🔷 5. Код с TensorFlow Probability</h2>
+<pre><code>import tensorflow as tf
+import tensorflow_probability as tfp
+tfd = tfp.distributions
+
+# Bayesian Dense Layer
+model = tf.keras.Sequential([
+    tfp.layers.DenseVariational(
+        units=64,
+        make_prior_fn=lambda *args: tfd.Normal(0., 1.),
+        make_posterior_fn=tfp.layers.default_mean_field_normal_fn(),
+        kl_weight=1/len(X_train)
+    ),
+    tf.keras.layers.ReLU(),
+    tfp.layers.DenseVariational(
+        units=10,
+        make_prior_fn=lambda *args: tfd.Normal(0., 1.),
+        make_posterior_fn=tfp.layers.default_mean_field_normal_fn(),
+        kl_weight=1/len(X_train)
+    )
+])
+
+# Компиляция
+model.compile(
+    optimizer='adam',
+    loss=lambda y, p_y: -p_y.log_prob(y)
+)
+
+model.fit(X_train, y_train, epochs=10)</code></pre></div>
+
+<div class="block"><h2>🔷 6. MC Dropout (простая альтернатива)</h2>
+<p><strong>Идея</strong>: Dropout во время inference = приближение Bayesian NN</p>
+<pre><code>import tensorflow as tf
+
+# Обычная модель с Dropout
+model = tf.keras.Sequential([
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dense(10)
+])
+
+# Предсказание с uncertainty
+def predict_with_uncertainty(X, n_samples=100):
+    predictions = []
+    for _ in range(n_samples):
+        # training=True чтобы Dropout работал
+        pred = model(X, training=True)
+        predictions.append(pred)
+    
+    predictions = tf.stack(predictions)
+    mean = tf.reduce_mean(predictions, axis=0)
+    std = tf.math.reduce_std(predictions, axis=0)
+    
+    return mean, std
+
+y_mean, y_std = predict_with_uncertainty(X_test)
+print(f"Prediction: {y_mean[0]:.2f} ± {y_std[0]:.2f}")</code></pre></div>
+
+<div class="block"><h2>🔷 7. Bayes by Backprop</h2>
+<p><strong>Алгоритм</strong>:</p><ol>
+<li>Веса w ∼ N(μ, σ²)</li>
+<li>Sample w из q(w|θ)</li>
+<li>Forward pass с этими весами</li>
+<li>Backprop для μ и σ</li>
+<li>Повторить</li></ol>
+<pre><code># PyTorch код
+import torch
+import torch.nn as nn
+
+class BayesianLinear(nn.Module):
+    def __init__(self, in_features, out_features):
+        super().__init__()
+        self.w_mu = nn.Parameter(torch.randn(out_features, in_features))
+        self.w_rho = nn.Parameter(torch.randn(out_features, in_features))
+        
+    def forward(self, x):
+        w_sigma = torch.log(1 + torch.exp(self.w_rho))
+        w = self.w_mu + w_sigma * torch.randn_like(w_sigma)
+        return F.linear(x, w)</code></pre></div>
+
+<div class="block"><h2>🔷 8. Типы Uncertainty</h2>
+<table><tr><th>Тип</th><th>Описание</th><th>Источник</th><th>Как снизить</th></tr>
+<tr><td>Aleatoric</td><td>Шум в данных</td><td>Измерения, стохастичность</td><td>Невозможно (природа данных)</td></tr>
+<tr><td>Epistemic</td><td>Неуверенность модели</td><td>Мало данных, плохая модель</td><td>Больше данных, лучшая модель</td></tr></table>
+<pre><code># Разделение uncertainty
+# Aleatoric: из выходного распределения
+# Epistemic: из вариации весов (MC Dropout)</code></pre></div>
+
+<div class="block"><h2>🔷 9. Ensemble как приближение</h2>
+<pre><code># Обучить несколько моделей
+models = []
+for i in range(5):
+    model = create_model()
+    model.fit(X_train, y_train, epochs=10)
+    models.append(model)
+
+# Предсказание
+predictions = [m.predict(X_test) for m in models]
+mean_pred = np.mean(predictions, axis=0)
+std_pred = np.std(predictions, axis=0)
+
+# Это приближение Bayesian posterior
+# Но не учитывает корреляции между весами</code></pre></div>
+
+<div class="block"><h2>🔷 10. Калибровка uncertainty</h2>
+<p><strong>Проверка</strong>: если модель говорит 90% уверенность, должна быть права в 90% случаев</p>
+<pre><code>from sklearn.calibration import calibration_curve
+
+# Получить вероятности и uncertainty
+probs, uncertainties = predict_with_uncertainty(X_test)
+
+# Calibration curve
+prob_true, prob_pred = calibration_curve(
+    y_test, probs, n_bins=10
+)
+
+plt.plot(prob_pred, prob_true, marker='o')
+plt.plot([0, 1], [0, 1], linestyle='--')
+plt.xlabel('Predicted probability')
+plt.ylabel('True probability')
+plt.title('Calibration Plot')
+plt.show()</code></pre></div>
+
+<div class="block"><h2>🔷 11. Применения</h2><ul>
+<li><strong>Медицина</strong>: не давать диагноз если неуверен</li>
+<li><strong>Autonomous driving</strong>: передать управление человеку</li>
+<li><strong>Финансы</strong>: risk-aware торговля</li>
+<li><strong>Active learning</strong>: запросить метку для неуверенных примеров</li>
+<li><strong>Out-of-distribution detection</strong>: обнаружить странные входы</li></ul></div>
+
+<div class="block"><h2>🔷 12. Продвинутые методы</h2>
+<p><strong>SWAG (Stochastic Weight Averaging Gaussian)</strong>:</p>
+<pre><code># Аппроксимация posterior через SWA
+# Простой и быстрый метод</code></pre>
+<p><strong>Laplace Approximation</strong>:</p>
+<pre><code># Гауссовское приближение posterior
+# Вокруг MAP estimate</code></pre>
+<p><strong>Hamiltonian Monte Carlo</strong>:</p>
+<pre><code># Точное семплирование
+# Очень медленно</code></pre></div>
+
+<div class="block"><h2>🔷 13. Практические советы</h2><ul>
+<li><strong>Начните с MC Dropout</strong>: проще всего</li>
+<li><strong>Используйте calibration</strong>: проверить uncertainty</li>
+<li><strong>Prior имеет значение</strong>: выбирайте разумный</li>
+<li><strong>KL weight</strong>: 1/N_train для баланса</li>
+<li><strong>Visualization</strong>: показывать uncertainty на графиках</li>
+<li><strong>Decision threshold</strong>: не предсказывать если uncertainty высокая</li></ul></div>
+
+<div class="block"><h2>🔷 14. Когда использовать</h2><table>
+<tr><th>Ситуация</th><th>Рекомендация</th></tr>
+<tr><td>Критичные решения (медицина)</td><td><strong>Bayesian NN обязательно</strong></td></tr>
+<tr><td>Autonomous systems</td><td>Bayesian NN</td></tr>
+<tr><td>Active learning</td><td>Bayesian NN или MC Dropout</td></tr>
+<tr><td>Обычная классификация</td><td>Не обязательно</td></tr>
+<tr><td>Мало вычислений</td><td>MC Dropout или Ensemble</td></tr></table></div>
+
+<div class="block"><h2>🔷 15. Чек-лист</h2><ul>
+<li>[ ] Выбрать метод (MC Dropout для начала)</li>
+<li>[ ] Реализовать uncertainty quantification</li>
+<li>[ ] Проверить calibration</li>
+<li>[ ] Визуализировать uncertainty</li>
+<li>[ ] Определить threshold для отказа от предсказания</li>
+<li>[ ] Тестировать на OOD данных</li>
+<li>[ ] Документировать limitations</li></ul>
+<blockquote>«Байесовские нейронные сети не просто предсказывают, но и говорят насколько уверены 
+в предсказании. Это критически важно в задачах где цена ошибки высока. Модель должна 
+"знать что она не знает" и уметь сказать "я не уверена" вместо выдачи ложных предсказаний».</blockquote></div>
+
+</div></body></html>
