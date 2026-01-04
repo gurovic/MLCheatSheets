@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Биннинг и дискретизация Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 Биннинг и дискретизация Cheatsheet</h1>
+  <div class="subtitle">Feature Engineering • Преобразование непрерывных признаков • Работа с моделями<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Зачем нужна дискретизация</h2>
+    <ul>
+      <li><strong>Простота</strong>: упрощает модель и интерпретацию</li>
+      <li><strong>Нелинейность</strong>: помогает линейным моделям захватывать нелинейные зависимости</li>
+      <li><strong>Выбросы</strong>: снижает влияние выбросов</li>
+      <li><strong>Производительность</strong>: ускоряет некоторые алгоритмы</li>
+      <li><strong>Категоризация</strong>: создает осмысленные группы (возрастные, ценовые)</li>
+      <li><strong>Деревья</strong>: иногда улучшает работу деревьев решений</li>
+    </ul>
+    <blockquote>
+      Биннинг превращает возраст 25 лет в категорию "молодой взрослый" (18-30), делая паттерны более явными.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Equal Width Binning</h2>
+    <p>Деление на интервалы одинаковой ширины:</p>
+    <pre><code>import pandas as pd
+import numpy as np
+
+# Пример данных
+ages = np.array([18, 25, 35, 45, 55, 65, 75, 85])
+
+# Equal width с pandas
+age_bins = pd.cut(ages, bins=4)
+print(age_bins)
+# [(17.933, 35.75], (17.933, 35.75], (35.75, 53.5], ...]
+
+# С метками
+age_bins = pd.cut(ages, 
+    bins=4, 
+    labels=['Young', 'Adult', 'Middle', 'Senior']
+)
+
+# Получить границы
+age_bins = pd.cut(ages, bins=4, retbins=True)
+print(age_bins[1])  # границы бинов
+
+# С numpy
+bins = np.linspace(ages.min(), ages.max(), 5)  # 4 бина
+binned = np.digitize(ages, bins)</code></pre>
+    <p><strong>Плюсы:</strong> Простота, интуитивность</p>
+    <p><strong>Минусы:</strong> Может быть неравномерное распределение точек</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Equal Frequency Binning (Quantile)</h2>
+    <p>Бины с одинаковым количеством наблюдений:</p>
+    <pre><code># Quantile binning с pandas
+age_bins = pd.qcut(ages, q=4)  # 4 квартиля
+print(age_bins)
+
+# С метками
+age_bins = pd.qcut(ages, 
+    q=4, 
+    labels=['Q1', 'Q2', 'Q3', 'Q4']
+)
+
+# Получить границы
+age_bins, bins = pd.qcut(ages, q=4, retbins=True)
+print(bins)
+
+# Или указать квантили вручную
+age_bins = pd.qcut(ages, 
+    q=[0, 0.25, 0.5, 0.75, 1.0],
+    labels=['25%', '50%', '75%', '100%']
+)
+
+# С sklearn
+from sklearn.preprocessing import KBinsDiscretizer
+
+kbd = KBinsDiscretizer(
+    n_bins=4, 
+    encode='ordinal', 
+    strategy='quantile'
+)
+binned = kbd.fit_transform(ages.reshape(-1, 1))</code></pre>
+    <p><strong>Плюсы:</strong> Равномерное распределение</p>
+    <p><strong>Минусы:</strong> Может группировать разные значения в один бин</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Custom Binning</h2>
+    <p>Определение границ вручную на основе доменных знаний:</p>
+    <pre><code># Возрастные группы по демографическим стандартам
+age_bins = [0, 18, 30, 45, 60, 100]
+age_labels = ['Ребенок', 'Молодой', 'Взрослый', 'Средний', 'Пожилой']
+
+df['age_group'] = pd.cut(
+    df['age'],
+    bins=age_bins,
+    labels=age_labels,
+    include_lowest=True
+)
+
+# Зарплатные категории
+salary_bins = [0, 30000, 60000, 100000, np.inf]
+salary_labels = ['Low', 'Medium', 'High', 'Very High']
+
+df['salary_cat'] = pd.cut(
+    df['salary'],
+    bins=salary_bins,
+    labels=salary_labels
+)
+
+# BMI категории (стандарт ВОЗ)
+bmi_bins = [0, 18.5, 25, 30, np.inf]
+bmi_labels = ['Underweight', 'Normal', 'Overweight', 'Obese']
+
+df['bmi_cat'] = pd.cut(
+    df['bmi'],
+    bins=bmi_bins,
+    labels=bmi_labels
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. KBinsDiscretizer (sklearn)</h2>
+    <p>Универсальный инструмент с разными стратегиями:</p>
+    <pre><code>from sklearn.preprocessing import KBinsDiscretizer
+
+# Uniform (equal width)
+kbd_uniform = KBinsDiscretizer(
+    n_bins=5, 
+    encode='ordinal',  # ordinal, onehot, onehot-dense
+    strategy='uniform'
+)
+X_binned = kbd_uniform.fit_transform(X)
+
+# Quantile (equal frequency)
+kbd_quantile = KBinsDiscretizer(
+    n_bins=5,
+    encode='ordinal',
+    strategy='quantile'
+)
+X_binned = kbd_quantile.fit_transform(X)
+
+# K-means (оптимальные границы)
+kbd_kmeans = KBinsDiscretizer(
+    n_bins=5,
+    encode='ordinal',
+    strategy='kmeans'
+)
+X_binned = kbd_kmeans.fit_transform(X)
+
+# Получение границ
+print(kbd_uniform.bin_edges_)
+
+# One-hot encoding бинов
+kbd_onehot = KBinsDiscretizer(
+    n_bins=5,
+    encode='onehot-dense'
+)
+X_onehot = kbd_onehot.fit_transform(X)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. K-means Binning</h2>
+    <p>Использование K-means для оптимального разбиения:</p>
+    <pre><code>from sklearn.cluster import KMeans
+
+# K-means clustering для биннинга
+def kmeans_binning(data, n_bins):
+    """Биннинг на основе K-means"""
+    kmeans = KMeans(n_clusters=n_bins, random_state=42)
+    labels = kmeans.fit_predict(data.reshape(-1, 1))
+    centers = kmeans.cluster_centers_.flatten()
+    
+    # Сортировка центров для получения порядка
+    sorted_indices = np.argsort(centers)
+    label_mapping = {old: new for new, old in enumerate(sorted_indices)}
+    mapped_labels = np.array([label_mapping[l] for l in labels])
+    
+    return mapped_labels, centers[sorted_indices]
+
+# Использование
+ages = df['age'].values
+binned_ages, centers = kmeans_binning(ages, n_bins=4)
+
+# Или через KBinsDiscretizer
+kbd = KBinsDiscretizer(n_bins=4, encode='ordinal', strategy='kmeans')
+binned = kbd.fit_transform(ages.reshape(-1, 1))</code></pre>
+    <p><strong>Плюсы:</strong> Адаптивные границы, минимизация дисперсии внутри бинов</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сравнение стратегий</h2>
+    <table>
+      <tr><th>Стратегия</th><th>Когда использовать</th><th>Плюсы</th><th>Минусы</th></tr>
+      <tr><td><strong>Equal Width</strong></td><td>Равномерные данные</td><td>Простота</td><td>Неравномерное распределение</td></tr>
+      <tr><td><strong>Equal Frequency</strong></td><td>Скошенные данные</td><td>Равные размеры бинов</td><td>Разные ширины интервалов</td></tr>
+      <tr><td><strong>K-means</strong></td><td>Неравномерные данные</td><td>Оптимальность</td><td>Вычислительная сложность</td></tr>
+      <tr><td><strong>Custom</strong></td><td>Есть доменные знания</td><td>Интерпретируемость</td><td>Требует экспертизы</td></tr>
+    </table>
+    <pre><code># Визуальное сравнение
+import matplotlib.pyplot as plt
+
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+for ax, strategy in zip(axes, ['uniform', 'quantile', 'kmeans']):
+    kbd = KBinsDiscretizer(n_bins=4, encode='ordinal', strategy=strategy)
+    binned = kbd.fit_transform(ages.reshape(-1, 1))
+    ax.hist(binned, bins=4)
+    ax.set_title(f'{strategy.capitalize()} Binning')
+    
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Encoding после биннинга</h2>
+    <pre><code># После биннинга нужно закодировать категории
+
+# 1. Ordinal Encoding (порядковые бины)
+# Уже числа: 0, 1, 2, 3
+X_ordinal = binned  # от KBinsDiscretizer с encode='ordinal'
+
+# 2. One-Hot Encoding
+from sklearn.preprocessing import OneHotEncoder
+
+ohe = OneHotEncoder(sparse=False)
+X_onehot = ohe.fit_transform(binned)
+
+# Или с pandas
+df['age_binned'] = pd.cut(df['age'], bins=4)
+df_encoded = pd.get_dummies(df, columns=['age_binned'], prefix='age')
+
+# 3. Target Encoding (с осторожностью)
+bin_target_means = df.groupby('age_binned')['target'].mean()
+df['age_target_enc'] = df['age_binned'].map(bin_target_means)
+
+# 4. Frequency Encoding
+bin_freq = df['age_binned'].value_counts() / len(df)
+df['age_freq'] = df['age_binned'].map(bin_freq)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Binning для деревьев решений</h2>
+    <p>Специальные подходы для tree-based моделей:</p>
+    <pre><code># Decision tree binning - использует дерево для нахождения оптимальных разбиений
+from sklearn.tree import DecisionTreeRegressor
+
+def decision_tree_binning(X, y, max_leaf_nodes=5):
+    """Биннинг на основе дерева решений"""
+    dt = DecisionTreeRegressor(max_leaf_nodes=max_leaf_nodes, random_state=42)
+    dt.fit(X.reshape(-1, 1), y)
+    
+    # Предсказания дерева - это индексы листьев
+    binned = dt.apply(X.reshape(-1, 1))
+    
+    # Получить границы
+    tree = dt.tree_
+    thresholds = tree.threshold[tree.feature != -2]
+    
+    return binned, np.sort(thresholds)
+
+# Использование
+X = df['age'].values
+y = df['target'].values
+binned, boundaries = decision_tree_binning(X, y, max_leaf_nodes=4)
+
+# Для XGBoost/LightGBM часто биннинг не нужен!
+# Они делают это автоматически и оптимально</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Monotonic Binning</h2>
+    <p>Биннинг с сохранением монотонности:</p>
+    <pre><code># Для кредитного скоринга важна монотонность
+from sklearn.tree import DecisionTreeClassifier
+
+def monotonic_binning(X, y, n_bins=5):
+    """
+    Биннинг с гарантией монотонности
+    (для кредитного скоринга и финансовых задач)
+    """
+    # Сортировка по X
+    sorted_idx = np.argsort(X)
+    X_sorted = X[sorted_idx]
+    y_sorted = y[sorted_idx]
+    
+    # Разбиение на квантили
+    bin_edges = np.percentile(
+        X_sorted, 
+        np.linspace(0, 100, n_bins + 1)
+    )
+    
+    # Проверка монотонности средних в бинах
+    bins = pd.cut(X, bins=bin_edges, include_lowest=True, duplicates='drop')
+    bin_means = pd.Series(y).groupby(bins).mean()
+    
+    # Если не монотонные, объединить соседние
+    while not bin_means.is_monotonic_increasing:
+        # Найти нарушение и объединить
+        diff = bin_means.diff()
+        if (diff < 0).any():
+            # Слияние бинов
+            pass  # упрощено
+    
+    return bins
+
+# Проверка монотонности
+def check_monotonicity(binned_feature, target):
+    bin_means = pd.Series(target).groupby(binned_feature).mean()
+    return bin_means.is_monotonic_increasing or bin_means.is_monotonic_decreasing</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Weight of Evidence (WoE)</h2>
+    <p>Специальное кодирование для кредитного скоринга:</p>
+    <pre><code>def calculate_woe(df, feature, target, bins=5):
+    """
+    Weight of Evidence для бинарной классификации
+    WoE = ln(% Good / % Bad)
+    """
+    # Биннинг
+    df['binned'] = pd.qcut(df[feature], q=bins, duplicates='drop')
+    
+    # Группировка
+    grouped = df.groupby('binned')[target].agg(['sum', 'count'])
+    grouped['bad'] = grouped['sum']
+    grouped['good'] = grouped['count'] - grouped['sum']
+    
+    # Процентные доли
+    grouped['bad_pct'] = grouped['bad'] / grouped['bad'].sum()
+    grouped['good_pct'] = grouped['good'] / grouped['good'].sum()
+    
+    # WoE
+    grouped['woe'] = np.log(grouped['good_pct'] / grouped['bad_pct'])
+    
+    # IV (Information Value)
+    grouped['iv'] = (grouped['good_pct'] - grouped['bad_pct']) * grouped['woe']
+    
+    return grouped
+
+# Использование
+woe_table = calculate_woe(df, 'age', 'default', bins=5)
+print(woe_table[['woe', 'iv']])
+print(f"Total IV: {woe_table['iv'].sum():.4f}")
+
+# Применение WoE
+woe_map = dict(zip(woe_table.index, woe_table['woe']))
+df['age_woe'] = df['binned'].map(woe_map)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Adaptive Binning</h2>
+    <pre><code># Адаптивный биннинг на основе целевой переменной
+from sklearn.tree import DecisionTreeClassifier
+
+def supervised_binning(X, y, max_bins=5, min_samples_bin=50):
+    """Биннинг под конкретную целевую переменную"""
+    # Используем дерево решений
+    dt = DecisionTreeClassifier(
+        max_leaf_nodes=max_bins,
+        min_samples_leaf=min_samples_bin,
+        random_state=42
+    )
+    dt.fit(X.reshape(-1, 1), y)
+    
+    # Получаем границы из дерева
+    tree = dt.tree_
+    thresholds = []
+    
+    def get_thresholds(node=0):
+        if tree.feature[node] != -2:  # не лист
+            thresholds.append(tree.threshold[node])
+            get_thresholds(tree.children_left[node])
+            get_thresholds(tree.children_right[node])
+    
+    get_thresholds()
+    thresholds = sorted(set(thresholds))
+    
+    # Создаем бины
+    bins = [-np.inf] + thresholds + [np.inf]
+    return pd.cut(X, bins=bins)
+
+# Использование
+binned = supervised_binning(df['age'].values, df['target'].values)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Binning в Pipeline</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import KBinsDiscretizer, StandardScaler
+from sklearn.linear_model import LogisticRegression
+
+# Pipeline с биннингом
+pipeline = Pipeline([
+    ('binning', KBinsDiscretizer(
+        n_bins=5, 
+        encode='onehot-dense',
+        strategy='quantile'
+    )),
+    ('scaler', StandardScaler()),
+    ('classifier', LogisticRegression())
+])
+
+pipeline.fit(X_train, y_train)
+predictions = pipeline.predict(X_test)
+
+# ColumnTransformer для разных признаков
+from sklearn.compose import ColumnTransformer
+
+ct = ColumnTransformer([
+    ('age_binning', KBinsDiscretizer(n_bins=5), ['age']),
+    ('salary_binning', KBinsDiscretizer(n_bins=4), ['salary']),
+    ('other', 'passthrough', ['city', 'gender'])
+])
+
+X_transformed = ct.fit_transform(X)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Визуализация биннинга</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import seaborn as sns
+
+def plot_binning_comparison(data, n_bins=4):
+    """Сравнение разных стратегий биннинга"""
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    
+    strategies = ['uniform', 'quantile', 'kmeans']
+    
+    # Original distribution
+    axes[0, 0].hist(data, bins=30, alpha=0.7)
+    axes[0, 0].set_title('Original Distribution')
+    
+    # Different binning strategies
+    for ax, strategy in zip(axes.flat[1:], strategies):
+        kbd = KBinsDiscretizer(
+            n_bins=n_bins, 
+            encode='ordinal', 
+            strategy=strategy
+        )
+        binned = kbd.fit_transform(data.reshape(-1, 1))
+        
+        ax.hist(binned, bins=n_bins, alpha=0.7)
+        ax.set_title(f'{strategy.capitalize()} Binning')
+        
+        # Показать границы
+        for edge in kbd.bin_edges_[0][1:-1]:
+            ax.axvline(edge, color='red', linestyle='--', alpha=0.5)
+    
+    plt.tight_layout()
+    plt.show()
+
+# Использование
+plot_binning_comparison(df['age'].values, n_bins=5)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Best Practices</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <ul>
+          <li>Использовать доменные знания для custom binning</li>
+          <li>Проверять распределение после биннинга</li>
+          <li>Использовать quantile для скошенных данных</li>
+          <li>Тестировать разные стратегии</li>
+          <li>Сохранять границы бинов для test set</li>
+          <li>Визуализировать результаты</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не делать</h3>
+        <ul>
+          <li>Слишком много бинов (теряется обобщение)</li>
+          <li>Слишком мало бинов (теряется информация)</li>
+          <li>Биннинг для tree-based без причины</li>
+          <li>Игнорировать выбросы при биннинге</li>
+          <li>Забывать про монотонность в финансах</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определена цель биннинга (интерпретация, производительность, нелинейность)</li>
+      <li>[ ] Выбрана подходящая стратегия (uniform, quantile, kmeans, custom)</li>
+      <li>[ ] Определено оптимальное количество бинов</li>
+      <li>[ ] Визуализировано распределение до и после</li>
+      <li>[ ] Проверена монотонность (если важно)</li>
+      <li>[ ] Выбран метод кодирования (ordinal, one-hot, WoE)</li>
+      <li>[ ] Границы бинов сохранены для test set</li>
+      <li>[ ] Сравнены результаты с/без биннинга</li>
+      <li>[ ] Документированы метки бинов</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Биннинг — это группировка похожих значений. Вместо точного возраста (25, 26, 27 лет) мы используем категории (молодые, взрослые, пожилые). Это упрощает анализ и делает модель более устойчивой к шуму в данных».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
