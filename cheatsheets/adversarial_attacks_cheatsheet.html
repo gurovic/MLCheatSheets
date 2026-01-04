@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Adversarial Attacks (Состязательные атаки) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⚔️ Adversarial Attacks (Состязательные атаки) Cheatsheet</h1>
+  <div class="subtitle">Безопасность нейронных сетей • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Adversarial Attacks</h2>
+    <p><strong>Adversarial attack</strong> — специально созданные небольшие возмущения входных данных, которые заставляют модель делать неправильные предсказания.</p>
+    <ul>
+      <li><strong>Цель</strong>: обмануть нейросеть минимальными изменениями</li>
+      <li><strong>Проблема</strong>: модели уязвимы к imperceptible изменениям</li>
+      <li><strong>Пример</strong>: изображение панды + шум = гиббон (99.3% уверенности)</li>
+      <li><strong>Применение</strong>: тестирование робастности моделей</li>
+      <li><strong>Защита</strong>: adversarial training, certified defenses</li>
+    </ul>
+    <blockquote>
+      Adversarial примеры показывают, что нейросети "видят" данные иначе, чем люди, и могут быть легко обманут даже небольшими изменениями, невидимыми для человека.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы атак</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Знание модели</th></tr>
+      <tr><td><strong>White-box</strong></td><td>Полный доступ к модели</td><td>Архитектура, веса, градиенты</td></tr>
+      <tr><td><strong>Black-box</strong></td><td>Только предсказания</td><td>Входы и выходы</td></tr>
+      <tr><td><strong>Gray-box</strong></td><td>Частичный доступ</td><td>Архитектура без весов</td></tr>
+    </table>
+    <p><strong>По цели:</strong></p>
+    <ul>
+      <li><strong>Untargeted</strong>: любая ошибка классификации</li>
+      <li><strong>Targeted</strong>: конкретный неправильный класс</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. FGSM (Fast Gradient Sign Method)</h2>
+    <p>Самая простая и быстрая атака. Использует знак градиента функции потерь.</p>
+    <pre><code># PyTorch реализация
+import torch
+import torch.nn.functional as F
+
+def fgsm_attack(image, epsilon, data_grad):
+    # Знак градиента
+    sign_data_grad = data_grad.sign()
+    # Создание возмущённого изображения
+    perturbed_image = image + epsilon * sign_data_grad
+    # Ограничение диапазона [0, 1]
+    perturbed_image = torch.clamp(perturbed_image, 0, 1)
+    return perturbed_image
+
+# Использование
+model.eval()
+image.requires_grad = True
+
+output = model(image)
+loss = F.nll_loss(output, target)
+model.zero_grad()
+loss.backward()
+
+# Атака
+perturbed_image = fgsm_attack(image, epsilon=0.1, data_grad=image.grad.data)
+
+# Epsilon контролирует силу атаки (обычно 0.01-0.3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. PGD (Projected Gradient Descent)</h2>
+    <p>Итеративная версия FGSM. Сильнее и эффективнее.</p>
+    <pre><code>def pgd_attack(model, images, labels, epsilon=0.3, alpha=0.01, num_iter=40):
+    # Копия изображения
+    perturbed_images = images.clone().detach()
+    perturbed_images.requires_grad = True
+    
+    for i in range(num_iter):
+        outputs = model(perturbed_images)
+        loss = F.cross_entropy(outputs, labels)
+        
+        model.zero_grad()
+        loss.backward()
+        
+        # Шаг градиента
+        data_grad = perturbed_images.grad.data
+        perturbed_images = perturbed_images.detach() + alpha * data_grad.sign()
+        
+        # Проецирование в epsilon-шар
+        eta = torch.clamp(perturbed_images - images, -epsilon, epsilon)
+        perturbed_images = torch.clamp(images + eta, 0, 1).detach()
+        perturbed_images.requires_grad = True
+    
+    return perturbed_images
+
+# PGD — одна из самых сильных white-box атак</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. C&W Attack (Carlini & Wagner)</h2>
+    <p>Оптимизационная атака, находит минимальное возмущение.</p>
+    <pre><code># Упрощённая версия C&W L2
+def cw_l2_attack(model, image, target, c=1.0, kappa=0, max_iter=1000, lr=0.01):
+    # Переменные
+    w = torch.zeros_like(image, requires_grad=True)
+    optimizer = torch.optim.Adam([w], lr=lr)
+    
+    for step in range(max_iter):
+        # Создание возмущённого изображения
+        perturbed = 0.5 * (torch.tanh(w) + 1)
+        
+        # Выход модели
+        output = model(perturbed)
+        
+        # Loss C&W
+        real = output[:, target]
+        other = torch.max((1 - F.one_hot(target, output.shape[1])) * output, dim=1)[0]
+        f_loss = torch.clamp(real - other + kappa, min=0)
+        
+        # L2 норма возмущения
+        l2_loss = torch.norm(perturbed - image, p=2)
+        
+        # Общая функция потерь
+        loss = l2_loss + c * f_loss
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    
+    return 0.5 * (torch.tanh(w) + 1)
+
+# C&W находит минимальное возмущение, сложнее детектировать</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. DeepFool</h2>
+    <p>Находит кратчайший путь к границе решения.</p>
+    <pre><code>def deepfool(model, image, num_classes=10, max_iter=50, overshoot=0.02):
+    f_image = model(image).detach()
+    I = f_image.argmax().item()
+    
+    input_shape = image.shape
+    pert_image = image.clone()
+    
+    w = torch.zeros(input_shape)
+    r_tot = torch.zeros(input_shape)
+    
+    for iter in range(max_iter):
+        pert_image.requires_grad = True
+        fs = model(pert_image)
+        
+        # Градиенты
+        grads = torch.zeros((num_classes,) + input_shape[1:])
+        for k in range(num_classes):
+            model.zero_grad()
+            fs[0, k].backward(retain_graph=True)
+            grads[k] = pert_image.grad.data.clone()
+        
+        # Находим ближайшую границу
+        pert = float('inf')
+        for k in range(num_classes):
+            if k == I:
+                continue
+            
+            w_k = grads[k] - grads[I]
+            f_k = fs[0, k] - fs[0, I]
+            
+            pert_k = abs(f_k) / torch.norm(w_k.flatten())
+            
+            if pert_k < pert:
+                pert = pert_k
+                w = w_k
+        
+        # Добавляем возмущение
+        r_i = (pert + 1e-4) * w / torch.norm(w)
+        r_tot += r_i
+        
+        pert_image = image + (1 + overshoot) * r_tot
+        
+        # Проверяем изменение класса
+        pred = model(pert_image).argmax().item()
+        if pred != I:
+            break
+    
+    return r_tot, pert_image, pred</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сравнение атак</h2>
+    <table>
+      <tr><th>Атака</th><th>Скорость</th><th>Эффективность</th><th>Видимость</th></tr>
+      <tr><td><strong>FGSM</strong></td><td>⚡⚡⚡</td><td>⭐⭐</td><td>Средняя</td></tr>
+      <tr><td><strong>PGD</strong></td><td>⚡⚡</td><td>⭐⭐⭐⭐</td><td>Средняя</td></tr>
+      <tr><td><strong>C&W</strong></td><td>⚡</td><td>⭐⭐⭐⭐⭐</td><td>Низкая</td></tr>
+      <tr><td><strong>DeepFool</strong></td><td>⚡⚡</td><td>⭐⭐⭐⭐</td><td>Низкая</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Защита: Adversarial Training</h2>
+    <p>Обучение модели на adversarial примерах.</p>
+    <pre><code>def adversarial_training(model, train_loader, epochs=10, epsilon=0.1):
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    
+    for epoch in range(epochs):
+        for images, labels in train_loader:
+            # Обычное обучение
+            outputs = model(images)
+            loss_clean = F.cross_entropy(outputs, labels)
+            
+            # Генерация adversarial примеров
+            images.requires_grad = True
+            outputs = model(images)
+            loss = F.cross_entropy(outputs, labels)
+            model.zero_grad()
+            loss.backward()
+            
+            # FGSM атака
+            perturbed = fgsm_attack(images, epsilon, images.grad.data)
+            
+            # Обучение на adversarial примерах
+            outputs_adv = model(perturbed)
+            loss_adv = F.cross_entropy(outputs_adv, labels)
+            
+            # Комбинированная loss
+            total_loss = 0.5 * loss_clean + 0.5 * loss_adv
+            
+            optimizer.zero_grad()
+            total_loss.backward()
+            optimizer.step()
+    
+    return model
+
+# Улучшает робастность, но может снизить точность на чистых данных</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Защита: Input Transformations</h2>
+    <pre><code># 1. Добавление шума
+def add_noise_defense(image, std=0.05):
+    noise = torch.randn_like(image) * std
+    return torch.clamp(image + noise, 0, 1)
+
+# 2. JPEG compression
+from PIL import Image
+import io
+
+def jpeg_compression_defense(image, quality=75):
+    # Конвертация в PIL
+    pil_image = Image.fromarray((image.numpy() * 255).astype('uint8'))
+    # Сжатие
+    buffer = io.BytesIO()
+    pil_image.save(buffer, format="JPEG", quality=quality)
+    buffer.seek(0)
+    # Обратно в тензор
+    compressed = Image.open(buffer)
+    return torch.from_numpy(np.array(compressed)) / 255.0
+
+# 3. Median filtering
+from scipy.ndimage import median_filter
+
+def median_filter_defense(image, size=3):
+    return torch.from_numpy(
+        median_filter(image.numpy(), size=size)
+    )
+
+# Эти методы снижают эффективность атак, но могут ухудшить точность</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Защита: Ensemble Defenses</h2>
+    <pre><code># Ансамбль моделей как защита
+class EnsembleDefense(nn.Module):
+    def __init__(self, models):
+        super().__init__()
+        self.models = models
+    
+    def forward(self, x):
+        outputs = []
+        for model in self.models:
+            # Разные трансформации для каждой модели
+            x_transformed = self.transform(x)
+            outputs.append(model(x_transformed))
+        
+        # Усреднение или голосование
+        return torch.stack(outputs).mean(dim=0)
+    
+    def transform(self, x):
+        # Случайные трансформации
+        if random.random() > 0.5:
+            x = add_noise_defense(x)
+        if random.random() > 0.5:
+            x = F.interpolate(x, scale_factor=0.9, mode='bilinear')
+            x = F.interpolate(x, scale_factor=1.11, mode='bilinear')
+        return x
+
+# Transferability атак ниже между разными моделями</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Детектирование атак</h2>
+    <pre><code># 1. Проверка уверенности модели
+def detect_by_confidence(model, image, threshold=0.95):
+    output = F.softmax(model(image), dim=1)
+    max_conf = output.max().item()
+    
+    # Подозрительно высокая уверенность
+    return max_conf > threshold
+
+# 2. Reconstruction error (Autoencoder)
+def detect_by_reconstruction(autoencoder, image, threshold=0.1):
+    reconstructed = autoencoder(image)
+    error = F.mse_loss(image, reconstructed).item()
+    
+    # Adversarial примеры плохо реконструируются
+    return error > threshold
+
+# 3. Statistical tests
+def detect_by_stats(image, clean_stats):
+    mean = image.mean().item()
+    std = image.std().item()
+    
+    # Сравнение со статистикой чистых изображений
+    return abs(mean - clean_stats['mean']) > 3 * clean_stats['std']</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Certified Defenses</h2>
+    <p>Математически доказуемые гарантии робастности.</p>
+    <ul>
+      <li><strong>Randomized Smoothing</strong>: добавление гауссового шума</li>
+      <li><strong>Interval Bound Propagation (IBP)</strong>: формальная верификация</li>
+      <li><strong>Lipschitz constraints</strong>: ограничение градиентов</li>
+      <li><strong>Certified radius</strong>: гарантированная устойчивость к возмущениям</li>
+    </ul>
+    <pre><code># Randomized Smoothing (упрощённо)
+def randomized_smoothing_predict(model, image, num_samples=100, sigma=0.25):
+    predictions = []
+    
+    for _ in range(num_samples):
+        # Добавление шума
+        noisy = image + torch.randn_like(image) * sigma
+        output = model(noisy)
+        predictions.append(output.argmax().item())
+    
+    # Мажоритарное голосование
+    from collections import Counter
+    most_common = Counter(predictions).most_common(1)[0]
+    return most_common[0], most_common[1] / num_samples
+
+# Гарантирует робастность в определённом радиусе</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Практические рекомендации</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Best Practices</h3>
+        <ul>
+          <li>Adversarial training на критичных моделях</li>
+          <li>Комбинация нескольких защит</li>
+          <li>Регулярное тестирование на робастность</li>
+          <li>Мониторинг unusual predictions</li>
+          <li>Ensemble моделей с разными архитектурами</li>
+          <li>Ограничение доступа к модели (black-box)</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Частые ошибки</h3>
+        <ul>
+          <li>Игнорирование проблемы безопасности</li>
+          <li>Полагаться только на одну защиту</li>
+          <li>Не тестировать на adversarial примерах</li>
+          <li>Публиковать полные веса модели</li>
+          <li>Переоценивать эффективность простых защит</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Библиотеки для атак</h2>
+    <pre><code># Foolbox
+pip install foolbox
+
+import foolbox as fb
+
+model = fb.PyTorchModel(pytorch_model, bounds=(0, 1))
+attack = fb.attacks.FGSM()
+advs, clipped, is_adv = attack(model, images, labels, epsilons=0.1)
+
+# CleverHans
+pip install cleverhans
+
+from cleverhans.torch.attacks.fast_gradient_method import fast_gradient_method
+
+adv_x = fast_gradient_method(model, x, eps=0.1, norm=np.inf)
+
+# Adversarial Robustness Toolbox (ART)
+pip install adversarial-robustness-toolbox
+
+from art.attacks.evasion import FastGradientMethod
+from art.estimators.classification import PyTorchClassifier
+
+classifier = PyTorchClassifier(model, loss, optimizer, input_shape, nb_classes)
+attack = FastGradientMethod(estimator=classifier, eps=0.1)
+x_adv = attack.generate(x=x_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Метрики робастности</h2>
+    <table>
+      <tr><th>Метрика</th><th>Описание</th></tr>
+      <tr><td><strong>Robust Accuracy</strong></td><td>Точность на adversarial примерах</td></tr>
+      <tr><td><strong>Attack Success Rate</strong></td><td>% успешных атак</td></tr>
+      <tr><td><strong>Perturbation Budget</strong></td><td>Максимальное epsilon для атаки</td></tr>
+      <tr><td><strong>Certified Radius</strong></td><td>Гарантированный радиус устойчивости</td></tr>
+    </table>
+    <pre><code># Оценка робастности
+def evaluate_robustness(model, test_loader, attack_fn, epsilon=0.1):
+    correct_clean = 0
+    correct_adv = 0
+    total = 0
+    
+    for images, labels in test_loader:
+        # Чистые данные
+        outputs_clean = model(images)
+        correct_clean += (outputs_clean.argmax(1) == labels).sum().item()
+        
+        # Adversarial данные
+        images_adv = attack_fn(model, images, labels, epsilon)
+        outputs_adv = model(images_adv)
+        correct_adv += (outputs_adv.argmax(1) == labels).sum().item()
+        
+        total += labels.size(0)
+    
+    clean_acc = 100 * correct_clean / total
+    robust_acc = 100 * correct_adv / total
+    
+    print(f"Clean Accuracy: {clean_acc:.2f}%")
+    print(f"Robust Accuracy: {robust_acc:.2f}%")
+    print(f"Attack Success Rate: {100 - robust_acc:.2f}%")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист безопасности</h2>
+    <ul>
+      <li>[ ] Тестировать модель на FGSM атаках</li>
+      <li>[ ] Тестировать на PGD атаках (сильнее)</li>
+      <li>[ ] Применить adversarial training</li>
+      <li>[ ] Добавить input transformation</li>
+      <li>[ ] Рассмотреть ensemble defenses</li>
+      <li>[ ] Внедрить детектирование аномалий</li>
+      <li>[ ] Ограничить доступ к модели</li>
+      <li>[ ] Мониторить predictions в production</li>
+      <li>[ ] Регулярно обновлять защиты</li>
+      <li>[ ] Документировать уязвимости</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Adversarial атаки — это как оптические иллюзии для AI. Мы добавляем невидимые для человека изменения к изображению, но нейросеть видит совсем другой объект. Это критично для безопасности систем распознавания — например, знак "стоп" может быть воспринят как знак ограничения скорости».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>TensorFlow/Keras Полный Гайд Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔷 TensorFlow/Keras Полный Гайд Cheatsheet</h1>
+  <div class="subtitle">Для начинающих и продвинутых • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы TensorFlow/Keras</h2>
+    <p><strong>TensorFlow</strong> — фреймворк от Google для машинного обучения. <strong>Keras</strong> — высокоуровневый API для TensorFlow.</p>
+    <ul>
+      <li><strong>Keras</strong>: простой, интуитивный API</li>
+      <li><strong>TensorFlow 2.x</strong>: eager execution по умолчанию</li>
+      <li><strong>Производство</strong>: отличная поддержка deployment</li>
+      <li><strong>Экосистема</strong>: TensorFlow Lite, TensorFlow.js, TF Serving</li>
+      <li><strong>Поддержка</strong>: TPU, GPU, распределённое обучение</li>
+    </ul>
+    <pre><code># Установка
+pip install tensorflow
+
+# Импорт
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# Проверка версии
+print(tf.__version__)
+print(keras.__version__)
+
+# Проверка GPU
+print("GPU:", tf.config.list_physical_devices('GPU'))
+print("GPU доступен:", tf.test.is_gpu_available())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Тензоры в TensorFlow</h2>
+    <pre><code># Создание тензоров
+x = tf.constant([1, 2, 3])
+y = tf.zeros([3, 4])
+z = tf.ones([2, 3, 4])
+rand_t = tf.random.normal([3, 3])
+rand_u = tf.random.uniform([3, 3])
+
+# Из numpy
+import numpy as np
+arr = np.array([1, 2, 3])
+t = tf.constant(arr)
+
+# В numpy
+arr_back = t.numpy()
+
+# Типы данных
+float_t = tf.constant([1.0, 2.0], dtype=tf.float32)
+int_t = tf.constant([1, 2], dtype=tf.int32)
+
+# Размерности
+print(x.shape)  # TensorShape([3])
+print(tf.rank(x))  # Ранг тензора
+
+# Операции
+a = tf.constant([1, 2, 3])
+b = tf.constant([4, 5, 6])
+c = a + b
+d = tf.matmul(tf.reshape(a, [3, 1]), tf.reshape(b, [1, 3]))
+
+# Изменение формы
+x = tf.random.normal([12])
+y = tf.reshape(x, [3, 4])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Создание модели (Sequential API)</h2>
+    <pre><code>from tensorflow.keras import Sequential
+from tensorflow.keras.layers import Dense, Dropout
+
+# Самый простой способ
+model = Sequential([
+    Dense(128, activation='relu', input_shape=(784,)),
+    Dropout(0.2),
+    Dense(64, activation='relu'),
+    Dropout(0.2),
+    Dense(10, activation='softmax')
+])
+
+# Или добавлять слои поочерёдно
+model = Sequential()
+model.add(Dense(128, activation='relu', input_shape=(784,)))
+model.add(Dropout(0.2))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(10, activation='softmax'))
+
+# Просмотр архитектуры
+model.summary()
+
+# Компиляция
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Functional API (гибкий)</h2>
+    <pre><code>from tensorflow.keras import Model, Input
+from tensorflow.keras.layers import Dense, Concatenate
+
+# Более гибкий подход
+inputs = Input(shape=(784,))
+x = Dense(128, activation='relu')(inputs)
+x = Dropout(0.2)(x)
+x = Dense(64, activation='relu')(x)
+outputs = Dense(10, activation='softmax')(x)
+
+model = Model(inputs=inputs, outputs=outputs)
+
+# Несколько входов/выходов
+input1 = Input(shape=(100,))
+input2 = Input(shape=(50,))
+
+x1 = Dense(64, activation='relu')(input1)
+x2 = Dense(32, activation='relu')(input2)
+
+# Объединение
+combined = Concatenate()([x1, x2])
+z = Dense(32, activation='relu')(combined)
+
+output1 = Dense(10, activation='softmax', name='class')(z)
+output2 = Dense(1, activation='sigmoid', name='aux')(z)
+
+model = Model(
+    inputs=[input1, input2],
+    outputs=[output1, output2]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Слои (Layers)</h2>
+    <table>
+      <tr><th>Слой</th><th>Описание</th><th>Пример</th></tr>
+      <tr><td><code>Dense</code></td><td>Fully connected</td><td><code>Dense(128, activation='relu')</code></td></tr>
+      <tr><td><code>Conv2D</code></td><td>2D свёртка</td><td><code>Conv2D(64, (3, 3), activation='relu')</code></td></tr>
+      <tr><td><code>MaxPooling2D</code></td><td>Max pooling</td><td><code>MaxPooling2D((2, 2))</code></td></tr>
+      <tr><td><code>Dropout</code></td><td>Dropout</td><td><code>Dropout(0.5)</code></td></tr>
+      <tr><td><code>BatchNormalization</code></td><td>Batch norm</td><td><code>BatchNormalization()</code></td></tr>
+      <tr><td><code>LSTM</code></td><td>LSTM</td><td><code>LSTM(128, return_sequences=True)</code></td></tr>
+      <tr><td><code>GRU</code></td><td>GRU</td><td><code>GRU(64)</code></td></tr>
+      <tr><td><code>Embedding</code></td><td>Embeddings</td><td><code>Embedding(10000, 128)</code></td></tr>
+      <tr><td><code>Flatten</code></td><td>Flatten</td><td><code>Flatten()</code></td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>�� 6. Функции активации</h2>
+    <pre><code># В слоях
+Dense(128, activation='relu')
+Dense(10, activation='softmax')
+Dense(1, activation='sigmoid')
+Dense(64, activation='tanh')
+
+# Или как отдельные слои
+from tensorflow.keras.layers import Activation
+
+model = Sequential([
+    Dense(128),
+    Activation('relu'),
+    Dense(10),
+    Activation('softmax')
+])
+
+# Доступные активации
+# 'relu', 'sigmoid', 'tanh', 'softmax', 
+# 'elu', 'selu', 'softplus', 'softsign',
+# 'swish', 'gelu'</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Функции потерь (Loss)</h2>
+    <pre><code># Классификация (бинарная)
+loss='binary_crossentropy'  # С sigmoid на выходе
+
+# Классификация (многоклассовая)
+loss='categorical_crossentropy'  # С softmax, one-hot labels
+loss='sparse_categorical_crossentropy'  # С softmax, integer labels
+
+# Регрессия
+loss='mse'  # Mean Squared Error
+loss='mae'  # Mean Absolute Error
+loss='huber'  # Huber loss
+
+# Кастомная loss
+def custom_loss(y_true, y_pred):
+    return tf.reduce_mean(tf.square(y_true - y_pred))
+
+model.compile(loss=custom_loss, optimizer='adam')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Оптимизаторы</h2>
+    <pre><code>from tensorflow.keras.optimizers import *
+
+# SGD
+optimizer = SGD(learning_rate=0.01, momentum=0.9)
+
+# Adam (популярный)
+optimizer = Adam(learning_rate=0.001)
+
+# RMSprop
+optimizer = RMSprop(learning_rate=0.001)
+
+# AdaGrad
+optimizer = Adagrad(learning_rate=0.01)
+
+# Компиляция с оптимизатором
+model.compile(
+    optimizer=Adam(learning_rate=0.001),
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+# Или строкой (параметры по умолчанию)
+model.compile(
+    optimizer='adam',
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Обучение модели</h2>
+    <pre><code># Простое обучение
+history = model.fit(
+    X_train, y_train,
+    batch_size=32,
+    epochs=10,
+    validation_split=0.2,  # Или validation_data=(X_val, y_val)
+    verbose=1
+)
+
+# С callback'ами
+from tensorflow.keras.callbacks import *
+
+callbacks = [
+    EarlyStopping(
+        monitor='val_loss',
+        patience=5,
+        restore_best_weights=True
+    ),
+    ModelCheckpoint(
+        'best_model.h5',
+        monitor='val_accuracy',
+        save_best_only=True
+    ),
+    ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.5,
+        patience=3
+    )
+]
+
+history = model.fit(
+    X_train, y_train,
+    batch_size=32,
+    epochs=50,
+    validation_split=0.2,
+    callbacks=callbacks
+)
+
+# История обучения
+print(history.history.keys())
+# ['loss', 'accuracy', 'val_loss', 'val_accuracy']</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>�� 10. Callbacks</h2>
+    <table>
+      <tr><th>Callback</th><th>Описание</th></tr>
+      <tr><td><code>EarlyStopping</code></td><td>Останавливает обучение при отсутствии улучшения</td></tr>
+      <tr><td><code>ModelCheckpoint</code></td><td>Сохраняет модель во время обучения</td></tr>
+      <tr><td><code>ReduceLROnPlateau</code></td><td>Снижает learning rate при застое</td></tr>
+      <tr><td><code>TensorBoard</code></td><td>Логирование для TensorBoard</td></tr>
+      <tr><td><code>LearningRateScheduler</code></td><td>Кастомное расписание LR</td></tr>
+      <tr><td><code>CSVLogger</code></td><td>Логирование метрик в CSV</td></tr>
+    </table>
+    <pre><code># TensorBoard
+tensorboard_callback = TensorBoard(
+    log_dir='./logs',
+    histogram_freq=1
+)
+
+# Запуск TensorBoard
+# tensorboard --logdir=./logs
+
+# Кастомный callback
+class CustomCallback(keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs=None):
+        print(f"\nEpoch {epoch}: loss={logs['loss']:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Предсказание и оценка</h2>
+    <pre><code># Предсказание
+predictions = model.predict(X_test)
+# Возвращает вероятности для каждого класса
+
+# Получение классов
+predicted_classes = np.argmax(predictions, axis=1)
+
+# Или сразу классы
+predicted_classes = model.predict_classes(X_test)  # Устарело в TF 2.6+
+
+# Оценка модели
+loss, accuracy = model.evaluate(X_test, y_test, verbose=0)
+print(f"Test Loss: {loss:.4f}")
+print(f"Test Accuracy: {accuracy:.4f}")
+
+# Batch-wise предсказание (для больших данных)
+predictions = model.predict(X_test, batch_size=128)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сохранение и загрузка</h2>
+    <pre><code># Сохранение всей модели (архитектура + веса + optimizer)
+model.save('my_model.h5')  # HDF5 формат
+model.save('my_model')     # SavedModel формат (рекомендуется)
+
+# Загрузка модели
+model = keras.models.load_model('my_model.h5')
+
+# Сохранение только весов
+model.save_weights('model_weights.h5')
+
+# Загрузка весов
+model.load_weights('model_weights.h5')
+
+# Экспорт архитектуры в JSON
+json_config = model.to_json()
+with open('model_architecture.json', 'w') as f:
+    f.write(json_config)
+
+# Загрузка архитектуры
+with open('model_architecture.json', 'r') as f:
+    json_config = f.read()
+model = keras.models.model_from_json(json_config)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Data Augmentation</h2>
+    <pre><code>from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+# Для изображений
+datagen = ImageDataGenerator(
+    rotation_range=20,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=True,
+    zoom_range=0.2,
+    shear_range=0.2,
+    fill_mode='nearest'
+)
+
+# Обучение с аугментацией
+model.fit(
+    datagen.flow(X_train, y_train, batch_size=32),
+    epochs=50,
+    validation_data=(X_val, y_val)
+)
+
+# Современный подход (TF 2.x)
+from tensorflow.keras.layers.experimental.preprocessing import *
+
+data_augmentation = Sequential([
+    RandomFlip("horizontal"),
+    RandomRotation(0.2),
+    RandomZoom(0.2),
+    RandomContrast(0.2)
+])
+
+# Добавить в модель
+model = Sequential([
+    data_augmentation,
+    Conv2D(32, (3, 3), activation='relu'),
+    # ...
+])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Свёрточная сеть (CNN)</h2>
+    <pre><code>model = Sequential([
+    # Conv Block 1
+    Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)),
+    BatchNormalization(),
+    Conv2D(32, (3, 3), activation='relu'),
+    BatchNormalization(),
+    MaxPooling2D((2, 2)),
+    Dropout(0.25),
+    
+    # Conv Block 2
+    Conv2D(64, (3, 3), activation='relu'),
+    BatchNormalization(),
+    Conv2D(64, (3, 3), activation='relu'),
+    BatchNormalization(),
+    MaxPooling2D((2, 2)),
+    Dropout(0.25),
+    
+    # FC layers
+    Flatten(),
+    Dense(512, activation='relu'),
+    BatchNormalization(),
+    Dropout(0.5),
+    Dense(10, activation='softmax')
+])
+
+model.compile(
+    optimizer=Adam(learning_rate=0.001),
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. RNN/LSTM</h2>
+    <pre><code># LSTM для последовательностей
+model = Sequential([
+    Embedding(vocab_size, 128, input_length=max_length),
+    LSTM(128, return_sequences=True, dropout=0.2),
+    LSTM(64, dropout=0.2),
+    Dense(64, activation='relu'),
+    Dropout(0.5),
+    Dense(num_classes, activation='softmax')
+])
+
+# Bidirectional LSTM
+from tensorflow.keras.layers import Bidirectional
+
+model = Sequential([
+    Embedding(vocab_size, 128),
+    Bidirectional(LSTM(64, return_sequences=True)),
+    Bidirectional(LSTM(32)),
+    Dense(num_classes, activation='softmax')
+])
+
+# GRU (быстрее LSTM)
+model = Sequential([
+    Embedding(vocab_size, 128),
+    GRU(128, return_sequences=False),
+    Dense(num_classes, activation='softmax')
+])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Transfer Learning</h2>
+    <pre><code>from tensorflow.keras.applications import *
+
+# Загрузка предобученной модели
+base_model = ResNet50(
+    weights='imagenet',
+    include_top=False,  # Без последних слоёв
+    input_shape=(224, 224, 3)
+)
+
+# Заморозка базовой модели
+base_model.trainable = False
+
+# Добавление своих слоёв
+model = Sequential([
+    base_model,
+    GlobalAveragePooling2D(),
+    Dense(256, activation='relu'),
+    Dropout(0.5),
+    Dense(10, activation='softmax')
+])
+
+# Обучение только новых слоёв
+model.compile(
+    optimizer=Adam(learning_rate=0.001),
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+model.fit(X_train, y_train, epochs=10)
+
+# Fine-tuning: разморозить и дообучить
+base_model.trainable = True
+model.compile(
+    optimizer=Adam(learning_rate=0.0001),  # Маленький LR!
+    loss='sparse_categorical_crossentropy',
+    metrics=['accuracy']
+)
+model.fit(X_train, y_train, epochs=5)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>�� 17. Предобученные модели</h2>
+    <table>
+      <tr><th>Модель</th><th>Размер</th><th>Top-1 Acc</th></tr>
+      <tr><td>VGG16</td><td>528 MB</td><td>71.3%</td></tr>
+      <tr><td>ResNet50</td><td>98 MB</td><td>74.9%</td></tr>
+      <tr><td>InceptionV3</td><td>92 MB</td><td>77.9%</td></tr>
+      <tr><td>MobileNetV2</td><td>14 MB</td><td>71.3%</td></tr>
+      <tr><td>EfficientNetB0</td><td>29 MB</td><td>77.1%</td></tr>
+    </table>
+    <pre><code># Использование
+from tensorflow.keras.applications import MobileNetV2
+
+base = MobileNetV2(weights='imagenet', include_top=False)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Custom Training Loop</h2>
+    <pre><code># Для полного контроля над обучением
+@tf.function
+def train_step(x, y):
+    with tf.GradientTape() as tape:
+        predictions = model(x, training=True)
+        loss = loss_fn(y, predictions)
+    
+    gradients = tape.gradient(loss, model.trainable_variables)
+    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+    
+    train_acc_metric.update_state(y, predictions)
+    return loss
+
+# Цикл обучения
+for epoch in range(epochs):
+    print(f"\nEpoch {epoch+1}/{epochs}")
+    
+    for step, (x_batch, y_batch) in enumerate(train_dataset):
+        loss = train_step(x_batch, y_batch)
+        
+        if step % 100 == 0:
+            print(f"Step {step}: loss = {loss:.4f}")
+    
+    train_acc = train_acc_metric.result()
+    print(f"Training accuracy: {train_acc:.4f}")
+    train_acc_metric.reset_states()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. TensorFlow Dataset (tf.data)</h2>
+    <pre><code>import tensorflow as tf
+
+# Создание dataset
+dataset = tf.data.Dataset.from_tensor_slices((X_train, y_train))
+
+# Операции
+dataset = dataset.shuffle(buffer_size=1024)
+dataset = dataset.batch(32)
+dataset = dataset.prefetch(tf.data.AUTOTUNE)
+
+# Использование
+model.fit(dataset, epochs=10)
+
+# Маппинг функции
+def preprocess(x, y):
+    x = tf.cast(x, tf.float32) / 255.0
+    return x, y
+
+dataset = dataset.map(preprocess, num_parallel_calls=tf.data.AUTOTUNE)
+
+# Для больших данных
+def load_image(path, label):
+    image = tf.io.read_file(path)
+    image = tf.image.decode_jpeg(image, channels=3)
+    image = tf.image.resize(image, [224, 224])
+    return image / 255.0, label
+
+dataset = tf.data.Dataset.from_tensor_slices((image_paths, labels))
+dataset = dataset.map(load_image, num_parallel_calls=tf.data.AUTOTUNE)
+dataset = dataset.batch(32).prefetch(tf.data.AUTOTUNE)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Визуализация обучения</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Построение кривых обучения
+history = model.fit(...)
+
+plt.figure(figsize=(12, 4))
+
+# Loss
+plt.subplot(1, 2, 1)
+plt.plot(history.history['loss'], label='train')
+plt.plot(history.history['val_loss'], label='val')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.title('Training and Validation Loss')
+
+# Accuracy
+plt.subplot(1, 2, 2)
+plt.plot(history.history['accuracy'], label='train')
+plt.plot(history.history['val_accuracy'], label='val')
+plt.xlabel('Epoch')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.title('Training and Validation Accuracy')
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 21. Советы и Best Practices</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Best Practices</h3>
+        <ul>
+          <li>Используйте <code>sparse_categorical_crossentropy</code> с integer labels</li>
+          <li>Нормализуйте входные данные (0-1 или стандартизация)</li>
+          <li>Используйте BatchNormalization после Conv/Dense</li>
+          <li>EarlyStopping с <code>restore_best_weights=True</code></li>
+          <li>Data augmentation для малых датасетов</li>
+          <li>Callback для снижения LR</li>
+          <li>SavedModel формат вместо HDF5</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Частые ошибки</h3>
+        <ul>
+          <li>Не нормализовать входные данные</li>
+          <li>Использовать softmax с sparse_categorical_crossentropy дважды</li>
+          <li>Забыть compile() перед fit()</li>
+          <li>Слишком большой learning rate</li>
+          <li>Не использовать validation_split</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 22. Чек-лист</h2>
+    <ul>
+      <li>[ ] Установить TensorFlow и проверить GPU</li>
+      <li>[ ] Подготовить и нормализовать данные</li>
+      <li>[ ] Создать модель (Sequential или Functional API)</li>
+      <li>[ ] Выбрать loss function и metrics</li>
+      <li>[ ] Скомпилировать модель с optimizer</li>
+      <li>[ ] Настроить callbacks (EarlyStopping, ModelCheckpoint)</li>
+      <li>[ ] Обучить модель с validation_split</li>
+      <li>[ ] Визуализировать кривые обучения</li>
+      <li>[ ] Оценить на тестовой выборке</li>
+      <li>[ ] Сохранить модель</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «TensorFlow/Keras — это как конструктор для создания искусственного интеллекта. Keras делает сложные вещи простыми: вы описываете, какую задачу хотите решить, показываете примеры, и система сама учится. Как обучение ребёнка — показываете картинки кошек и собак, и он учится их различать».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
