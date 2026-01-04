@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Мультимодальные трансформеры Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔄 Мультимодальные трансформеры Cheatsheet</h1>
+  <div class="subtitle">Multi-modal Transformers • Cross-attention • Unified models<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Архитектура</strong>: Transformer для нескольких модальностей</li>
+      <li><strong>Ключ</strong>: cross-attention между модальностями</li>
+      <li><strong>Цель</strong>: единая модель для vision + language + audio</li>
+      <li><strong>Преимущество</strong>: общие представления, transfer learning</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Ключевые модели</h2>
+    <table>
+      <tr><th>Модель</th><th>Модальности</th><th>Особенности</th></tr>
+      <tr><td><strong>ViLT</strong></td><td>Vision+Text</td><td>Single-stream без CNN</td></tr>
+      <tr><td><strong>ViLBERT</strong></td><td>Vision+Text</td><td>Dual-stream с cross-attention</td></tr>
+      <tr><td><strong>UNITER</strong></td><td>Vision+Text</td><td>Universal image-text representation</td></tr>
+      <tr><td><strong>Flamingo</strong></td><td>Vision+Text</td><td>Few-shot learning (DeepMind)</td></tr>
+      <tr><td><strong>BLIP-2</strong></td><td>Vision+Text</td><td>Q-Former architecture</td></tr>
+      <tr><td><strong>ImageBind</strong></td><td>6 модальностей</td><td>Unified embedding (Meta)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Архитектурные подходы</h2>
+    <p><strong>Single-stream (ViLT)</strong></p>
+    <ul>
+      <li>Все модальности в одном Transformer</li>
+      <li>Простота, меньше параметров</li>
+      <li>Линейные проекции для каждой модальности</li>
+    </ul>
+    <p><strong>Dual-stream (ViLBERT)</strong></p>
+    <ul>
+      <li>Отдельные энкодеры для каждой модальности</li>
+      <li>Cross-attention между потоками</li>
+      <li>Сохранение специфики модальностей</li>
+    </ul>
+    <p><strong>Fusion Transformer</strong></p>
+    <ul>
+      <li>Поздний fusion через дополнительный Transformer</li>
+      <li>Гибкость в добавлении модальностей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. ViLT — пример кода</h2>
+    <pre><code>from transformers import ViltProcessor, ViltModel
+from PIL import Image
+
+# Загрузка модели
+processor = ViltProcessor.from_pretrained("dandelin/vilt-b32-mlm")
+model = ViltModel.from_pretrained("dandelin/vilt-b32-mlm")
+
+# Подготовка данных
+image = Image.open("photo.jpg")
+text = "a photo of a cat"
+
+inputs = processor(image, text, return_tensors="pt")
+
+# Forward pass
+outputs = model(**inputs)
+
+# Pooled output (для задач классификации)
+pooled_output = outputs.pooler_output  # [batch, hidden_dim]
+
+# Последовательность (для детальных задач)
+sequence_output = outputs.last_hidden_state  # [batch, seq_len, hidden_dim]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Cross-modal Attention</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class CrossModalAttention(nn.Module):
+    def __init__(self, dim, num_heads=8):
+        super().__init__()
+        self.multihead_attn = nn.MultiheadAttention(
+            dim, num_heads, batch_first=True
+        )
+        self.norm1 = nn.LayerNorm(dim)
+        self.norm2 = nn.LayerNorm(dim)
+        self.ffn = nn.Sequential(
+            nn.Linear(dim, dim * 4),
+            nn.GELU(),
+            nn.Linear(dim * 4, dim)
+        )
+    
+    def forward(self, query_modal, key_value_modal):
+        # Query из одной модальности, K,V из другой
+        attn_out, _ = self.multihead_attn(
+            query_modal, 
+            key_value_modal, 
+            key_value_modal
+        )
+        x = self.norm1(query_modal + attn_out)
+        
+        # Feed-forward
+        ffn_out = self.ffn(x)
+        x = self.norm2(x + ffn_out)
+        
+        return x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Tokenization стратегии</h2>
+    <p><strong>Vision tokens</strong></p>
+    <ul>
+      <li><strong>Patch embedding</strong>: разбиение изображения на патчи (ViT-style)</li>
+      <li><strong>ROI features</strong>: регионы интереса (Faster R-CNN)</li>
+      <li><strong>Grid features</strong>: сетка фичей из CNN</li>
+    </ul>
+    <p><strong>Text tokens</strong></p>
+    <ul>
+      <li><strong>WordPiece/BPE</strong>: стандартная токенизация</li>
+      <li><strong>Special tokens</strong>: [CLS], [SEP], [MASK]</li>
+    </ul>
+    <pre><code># Пример объединения токенов
+def create_multimodal_input(image_patches, text_tokens):
+    # [CLS] + image_patches + [SEP] + text_tokens + [SEP]
+    cls_token = torch.tensor([[CLS_ID]])
+    sep_token = torch.tensor([[SEP_ID]])
+    
+    combined = torch.cat([
+        cls_token,
+        image_patches,
+        sep_token,
+        text_tokens,
+        sep_token
+    ], dim=1)
+    
+    return combined</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Positional Encoding</h2>
+    <p><strong>Для разных модальностей</strong></p>
+    <pre><code>class MultiModalPositionalEncoding(nn.Module):
+    def __init__(self, d_model, max_len=512):
+        super().__init__()
+        # Отдельные эмбеддинги для типов токенов
+        self.text_pos_emb = nn.Embedding(max_len, d_model)
+        self.image_pos_emb = nn.Embedding(max_len, d_model)
+        # Type embeddings
+        self.type_emb = nn.Embedding(3, d_model)  # 0:text, 1:image, 2:cls
+    
+    def forward(self, tokens, token_types):
+        positions = torch.arange(len(tokens))
+        
+        # Позиционное + type эмбеддинги
+        pos_embed = self.text_pos_emb(positions) * (token_types == 0).float() + \
+                    self.image_pos_emb(positions) * (token_types == 1).float()
+        
+        type_embed = self.type_emb(token_types)
+        
+        return tokens + pos_embed + type_embed</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Pre-training задачи</h2>
+    <table>
+      <tr><th>Задача</th><th>Описание</th></tr>
+      <tr><td><strong>MLM</strong></td><td>Masked Language Modeling (текст)</td></tr>
+      <tr><td><strong>MIM</strong></td><td>Masked Image Modeling (изображения)</td></tr>
+      <tr><td><strong>ITM</strong></td><td>Image-Text Matching (соответствие)</td></tr>
+      <tr><td><strong>WPA</strong></td><td>Word-Patch Alignment</td></tr>
+      <tr><td><strong>Contrastive</strong></td><td>CLIP-style contrastive learning</td></tr>
+    </table>
+    <pre><code># Image-Text Matching loss
+def itm_loss(pooled_output, labels):
+    """
+    labels: 1 если пара соответствует, 0 если нет
+    """
+    classifier = nn.Linear(pooled_output.size(-1), 2)
+    logits = classifier(pooled_output)
+    loss = F.cross_entropy(logits, labels)
+    return loss</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. BLIP-2 Q-Former</h2>
+    <p><strong>Эффективный способ связать frozen энкодеры</strong></p>
+    <ul>
+      <li>Learnable query tokens взаимодействуют с image features</li>
+      <li>Не нужно fine-tuning тяжелых энкодеров</li>
+      <li>Легко подключается к разным LLM</li>
+    </ul>
+    <pre><code>class QFormer(nn.Module):
+    def __init__(self, num_queries=32, dim=768):
+        super().__init__()
+        self.queries = nn.Parameter(torch.randn(1, num_queries, dim))
+        self.cross_attn_layers = nn.ModuleList([
+            CrossAttentionLayer(dim) for _ in range(6)
+        ])
+    
+    def forward(self, image_features):
+        # Queries взаимодействуют с image features
+        queries = self.queries.expand(image_features.size(0), -1, -1)
+        
+        for layer in self.cross_attn_layers:
+            queries = layer(queries, image_features)
+        
+        return queries  # Сжатое представление изображения</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Fine-tuning стратегии</h2>
+    <p><strong>Полное fine-tuning</strong></p>
+    <ul>
+      <li>Обучение всех параметров</li>
+      <li>Лучшее качество, но дорого</li>
+    </ul>
+    <p><strong>LoRA (Low-Rank Adaptation)</strong></p>
+    <ul>
+      <li>Обучение только low-rank матриц</li>
+      <li>Эффективно по памяти</li>
+    </ul>
+    <p><strong>Prompt tuning</strong></p>
+    <ul>
+      <li>Обучение только промптов</li>
+      <li>Минимальные изменения модели</li>
+    </ul>
+    <pre><code>from peft import get_peft_model, LoraConfig
+
+# LoRA для efficient fine-tuning
+lora_config = LoraConfig(
+    r=16,
+    lora_alpha=32,
+    target_modules=["query", "value"],
+    lora_dropout=0.1
+)
+
+model = get_peft_model(base_model, lora_config)
+# Только LoRA параметры обучаются
+trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Attention масштабирование</h2>
+    <p><strong>Проблема</strong>: квадратичная сложность attention</p>
+    <p><strong>Решения</strong>:</p>
+    <ul>
+      <li><strong>Sparse attention</strong>: не все токены attend друг к другу</li>
+      <li><strong>Linear attention</strong>: аппроксимация softmax</li>
+      <li><strong>Flash Attention</strong>: оптимизация на уровне GPU</li>
+    </ul>
+    <pre><code># Пример sparse attention паттерна
+def get_sparse_attention_mask(seq_len, window_size=128):
+    """Локальное окно + global tokens"""
+    mask = torch.zeros(seq_len, seq_len)
+    
+    # Локальное окно
+    for i in range(seq_len):
+        start = max(0, i - window_size)
+        end = min(seq_len, i + window_size)
+        mask[i, start:end] = 1
+    
+    # Global tokens ([CLS] всегда доступен)
+    mask[:, 0] = 1
+    mask[0, :] = 1
+    
+    return mask</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Рекомендуется</h3>
+        <ul>
+          <li>Pre-trained базы (BERT, ViT)</li>
+          <li>Gradient checkpointing для экономии памяти</li>
+          <li>Mixed precision training (fp16)</li>
+          <li>LoRA для efficient fine-tuning</li>
+          <li>Flash Attention где возможно</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Избегать</h3>
+        <ul>
+          <li>Обучение с нуля без огромного датасета</li>
+          <li>Полное fine-tuning без необходимости</li>
+          <li>Игнорирование positional encodings</li>
+          <li>Слишком длинные последовательности без оптимизаций</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Датасеты для pre-training</h2>
+    <table>
+      <tr><th>Датасет</th><th>Размер</th><th>Модальности</th></tr>
+      <tr><td><strong>LAION-5B</strong></td><td>5.85B пар</td><td>Image-Text</td></tr>
+      <tr><td><strong>Conceptual Captions</strong></td><td>15M пар</td><td>Image-Text</td></tr>
+      <tr><td><strong>WebVid</strong></td><td>10M видео</td><td>Video-Text</td></tr>
+      <tr><td><strong>AudioSet</strong></td><td>2M видео</td><td>Audio-Video-Text</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Downstream задачи</h2>
+    <ul>
+      <li><strong>VQA</strong>: Visual Question Answering</li>
+      <li><strong>Image Captioning</strong>: генерация описаний</li>
+      <li><strong>Visual Reasoning</strong>: логические задачи с изображениями</li>
+      <li><strong>Multimodal Retrieval</strong>: кросс-модальный поиск</li>
+      <li><strong>Text-to-Image Generation</strong>: генерация с conditioning</li>
+      <li><strong>Video Understanding</strong>: анализ видео + субтитры</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Применения</h2>
+    <ul>
+      <li><strong>Ассистенты</strong>: понимание изображений + диалог</li>
+      <li><strong>Поиск</strong>: мультимодальный поиск (текст, изображения, видео)</li>
+      <li><strong>Контент-модерация</strong>: анализ всех типов контента</li>
+      <li><strong>Образование</strong>: интерактивные учебные материалы</li>
+      <li><strong>Медицина</strong>: анализ медицинских изображений + текст</li>
+      <li><strong>E-commerce</strong>: умный поиск товаров</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Это как универсальный мозг, который понимает и текст, и изображения, и звук одновременно. 
+      Можно задать вопрос о фотографии, найти видео по описанию, или автоматически описать изображение. 
+      Модель учится связывать разные типы информации, как это делает человек».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать архитектуру (single/dual-stream)</li>
+      <li>[ ] Подготовить aligned multi-modal данные</li>
+      <li>[ ] Настроить tokenization для всех модальностей</li>
+      <li>[ ] Реализовать cross-modal attention</li>
+      <li>[ ] Настроить pre-training задачи</li>
+      <li>[ ] Применить efficient training (LoRA, gradient checkpointing)</li>
+      <li>[ ] Fine-tune на downstream задаче</li>
+      <li>[ ] Оценить на benchmark (VQA, captioning)</li>
+      <li>[ ] Оптимизировать inference (квантизация)</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
