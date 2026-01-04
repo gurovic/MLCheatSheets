@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>BERT и языковые модели Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 BERT и языковые модели Cheatsheet</h1>
+  <div class="subtitle">От Word2Vec до современных трансформеров • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. BERT: основы</h2>
+    <p><strong>BERT</strong> (Bidirectional Encoder Representations from Transformers) — революционная языковая модель от Google (2018)</p>
+    <ul>
+      <li><strong>Двунаправленная</strong>: учитывает контекст слева и справа</li>
+      <li><strong>Предобучение</strong>: на огромных корпусах текстов</li>
+      <li><strong>Fine-tuning</strong>: дообучение на конкретной задаче</li>
+      <li><strong>Transfer learning</strong>: переносит знания между задачами</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Архитектура BERT</h2>
+    <p>Основана на <strong>Transformer Encoder</strong></p>
+    <ul>
+      <li><strong>BERT-Base</strong>: 12 слоев, 768 hidden units, 12 attention heads (110M параметров)</li>
+      <li><strong>BERT-Large</strong>: 24 слоя, 1024 hidden units, 16 attention heads (340M параметров)</li>
+      <li><strong>Входные токены</strong>: [CLS] + текст + [SEP]</li>
+      <li><strong>Позиционные эмбеддинги</strong>: до 512 токенов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Предобучение BERT</h2>
+    <p>Две задачи для предобучения:</p>
+    <table>
+      <tr><th>Задача</th><th>Описание</th></tr>
+      <tr><td><strong>MLM</strong> (Masked Language Model)</td><td>Предсказать 15% замаскированных токенов</td></tr>
+      <tr><td><strong>NSP</strong> (Next Sentence Prediction)</td><td>Определить, идет ли предложение B после A</td></tr>
+    </table>
+    <blockquote>
+      MLM позволяет модели учиться двунаправленно, в отличие от классических LM
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Базовый код с BERT</h2>
+    <pre><code>from transformers import BertTokenizer, BertModel
+import torch
+
+# Загрузка модели и токенизатора
+tokenizer = BertTokenizer.from_pretrained(
+    'bert-base-uncased'
+)
+model = BertModel.from_pretrained(
+    'bert-base-uncased'
+)
+
+# Токенизация
+text = "Hello, how are you?"
+inputs = tokenizer(
+    text, 
+    return_tensors="pt",
+    padding=True,
+    truncation=True
+)
+
+# Получение эмбеддингов
+with torch.no_grad():
+    outputs = model(**inputs)
+    
+# Эмбеддинг [CLS] токена (представление всей последовательности)
+cls_embedding = outputs.last_hidden_state[:, 0, :]
+
+# Все токенные эмбеддинги
+token_embeddings = outputs.last_hidden_state</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Fine-tuning BERT для классификации</h2>
+    <pre><code>from transformers import BertForSequenceClassification
+from transformers import Trainer, TrainingArguments
+
+# Модель для классификации
+model = BertForSequenceClassification.from_pretrained(
+    'bert-base-uncased',
+    num_labels=2  # бинарная классификация
+)
+
+# Параметры обучения
+training_args = TrainingArguments(
+    output_dir='./results',
+    num_train_epochs=3,
+    per_device_train_batch_size=16,
+    learning_rate=2e-5,
+    warmup_steps=500,
+    weight_decay=0.01,
+    logging_steps=10
+)
+
+# Обучение
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset,
+    eval_dataset=eval_dataset
+)
+
+trainer.train()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Варианты BERT</h2>
+    <table>
+      <tr><th>Модель</th><th>Особенность</th><th>Применение</th></tr>
+      <tr><td><strong>RoBERTa</strong></td><td>Без NSP, больше данных</td><td>Лучше BERT</td></tr>
+      <tr><td><strong>ALBERT</strong></td><td>Факторизация параметров</td><td>Меньше параметров</td></tr>
+      <tr><td><strong>DistilBERT</strong></td><td>Knowledge distillation</td><td>60% быстрее, 97% качества</td></tr>
+      <tr><td><strong>ELECTRA</strong></td><td>Discriminator подход</td><td>Эффективнее обучение</td></tr>
+      <tr><td><strong>DeBERTa</strong></td><td>Disentangled attention</td><td>SOTA результаты</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Многоязычные модели</h2>
+    <ul>
+      <li><strong>mBERT</strong>: multilingual BERT на 104 языках</li>
+      <li><strong>XLM-RoBERTa</strong>: cross-lingual, 100 языков</li>
+      <li><strong>mT5</strong>: multilingual T5</li>
+      <li><strong>ruBERT</strong>: специально для русского языка</li>
+    </ul>
+    <pre><code># Загрузка ruBERT
+from transformers import BertTokenizer, BertModel
+
+tokenizer = BertTokenizer.from_pretrained(
+    'DeepPavlov/rubert-base-cased'
+)
+model = BertModel.from_pretrained(
+    'DeepPavlov/rubert-base-cased'
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Задачи с BERT</h2>
+    <table>
+      <tr><th>Задача</th><th>Модель HuggingFace</th></tr>
+      <tr><td>Классификация текста</td><td><code>BertForSequenceClassification</code></td></tr>
+      <tr><td>NER (Named Entity Recognition)</td><td><code>BertForTokenClassification</code></td></tr>
+      <tr><td>Question Answering</td><td><code>BertForQuestionAnswering</code></td></tr>
+      <tr><td>Multiple Choice</td><td><code>BertForMultipleChoice</code></td></tr>
+      <tr><td>Sentence Similarity</td><td><code>Sentence-BERT</code></td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Оптимизация производительности</h2>
+    <ul>
+      <li><strong>DistilBERT</strong>: 40% меньше, 60% быстрее</li>
+      <li><strong>Quantization</strong>: квантование весов (int8)</li>
+      <li><strong>ONNX</strong>: оптимизированный runtime</li>
+      <li><strong>TensorRT</strong>: ускорение на GPU</li>
+      <li><strong>Pruning</strong>: удаление неважных весов</li>
+    </ul>
+    <pre><code># Квантование модели
+from transformers import BertForSequenceClassification
+from torch.quantization import quantize_dynamic
+
+model = BertForSequenceClassification.from_pretrained(
+    'bert-base-uncased'
+)
+
+quantized_model = quantize_dynamic(
+    model, {torch.nn.Linear}, dtype=torch.qint8
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. GPT vs BERT</h2>
+    <table>
+      <tr><th>Аспект</th><th>BERT</th><th>GPT</th></tr>
+      <tr><td><strong>Архитектура</strong></td><td>Encoder-only</td><td>Decoder-only</td></tr>
+      <tr><td><strong>Направление</strong></td><td>Двунаправленная</td><td>Однонаправленная (авторегрессионная)</td></tr>
+      <tr><td><strong>Задача обучения</strong></td><td>MLM + NSP</td><td>Next token prediction</td></tr>
+      <tr><td><strong>Лучше для</strong></td><td>Понимание текста</td><td>Генерация текста</td></tr>
+      <tr><td><strong>Fine-tuning</strong></td><td>Требуется</td><td>Можно zero-shot</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. История языковых моделей</h2>
+    <ol>
+      <li><strong>Word2Vec, GloVe</strong> (2013): статические эмбеддинги</li>
+      <li><strong>ELMo</strong> (2018): контекстные эмбеддинги</li>
+      <li><strong>GPT</strong> (2018): трансформер decoder</li>
+      <li><strong>BERT</strong> (2018): двунаправленный трансформер</li>
+      <li><strong>GPT-2</strong> (2019): масштабирование GPT</li>
+      <li><strong>T5, BART</strong> (2019): encoder-decoder</li>
+      <li><strong>GPT-3</strong> (2020): 175B параметров</li>
+      <li><strong>ChatGPT, GPT-4</strong> (2022-2023): RLHF</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Sentence-BERT</h2>
+    <p>Модификация BERT для создания <strong>sentence embeddings</strong></p>
+    <pre><code>from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Загрузка модели
+model = SentenceTransformer(
+    'paraphrase-multilingual-MiniLM-L12-v2'
+)
+
+# Получение эмбеддингов
+sentences = [
+    "Машинное обучение — это круто",
+    "Deep Learning очень интересен",
+    "Я люблю пиццу"
+]
+
+embeddings = model.encode(sentences)
+
+# Сходство
+similarity = cosine_similarity(
+    [embeddings[0]], [embeddings[1]]
+)
+print(f"Similarity: {similarity[0][0]:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Применения BERT</h2>
+    <ul>
+      <li><strong>Sentiment Analysis</strong>: анализ тональности</li>
+      <li><strong>Text Classification</strong>: категоризация</li>
+      <li><strong>NER</strong>: извлечение сущностей</li>
+      <li><strong>Question Answering</strong>: SQuAD</li>
+      <li><strong>Semantic Search</strong>: семантический поиск</li>
+      <li><strong>Summarization</strong>: с encoder-decoder</li>
+      <li><strong>Chatbots</strong>: понимание запросов</li>
+      <li><strong>Recommendation</strong>: контентная фильтрация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Best Practices</h2>
+    <ol>
+      <li><strong>Выбор размера</strong>: Base для начала, Large для лучшего качества</li>
+      <li><strong>Learning rate</strong>: 2e-5, 3e-5, 5e-5</li>
+      <li><strong>Batch size</strong>: 16 или 32 (зависит от GPU)</li>
+      <li><strong>Epochs</strong>: 3-4 обычно достаточно</li>
+      <li><strong>Warmup</strong>: 10% от общих шагов</li>
+      <li><strong>Max length</strong>: обрезать до 128-512 токенов</li>
+      <li><strong>Gradient clipping</strong>: max_grad_norm=1.0</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Преимущества и ограничения</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>Преимущества</h3>
+        <ul>
+          <li>SOTA результаты на многих задачах NLP</li>
+          <li>Transfer learning экономит время</li>
+          <li>Понимает контекст</li>
+          <li>Много готовых моделей</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>Ограничения</h3>
+        <ul>
+          <li>Требует много вычислительных ресурсов</li>
+          <li>Ограничение 512 токенов</li>
+          <li>Не генерирует текст (нужен GPT)</li>
+          <li>Fine-tuning требует размеченных данных</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист использования</h2>
+    <ol>
+      <li>✓ Выбрать подходящую предобученную модель</li>
+      <li>✓ Подготовить данные в нужном формате</li>
+      <li>✓ Настроить токенизатор с padding/truncation</li>
+      <li>✓ Выбрать гиперпараметры (lr, batch_size, epochs)</li>
+      <li>✓ Добавить warmup для стабильности</li>
+      <li>✓ Мониторить overfitting на валидации</li>
+      <li>✓ Оценить на тестовой выборке</li>
+      <li>✓ Оптимизировать для production (quantization, ONNX)</li>
+    </ol>
+  </div>
+
+</div>
+
+</body>
+</html>
