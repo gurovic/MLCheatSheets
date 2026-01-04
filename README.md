@@ -106,7 +106,7 @@
 1. [Feature Engineering (основы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_engineering_cheatsheet.html)
 1. [Feature Engineering (подробно)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_engineering_detailed_cheatsheet.html)
 1. [Создание полиномиальных признаков и взаимодействия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_interaction_cheatsheet.html)
-1. Биннинг (дискретизация)
+1. [Биннинг (дискретизация)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/binning_discretization_cheatsheet.html)
 1. [Target Encoding](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/target_encoding_cheatsheet.html)
 1. Дата-специфичные признаки (временные, текстовые)
 
@@ -124,7 +124,7 @@
 1. Surrogate models
 
 ### **16. Производственные аспекты**
-1. Сериализация моделей
+1. [Сериализация моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_serialization_cheatsheet.html)
 1. [Дрейф данных и концептуальный дрейф](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/concept_drift_cheatsheet.html)
 1. [Пайплайны ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ml_pipelines_cheatsheet.html)
 
@@ -133,7 +133,7 @@
 1. Линейный дискриминантный анализ (LDA)
 1. Канонический корреляционный анализ
 1. Скрытые марковские модели
-1. EM-алгоритм
+1. [EM-алгоритм](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/em_algorithm_cheatsheet.html)
 
 ### **18. Визуализация в ML**
 1. [Визуализация данных](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/data_visualization_ml_cheatsheet.html)
@@ -152,8 +152,8 @@
 
 ### **20. Инструменты и библиотеки**
 1. [Scikit-learn полный обзор](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/sklearn_overview_cheatsheet.html)
-1. Pandas для ML
-1. NumPy для ML
+1. [Pandas для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pandas_ml_cheatsheet.html)
+1. [NumPy для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/numpy_ml_cheatsheet.html)
 1. Matplotlib/Seaborn для визуализации
 
 ### **21. Дополнительные темы**
@@ -161,7 +161,7 @@
 1. [Transfer Learning (классические подходы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transfer_learning_cheatsheet.html)
 1. Multi-task Learning
 1. Multi-output модели
-1. Квантильная регрессия
+1. [Квантильная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantile_regression_cheatsheet.html)
 
 ## II Глубокое обучение
 
@@ -214,13 +214,13 @@
 1. [Генеративно-состязательные сети (GAN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gan_cheatsheet.html)
 1. DCGAN, Conditional GAN
 1. StyleGAN
-1. Diffusion модели
+1. [Diffusion модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/diffusion_models_cheatsheet.html)
 1. Нормализующие потоки (Normalizing Flows)
 
 ### **6. Обучение с подкреплением (Deep RL)**
 1. [Deep Q-Networks (DQN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dqn_cheatsheet.html)
 1. Policy Gradient методы
-1. Actor-Critic методы
+1. [Actor-Critic методы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/actor_critic_cheatsheet.html)
 1. PPO (Proximal Policy Optimization)
 1. Многозадачное RL
 1. Иерархическое RL
@@ -233,7 +233,7 @@
 1. [BERT и его вариации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bert_finetuning_cheatsheet.html)
 1. GPT-архитектуры
 1. [Prompt Engineering для LLM (ChatGPT, GPT-4, Claude)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/prompt_engineering_cheatsheet.html)
-1. Токенизация (BPE, WordPiece, SentencePiece)
+1. [Токенизация (BPE, WordPiece, SentencePiece)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tokenization_cheatsheet.html)
 1. Задачи NLP (NER, классификация, суммаризация)
 
 ### **8. Компьютерное зрение (Computer Vision)**
@@ -605,7 +605,7 @@
 ### **31. Компьютерная безопасность и ML**
 31. Обнаружение вторжений
 31. Malware detection
-31. Fraud detection
+31. [Fraud detection](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fraud_detection_cheatsheet.html)
 
 ### **32. Финансовое ML**
 31. Алгоритмический трейдинг

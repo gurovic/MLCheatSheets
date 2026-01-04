@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Сериализация моделей ML Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>💾 Сериализация моделей ML Cheatsheet</h1>
+  <div class="subtitle">Сохранение и загрузка • Production deployment • Версионирование<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Зачем нужна сериализация</h2>
+    <ul>
+      <li><strong>Развертывание</strong>: использование обученной модели в production</li>
+      <li><strong>Экономия времени</strong>: не переобучать каждый раз</li>
+      <li><strong>Версионирование</strong>: сохранение разных версий модели</li>
+      <li><strong>Воспроизводимость</strong>: точно те же результаты</li>
+      <li><strong>Обмен</strong>: передача модели между системами</li>
+      <li><strong>A/B тестирование</strong>: сравнение версий</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Pickle (базовый метод)</h2>
+    <pre><code>import pickle
+from sklearn.ensemble import RandomForestClassifier
+
+# Обучение модели
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Сохранение
+with open('model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+# Загрузка
+with open('model.pkl', 'rb') as f:
+    loaded_model = pickle.load(f)
+
+# Предсказание
+predictions = loaded_model.predict(X_test)</code></pre>
+    <p><strong>Плюсы:</strong> Простота, работает с любыми Python объектами</p>
+    <p><strong>Минусы:</strong> Небезопасно (code injection), не межязыковая совместимость</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Joblib (рекомендуется для sklearn)</h2>
+    <pre><code>import joblib
+from sklearn.linear_model import LogisticRegression
+
+# Обучение
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Сохранение (более эффективно для больших numpy массивов)
+joblib.dump(model, 'model.joblib')
+
+# Также можно использовать сжатие
+joblib.dump(model, 'model.joblib', compress=3)  # уровень 0-9
+
+# Загрузка
+loaded_model = joblib.load('model.joblib')
+
+# Проверка версии
+print(f"Scikit-learn version: {joblib.__version__}")</code></pre>
+    <p><strong>Плюсы:</strong> Быстрее pickle для больших массивов, сжатие</p>
+    <p><strong>Минусы:</strong> Только для sklearn, проблемы с версиями</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Сериализация с метаданными</h2>
+    <pre><code>import joblib
+import json
+from datetime import datetime
+
+# Метаданные модели
+metadata = {
+    'model_type': 'RandomForestClassifier',
+    'n_estimators': 100,
+    'train_date': datetime.now().isoformat(),
+    'sklearn_version': sklearn.__version__,
+    'accuracy': 0.95,
+    'features': ['age', 'salary', 'city']
+}
+
+# Сохранение модели и метаданных
+joblib.dump(model, 'model.joblib')
+with open('metadata.json', 'w') as f:
+    json.dump(metadata, f, indent=2)
+
+# Загрузка с проверкой
+with open('metadata.json', 'r') as f:
+    meta = json.load(f)
+    
+if meta['sklearn_version'] != sklearn.__version__:
+    print("Warning: Version mismatch!")
+    
+model = joblib.load('model.joblib')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Сохранение Pipeline</h2>
+    <pre><code>from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import RandomForestClassifier
+
+# Создание пайплайна
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('classifier', RandomForestClassifier(n_estimators=100))
+])
+
+# Обучение пайплайна
+pipeline.fit(X_train, y_train)
+
+# Сохранение ВСЕГО пайплайна
+joblib.dump(pipeline, 'pipeline.joblib')
+
+# Загрузка
+loaded_pipeline = joblib.load('pipeline.joblib')
+
+# Теперь можно использовать на сырых данных
+# (preprocessing уже включен)
+predictions = loaded_pipeline.predict(X_test_raw)</code></pre>
+    <p><strong>Важно:</strong> Сохраняйте весь пайплайн, включая preprocessing!</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. PyTorch модели</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+# Определение модели
+class Net(nn.Module):
+    def __init__(self):
+        super(Net, self).__init__()
+        self.fc1 = nn.Linear(10, 50)
+        self.fc2 = nn.Linear(50, 2)
+    
+    def forward(self, x):
+        x = torch.relu(self.fc1(x))
+        return self.fc2(x)
+
+model = Net()
+# ... обучение ...
+
+# Способ 1: Сохранить только веса (рекомендуется)
+torch.save(model.state_dict(), 'model_weights.pth')
+
+# Загрузка весов
+model = Net()  # сначала создать архитектуру
+model.load_state_dict(torch.load('model_weights.pth'))
+model.eval()  # режим evaluation
+
+# Способ 2: Сохранить всю модель
+torch.save(model, 'model_full.pth')
+loaded_model = torch.load('model_full.pth')
+loaded_model.eval()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. TensorFlow/Keras модели</h2>
+    <pre><code>import tensorflow as tf
+from tensorflow import keras
+
+# Создание и обучение модели
+model = keras.Sequential([
+    keras.layers.Dense(64, activation='relu', input_shape=(10,)),
+    keras.layers.Dense(32, activation='relu'),
+    keras.layers.Dense(1, activation='sigmoid')
+])
+model.compile(optimizer='adam', loss='binary_crossentropy')
+# ... обучение ...
+
+# Способ 1: SavedModel формат (рекомендуется)
+model.save('my_model')  # создаст директорию
+
+# Загрузка
+loaded_model = keras.models.load_model('my_model')
+
+# Способ 2: HDF5 формат
+model.save('model.h5')
+loaded_model = keras.models.load_model('model.h5')
+
+# Способ 3: Только веса
+model.save_weights('weights.h5')
+# Загрузка требует создания архитектуры
+new_model = keras.Sequential([...])  # та же архитектура
+new_model.load_weights('weights.h5')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. ONNX (межплатформенный формат)</h2>
+    <pre><code># Конвертация sklearn в ONNX
+from skl2onnx import convert_sklearn
+from skl2onnx.common.data_types import FloatTensorType
+
+# Обучение модели
+model = RandomForestClassifier()
+model.fit(X_train, y_train)
+
+# Конвертация
+initial_type = [('float_input', FloatTensorType([None, X_train.shape[1]]))]
+onx = convert_sklearn(model, initial_types=initial_type)
+
+# Сохранение
+with open("model.onnx", "wb") as f:
+    f.write(onx.SerializeToString())
+
+# Загрузка и inference через ONNX Runtime
+import onnxruntime as rt
+sess = rt.InferenceSession("model.onnx")
+input_name = sess.get_inputs()[0].name
+pred_onx = sess.run(None, {input_name: X_test.astype(np.float32)})</code></pre>
+    <p><strong>Плюсы:</strong> Кросс-платформенность, оптимизация, production-ready</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. XGBoost/LightGBM модели</h2>
+    <pre><code># XGBoost
+import xgboost as xgb
+
+# Обучение
+model = xgb.XGBClassifier()
+model.fit(X_train, y_train)
+
+# Сохранение (JSON формат - рекомендуется)
+model.save_model('xgb_model.json')
+
+# Загрузка
+loaded_model = xgb.XGBClassifier()
+loaded_model.load_model('xgb_model.json')
+
+# Альтернатива: использовать pickle/joblib
+joblib.dump(model, 'xgb_model.joblib')
+
+# LightGBM
+import lightgbm as lgb
+
+# Обучение
+model = lgb.LGBMClassifier()
+model.fit(X_train, y_train)
+
+# Сохранение (текстовый формат)
+model.booster_.save_model('lgb_model.txt')
+
+# Загрузка
+bst = lgb.Booster(model_file='lgb_model.txt')
+# или через pickle
+joblib.dump(model, 'lgb_model.joblib')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Версионирование моделей</h2>
+    <pre><code>from datetime import datetime
+import os
+
+# Структура директорий для версий
+def save_model_with_version(model, model_name, version=None):
+    if version is None:
+        version = datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    model_dir = f"models/{model_name}/{version}"
+    os.makedirs(model_dir, exist_ok=True)
+    
+    # Сохранение модели
+    model_path = f"{model_dir}/model.joblib"
+    joblib.dump(model, model_path)
+    
+    # Сохранение метаданных
+    metadata = {
+        'version': version,
+        'timestamp': datetime.now().isoformat(),
+        'model_type': type(model).__name__,
+        'accuracy': model.score(X_test, y_test)
+    }
+    
+    with open(f"{model_dir}/metadata.json", 'w') as f:
+        json.dump(metadata, f, indent=2)
+    
+    return model_dir
+
+# Использование
+model_dir = save_model_with_version(model, 'my_classifier', 'v1.0')
+print(f"Model saved to: {model_dir}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. MLflow для управления моделями</h2>
+    <pre><code>import mlflow
+import mlflow.sklearn
+
+# Начало эксперимента
+mlflow.start_run()
+
+# Логирование параметров
+mlflow.log_param("n_estimators", 100)
+mlflow.log_param("max_depth", 10)
+
+# Обучение модели
+model = RandomForestClassifier(n_estimators=100, max_depth=10)
+model.fit(X_train, y_train)
+
+# Логирование метрик
+accuracy = model.score(X_test, y_test)
+mlflow.log_metric("accuracy", accuracy)
+
+# Сохранение модели
+mlflow.sklearn.log_model(model, "model")
+
+# Завершение
+mlflow.end_run()
+
+# Загрузка модели из MLflow
+model_uri = "runs:/<run_id>/model"
+loaded_model = mlflow.sklearn.load_model(model_uri)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Облачное хранилище (AWS S3)</h2>
+    <pre><code>import boto3
+import joblib
+import io
+
+# Сохранение в S3
+s3 = boto3.client('s3')
+bucket_name = 'my-ml-models'
+
+# Сериализация в память
+buffer = io.BytesIO()
+joblib.dump(model, buffer)
+buffer.seek(0)
+
+# Загрузка в S3
+s3.upload_fileobj(
+    buffer, 
+    bucket_name, 
+    'models/my_model_v1.joblib'
+)
+
+# Загрузка из S3
+buffer = io.BytesIO()
+s3.download_fileobj(
+    bucket_name,
+    'models/my_model_v1.joblib',
+    buffer
+)
+buffer.seek(0)
+loaded_model = joblib.load(buffer)
+
+# Альтернатива: сохранить файл локально, потом загрузить
+joblib.dump(model, 'model.joblib')
+s3.upload_file('model.joblib', bucket_name, 'models/model.joblib')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Проблемы совместимости</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Разные версии sklearn</td><td>Сохранять версию, использовать ONNX</td></tr>
+      <tr><td>Разные версии Python</td><td>Docker, виртуальные окружения</td></tr>
+      <tr><td>Отсутствие зависимостей</td><td>Сохранять requirements.txt</td></tr>
+      <tr><td>Разные ОС</td><td>ONNX, Docker контейнеры</td></tr>
+    </table>
+    <pre><code># Сохранение зависимостей
+# requirements.txt
+scikit-learn==1.3.0
+numpy==1.24.0
+pandas==2.0.0
+
+# Или через pip freeze
+pip freeze > requirements.txt
+
+# Dockerfile для воспроизводимости
+FROM python:3.9
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY model.joblib .
+COPY app.py .
+CMD ["python", "app.py"]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Best Practices</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Делать</h3>
+        <ul>
+          <li>Сохранять весь pipeline (preprocessing + модель)</li>
+          <li>Версионировать модели</li>
+          <li>Сохранять метаданные (версия, дата, метрики)</li>
+          <li>Использовать joblib для sklearn</li>
+          <li>Тестировать загруженную модель</li>
+          <li>Использовать ONNX для production</li>
+          <li>Документировать структуру признаков</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не делать</h3>
+        <ul>
+          <li>Сохранять только модель без preprocessing</li>
+          <li>Использовать pickle для production</li>
+          <li>Игнорировать версии библиотек</li>
+          <li>Переобучать модель каждый раз</li>
+          <li>Не проверять совместимость версий</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Тестирование загруженной модели</h2>
+    <pre><code>import numpy as np
+
+# Сохранение тестовых данных
+X_test_sample = X_test[:5].copy()
+y_test_sample = y_test[:5].copy()
+
+np.save('test_X.npy', X_test_sample)
+np.save('test_y.npy', y_test_sample)
+
+# Сохранение предсказаний оригинальной модели
+original_predictions = model.predict(X_test_sample)
+np.save('test_predictions.npy', original_predictions)
+
+# После загрузки модели - проверка
+loaded_model = joblib.load('model.joblib')
+X_test_sample = np.load('test_X.npy')
+expected_predictions = np.load('test_predictions.npy')
+
+loaded_predictions = loaded_model.predict(X_test_sample)
+
+# Проверка идентичности
+assert np.allclose(loaded_predictions, expected_predictions), \
+    "Predictions don't match!"
+print("✅ Model loaded successfully and predictions match!")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист для production</h2>
+    <ul>
+      <li>[ ] Сохранен полный pipeline (preprocessing + модель)</li>
+      <li>[ ] Добавлены метаданные (версия, дата, метрики)</li>
+      <li>[ ] Сохранены зависимости (requirements.txt)</li>
+      <li>[ ] Версия модели документирована</li>
+      <li>[ ] Загруженная модель протестирована</li>
+      <li>[ ] Проверена совместимость версий</li>
+      <li>[ ] Модель загружена в облако или репозиторий</li>
+      <li>[ ] Документированы входные признаки</li>
+      <li>[ ] Есть fallback стратегия</li>
+      <li>[ ] Настроен мониторинг производительности</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Сериализация модели — это как сохранение прогресса в видеоигре. Мы обучаем модель один раз (это долго), сохраняем её, и потом можем загружать и использовать мгновенно, не переобучая заново».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

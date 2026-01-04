@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>NumPy для ML Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔢 NumPy для Machine Learning Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Векторизация • ML-специфичные операции<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Создание массивов</h2>
+    <pre><code>import numpy as np
+
+# Из списка
+arr = np.array([1, 2, 3, 4, 5])
+matrix = np.array([[1, 2, 3], [4, 5, 6]])
+
+# Специальные массивы
+zeros = np.zeros((3, 4))          # матрица нулей
+ones = np.ones((2, 3))            # матрица единиц
+eye = np.eye(4)                   # единичная матрица
+empty = np.empty((2, 2))          # неинициализированный
+
+# Диапазоны
+arr = np.arange(0, 10, 2)         # [0, 2, 4, 6, 8]
+arr = np.linspace(0, 1, 5)        # 5 точек от 0 до 1
+arr = np.logspace(0, 2, 5)        # логарифмическая шкала
+
+# Случайные числа
+np.random.seed(42)                # для воспроизводимости
+rand = np.random.rand(3, 4)       # равномерное [0, 1)
+randn = np.random.randn(3, 4)     # нормальное N(0,1)
+randint = np.random.randint(0, 10, size=(3, 4))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Свойства массивов</h2>
+    <pre><code>arr = np.array([[1, 2, 3], [4, 5, 6]])
+
+# Основные атрибуты
+arr.shape      # (2, 3) - форма массива
+arr.ndim       # 2 - количество измерений
+arr.size       # 6 - количество элементов
+arr.dtype      # dtype('int64') - тип данных
+arr.itemsize   # 8 - размер элемента в байтах
+arr.nbytes     # 48 - общий размер в байтах
+
+# Изменение типа
+arr_float = arr.astype(np.float32)
+arr_int = arr.astype(np.int32)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Индексация и срезы</h2>
+    <pre><code>arr = np.array([[1, 2, 3, 4],
+                [5, 6, 7, 8],
+                [9, 10, 11, 12]])
+
+# Базовая индексация
+arr[0, 1]           # элемент (0,1) -> 2
+arr[1]              # вторая строка -> [5, 6, 7, 8]
+arr[:, 2]           # третий столбец -> [3, 7, 11]
+
+# Срезы
+arr[0:2, 1:3]       # подматрица
+arr[:2, :]          # первые две строки
+arr[:, -1]          # последний столбец
+
+# Булева индексация
+mask = arr > 5
+arr[mask]           # элементы > 5
+arr[arr > 5]        # то же самое
+
+# Fancy indexing
+rows = np.array([0, 2])
+cols = np.array([1, 3])
+arr[rows, cols]     # элементы (0,1) и (2,3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Изменение формы</h2>
+    <pre><code>arr = np.arange(12)  # [0, 1, 2, ..., 11]
+
+# Reshape
+arr_2d = arr.reshape(3, 4)      # в матрицу 3x4
+arr_2d = arr.reshape(3, -1)     # -1 автоматически
+arr_3d = arr.reshape(2, 2, 3)   # 3D массив
+
+# Flatten/Ravel
+flat = arr_2d.flatten()         # копия в 1D
+flat = arr_2d.ravel()           # view в 1D (быстрее)
+
+# Transpose
+arr_t = arr_2d.T                # транспонирование
+arr_t = arr_2d.transpose()      # то же самое
+arr_t = np.swapaxes(arr_3d, 0, 2)  # поменять оси
+
+# Добавление/удаление осей
+arr_expanded = arr[np.newaxis, :]  # (12,) -> (1, 12)
+arr_expanded = arr[:, np.newaxis]  # (12,) -> (12, 1)
+arr_squeezed = np.squeeze(arr_expanded)  # убрать оси длины 1</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Математические операции</h2>
+    <pre><code># Элементарные операции (векторизованные)
+a = np.array([1, 2, 3, 4])
+b = np.array([10, 20, 30, 40])
+
+a + b          # [11, 22, 33, 44]
+a - b          # [-9, -18, -27, -36]
+a * b          # [10, 40, 90, 160]
+a / b          # [0.1, 0.1, 0.1, 0.1]
+a ** 2         # [1, 4, 9, 16]
+
+# С константами (broadcasting)
+a + 10         # [11, 12, 13, 14]
+a * 2          # [2, 4, 6, 8]
+
+# Функции
+np.sqrt(a)     # квадратный корень
+np.exp(a)      # экспонента
+np.log(a)      # натуральный логарифм
+np.sin(a)      # тригонометрия
+np.abs(a)      # абсолютное значение</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Агрегирующие функции</h2>
+    <pre><code>arr = np.array([[1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9]])
+
+# Для всего массива
+np.sum(arr)         # 45
+np.mean(arr)        # 5.0
+np.std(arr)         # стандартное отклонение
+np.var(arr)         # дисперсия
+np.min(arr)         # 1
+np.max(arr)         # 9
+np.median(arr)      # 5.0
+
+# По осям
+np.sum(arr, axis=0)    # [12, 15, 18] - по столбцам
+np.sum(arr, axis=1)    # [6, 15, 24] - по строкам
+np.mean(arr, axis=0)   # среднее по столбцам
+
+# Кумулятивные
+np.cumsum(arr)         # накопительная сумма
+np.cumprod(arr)        # накопительное произведение</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Broadcasting</h2>
+    <p><strong>Broadcasting</strong> — автоматическое расширение массивов для совместимости операций:</p>
+    <pre><code># Скаляр + массив
+arr = np.array([1, 2, 3])
+arr + 10           # [11, 12, 13]
+
+# Вектор + матрица
+matrix = np.array([[1, 2, 3],
+                   [4, 5, 6]])
+vector = np.array([10, 20, 30])
+matrix + vector    # [[11, 22, 33], [14, 25, 36]]
+
+# Столбец + строка
+col = np.array([[1], [2], [3]])    # (3, 1)
+row = np.array([[10, 20, 30]])     # (1, 3)
+col + row          # (3, 3) matrix
+
+# Правила broadcasting:
+# 1. Размеры осей равны, или
+# 2. Одна из осей имеет размер 1</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Линейная алгебра</h2>
+    <pre><code># Матричное умножение
+A = np.array([[1, 2], [3, 4]])
+B = np.array([[5, 6], [7, 8]])
+
+# Dot product
+C = np.dot(A, B)           # матричное умножение
+C = A @ B                  # то же через оператор @
+
+# Скалярное произведение векторов
+v1 = np.array([1, 2, 3])
+v2 = np.array([4, 5, 6])
+np.dot(v1, v2)             # 32
+
+# Нормы
+np.linalg.norm(v1)         # L2 норма (евклидова)
+np.linalg.norm(v1, ord=1)  # L1 норма
+
+# Определитель, след
+np.linalg.det(A)           # определитель
+np.trace(A)                # след (сумма диагонали)
+
+# Обратная матрица
+A_inv = np.linalg.inv(A)
+
+# Собственные значения и векторы
+eigenvalues, eigenvectors = np.linalg.eig(A)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Объединение массивов</h2>
+    <pre><code>a = np.array([[1, 2], [3, 4]])
+b = np.array([[5, 6], [7, 8]])
+
+# Вертикальная конкатенация (axis=0)
+np.vstack([a, b])      # [[1,2], [3,4], [5,6], [7,8]]
+np.concatenate([a, b], axis=0)  # то же
+
+# Горизонтальная конкатенация (axis=1)
+np.hstack([a, b])      # [[1,2,5,6], [3,4,7,8]]
+np.concatenate([a, b], axis=1)  # то же
+
+# Column_stack для векторов
+v1 = np.array([1, 2, 3])
+v2 = np.array([4, 5, 6])
+np.column_stack([v1, v2])  # [[1,4], [2,5], [3,6]]
+
+# Разделение
+arr = np.arange(12).reshape(3, 4)
+chunks = np.split(arr, 3, axis=0)  # 3 части по строкам</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Статистика для ML</h2>
+    <pre><code># Корреляция и ковариация
+X = np.random.randn(100, 3)  # 100 samples, 3 features
+
+# Ковариационная матрица
+cov_matrix = np.cov(X, rowvar=False)  # (3, 3)
+
+# Корреляционная матрица
+corr_matrix = np.corrcoef(X, rowvar=False)
+
+# Перцентили
+np.percentile(X, 25, axis=0)   # 25-й перцентиль по столбцам
+np.percentile(X, [25, 50, 75]) # квартили
+
+# Гистограмма
+counts, bins = np.histogram(X[:, 0], bins=10)
+
+# Стандартизация
+X_mean = X.mean(axis=0)
+X_std = X.std(axis=0)
+X_standardized = (X - X_mean) / X_std
+
+# Min-Max нормализация
+X_min = X.min(axis=0)
+X_max = X.max(axis=0)
+X_normalized = (X - X_min) / (X_max - X_min)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Условия и сравнения</h2>
+    <pre><code>arr = np.array([1, 2, 3, 4, 5])
+
+# Булевы операции
+arr > 3            # [False, False, False, True, True]
+arr == 3           # [False, False, True, False, False]
+
+# Логические операции
+(arr > 2) & (arr < 5)   # AND
+(arr < 2) | (arr > 4)   # OR
+~(arr > 3)              # NOT
+
+# np.where - условный выбор
+result = np.where(arr > 3, 100, 0)  # if >3: 100, else: 0
+result = np.where(arr > 3, arr * 2, arr)  # умножить на 2, если >3
+
+# np.select - множественные условия
+conditions = [arr < 2, arr == 3, arr > 4]
+choices = ['low', 'medium', 'high']
+result = np.select(conditions, choices, default='normal')
+
+# Подсчет
+np.sum(arr > 3)     # количество элементов > 3
+np.any(arr > 10)    # есть ли хотя бы один > 10
+np.all(arr > 0)     # все ли > 0</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сортировка и поиск</h2>
+    <pre><code>arr = np.array([3, 1, 4, 1, 5, 9, 2, 6])
+
+# Сортировка
+sorted_arr = np.sort(arr)           # [1, 1, 2, 3, 4, 5, 6, 9]
+arr.sort()                          # in-place сортировка
+
+# Индексы отсортированных элементов
+indices = np.argsort(arr)           # [1, 3, 6, 0, 2, 4, 7, 5]
+sorted_arr = arr[indices]
+
+# Сортировка 2D по столбцам
+matrix = np.array([[3, 1], [1, 4], [2, 5]])
+sorted_matrix = np.sort(matrix, axis=0)  # по столбцам
+
+# Поиск
+np.argmin(arr)      # индекс минимального элемента
+np.argmax(arr)      # индекс максимального элемента
+np.where(arr == 5)  # индексы всех 5
+
+# Уникальные значения
+unique_vals = np.unique(arr)
+unique_vals, counts = np.unique(arr, return_counts=True)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Генерация данных для ML</h2>
+    <pre><code># Установка seed
+np.random.seed(42)
+
+# Нормальное распределение
+X = np.random.normal(loc=0, scale=1, size=(1000, 5))
+
+# Равномерное распределение
+X = np.random.uniform(low=0, high=1, size=(1000, 5))
+
+# Биномиальное (для классификации)
+y = np.random.binomial(n=1, p=0.5, size=1000)
+
+# Случайный выбор
+indices = np.random.choice(1000, size=100, replace=False)
+sample = X[indices]
+
+# Перемешивание
+np.random.shuffle(X)  # in-place
+
+# Или с сохранением связи X-y
+indices = np.arange(len(X))
+np.random.shuffle(indices)
+X_shuffled = X[indices]
+y_shuffled = y[indices]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Работа с NaN и Inf</h2>
+    <pre><code>arr = np.array([1, 2, np.nan, 4, np.inf, -np.inf])
+
+# Проверка на NaN и Inf
+np.isnan(arr)       # [False, False, True, False, False, False]
+np.isinf(arr)       # [False, False, False, False, True, True]
+np.isfinite(arr)    # [True, True, False, True, False, False]
+
+# Подсчет
+np.sum(np.isnan(arr))    # количество NaN
+np.sum(np.isinf(arr))    # количество Inf
+
+# Замена
+arr[np.isnan(arr)] = 0           # NaN -> 0
+arr[np.isinf(arr)] = 99          # Inf -> 99
+
+# Игнорирование NaN в вычислениях
+np.nanmean(arr)     # среднее без NaN
+np.nanstd(arr)      # std без NaN
+np.nansum(arr)      # сумма без NaN</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Производительность</h2>
+    <table>
+      <tr><th>Задача</th><th>Медленно ❌</th><th>Быстро ✅</th></tr>
+      <tr><td>Итерация</td><td>Python цикл</td><td>Векторизация</td></tr>
+      <tr><td>Условия</td><td><code>if</code> в цикле</td><td><code>np.where()</code></td></tr>
+      <tr><td>Копирование</td><td><code>arr.copy()</code></td><td>Views (срезы)</td></tr>
+      <tr><td>Память</td><td>Списки Python</td><td>NumPy массивы</td></tr>
+    </table>
+    <pre><code># Векторизация vs циклы
+# Медленно (Python цикл)
+result = []
+for x in arr:
+    result.append(x ** 2 + 2 * x + 1)
+result = np.array(result)
+
+# Быстро (векторизация)
+result = arr ** 2 + 2 * arr + 1
+
+# Views vs копии
+arr_view = arr[1:5]       # view (быстро, но меняет оригинал)
+arr_copy = arr[1:5].copy()  # копия (медленнее, но безопасно)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист для ML</h2>
+    <ul>
+      <li>[ ] Использовать векторизацию вместо циклов</li>
+      <li>[ ] Проверять форму массивов: <code>arr.shape</code></li>
+      <li>[ ] Использовать broadcasting для операций</li>
+      <li>[ ] Установить <code>random.seed()</code> для воспроизводимости</li>
+      <li>[ ] Обрабатывать NaN и Inf перед обучением</li>
+      <li>[ ] Использовать правильный тип данных (float32 для скорости)</li>
+      <li>[ ] Нормализовать/стандартизовать признаки</li>
+      <li>[ ] Использовать <code>@</code> для матричного умножения</li>
+      <li>[ ] Избегать лишних копий массивов</li>
+      <li>[ ] Проверять размерности перед операциями</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «NumPy — это ускоритель вычислений для Python. Операции в сотни раз быстрее обычных циклов, что критично для обработки больших объемов данных в машинном обучении».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

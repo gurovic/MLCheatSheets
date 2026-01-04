@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Actor-Critic методы Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎭 Actor-Critic методы Cheatsheet</h1>
+  <div class="subtitle">Reinforcement Learning • Policy Gradient • Value-based • A3C • PPO<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть Actor-Critic</h2>
+<ul><li><strong>Actor</strong>: политика π(a|s) - выбирает действия</li><li><strong>Critic</strong>: функция ценности V(s) - оценивает состояния</li><li><strong>Комбинация</strong>: policy gradient + value-based</li><li><strong>Преимущество</strong>: стабильность и эффективность</li></ul><blockquote>Actor решает, что делать. Critic говорит, насколько хорошо получилось.</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Архитектура</h2>
+<pre><code># Actor: выбирает действия
+π_θ(a|s) - политика с параметрами θ
+
+# Critic: оценивает состояния
+V_w(s) - функция ценности с параметрами w
+
+# Advantage
+A(s,a) = Q(s,a) - V(s)
+       = r + γV(s') - V(s)  (TD error)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый алгоритм</h2>
+<ol><li>Наблюдаем состояние s</li><li>Actor выбирает действие a ~ π_θ(a|s)</li><li>Получаем reward r и новое состояние s'</li><li>Critic вычисляет TD error: δ = r + γV_w(s') - V_w(s)</li><li>Обновляем Critic: w ← w + α_w δ ∇_w V_w(s)</li><li>Обновляем Actor: θ ← θ + α_θ δ ∇_θ log π_θ(a|s)</li></ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Реализация PyTorch</h2>
+<pre><code>import torch
+import torch.nn as nn
+
+class ActorCritic(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.shared = nn.Sequential(
+            nn.Linear(state_dim, 128),
+            nn.ReLU()
+        )
+        # Actor head
+        self.actor = nn.Linear(128, action_dim)
+        # Critic head
+        self.critic = nn.Linear(128, 1)
+    
+    def forward(self, state):
+        features = self.shared(state)
+        action_probs = F.softmax(self.actor(features), dim=-1)
+        value = self.critic(features)
+        return action_probs, value</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Обучение</h2>
+<pre><code>def train_step(state, action, reward, next_state, done):
+    # Forward pass
+    probs, value = model(state)
+    _, next_value = model(next_state)
+    
+    # TD error (advantage)
+    td_target = reward + gamma * next_value * (1 - done)
+    advantage = td_target - value
+    
+    # Critic loss
+    critic_loss = advantage.pow(2).mean()
+    
+    # Actor loss
+    log_prob = torch.log(probs[action])
+    actor_loss = -(log_prob * advantage.detach()).mean()
+    
+    # Total loss
+    loss = actor_loss + critic_loss
+    
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. A2C (Advantage Actor-Critic)</h2>
+<pre><code># Синхронный parallel training
+for episode in range(num_episodes):
+    states, actions, rewards = [], [], []
+    
+    # Сбор траектории
+    for step in range(max_steps):
+        action_probs, _ = model(state)
+        action = sample(action_probs)
+        next_state, reward, done = env.step(action)
+        
+        states.append(state)
+        actions.append(action)
+        rewards.append(reward)
+        
+        if done:
+            break
+    
+    # Обновление
+    update(states, actions, rewards)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. A3C (Asynchronous)</h2>
+<pre><code>import multiprocessing as mp
+
+class Worker(mp.Process):
+    def __init__(self, global_model):
+        super().__init__()
+        self.global_model = global_model
+        self.local_model = ActorCritic()
+    
+    def run(self):
+        while not done:
+            # Собрать траекторию
+            trajectory = collect_trajectory()
+            
+            # Вычислить градиенты
+            gradients = compute_gradients(trajectory)
+            
+            # Обновить глобальную модель
+            self.global_model.apply_gradients(gradients)
+            
+            # Синхронизация
+            self.local_model.load_state_dict(
+                self.global_model.state_dict()
+            )</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. GAE (Generalized Advantage)</h2>
+<pre><code># Сглаженная оценка advantage
+δ_t = r_t + γV(s_{t+1}) - V(s_t)
+
+A^{GAE}_t = Σ (γλ)^l δ_{t+l}
+
+λ ∈ [0, 1] - trade-off:
+  λ = 0: только TD error
+  λ = 1: Monte Carlo return</code></pre><pre><code>def compute_gae(rewards, values, gamma=0.99, lam=0.95):
+    advantages = []
+    gae = 0
+    
+    for t in reversed(range(len(rewards))):
+        delta = rewards[t] + gamma * values[t+1] - values[t]
+        gae = delta + gamma * lam * gae
+        advantages.insert(0, gae)
+    
+    return advantages</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. PPO (Proximal Policy Optimization)</h2>
+<pre><code># Clipped surrogate objective
+r_t(θ) = π_θ(a|s) / π_θ_old(a|s)  # importance sampling ratio
+
+L^{CLIP}(θ) = E[min(
+    r_t(θ) * A_t,
+    clip(r_t(θ), 1-ε, 1+ε) * A_t
+)]
+
+ε - clip parameter (обычно 0.2)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Continuous actions</h2>
+<pre><code># Для непрерывных действий: Gaussian policy
+class ContinuousActor(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.mu = nn.Linear(state_dim, action_dim)
+        self.log_std = nn.Parameter(torch.zeros(action_dim))
+    
+    def forward(self, state):
+        mu = self.mu(state)
+        std = torch.exp(self.log_std)
+        dist = Normal(mu, std)
+        return dist
+
+# Sampling
+dist = actor(state)
+action = dist.sample()
+log_prob = dist.log_prob(action)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Tricks для стабильности</h2>
+<ul><li><strong>Baseline subtraction</strong>: убрать V(s) из returns</li><li><strong>Entropy bonus</strong>: +β*H(π) для exploration</li><li><strong>Value clipping</strong>: ограничить изменения V</li><li><strong>Gradient clipping</strong>: norm ≤ 0.5</li><li><strong>Orthogonal initialization</strong></li></ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сравнение методов</h2>
+<table><tr><th>Метод</th><th>Плюсы</th><th>Минусы</th></tr><tr><td>A2C</td><td>Простота, стабильность</td><td>Медленнее A3C</td></tr><tr><td>A3C</td><td>Скорость (parallel)</td><td>Нестабильность</td></tr><tr><td>PPO</td><td>State-of-the-art</td><td>Сложность</td></tr></table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Gym пример</h2>
+<pre><code>import gym
+
+env = gym.make("CartPole-v1")
+model = ActorCritic(4, 2)
+optimizer = torch.optim.Adam(model.parameters())
+
+for episode in range(1000):
+    state = env.reset()
+    done = False
+    
+    while not done:
+        # Select action
+        probs, value = model(torch.FloatTensor(state))
+        action = torch.multinomial(probs, 1).item()
+        
+        # Environment step
+        next_state, reward, done, _ = env.step(action)
+        
+        # Train
+        train_step(state, action, reward, next_state, done)
+        
+        state = next_state</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Hyperparameters</h2>
+<table><tr><th>Параметр</th><th>Значение</th></tr><tr><td>Learning rate (actor)</td><td>1e-4</td></tr><tr><td>Learning rate (critic)</td><td>1e-3</td></tr><tr><td>Gamma (γ)</td><td>0.99</td></tr><tr><td>GAE lambda (λ)</td><td>0.95</td></tr><tr><td>Entropy coef</td><td>0.01</td></tr></table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Best Practices</h2>
+<ul><li>[ ] Использовать GAE для advantage estimation</li><li>[ ] Нормализовать rewards</li><li>[ ] Gradient clipping</li><li>[ ] Entropy bonus для exploration</li><li>[ ] Правильная инициализация весов</li><li>[ ] Логировать метрики (reward, loss)</li></ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+<ul><li>[ ] Окружение выбрано</li><li>[ ] Actor и Critic реализованы</li><li>[ ] GAE настроен</li><li>[ ] Гиперпараметры подобраны</li><li>[ ] Мониторинг работает</li></ul><blockquote>«Actor-Critic — это как водитель (actor) и инструктор (critic): один управляет, другой оценивает и направляет обучение».</blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
