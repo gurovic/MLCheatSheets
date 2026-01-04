@@ -71,4 +71,110 @@ test_suite.run(reference_data=train,
                current_data=prod)
 test_suite</code></pre></div>
 <div class="block"><h2>10. Чек-лист</h2><ul><li>Мониторить распределения признаков</li><li>Отслеживать метрики модели</li><li>Настроить алерты на drift</li><li>Иметь план переобучения</li><li>Логировать предсказания</li></ul></div>
-</div></body></html>
+</div>
+<div class="block">
+<h2>11. Обнаружение Drift с помощью KS-test</h2>
+<pre><code>from scipy.stats import ks_2samp
+import pandas as pd
+
+def detect_drift_ks_test(reference_data, current_data, features, threshold=0.05):
+    """Обнаружение дрейфа с помощью Kolmogorov-Smirnov теста"""
+    drift_detected = {}
+    
+    for feature in features:
+        # KS-test для каждого признака
+        statistic, p_value = ks_2samp(
+            reference_data[feature], 
+            current_data[feature]
+        )
+        
+        drift_detected[feature] = {
+            'p_value': p_value,
+            'drift': p_value < threshold
+        }
+        
+        if p_value < threshold:
+            print(f"⚠️  Drift detected in {feature}: p={p_value:.4f}")
+    
+    return drift_detected
+
+# Использование
+drift_results = detect_drift_ks_test(X_train_df, X_new_df, 
+                                     X_train_df.columns, 
+                                     threshold=0.01)</code></pre>
+</div>
+
+<div class="block">
+<h2>12. Мониторинг в Production</h2>
+<pre><code># Continuous monitoring setup
+class DriftMonitor:
+    def __init__(self, reference_data, window_size=1000):
+        self.reference_data = reference_data
+        self.window_size = window_size
+        self.current_window = []
+        self.alerts = []
+    
+    def update(self, new_sample):
+        self.current_window.append(new_sample)
+        
+        if len(self.current_window) >= self.window_size:
+            # Проверка на drift
+            current_df = pd.DataFrame(self.current_window)
+            drift = self.check_drift(current_df)
+            
+            if drift:
+                self.alerts.append({
+                    'timestamp': datetime.now(),
+                    'type': 'data_drift'
+                })
+            
+            # Скользящее окно
+            self.current_window = self.current_window[-self.window_size//2:]
+    
+    def check_drift(self, current_data):
+        # Проверка KS-test для каждого признака
+        for col in self.reference_data.columns:
+            _, p_value = ks_2samp(self.reference_data[col], 
+                                 current_data[col])
+            if p_value < 0.01:
+                return True
+        return False
+
+# Production usage
+monitor = DriftMonitor(X_train)
+for sample in incoming_stream:
+    monitor.update(sample)
+    if monitor.alerts:
+        # Trigger retraining or alert
+        trigger_retraining_pipeline()</code></pre>
+</div>
+
+<div class="block">
+<h2>13. Стратегии реагирования на Drift</h2>
+<ul>
+<li><strong>Переобучение модели</strong>: на новых данных</li>
+<li><strong>Адаптация модели</strong>: инкрементное обучение</li>
+<li><strong>Ансамбль моделей</strong>: комбинация старых и новых</li>
+<li><strong>Feature engineering</strong>: добавление новых признаков</li>
+<li><strong>Переключение моделей</strong>: на pre-trained альтернативу</li>
+<li><strong>Мониторинг и алерты</strong>: уведомление команды</li>
+</ul>
+</div>
+
+<div class="block">
+<h2>14. Чек-лист мониторинга Drift</h2>
+<ol>
+<li>✅ Установить baseline метрики на training data</li>
+<li>✅ Настроить мониторинг входных признаков</li>
+<li>✅ Мониторить предсказания модели</li>
+<li>✅ Отслеживать performance метрики</li>
+<li>✅ Использовать статистические тесты (KS, Chi-square)</li>
+<li>✅ Визуализировать распределения со временем</li>
+<li>✅ Настроить автоматические alerts</li>
+<li>✅ Иметь план реагирования на drift</li>
+<li>✅ Регулярно переобучать модели</li>
+<li>✅ Версионировать данные и модели</li>
+</ol>
+</div>
+
+</body></html>

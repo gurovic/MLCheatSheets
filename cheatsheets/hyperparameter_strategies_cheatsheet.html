@@ -124,4 +124,187 @@ study.optimize(objective, n_trials=100,
                timeout=600)  # Макс 10 минут</code></pre></div>
 <div class="block"><h2>9. Лучшие практики</h2><ul><li>Начать с Random Search</li><li>Использовать логарифмические шкалы</li><li>Cross-validation обязательно</li><li>Сохранить историю поиска</li><li>Bayesian для дорогих моделей</li></ul></div>
 <div class="block"><h2>10. Чек-лист</h2><ul><li>[ ] Определить диапазоны параметров</li><li>[ ] Выбрать стратегию поиска</li><li>[ ] Настроить cross-validation</li><li>[ ] Логировать результаты</li><li>[ ] Валидировать на test</li><li>[ ] Документировать best params</li></ul></div>
-</div></body></html>
+</div>
+<div class="block">
+<h2>11. Transfer Learning для гиперпараметров</h2>
+<pre><code># Использование гиперпараметров с похожих задач
+# Meta-learning подход
+
+best_params_history = {
+    'task1': {'C': 10, 'gamma': 0.001},
+    'task2': {'C': 8, 'gamma': 0.002},
+    'task3': {'C': 12, 'gamma': 0.0015}
+}
+
+# Инициализация поиска с средними значениями
+import numpy as np
+
+initial_C = np.mean([p['C'] for p in best_params_history.values()])
+initial_gamma = np.mean([p['gamma'] for p in best_params_history.values()])
+
+# Warm start для нового поиска
+param_grid = {
+    'C': [initial_C * 0.5, initial_C, initial_C * 2],
+    'gamma': [initial_gamma * 0.5, initial_gamma, initial_gamma * 2]
+}
+
+# Grid search с warm start
+grid_search = GridSearchCV(SVC(), param_grid, cv=5)
+grid_search.fit(X_new, y_new)</code></pre>
+</div>
+
+<div class="block">
+<h2>12. Multi-fidelity оптимизация</h2>
+<pre><code># Использование меньших subset для быстрой оценки
+from sklearn.model_selection import learning_curve
+
+def multi_fidelity_search(X, y, param_space, budget=100):
+    best_params = None
+    best_score = -np.inf
+    
+    # Уровень 1: быстрая оценка на 10% данных
+    n_samples_level1 = int(0.1 * len(X))
+    X_level1 = X[:n_samples_level1]
+    y_level1 = y[:n_samples_level1]
+    
+    candidates = []
+    for _ in range(budget // 3):
+        params = sample_params(param_space)
+        model = create_model(params)
+        score = cross_val_score(model, X_level1, y_level1, cv=3).mean()
+        candidates.append((params, score))
+    
+    # Уровень 2: средняя оценка на 50% данных
+    top_candidates = sorted(candidates, key=lambda x: x[1], reverse=True)[:10]
+    n_samples_level2 = int(0.5 * len(X))
+    
+    for params, _ in top_candidates:
+        model = create_model(params)
+        score = cross_val_score(model, X[:n_samples_level2], 
+                               y[:n_samples_level2], cv=5).mean()
+        if score > best_score:
+            best_score = score
+            best_params = params
+    
+    # Уровень 3: финальная оценка на всех данных
+    model = create_model(best_params)
+    final_score = cross_val_score(model, X, y, cv=10).mean()
+    
+    return best_params, final_score</code></pre>
+</div>
+
+<div class="block">
+<h2>13. Hyperband algorithm</h2>
+<pre><code># Hyperband: эффективный метод для больших search spaces
+# Адаптивное выделение ресурсов
+
+class Hyperband:
+    def __init__(self, max_iter, eta=3):
+        self.max_iter = max_iter
+        self.eta = eta
+    
+    def run(self, X, y, param_space, n_configs=81):
+        best_config = None
+        best_score = -np.inf
+        
+        # Successive halving
+        configs = [sample_params(param_space) for _ in range(n_configs)]
+        
+        for r in range(int(np.log(n_configs) / np.log(self.eta))):
+            # Train каждую конфигурацию на r итераций
+            n_iterations = int(self.max_iter * self.eta ** (-r))
+            
+            scores = []
+            for config in configs:
+                model = create_model(config)
+                score = evaluate_model(model, X, y, n_iterations)
+                scores.append(score)
+            
+            # Оставляем только top 1/eta конфигураций
+            top_k = int(len(configs) / self.eta)
+            top_indices = np.argsort(scores)[-top_k:]
+            configs = [configs[i] for i in top_indices]
+            
+            if scores[top_indices[-1]] > best_score:
+                best_score = scores[top_indices[-1]]
+                best_config = configs[-1]
+        
+        return best_config, best_score
+
+# Usage
+hb = Hyperband(max_iter=100, eta=3)
+best_params, score = hb.run(X_train, y_train, param_space)</code></pre>
+</div>
+
+<div class="block">
+<h2>14. Monitoring и визуализация поиска</h2>
+<pre><code>import matplotlib.pyplot as plt
+from sklearn.model_selection import RandomizedSearchCV
+
+# Отслеживание процесса оптимизации
+class OptimizationMonitor:
+    def __init__(self):
+        self.iteration = []
+        self.scores = []
+        self.params = []
+    
+    def callback(self, search_result):
+        self.iteration.append(len(self.scores))
+        self.scores.append(search_result.best_score_)
+        self.params.append(search_result.best_params_)
+    
+    def plot_convergence(self):
+        plt.figure(figsize=(12, 5))
+        
+        plt.subplot(1, 2, 1)
+        plt.plot(self.iteration, self.scores, marker='o')
+        plt.xlabel('Iteration')
+        plt.ylabel('Best Score')
+        plt.title('Optimization Convergence')
+        plt.grid(alpha=0.3)
+        
+        plt.subplot(1, 2, 2)
+        running_best = np.maximum.accumulate(self.scores)
+        plt.plot(self.iteration, running_best, marker='s', color='green')
+        plt.xlabel('Iteration')
+        plt.ylabel('Running Best Score')
+        plt.title('Best Score Over Time')
+        plt.grid(alpha=0.3)
+        
+        plt.tight_layout()
+        plt.show()
+
+# Usage with custom callback
+monitor = OptimizationMonitor()
+
+search = RandomizedSearchCV(
+    estimator, param_distributions,
+    n_iter=100, cv=5,
+    verbose=2, random_state=42
+)
+
+# После каждой итерации
+for i in range(10):
+    search.fit(X_train, y_train)
+    monitor.callback(search)
+
+monitor.plot_convergence()</code></pre>
+</div>
+
+<div class="block">
+<h2>15. Cheatsheet summary</h2>
+<ul>
+<li>✅ Начните с Random Search для исследования</li>
+<li>✅ Используйте Bayesian Optimization для уточнения</li>
+<li>✅ Применяйте early stopping для экономии времени</li>
+<li>✅ Комбинируйте методы (Multi-stage search)</li>
+<li>✅ Логируйте все эксперименты</li>
+<li>✅ Используйте cross-validation</li>
+<li>✅ Рассматривайте computational budget</li>
+<li>✅ Проверяйте стабильность лучших параметров</li>
+<li>✅ Документируйте выбранную стратегию</li>
+<li>✅ Автоматизируйте pipeline оптимизации</li>
+</ul>
+</div>
+
+</body></html>

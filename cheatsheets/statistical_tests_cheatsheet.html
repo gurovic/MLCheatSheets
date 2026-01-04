@@ -146,5 +146,91 @@ print(f"p-value: {result.pvalue:.4f}")</code></pre>
   </div>
 
 </div>
+
+<div class="block">
+<h2>11. A/B Testing для ML моделей</h2>
+<pre><code># Сравнение двух моделей в production
+from scipy.stats import ttest_ind
+
+# Метрики модели A и модели B
+metrics_a = [0.85, 0.87, 0.86, 0.88, 0.84]
+metrics_b = [0.89, 0.90, 0.88, 0.91, 0.89]
+
+# t-test для сравнения
+t_stat, p_value = ttest_ind(metrics_a, metrics_b)
+
+if p_value < 0.05:
+    print(f"Модель B значимо лучше (p={p_value:.4f})")
+else:
+    print(f"Нет значимой разницы (p={p_value:.4f})")
+
+# Эффект размера (Cohen's d)
+import numpy as np
+
+def cohens_d(group1, group2):
+    n1, n2 = len(group1), len(group2)
+    var1, var2 = np.var(group1, ddof=1), np.var(group2, ddof=1)
+    pooled_std = np.sqrt(((n1-1)*var1 + (n2-1)*var2) / (n1+n2-2))
+    return (np.mean(group1) - np.mean(group2)) / pooled_std
+
+effect_size = cohens_d(metrics_a, metrics_b)
+print(f"Effect size: {effect_size:.3f}")</code></pre>
+</div>
+
+<div class="block">
+<h2>12. Множественное тестирование</h2>
+<pre><code>from statsmodels.stats.multitest import multipletests
+
+# P-values от множественных тестов
+p_values = [0.01, 0.04, 0.03, 0.15, 0.02, 0.08]
+
+# Коррекция Bonferroni
+reject_bonf, pvals_bonf, _, _ = multipletests(
+    p_values, alpha=0.05, method='bonferroni'
+)
+
+# Коррекция Benjamini-Hochberg (FDR)
+reject_fdr, pvals_fdr, _, _ = multipletests(
+    p_values, alpha=0.05, method='fdr_bh'
+)
+
+print("Bonferroni correction:", reject_bonf)
+print("FDR correction:", reject_fdr)</code></pre>
+</div>
+
+<div class="block">
+<h2>13. Power Analysis</h2>
+<pre><code>from statsmodels.stats.power import ttest_power
+
+# Расчет необходимого размера выборки
+effect_size = 0.5  # средний эффект
+alpha = 0.05
+power = 0.8
+
+required_n = ttest_power(effect_size, nobs=None, 
+                        alpha=alpha, power=power)
+
+print(f"Требуемый размер выборки: {required_n:.0f} на группу")
+
+# Расчет мощности для данного размера
+actual_power = ttest_power(effect_size, nobs=100,
+                          alpha=alpha, power=None)
+print(f"Мощность теста при n=100: {actual_power:.3f}")</code></pre>
+</div>
+
+<div class="block">
+<h2>14. Best Practices для статистических тестов</h2>
+<ul>
+<li><strong>Проверяйте assumptions</strong>: нормальность, гомоскедастичность</li>
+<li><strong>Выбирайте подходящий тест</strong>: параметрический vs непараметрический</li>
+<li><strong>Корректируйте на multiple testing</strong>: Bonferroni, FDR</li>
+<li><strong>Проводите power analysis</strong>: до сбора данных</li>
+<li><strong>Используйте доверительные интервалы</strong>: не только p-values</li>
+<li><strong>Оценивайте effect size</strong>: практическая значимость</li>
+<li><strong>Cross-validate результаты</strong>: на разных подвыборках</li>
+<li><strong>Документируйте решения</strong>: выбор тестов и порогов</li>
+</ul>
+</div>
+
 </body>
 </html>
