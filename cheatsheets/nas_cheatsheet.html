@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Neural Architecture Search Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    .container { column-count: 3; column-gap: 20px; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    code { font-family: 'Consolas', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🔍 Neural Architecture Search Cheatsheet</h1>
+  <div class="subtitle">Автоматический поиск архитектур<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое NAS?</h2>
+    <p><strong>NAS</strong> — автоматический поиск оптимальной архитектуры.</p>
+    <p><strong>Мотивация:</strong></p>
+    <ul>
+      <li>Ручной design долгий</li>
+      <li>Огромное пространство вариантов</li>
+      <li>NAS находит лучше человека</li>
+    </ul>
+    <p><strong>Компоненты:</strong></p>
+    <ol>
+      <li>Search Space: возможные архитектуры</li>
+      <li>Search Strategy: как искать</li>
+      <li>Performance Estimation: как оценивать</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Search Space</h2>
+    <pre><code># Cell-based search space
+operations = [
+    'none',
+    'skip_connect',
+    'conv_3x3',
+    'conv_5x5',
+    'max_pool_3x3',
+    'avg_pool_3x3',
+    'sep_conv_3x3',
+    'dil_conv_3x3'
+]
+
+# Cell = граф
+# Node = operation
+# Edge = connection</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. DARTS</h2>
+    <p><strong>Differentiable Architecture Search</strong></p>
+    <pre><code>class MixedOp(nn.Module):
+    def __init__(self, C):
+        super().__init__()
+        self.ops = nn.ModuleList([
+            OPS[op](C) for op in OPERATIONS
+        ])
+    
+    def forward(self, x, weights):
+        # Weighted sum
+        return sum(w * op(x) 
+                  for w, op in zip(weights, self.ops))
+
+# Architecture parameters
+arch_params = nn.Parameter(
+    torch.randn(num_edges, num_ops)
+)
+
+# Bi-level optimization
+# 1. Train arch_params on validation
+# 2. Train model weights on training</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. EfficientNet</h2>
+    <p><strong>Compound Scaling</strong></p>
+    <pre><code># Масштабирование depth, width, resolution
+def compound_scaling(phi):
+    alpha = 1.2  # depth
+    beta = 1.1   # width
+    gamma = 1.15 # resolution
+    
+    return {
+        'depth': alpha ** phi,
+        'width': beta ** phi,
+        'resolution': gamma ** phi
+    }
+
+# B0: phi=0
+# B7: phi=2
+
+from efficientnet_pytorch import EfficientNet
+model = EfficientNet.from_pretrained('efficientnet-b0')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Once-for-All</h2>
+    <p><strong>Progressive Shrinking</strong></p>
+    <pre><code># Обучить одну сеть для всех размеров
+
+# 1. Train largest
+model = build_largest()
+train(model)
+
+# 2. Shrink depth
+for d in [4, 3, 2]:
+    model.set_active_depth(d)
+    finetune(model)
+
+# 3. Shrink width
+for w in [1.0, 0.75, 0.5]:
+    model.set_active_width(w)
+    finetune(model)
+
+# 4. Select subnet
+model.set_active_subnet(d=3, w=0.75)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. AutoML фреймворки</h2>
+    <pre><code># Auto-PyTorch
+from autoPyTorch import AutoNetClassification
+
+auto = AutoNetClassification()
+auto.fit(X_train, y_train, validation_split=0.2)
+
+# NNI
+import nni
+
+search_space = {
+    'lr': {'_type': 'loguniform', '_value': [0.0001, 0.1]},
+    'layers': {'_type': 'choice', '_value': [2, 3, 4]}
+}
+
+params = nni.get_next_parameter()
+model = build_model(**params)
+nni.report_final_result(accuracy)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Search Strategies</h2>
+    <table>
+      <tr><th>Метод</th><th>GPU-days</th></tr>
+      <tr><td>Random</td><td>100+</td></tr>
+      <tr><td>Evolution</td><td>3150</td></tr>
+      <tr><td>RL (NASNet)</td><td>1800</td></tr>
+      <tr><td>Gradient (DARTS)</td><td>4</td></tr>
+      <tr><td>Weight Sharing</td><td>0.5</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Performance Estimation</h2>
+    <ul>
+      <li><strong>Train from scratch</strong>: точно, медленно</li>
+      <li><strong>Proxy задачи</strong>: меньше эпох/данных</li>
+      <li><strong>Weight sharing</strong>: ускорение 1000x</li>
+      <li><strong>Early stopping</strong>: по loss curve</li>
+      <li><strong>Transfer</strong>: ImageNet → своя задача</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Multi-Objective NAS</h2>
+    <pre><code># Учитывать accuracy + latency + size
+objectives = {
+    'accuracy': maximize,
+    'latency': minimize,
+    'model_size': minimize
+}
+
+# Pareto frontier
+# Находим архитектуры на границе
+
+# Hardware-aware NAS
+# Измеряем latency на реальном устройстве</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Best Practices</h2>
+    <ul>
+      <li>Начните с small search space</li>
+      <li>Используйте proxy tasks</li>
+      <li>Weight sharing для ускорения</li>
+      <li>Учитывайте hardware constraints</li>
+      <li>Валидация на отдельных данных</li>
+      <li>Transfer от ImageNet</li>
+    </ul>
+    <blockquote>
+«NAS автоматизирует проектирование архитектур. Вместо недель экспериментов вручную, алгоритм за дни находит оптимальную структуру».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

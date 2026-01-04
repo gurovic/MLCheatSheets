@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Prompt Engineering Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    .container { column-count: 3; column-gap: 20px; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    code { font-family: 'Consolas', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>💬 Prompt Engineering Cheatsheet</h1>
+  <div class="subtitle">ChatGPT • GPT-4 • Claude • Gemini<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <p><strong>Prompt</strong> — текстовая инструкция для LLM.</p>
+    <p><strong>Компоненты:</strong></p>
+    <ul>
+      <li><strong>Instruction</strong>: что делать</li>
+      <li><strong>Context</strong>: доп. информация</li>
+      <li><strong>Input Data</strong>: данные</li>
+      <li><strong>Output Format</strong>: формат ответа</li>
+    </ul>
+    <pre><code># Плохо
+"Расскажи про ML"
+
+# Хорошо
+"Ты ML-инженер. Объясни Gradient Descent 
+студенту простыми словами. Используй аналогии. 
+Не более 150 слов."</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Few-Shot Prompting</h2>
+    <pre><code>Классифицируй отзывы.
+
+Отзыв: "Отлично!"
+Sentiment: Positive
+
+Отзыв: "Ужасно."
+Sentiment: Negative
+
+Отзыв: "{user_review}"
+Sentiment:</code></pre>
+    <p><strong>Zero-shot</strong>: без примеров</p>
+    <pre><code>Определи sentiment: "{text}"</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Chain-of-Thought</h2>
+    <pre><code>Q: У Роджера 5 мячей. Купил 2 банки по 3. 
+Сколько всего?
+
+A: Давайте пошагово:
+1. Было: 5
+2. Купил: 2 × 3 = 6
+3. Всего: 5 + 6 = 11
+
+Ответ: 11</code></pre>
+    <p><strong>Zero-shot CoT:</strong></p>
+    <pre><code>Q: {question}
+A: Давайте подумаем шаг за шагом.</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Role Prompting</h2>
+    <pre><code>System: "Ты опытный Python-разработчик 
+с 10-летним стажем."
+
+User: "Напиши код для binary search"</code></pre>
+    <p><strong>Примеры ролей:</strong></p>
+    <ul>
+      <li>Data Scientist</li>
+      <li>Эксперт по безопасности</li>
+      <li>Преподаватель</li>
+      <li>Детский психолог</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Structured Output</h2>
+    <pre><code>Проанализируй отзыв. Ответь в JSON:
+{
+  "sentiment": "positive/negative/neutral",
+  "confidence": 0.0-1.0,
+  "keywords": ["word1", "word2"],
+  "summary": "краткое резюме"
+}
+
+Отзыв: "{text}"</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Self-Consistency</h2>
+    <pre><code># Генерируем несколько ответов
+responses = []
+for _ in range(5):
+    response = llm(prompt)
+    responses.append(response)
+
+# Выбираем самый частый
+final = most_common(responses)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. ReAct (Reasoning + Acting)</h2>
+    <pre><code>Вопрос: Какой рост у президента страны, 
+где был изобретен Python?
+
+Thought: Нужно узнать, где изобретен Python
+Action: search("Python programming language creator")
+Observation: Guido van Rossum, Netherlands
+
+Thought: Теперь нужен президент Netherlands
+Action: search("Netherlands president")
+Observation: Mark Rutte (Prime Minister)
+
+Thought: Узнать рост Mark Rutte
+Action: search("Mark Rutte height")
+Observation: 1.93 m
+
+Answer: 1.93 метра</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. API Usage</h2>
+    <pre><code>import openai
+
+openai.api_key = "YOUR_KEY"
+
+response = openai.ChatCompletion.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": "Ты AI ассистент"},
+        {"role": "user", "content": "Объясни ML"}
+    ],
+    temperature=0.7,
+    max_tokens=150
+)
+
+print(response.choices[0].message.content)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Best Practices</h2>
+    <ul>
+      <li>Будьте конкретны</li>
+      <li>Задавайте роль</li>
+      <li>Используйте примеры (few-shot)</li>
+      <li>Просите пошаговые решения</li>
+      <li>Указывайте формат output</li>
+      <li>Итерируйте промпты</li>
+      <li>Тестируйте на разных примерах</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Частые ошибки</h2>
+    <ul>
+      <li>❌ Слишком расплывчато</li>
+      <li>❌ Нет примеров</li>
+      <li>❌ Не указан формат</li>
+      <li>❌ Противоречивые инструкции</li>
+      <li>❌ Слишком длинный prompt</li>
+    </ul>
+    <blockquote>
+«Prompt engineering — искусство правильно формулировать задачу для LLM. Хороший промпт = чёткая инструкция + примеры + формат ответа».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>
