@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Визуализация деревьев решений Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🌳 Визуализация деревьев решений</h1>
+  <div class="subtitle">Практический фокус • Январь 2026</div>
+  
+  <div class="block">
+    <h2>🔷 1. plot_tree из sklearn</h2>
+    <pre><code>from sklearn.tree import plot_tree, DecisionTreeClassifier
+import matplotlib.pyplot as plt
+
+tree = DecisionTreeClassifier(max_depth=3)
+tree.fit(X_train, y_train)
+
+plt.figure(figsize=(20, 10))
+plot_tree(tree, 
+         feature_names=feature_names,
+         class_names=class_names,
+         filled=True,
+         rounded=True,
+         fontsize=10)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Текстовое представление</h2>
+    <pre><code>from sklearn.tree import export_text
+
+tree_rules = export_text(tree, feature_names=feature_names)
+print(tree_rules)
+
+# Output:
+# |--- feature_0 <= 0.50
+# |   |--- feature_1 <= 0.30
+# |   |   |--- class: 0
+# |   |--- feature_1 >  0.30
+# |   |   |--- class: 1</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Graphviz визуализация</h2>
+    <pre><code>from sklearn.tree import export_graphviz
+import graphviz
+
+dot_data = export_graphviz(tree,
+                          out_file=None,
+                          feature_names=feature_names,
+                          class_names=class_names,
+                          filled=True,
+                          rounded=True)
+
+graph = graphviz.Source(dot_data)
+graph.render("decision_tree")  # Saves as PDF
+graph.view()  # Opens in viewer</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. dtreeviz библиотека</h2>
+    <pre><code>from dtreeviz.trees import dtreeviz
+
+viz = dtreeviz(tree,
+               X_train,
+               y_train,
+               target_name="target",
+               feature_names=feature_names,
+               class_names=class_names,
+               fancy=True)
+
+viz.save("tree_viz.svg")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Feature Importance</h2>
+    <pre><code>importances = tree.feature_importances_
+indices = np.argsort(importances)[::-1]
+
+plt.figure(figsize=(10, 6))
+plt.bar(range(len(importances)), 
+        importances[indices])
+plt.xticks(range(len(importances)),
+          [feature_names[i] for i in indices],
+          rotation=45)
+plt.title('Feature Importances')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Tree depth и листья</h2>
+    <pre><code># Информация о дереве
+print(f"Max depth: {tree.get_depth()}")
+print(f"Num leaves: {tree.get_n_leaves()}")
+print(f"Num nodes: {tree.tree_.node_count}")
+
+# Граф глубины
+depths = []
+for max_depth in range(1, 11):
+    t = DecisionTreeClassifier(max_depth=max_depth)
+    t.fit(X_train, y_train)
+    depths.append(t.score(X_test, y_test))
+
+plt.plot(range(1, 11), depths)
+plt.xlabel('Max Depth')
+plt.ylabel('Accuracy')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Random Forest визуализация</h2>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+
+rf = RandomForestClassifier(n_estimators=5, max_depth=3)
+rf.fit(X_train, y_train)
+
+# Визуализировать несколько деревьев
+fig, axes = plt.subplots(1, 3, figsize=(20, 5))
+
+for i, ax in enumerate(axes):
+    plot_tree(rf.estimators_[i],
+             feature_names=feature_names,
+             filled=True,
+             ax=ax)
+    ax.set_title(f'Tree {i+1}')
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Decision Path</h2>
+    <pre><code># Путь решения для одного объекта
+sample_id = 0
+node_indicator = tree.decision_path(X_test)
+leaf_id = tree.apply(X_test)
+
+# Nodes used for sample
+node_index = node_indicator.indices[
+    node_indicator.indptr[sample_id]:
+    node_indicator.indptr[sample_id + 1]
+]
+
+print(f'Sample {sample_id} path:')
+for node_id in node_index:
+    if leaf_id[sample_id] == node_id:
+        print(f"  Leaf node {node_id}")
+    else:
+        print(f"  Node {node_id}: decision")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Интерактивная визуализация</h2>
+    <pre><code>import plotly.graph_objects as go
+from sklearn.tree import _tree
+
+def plot_tree_plotly(tree, feature_names):
+    tree_ = tree.tree_
+    
+    # Build tree structure
+    # ... (code to build nodes and edges)
+    
+    fig = go.Figure(data=[...])
+    fig.update_layout(title="Interactive Decision Tree")
+    fig.show()
+    return fig
+
+fig = plot_tree_plotly(tree, feature_names)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Ограничить глубину для читаемости</li>
+      <li>[ ] Использовать filled=True для цвета</li>
+      <li>[ ] Добавить feature и class names</li>
+      <li>[ ] Экспортировать в высоком разрешении</li>
+      <li>[ ] Показать feature importance</li>
+      <li>[ ] Визуализировать несколько деревьев из RF</li>
+      <li>[ ] Использовать dtreeviz для красоты</li>
+      <li>[ ] Интерактивность (Plotly)</li>
+    </ul>
+  </div>
+
+
+</div>
+</body>
+</html>

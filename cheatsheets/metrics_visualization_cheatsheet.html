@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Визуализация метрик Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📈 Визуализация метрик</h1>
+  <div class="subtitle">Практический фокус • Январь 2026</div>
+  
+  <div class="block">
+    <h2>🔷 1. Confusion Matrix</h2>
+    <pre><code>from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+cm = confusion_matrix(y_true, y_pred)
+
+disp = ConfusionMatrixDisplay(cm, display_labels=class_names)
+disp.plot(cmap='Blues')
+plt.title('Confusion Matrix')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. ROC Curve</h2>
+    <pre><code>from sklearn.metrics import roc_curve, auc
+
+fpr, tpr, thresholds = roc_curve(y_true, y_proba)
+roc_auc = auc(fpr, tpr)
+
+plt.plot(fpr, tpr, label=f'ROC (AUC = {roc_auc:.2f})')
+plt.plot([0, 1], [0, 1], 'k--')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Precision-Recall Curve</h2>
+    <pre><code>from sklearn.metrics import precision_recall_curve
+
+precision, recall, _ = precision_recall_curve(y_true, y_proba)
+
+plt.plot(recall, precision)
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall Curve')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Learning Curves</h2>
+    <pre><code>from sklearn.model_selection import learning_curve
+
+train_sizes, train_scores, val_scores = learning_curve(
+    model, X, y, cv=5, 
+    train_sizes=np.linspace(0.1, 1.0, 10)
+)
+
+plt.plot(train_sizes, train_scores.mean(axis=1), label='Train')
+plt.plot(train_sizes, val_scores.mean(axis=1), label='Validation')
+plt.xlabel('Training Size')
+plt.ylabel('Score')
+plt.legend()
+plt.title('Learning Curves')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Validation Curve</h2>
+    <pre><code>from sklearn.model_selection import validation_curve
+
+param_range = [1, 5, 10, 20, 50, 100]
+train_scores, val_scores = validation_curve(
+    RandomForestClassifier(), X, y,
+    param_name="n_estimators",
+    param_range=param_range,
+    cv=5
+)
+
+plt.plot(param_range, train_scores.mean(axis=1), label='Train')
+plt.plot(param_range, val_scores.mean(axis=1), label='Validation')
+plt.xlabel('n_estimators')
+plt.ylabel('Score')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Feature Importance</h2>
+    <pre><code>importances = model.feature_importances_
+indices = np.argsort(importances)[::-1]
+
+plt.figure(figsize=(10, 6))
+plt.bar(range(len(importances)), importances[indices])
+plt.xticks(range(len(importances)),
+          [feature_names[i] for i in indices],
+          rotation=45)
+plt.title('Feature Importances')
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Calibration Curve</h2>
+    <pre><code>from sklearn.calibration import calibration_curve
+
+prob_true, prob_pred = calibration_curve(y_true, y_proba, n_bins=10)
+
+plt.plot(prob_pred, prob_true, marker='o')
+plt.plot([0, 1], [0, 1], 'k--')
+plt.xlabel('Mean predicted probability')
+plt.ylabel('Fraction of positives')
+plt.title('Calibration Curve')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Multiple Models Comparison</h2>
+    <pre><code>models = ['Logistic', 'RF', 'XGBoost', 'SVM']
+scores = [0.85, 0.89, 0.91, 0.87]
+
+plt.bar(models, scores)
+plt.ylim(0.8, 0.95)
+plt.ylabel('Accuracy')
+plt.title('Model Comparison')
+
+for i, v in enumerate(scores):
+    plt.text(i, v+0.005, f'{v:.2f}', ha='center')
+
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Cross-validation результаты</h2>
+    <pre><code>from sklearn.model_selection import cross_val_score
+
+cv_scores = cross_val_score(model, X, y, cv=5)
+
+plt.figure(figsize=(10, 5))
+plt.subplot(1, 2, 1)
+plt.boxplot(cv_scores)
+plt.ylabel('Score')
+plt.title('CV Scores Distribution')
+
+plt.subplot(1, 2, 2)
+plt.bar(range(1, 6), cv_scores)
+plt.xlabel('Fold')
+plt.ylabel('Score')
+plt.title('Scores by Fold')
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Confusion matrix с аннотациями</li>
+      <li>[ ] ROC и PR curves</li>
+      <li>[ ] Learning curves для диагностики</li>
+      <li>[ ] Feature importance</li>
+      <li>[ ] Calibration plot</li>
+      <li>[ ] Cross-validation scores</li>
+      <li>[ ] Сравнение моделей</li>
+      <li>[ ] Использовать цвета осмысленно</li>
+      <li>[ ] Добавлять подписи и легенды</li>
+      <li>[ ] Сохранять в высоком разрешении</li>
+    </ul>
+  </div>
+
+
+</div>
+</body>
+</html>

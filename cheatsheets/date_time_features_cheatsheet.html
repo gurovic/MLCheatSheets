@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Дата-специфичные признаки Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📅 Дата-специфичные признаки Cheatsheet</h1>
+  <div class="subtitle">Feature Engineering для дат и времени • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: извлечь полезные паттерны из временных данных</li>
+      <li><strong>Зачем</strong>: даты содержат скрытые закономерности (сезонность, тренды)</li>
+      <li><strong>Результат</strong>: улучшение качества модели на 5-30%</li>
+      <li><strong>Применение</strong>: продажи, логи, финансы, поведение пользователей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовое извлечение признаков</h2>
+    <pre><code>import pandas as pd
+
+# Преобразование в datetime
+df['date'] = pd.to_datetime(df['date'])
+
+# Базовые признаки
+df['year'] = df['date'].dt.year
+df['month'] = df['date'].dt.month
+df['day'] = df['date'].dt.day
+df['hour'] = df['date'].dt.hour
+df['minute'] = df['date'].dt.minute
+df['dayofweek'] = df['date'].dt.dayofweek  # 0=Пн, 6=Вс
+df['dayofyear'] = df['date'].dt.dayofyear
+df['quarter'] = df['date'].dt.quarter
+df['weekofyear'] = df['date'].dt.isocalendar().week
+
+# День недели как название
+df['day_name'] = df['date'].dt.day_name()
+
+# Логические признаки
+df['is_weekend'] = df['dayofweek'].isin([5, 6]).astype(int)
+df['is_month_start'] = df['date'].dt.is_month_start.astype(int)
+df['is_month_end'] = df['date'].dt.is_month_end.astype(int)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Циклические признаки</h2>
+    <p><strong>Проблема</strong>: месяц 12 и месяц 1 далеки числом, но близки по смыслу</p>
+    <p><strong>Решение</strong>: синус и косинус для цикличности</p>
+    <pre><code>import numpy as np
+
+# Месяц (1-12)
+df['month_sin'] = np.sin(2 * np.pi * df['month'] / 12)
+df['month_cos'] = np.cos(2 * np.pi * df['month'] / 12)
+
+# День недели (0-6)
+df['dow_sin'] = np.sin(2 * np.pi * df['dayofweek'] / 7)
+df['dow_cos'] = np.cos(2 * np.pi * df['dayofweek'] / 7)
+
+# Час (0-23)
+df['hour_sin'] = np.sin(2 * np.pi * df['hour'] / 24)
+df['hour_cos'] = np.cos(2 * np.pi * df['hour'] / 24)
+
+# День года (1-365)
+df['doy_sin'] = np.sin(2 * np.pi * df['dayofyear'] / 365.25)
+df['doy_cos'] = np.cos(2 * np.pi * df['dayofyear'] / 365.25)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Временные интервалы</h2>
+    <pre><code># Разница между датами
+df['days_since_start'] = (df['date'] - df['date'].min()).dt.days
+df['days_until_end'] = (df['date'].max() - df['date']).dt.days
+
+# Время с последнего события
+df = df.sort_values('date')
+df['days_since_last_event'] = df['date'].diff().dt.days
+
+# Скользящие окна
+df['events_last_7d'] = df.rolling(window=7, on='date')['event'].sum()
+df['events_last_30d'] = df.rolling(window=30, on='date')['event'].sum()
+
+# Время до/после определенной даты
+reference_date = pd.to_datetime('2024-01-01')
+df['days_from_reference'] = (df['date'] - reference_date).dt.days
+
+# Возраст данных
+df['data_age_days'] = (pd.Timestamp.now() - df['date']).dt.days</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Праздники и специальные дни</h2>
+    <pre><code>from datetime import date
+import holidays
+
+# Праздники России
+ru_holidays = holidays.Russia()
+df['is_holiday'] = df['date'].apply(
+    lambda x: x.date() in ru_holidays
+).astype(int)
+
+# Расстояние до ближайшего праздника
+def days_to_holiday(d):
+    upcoming = [h for h in ru_holidays.keys() if h >= d.date()]
+    if upcoming:
+        return (min(upcoming) - d.date()).days
+    return 365
+
+df['days_to_holiday'] = df['date'].apply(days_to_holiday)
+
+# День до/после праздника
+df['is_pre_holiday'] = (df['days_to_holiday'] == 1).astype(int)
+df['is_post_holiday'] = df['is_holiday'].shift(1).fillna(0).astype(int)
+
+# Пользовательские важные даты
+special_dates = ['2024-01-01', '2024-12-31']
+special_dates = pd.to_datetime(special_dates)
+df['is_special'] = df['date'].isin(special_dates).astype(int)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Бизнес-дни и рабочее время</h2>
+    <pre><code>from pandas.tseries.offsets import BDay
+
+# Количество рабочих дней
+df['business_days_from_start'] = df['date'].apply(
+    lambda x: len(pd.bdate_range(df['date'].min(), x))
+)
+
+# Это рабочий день?
+df['is_business_day'] = df['date'].apply(
+    lambda x: bool(len(pd.bdate_range(x, x)))
+).astype(int)
+
+# Рабочие часы
+df['is_work_hours'] = (
+    (df['hour'] >= 9) & (df['hour'] < 18) & 
+    (df['dayofweek'] < 5)
+).astype(int)
+
+# Части дня
+def part_of_day(hour):
+    if 6 <= hour < 12:
+        return 'morning'
+    elif 12 <= hour < 18:
+        return 'afternoon'
+    elif 18 <= hour < 22:
+        return 'evening'
+    else:
+        return 'night'
+
+df['part_of_day'] = df['hour'].apply(part_of_day)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сезонность и тренды</h2>
+    <pre><code># Сезон
+def get_season(month):
+    if month in [12, 1, 2]:
+        return 'winter'
+    elif month in [3, 4, 5]:
+        return 'spring'
+    elif month in [6, 7, 8]:
+        return 'summer'
+    else:
+        return 'autumn'
+
+df['season'] = df['month'].apply(get_season)
+
+# Неделя месяца
+df['week_of_month'] = (df['day'] - 1) // 7 + 1
+
+# Декада месяца
+df['decade_of_month'] = (df['day'] - 1) // 10 + 1
+
+# Является ли середина месяца
+df['is_mid_month'] = ((df['day'] >= 13) & (df['day'] <= 17)).astype(int)
+
+# Тренд (порядковый номер)
+df['trend'] = range(len(df))
+
+# Нормализованный тренд (0-1)
+df['trend_normalized'] = df['trend'] / df['trend'].max()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Агрегаты и статистики</h2>
+    <pre><code># Группировка по периодам
+# Среднее по дням недели
+dow_mean = df.groupby('dayofweek')['target'].transform('mean')
+df['target_mean_by_dow'] = dow_mean
+
+# Среднее по часам
+hour_mean = df.groupby('hour')['target'].transform('mean')
+df['target_mean_by_hour'] = hour_mean
+
+# Месячные агрегаты
+df['year_month'] = df['date'].dt.to_period('M')
+monthly_stats = df.groupby('year_month')['target'].agg([
+    'mean', 'std', 'min', 'max', 'count'
+]).add_prefix('monthly_')
+df = df.join(monthly_stats, on='year_month')
+
+# Скользящие средние
+df = df.sort_values('date')
+df['ma_7d'] = df['target'].rolling(window=7, min_periods=1).mean()
+df['ma_30d'] = df['target'].rolling(window=30, min_periods=1).mean()
+
+# Экспоненциальное скользящее среднее
+df['ema_7d'] = df['target'].ewm(span=7, adjust=False).mean()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Взаимодействие признаков</h2>
+    <pre><code># Комбинированные признаки
+df['is_weekend_evening'] = (
+    (df['is_weekend'] == 1) & (df['hour'] >= 18)
+).astype(int)
+
+df['is_workday_morning'] = (
+    (df['is_weekend'] == 0) & (df['hour'] >= 6) & (df['hour'] < 12)
+).astype(int)
+
+df['is_holiday_or_weekend'] = (
+    (df['is_holiday'] == 1) | (df['is_weekend'] == 1)
+).astype(int)
+
+# Месяц + час (для seasonal patterns)
+df['month_hour'] = df['month'].astype(str) + '_' + df['hour'].astype(str)
+
+# День недели + час
+df['dow_hour'] = df['dayofweek'].astype(str) + '_' + df['hour'].astype(str)
+
+# Квартал + день недели
+df['quarter_dow'] = df['quarter'].astype(str) + '_' + df['dayofweek'].astype(str)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Лаги и опережения</h2>
+    <pre><code># Лаги (прошлые значения)
+df = df.sort_values('date')
+df['target_lag_1'] = df['target'].shift(1)
+df['target_lag_7'] = df['target'].shift(7)
+df['target_lag_30'] = df['target'].shift(30)
+
+# Опережающие значения
+df['target_lead_1'] = df['target'].shift(-1)
+
+# Разность
+df['target_diff_1'] = df['target'] - df['target_lag_1']
+df['target_diff_7'] = df['target'] - df['target_lag_7']
+
+# Процентное изменение
+df['target_pct_change_1'] = df['target'].pct_change(1)
+df['target_pct_change_7'] = df['target'].pct_change(7)
+
+# Скользящая дисперсия
+df['target_rolling_std_7'] = df['target'].rolling(window=7).std()
+df['target_rolling_std_30'] = df['target'].rolling(window=30).std()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Специфичные паттерны</h2>
+    <pre><code># Начало/конец периодов
+df['is_year_start'] = (df['month'] == 1).astype(int)
+df['is_year_end'] = (df['month'] == 12).astype(int)
+df['is_quarter_start'] = df['date'].dt.is_quarter_start.astype(int)
+df['is_quarter_end'] = df['date'].dt.is_quarter_end.astype(int)
+
+# "Зарплатные" дни
+df['is_payday'] = df['day'].isin([1, 2, 15, 16]).astype(int)
+
+# Выходные перед/после праздников
+df['is_long_weekend'] = (
+    (df['is_weekend'] == 1) & 
+    ((df['days_to_holiday'] <= 2) | (df['is_post_holiday'] == 1))
+).astype(int)
+
+# Дни распродаж (Black Friday, etc)
+df['is_black_friday'] = (
+    (df['month'] == 11) & 
+    (df['dayofweek'] == 4) & 
+    (df['week_of_month'] == 4)
+).astype(int)
+
+# Кастомные периоды (например, пандемия)
+lockdown_start = pd.to_datetime('2020-03-01')
+lockdown_end = pd.to_datetime('2020-06-01')
+df['is_lockdown'] = (
+    (df['date'] >= lockdown_start) & (df['date'] <= lockdown_end)
+).astype(int)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Лучшие практики</h2>
+    <table>
+      <tr><th>Практика</th><th>Описание</th></tr>
+      <tr><td><strong>Циклические</strong></td><td>Всегда используйте sin/cos для периодических признаков</td></tr>
+      <tr><td><strong>Масштаб</strong></td><td>Нормализуйте тренды и временные интервалы</td></tr>
+      <tr><td><strong>Лаги</strong></td><td>Осторожно с утечкой данных (data leakage)</td></tr>
+      <tr><td><strong>Валидация</strong></td><td>Используйте временное разбиение (TimeSeriesSplit)</td></tr>
+      <tr><td><strong>Null значения</strong></td><td>Заполняйте forward fill для временных рядов</td></tr>
+    </table>
+
+    <h3>⚠️ Частые ошибки:</h3>
+    <ul>
+      <li>Использование будущих данных в лагах</li>
+      <li>Забыть про циклическую природу времени</li>
+      <li>Игнорирование часовых поясов</li>
+      <li>Не учитывать пропуски во времени</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Полный пример</h2>
+    <pre><code>import pandas as pd
+import numpy as np
+from datetime import datetime
+
+def create_date_features(df, date_col='date'):
+    """Создает полный набор временных признаков"""
+    df = df.copy()
+    df[date_col] = pd.to_datetime(df[date_col])
+    
+    # Базовые
+    df['year'] = df[date_col].dt.year
+    df['month'] = df[date_col].dt.month
+    df['day'] = df[date_col].dt.day
+    df['hour'] = df[date_col].dt.hour
+    df['dayofweek'] = df[date_col].dt.dayofweek
+    df['quarter'] = df[date_col].dt.quarter
+    df['dayofyear'] = df[date_col].dt.dayofyear
+    
+    # Циклические
+    df['month_sin'] = np.sin(2 * np.pi * df['month'] / 12)
+    df['month_cos'] = np.cos(2 * np.pi * df['month'] / 12)
+    df['dow_sin'] = np.sin(2 * np.pi * df['dayofweek'] / 7)
+    df['dow_cos'] = np.cos(2 * np.pi * df['dayofweek'] / 7)
+    
+    # Логические
+    df['is_weekend'] = df['dayofweek'].isin([5, 6]).astype(int)
+    df['is_month_start'] = df[date_col].dt.is_month_start.astype(int)
+    df['is_month_end'] = df[date_col].dt.is_month_end.astype(int)
+    
+    # Интервалы
+    df['days_since_start'] = (df[date_col] - df[date_col].min()).dt.days
+    
+    return df
+
+# Использование
+df_features = create_date_features(df, 'transaction_date')
+print(f"Создано {len(df_features.columns)} признаков")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Преобразовать в datetime формат</li>
+      <li>[ ] Извлечь базовые признаки (год, месяц, день, час)</li>
+      <li>[ ] Создать циклические признаки (sin/cos)</li>
+      <li>[ ] Добавить is_weekend, is_holiday</li>
+      <li>[ ] Вычислить временные интервалы</li>
+      <li>[ ] Создать лаги для временных рядов</li>
+      <li>[ ] Добавить агрегаты по периодам</li>
+      <li>[ ] Проверить на утечку данных</li>
+      <li>[ ] Использовать TimeSeriesSplit для валидации</li>
+      <li>[ ] Визуализировать сезонность</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Даты — это не просто числа. Они содержат паттерны: люди покупают больше в выходные, продажи растут перед праздниками, трафик выше утром и вечером. Извлекая эти признаки, модель "понимает" время и делает точные прогнозы».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

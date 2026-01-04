@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Классификация изображений (Deep Learning) Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🖼️ Классификация изображений (Deep Learning)</h1>
+  <div class="subtitle">Практический фокус • Январь 2026</div>
+  
+  <div class="block">
+    <h2>🔷 1. Базовая CNN архитектура</h2>
+    <pre><code>import tensorflow as tf
+from tensorflow.keras import layers, models
+
+model = models.Sequential([
+    layers.Conv2D(32, (3, 3), activation='relu', 
+                  input_shape=(224, 224, 3)),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    layers.Conv2D(128, (3, 3), activation='relu'),
+    layers.MaxPooling2D((2, 2)),
+    layers.Flatten(),
+    layers.Dense(128, activation='relu'),
+    layers.Dropout(0.5),
+    layers.Dense(num_classes, activation='softmax')
+])
+
+model.compile(optimizer='adam',
+             loss='categorical_crossentropy',
+             metrics=['accuracy'])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Data Augmentation</h2>
+    <pre><code>from tensorflow.keras.preprocessing.image import ImageDataGenerator
+
+datagen = ImageDataGenerator(
+    rotation_range=20,
+    width_shift_range=0.2,
+    height_shift_range=0.2,
+    horizontal_flip=True,
+    zoom_range=0.2,
+    fill_mode='nearest'
+)
+
+# Augmentation в реальном времени
+train_generator = datagen.flow_from_directory(
+    'train/',
+    target_size=(224, 224),
+    batch_size=32,
+    class_mode='categorical'
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Transfer Learning</h2>
+    <pre><code>from tensorflow.keras.applications import ResNet50
+
+# Предобученная модель
+base_model = ResNet50(weights='imagenet',
+                     include_top=False,
+                     input_shape=(224, 224, 3))
+
+# Заморозить веса base model
+base_model.trainable = False
+
+# Добавить свои слои
+model = models.Sequential([
+    base_model,
+    layers.GlobalAveragePooling2D(),
+    layers.Dense(256, activation='relu'),
+    layers.Dropout(0.5),
+    layers.Dense(num_classes, activation='softmax')
+])
+
+model.compile(optimizer='adam',
+             loss='categorical_crossentropy',
+             metrics=['accuracy'])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Fine-tuning</h2>
+    <pre><code># После initial training
+# Разморозить последние слои
+base_model.trainable = True
+
+# Заморозить только первые слои
+for layer in base_model.layers[:-20]:
+    layer.trainable = False
+
+# Перекомпилировать с низким learning rate
+model.compile(optimizer=tf.keras.optimizers.Adam(1e-5),
+             loss='categorical_crossentropy',
+             metrics=['accuracy'])
+
+# Fine-tune
+model.fit(train_ds, epochs=10, validation_data=val_ds)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Популярные архитектуры</h2>
+    <table>
+      <tr><th>Модель</th><th>Параметры</th><th>Применение</th></tr>
+      <tr><td>ResNet50</td><td>25M</td><td>General purpose</td></tr>
+      <tr><td>MobileNetV2</td><td>3.5M</td><td>Mobile, edge</td></tr>
+      <tr><td>EfficientNetB0</td><td>5.3M</td><td>Лучший баланс</td></tr>
+      <tr><td>VGG16</td><td>138M</td><td>Feature extraction</td></tr>
+      <tr><td>InceptionV3</td><td>24M</td><td>Multi-scale</td></tr>
+    </table>
+    <pre><code>from tensorflow.keras.applications import (
+    ResNet50, MobileNetV2, EfficientNetB0
+)
+
+# Выбор модели
+base = EfficientNetB0(weights='imagenet', include_top=False)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Callbacks</h2>
+    <pre><code>from tensorflow.keras.callbacks import (
+    ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+)
+
+callbacks = [
+    ModelCheckpoint('best_model.h5', save_best_only=True),
+    EarlyStopping(patience=10, restore_best_weights=True),
+    ReduceLROnPlateau(factor=0.5, patience=5)
+]
+
+model.fit(train_ds, epochs=100, 
+         validation_data=val_ds,
+         callbacks=callbacks)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Preprocessing</h2>
+    <pre><code>from tensorflow.keras.applications.resnet50 import preprocess_input
+
+# Для каждой архитектуры свой preprocessing
+# ResNet: scale to [-1, 1]
+# Inception: scale to [-1, 1]
+# VGG: subtract mean RGB
+
+img = tf.keras.preprocessing.image.load_img('image.jpg',
+                                            target_size=(224, 224))
+img_array = tf.keras.preprocessing.image.img_to_array(img)
+img_array = tf.expand_dims(img_array, 0)
+img_array = preprocess_input(img_array)
+
+predictions = model.predict(img_array)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Градиентная визуализация (Grad-CAM)</h2>
+    <pre><code>import numpy as np
+
+def grad_cam(model, img_array, layer_name):
+    grad_model = tf.keras.models.Model(
+        [model.inputs],
+        [model.get_layer(layer_name).output, model.output]
+    )
+    
+    with tf.GradientTape() as tape:
+        conv_outputs, predictions = grad_model(img_array)
+        loss = predictions[:, np.argmax(predictions[0])]
+    
+    grads = tape.gradient(loss, conv_outputs)
+    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+    
+    heatmap = conv_outputs[0] @ pooled_grads[..., tf.newaxis]
+    heatmap = tf.squeeze(heatmap)
+    heatmap = tf.maximum(heatmap, 0) / tf.math.reduce_max(heatmap)
+    
+    return heatmap.numpy()
+
+heatmap = grad_cam(model, img_array, 'conv5_block3_out')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Метрики оценки</h2>
+    <pre><code>from sklearn.metrics import classification_report, confusion_matrix
+
+y_pred = model.predict(test_ds)
+y_pred_classes = np.argmax(y_pred, axis=1)
+y_true = test_ds.classes
+
+print(classification_report(y_true, y_pred_classes))
+
+# Top-k accuracy
+top_5_acc = tf.keras.metrics.TopKCategoricalAccuracy(k=5)
+top_5_acc.update_state(y_true_onehot, y_pred)
+print(f"Top-5 Accuracy: {top_5_acc.result().numpy():.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Нормализовать изображения правильно</li>
+      <li>[ ] Использовать data augmentation</li>
+      <li>[ ] Transfer learning с pretrained моделью</li>
+      <li>[ ] Fine-tuning с низким LR</li>
+      <li>[ ] Early stopping и checkpointing</li>
+      <li>[ ] Проверять на test set</li>
+      <li>[ ] Визуализировать предсказания</li>
+      <li>[ ] Grad-CAM для интерпретации</li>
+      <li>[ ] Мониторить val_accuracy</li>
+      <li>[ ] Оптимизировать для deployment</li>
+    </ul>
+    <blockquote>
+      «Transfer learning — использование знаний, полученных на ImageNet (миллионы изображений), для вашей задачи. Это как нанять эксперта вместо обучения новичка с нуля».
+    </blockquote>
+  </div>
+
+
+</div>
+</body>
+</html>
