@@ -178,166 +178,338 @@
   </style>
 </head>
 <body>
-  <div class="block">
-    <h2>🔷 1. Раздел 1</h2>
-    <ul>
-      <li>Информация по теме "Дисперсионный анализ (ANOVA)"</li>
-      <li>Раздел 1 содержит важные концепции</li>
-      <li>Примеры и практические советы</li>
-    </ul>
-    <pre><code># Пример кода для раздела 1
-import numpy as np
-import pandas as pd
 
-# Ваш код здесь
-data = np.random.randn(100)
-print(data.mean())</code></pre>
+<div class="container">
+
+  <h1>📈 Дисперсионный анализ (ANOVA) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы ANOVA</h2>
+    <ul>
+      <li><strong>Цель</strong>: сравнение средних значений между группами</li>
+      <li><strong>Гипотезы</strong>: H₀: все средние равны vs H₁: хотя бы одно отличается</li>
+      <li><strong>Идея</strong>: сравнение внутригрупповой и межгрупповой вариации</li>
+      <li><strong>F-статистика</strong>: отношение дисперсий</li>
+      <li><strong>Применение</strong>: A/B/C тестирование, эксперименты</li>
+    </ul>
+    <p><strong>Простыми словами</strong>: ANOVA проверяет, отличаются ли средние значения в разных группах больше, чем можно объяснить случайным разбросом.</p>
   </div>
 
   <div class="block">
-    <h2>🔷 2. Раздел 2</h2>
-    <ul>
-      <li>Информация по теме "Дисперсионный анализ (ANOVA)"</li>
-      <li>Раздел 2 содержит важные концепции</li>
-      <li>Примеры и практические советы</li>
-    </ul>
-    <pre><code># Пример кода для раздела 2
-import numpy as np
-import pandas as pd
+    <h2>🔷 2. One-Way ANOVA</h2>
+    <p>Сравнение средних для одного фактора с несколькими уровнями:</p>
+    <pre><code>import numpy as np
+from scipy import stats
 
-# Ваш код здесь
-data = np.random.randn(100)
-print(data.mean())</code></pre>
+# Данные трех групп
+group1 = np.array([23, 25, 27, 29, 31])
+group2 = np.array([33, 35, 37, 39, 41])
+group3 = np.array([43, 45, 47, 49, 51])
+
+# One-way ANOVA
+f_stat, p_value = stats.f_oneway(group1, group2, group3)
+
+print(f"F-статистика: {f_stat:.4f}")
+print(f"p-value: {p_value:.4f}")
+
+if p_value < 0.05:
+    print("Отвергаем H₀: группы отличаются")
+else:
+    print("Не отвергаем H₀: группы не отличаются")</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 3. Раздел 3</h2>
-    <ul>
-      <li>Информация по теме "Дисперсионный анализ (ANOVA)"</li>
-      <li>Раздел 3 содержит важные концепции</li>
-      <li>Примеры и практические советы</li>
-    </ul>
-    <pre><code># Пример кода для раздела 3
-import numpy as np
-import pandas as pd
+    <h2>🔷 3. Ручной расчет ANOVA</h2>
+    <pre><code>def one_way_anova_manual(groups):
+    """Ручной расчет One-Way ANOVA"""
+    k = len(groups)  # число групп
+    n = sum(len(g) for g in groups)  # общее число наблюдений
+    
+    # Общее среднее
+    grand_mean = np.mean([x for g in groups for x in g])
+    
+    # SST (Total Sum of Squares)
+    sst = sum((x - grand_mean)**2 
+             for g in groups for x in g)
+    
+    # SSB (Between-group Sum of Squares)
+    ssb = sum(len(g) * (np.mean(g) - grand_mean)**2 
+             for g in groups)
+    
+    # SSW (Within-group Sum of Squares)
+    ssw = sum((x - np.mean(g))**2 
+             for g in groups for x in g)
+    
+    # Degrees of freedom
+    df_between = k - 1
+    df_within = n - k
+    
+    # Mean squares
+    msb = ssb / df_between
+    msw = ssw / df_within
+    
+    # F-statistic
+    f_stat = msb / msw
+    
+    # p-value
+    p_value = 1 - stats.f.cdf(f_stat, df_between, df_within)
+    
+    return {
+        'F': f_stat,
+        'p_value': p_value,
+        'SSB': ssb,
+        'SSW': ssw,
+        'SST': sst,
+        'df_between': df_between,
+        'df_within': df_within
+    }
 
-# Ваш код здесь
-data = np.random.randn(100)
-print(data.mean())</code></pre>
+# Использование
+groups = [group1, group2, group3]
+results = one_way_anova_manual(groups)
+print(f"F = {results['F']:.4f}, p = {results['p_value']:.4f}")</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 4. Раздел 4</h2>
-    <ul>
-      <li>Информация по теме "Дисперсионный анализ (ANOVA)"</li>
-      <li>Раздел 4 содержит важные концепции</li>
-      <li>Примеры и практические советы</li>
-    </ul>
-    <pre><code># Пример кода для раздела 4
-import numpy as np
-import pandas as pd
+    <h2>🔷 4. ANOVA таблица</h2>
+    <table>
+      <tr><th>Источник</th><th>SS</th><th>df</th><th>MS</th><th>F</th></tr>
+      <tr><td>Между группами</td><td>SSB</td><td>k-1</td><td>MSB = SSB/(k-1)</td><td>F = MSB/MSW</td></tr>
+      <tr><td>Внутри групп</td><td>SSW</td><td>n-k</td><td>MSW = SSW/(n-k)</td><td>-</td></tr>
+      <tr><td>Всего</td><td>SST</td><td>n-1</td><td>-</td><td>-</td></tr>
+    </table>
+    <pre><code>import pandas as pd
 
-# Ваш код здесь
-data = np.random.randn(100)
-print(data.mean())</code></pre>
+def anova_table(groups):
+    results = one_way_anova_manual(groups)
+    
+    table = pd.DataFrame({
+        'Source': ['Between', 'Within', 'Total'],
+        'SS': [results['SSB'], results['SSW'], results['SST']],
+        'df': [results['df_between'], results['df_within'], 
+               results['df_between'] + results['df_within']],
+        'MS': [results['SSB']/results['df_between'],
+               results['SSW']/results['df_within'], 
+               np.nan],
+        'F': [results['F'], np.nan, np.nan],
+        'p-value': [results['p_value'], np.nan, np.nan]
+    })
+    
+    return table
+
+print(anova_table(groups))</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 5. Раздел 5</h2>
-    <ul>
-      <li>Информация по теме "Дисперсионный анализ (ANOVA)"</li>
-      <li>Раздел 5 содержит важные концепции</li>
-      <li>Примеры и практические советы</li>
-    </ul>
-    <pre><code># Пример кода для раздела 5
-import numpy as np
-import pandas as pd
+    <h2>🔷 5. Предположения ANOVA</h2>
+    <ol>
+      <li><strong>Нормальность</strong>: данные в каждой группе нормально распределены</li>
+      <li><strong>Гомоскедастичность</strong>: равные дисперсии в группах</li>
+      <li><strong>Независимость</strong>: наблюдения независимы</li>
+    </ol>
+    <pre><code># Проверка нормальности (Shapiro-Wilk)
+for i, group in enumerate(groups, 1):
+    stat, p = stats.shapiro(group)
+    print(f"Group {i}: p={p:.4f}", 
+          "✓ Normal" if p > 0.05 else "✗ Not normal")
 
-# Ваш код здесь
-data = np.random.randn(100)
-print(data.mean())</code></pre>
+# Проверка равенства дисперсий (Levene's test)
+stat, p = stats.levene(*groups)
+print(f"\nLevene's test: p={p:.4f}",
+      "✓ Equal var" if p > 0.05 else "✗ Unequal var")
+
+# Если предположения нарушены, используйте:
+# - Welch's ANOVA (неравные дисперсии)
+# - Kruskal-Wallis (непараметрический)</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 6. Раздел 6</h2>
-    <ul>
-      <li>Информация по теме "Дисперсионный анализ (ANOVA)"</li>
-      <li>Раздел 6 содержит важные концепции</li>
-      <li>Примеры и практические советы</li>
-    </ul>
-    <pre><code># Пример кода для раздела 6
-import numpy as np
-import pandas as pd
+    <h2>🔷 6. Post-hoc тесты</h2>
+    <p>После значимого ANOVA — попарные сравнения:</p>
+    <pre><code>from scipy.stats import tukey_hsd
 
-# Ваш код здесь
-data = np.random.randn(100)
-print(data.mean())</code></pre>
+# Tukey HSD (Honestly Significant Difference)
+result = tukey_hsd(*groups)
+print("Tukey HSD:")
+print(result)
+
+# Bonferroni correction (ручной)
+from itertools import combinations
+
+def bonferroni_test(groups, alpha=0.05):
+    k = len(groups)
+    n_comparisons = k * (k - 1) // 2
+    adjusted_alpha = alpha / n_comparisons
+    
+    print(f"Adjusted alpha: {adjusted_alpha:.4f}\n")
+    
+    for (i, g1), (j, g2) in combinations(enumerate(groups), 2):
+        t_stat, p = stats.ttest_ind(g1, g2)
+        sig = "✓" if p < adjusted_alpha else "✗"
+        print(f"Group {i} vs {j}: p={p:.4f} {sig}")
+
+bonferroni_test(groups)</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 7. Раздел 7</h2>
-    <ul>
-      <li>Информация по теме "Дисперсионный анализ (ANOVA)"</li>
-      <li>Раздел 7 содержит важные концепции</li>
-      <li>Примеры и практические советы</li>
-    </ul>
-    <pre><code># Пример кода для раздела 7
-import numpy as np
-import pandas as pd
+    <h2>🔷 7. Two-Way ANOVA</h2>
+    <p>Два фактора и их взаимодействие:</p>
+    <pre><code>import statsmodels.api as sm
+from statsmodels.formula.api import ols
 
-# Ваш код здесь
-data = np.random.randn(100)
-print(data.mean())</code></pre>
+# Данные
+data = pd.DataFrame({
+    'score': [23, 25, 27, 33, 35, 37, 
+              43, 45, 47, 53, 55, 57],
+    'treatment': ['A', 'A', 'A', 'B', 'B', 'B',
+                  'A', 'A', 'A', 'B', 'B', 'B'],
+    'gender': ['M', 'M', 'M', 'M', 'M', 'M',
+               'F', 'F', 'F', 'F', 'F', 'F']
+})
+
+# Two-way ANOVA
+model = ols('score ~ C(treatment) + C(gender) + '
+           'C(treatment):C(gender)', data=data).fit()
+
+anova_results = sm.stats.anova_lm(model, typ=2)
+print(anova_results)</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 8. Раздел 8</h2>
-    <ul>
-      <li>Информация по теме "Дисперсионный анализ (ANOVA)"</li>
-      <li>Раздел 8 содержит важные концепции</li>
-      <li>Примеры и практические советы</li>
-    </ul>
-    <pre><code># Пример кода для раздела 8
-import numpy as np
-import pandas as pd
+    <h2>🔷 8. Repeated Measures ANOVA</h2>
+    <p>Для зависимых выборок (одни и те же субъекты):</p>
+    <pre><code>from statsmodels.stats.anova import AnovaRM
 
-# Ваш код здесь
-data = np.random.randn(100)
-print(data.mean())</code></pre>
+# Данные: несколько измерений одних субъектов
+data = pd.DataFrame({
+    'subject': [1,1,1, 2,2,2, 3,3,3, 4,4,4],
+    'time': ['T1','T2','T3'] * 4,
+    'score': [23, 25, 27, 33, 35, 37, 
+              43, 45, 47, 53, 55, 57]
+})
+
+# Repeated measures ANOVA
+aovrm = AnovaRM(data, 'score', 'subject', 
+                within=['time'])
+res = aovrm.fit()
+print(res)</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 9. Раздел 9</h2>
-    <ul>
-      <li>Информация по теме "Дисперсионный анализ (ANOVA)"</li>
-      <li>Раздел 9 содержит важные концепции</li>
-      <li>Примеры и практические советы</li>
-    </ul>
-    <pre><code># Пример кода для раздела 9
-import numpy as np
-import pandas as pd
+    <h2>🔷 9. Эффект размера</h2>
+    <pre><code>def eta_squared(groups):
+    """Eta-squared: доля объясненной дисперсии"""
+    results = one_way_anova_manual(groups)
+    return results['SSB'] / results['SST']
 
-# Ваш код здесь
-data = np.random.randn(100)
-print(data.mean())</code></pre>
+def omega_squared(groups):
+    """Omega-squared: несмещенная оценка"""
+    results = one_way_anova_manual(groups)
+    k = len(groups)
+    n = sum(len(g) for g in groups)
+    
+    numerator = results['SSB'] - (k - 1) * results['SSW'] / (n - k)
+    denominator = results['SST'] + results['SSW'] / (n - k)
+    
+    return numerator / denominator
+
+eta2 = eta_squared(groups)
+omega2 = omega_squared(groups)
+
+print(f"η² = {eta2:.4f}")
+print(f"ω² = {omega2:.4f}")
+
+# Интерпретация: 0.01=small, 0.06=medium, 0.14=large</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 10. Раздел 10</h2>
-    <ul>
-      <li>Информация по теме "Дисперсионный анализ (ANOVA)"</li>
-      <li>Раздел 10 содержит важные концепции</li>
-      <li>Примеры и практические советы</li>
-    </ul>
-    <pre><code># Пример кода для раздела 10
-import numpy as np
-import pandas as pd
+    <h2>🔷 10. Непараметрические альтернативы</h2>
+    <pre><code># Kruskal-Wallis (непараметрический аналог ANOVA)
+h_stat, p_value = stats.kruskal(*groups)
+print(f"Kruskal-Wallis H: {h_stat:.4f}, p={p_value:.4f}")
 
-# Ваш код здесь
-data = np.random.randn(100)
-print(data.mean())</code></pre>
+# Mann-Whitney U для попарных сравнений
+from scipy.stats import mannwhitneyu
+
+for i in range(len(groups)):
+    for j in range(i+1, len(groups)):
+        u_stat, p = mannwhitneyu(groups[i], groups[j])
+        print(f"Group {i} vs {j}: U={u_stat:.0f}, p={p:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Визуализация</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Boxplot
+data_long = pd.DataFrame({
+    'value': np.concatenate(groups),
+    'group': np.repeat(['Group 1', 'Group 2', 'Group 3'], 
+                      [len(g) for g in groups])
+})
+
+plt.figure(figsize=(10, 6))
+sns.boxplot(x='group', y='value', data=data_long)
+plt.title('Сравнение групп')
+plt.ylabel('Значение')
+plt.show()
+
+# Violin plot с точками
+plt.figure(figsize=(10, 6))
+sns.violinplot(x='group', y='value', data=data_long)
+sns.swarmplot(x='group', y='value', data=data_long, 
+             color='black', alpha=0.5)
+plt.title('Распределение по группам')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Сравнение 3+ групп</li>
+          <li>Нормально распределенные данные</li>
+          <li>Равные дисперсии</li>
+          <li>A/B/C тестирование</li>
+          <li>Экспериментальные данные</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Две группы (используйте t-test)</li>
+          <li>Нарушение предположений (используйте Kruskal-Wallis)</li>
+          <li>Неравные дисперсии (используйте Welch ANOVA)</li>
+          <li>Сильные выбросы</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Проверить нормальность (Shapiro-Wilk)</li>
+      <li>[ ] Проверить равенство дисперсий (Levene)</li>
+      <li>[ ] Провести ANOVA</li>
+      <li>[ ] Если значимо — post-hoc тесты</li>
+      <li>[ ] Рассчитать размер эффекта</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Интерпретировать в контексте задачи</li>
+      <li>[ ] Проверить на выбросы</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «ANOVA помогает понять, действительно ли разные группы (например, разные версии продукта, маркетинговые кампании) дают разные результаты, или наблюдаемые различия можно объяснить случайностью. Это статистически строгий способ сравнения нескольких вариантов одновременно».
+    </blockquote>
   </div>
 
 </div>
+
 </body>
 </html>
