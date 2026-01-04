@@ -100,597 +100,571 @@
       white-space: pre-wrap;
     }
 
-    strong {
-      color: #1a5fb4;
-      font-weight: 600;
-    }
-
-    .formula {
-      background: #fff9e6;
-      padding: 6px;
-      border-left: 3px solid #ffcc00;
-      margin: 8px 0;
-      font-style: italic;
-    }
-
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.88em;
-      margin: 8px 0;
+      font-size: 0.82em;
+      margin: 6px 0;
     }
 
-    table th {
-      background-color: #e0e7ff;
-      padding: 6px;
+    th {
+      background-color: #e6f0ff;
       text-align: left;
+      padding: 4px 6px;
       font-weight: 600;
     }
 
-    table td {
-      padding: 5px 6px;
-      border-bottom: 1px solid #e0e7ff;
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
     }
   </style>
 </head>
 <body>
 
-<h1>Feature Engineering для временных рядов</h1>
-<div class="subtitle">Создание признаков из временных данных для ML моделей</div>
-
 <div class="container">
 
+  <h1>⏰ Feature Engineering для временных рядов Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
   <div class="block">
-    <h2>1. Лаговые признаки (Lags)</h2>
-    <p><strong>Lag features</strong> — значения ряда со сдвигом назад во времени.</p>
-    
-    <p><strong>Создание лагов:</strong></p>
+    <h2>🔷 1. Основы</h2>
+    <ul>
+      <li><strong>Цель</strong>: извлечение полезной информации из временных данных</li>
+      <li><strong>Время как признак</strong>: дата, день недели, месяц, сезон</li>
+      <li><strong>Лаговые признаки</strong>: прошлые значения как предикторы</li>
+      <li><strong>Скользящие статистики</strong>: тренды и паттерны</li>
+      <li><strong>Домен-специфичные</strong>: особенности задачи</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Временные признаки</h2>
     <pre><code>import pandas as pd
-
-# Один лаг
-df['lag_1'] = df['value'].shift(1)
-df['lag_7'] = df['value'].shift(7)
-
-# Множество лагов
-for lag in [1, 2, 3, 7, 14, 30]:
-    df[f'lag_{lag}'] = df['value'].shift(lag)
-
-# Векторизованно
-lags = pd.concat([
-    df['value'].shift(i).rename(f'lag_{i}')
-    for i in range(1, 8)
-], axis=1)</code></pre>
-    
-    <p><strong>Выбор лагов:</strong></p>
-    <ul>
-      <li>Анализ автокорреляции (ACF)</li>
-      <li>Частная автокорреляция (PACF)</li>
-      <li>Доменные знания (недельные, месячные циклы)</li>
-      <li>Feature selection алгоритмы</li>
-    </ul>
-    
-    <p><strong>Типы лагов:</strong></p>
-    <ul>
-      <li><strong>Короткие (1-7):</strong> краткосрочные паттерны</li>
-      <li><strong>Сезонные (7, 30, 365):</strong> циклы</li>
-      <li><strong>Длинные (>30):</strong> долгосрочные тренды</li>
-    </ul>
-  </div>
-
-  <div class="block">
-    <h2>2. Rolling статистики</h2>
-    <p><strong>Rolling window features</strong> — статистики на скользящем окне.</p>
-    
-    <pre><code># Основные статистики
-df['roll_mean_7'] = df['value'].rolling(7).mean()
-df['roll_std_7'] = df['value'].rolling(7).std()
-df['roll_min_7'] = df['value'].rolling(7).min()
-df['roll_max_7'] = df['value'].rolling(7).max()
-
-# Квантили
-df['roll_q25'] = df['value'].rolling(7).quantile(0.25)
-df['roll_q75'] = df['value'].rolling(7).quantile(0.75)
-
-# Медиана
-df['roll_median'] = df['value'].rolling(7).median()
-
-# Сумма
-df['roll_sum'] = df['value'].rolling(7).sum()</code></pre>
-    
-    <p><strong>Продвинутые статистики:</strong></p>
-    <pre><code># Размах (range)
-df['roll_range'] = (df['value'].rolling(7).max() - 
-                    df['value'].rolling(7).min())
-
-# Коэффициент вариации
-roll_mean = df['value'].rolling(7).mean()
-roll_std = df['value'].rolling(7).std()
-df['roll_cv'] = roll_std / roll_mean
-
-# Асимметрия (skewness)
-df['roll_skew'] = df['value'].rolling(7).skew()
-
-# Эксцесс (kurtosis)
-df['roll_kurt'] = df['value'].rolling(7).kurt()</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>3. Expanding статистики</h2>
-    <p><strong>Expanding window</strong> — статистики от начала ряда до текущей точки.</p>
-    
-    <pre><code># Кумулятивное среднее
-df['expanding_mean'] = df['value'].expanding().mean()
-
-# Кумулятивная сумма
-df['cumsum'] = df['value'].cumsum()
-
-# Кумулятивный min/max
-df['cummin'] = df['value'].cummin()
-df['cummax'] = df['value'].cummax()
-
-# Кумулятивное std
-df['expanding_std'] = df['value'].expanding().std()
-
-# Количество наблюдений
-df['count'] = df['value'].expanding().count()</code></pre>
-    
-    <p><strong>Применение:</strong></p>
-    <ul>
-      <li>Отслеживание исторических экстремумов</li>
-      <li>Расчёт накопленных показателей</li>
-      <li>Определение аномалий относительно истории</li>
-    </ul>
-  </div>
-
-  <div class="block">
-    <h2>4. Разности и изменения</h2>
-    <p><strong>Difference features</strong> — изменения значений во времени.</p>
-    
-    <pre><code># Первая разность
-df['diff_1'] = df['value'].diff(1)
-
-# Вторая разность
-df['diff_2'] = df['value'].diff(2)
-
-# Процентное изменение
-df['pct_change'] = df['value'].pct_change()
-
-# Процентное изменение за n периодов
-df['pct_change_7'] = df['value'].pct_change(periods=7)
-
-# Логарифмическая разность
 import numpy as np
-df['log_return'] = np.log(df['value'] / df['value'].shift(1))
 
-# Абсолютное изменение
-df['abs_change'] = abs(df['value'].diff())</code></pre>
-    
-    <p><strong>Сезонные разности:</strong></p>
-    <pre><code># Недельная сезонная разность
-df['seasonal_diff_7'] = df['value'] - df['value'].shift(7)
+# Создание датафрейма
+df = pd.DataFrame({
+    'date': pd.date_range('2023-01-01', periods=365, 
+                         freq='D'),
+    'value': np.random.randn(365)
+})
 
-# Месячная
-df['seasonal_diff_30'] = df['value'] - df['value'].shift(30)</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>5. Временные признаки</h2>
-    <p><strong>Date/time features</strong> — извлечение компонент даты.</p>
-    
-    <pre><code># Преобразование в datetime
-df['date'] = pd.to_datetime(df['date'])
-
-# Линейные временные признаки
+# Временные признаки
 df['year'] = df['date'].dt.year
 df['month'] = df['date'].dt.month
 df['day'] = df['date'].dt.day
-df['dayofweek'] = df['date'].dt.dayofweek
+df['dayofweek'] = df['date'].dt.dayofweek  # 0=Пн
 df['dayofyear'] = df['date'].dt.dayofyear
 df['week'] = df['date'].dt.isocalendar().week
 df['quarter'] = df['date'].dt.quarter
-df['hour'] = df['date'].dt.hour
-df['minute'] = df['date'].dt.minute
 
 # Булевы признаки
-df['is_weekend'] = df['dayofweek'].isin([5, 6]).astype(int)
-df['is_month_start'] = df['date'].dt.is_month_start.astype(int)
-df['is_month_end'] = df['date'].dt.is_month_end.astype(int)
-df['is_quarter_start'] = df['date'].dt.is_quarter_start.astype(int)</code></pre>
-    
-    <p><strong>Циклические признаки:</strong></p>
-    <pre><code># Для циклических признаков (день недели, месяц)
-df['month_sin'] = np.sin(2 * np.pi * df['month'] / 12)
-df['month_cos'] = np.cos(2 * np.pi * df['month'] / 12)
+df['is_weekend'] = df['dayofweek'].isin([5, 6])
+df['is_month_start'] = df['date'].dt.is_month_start
+df['is_month_end'] = df['date'].dt.is_month_end
+df['is_quarter_start'] = df['date'].dt.is_quarter_start
+df['is_year_start'] = df['date'].dt.is_year_start
 
-df['day_sin'] = np.sin(2 * np.pi * df['dayofweek'] / 7)
-df['day_cos'] = np.cos(2 * np.pi * df['dayofweek'] / 7)
-
-df['hour_sin'] = np.sin(2 * np.pi * df['hour'] / 24)
-df['hour_cos'] = np.cos(2 * np.pi * df['hour'] / 24)</code></pre>
+# Время суток (если есть время)
+df['hour'] = df['date'].dt.hour
+df['is_business_hours'] = df['hour'].between(9, 17)</code></pre>
   </div>
 
   <div class="block">
-    <h2>6. EWM (Exponentially Weighted)</h2>
-    <p><strong>EWM features</strong> — экспоненциально взвешенные статистики.</p>
-    
-    <pre><code># EWM среднее
-df['ewm_mean'] = df['value'].ewm(span=7).mean()
+    <h2>🔷 3. Циклические признаки</h2>
+    <p>Кодирование циклических переменных (день недели, месяц):</p>
+    <pre><code># Проблема: январь=1, декабрь=12 
+# но они рядом по времени!
 
-# EWM std
-df['ewm_std'] = df['value'].ewm(span=7).std()
+# Решение: sin/cos преобразование
+def encode_cyclical(df, col, max_val):
+    df[col + '_sin'] = np.sin(
+        2 * np.pi * df[col] / max_val
+    )
+    df[col + '_cos'] = np.cos(
+        2 * np.pi * df[col] / max_val
+    )
+    return df
 
-# EWM с разными span
-for span in [3, 7, 14, 30]:
-    df[f'ewm_mean_{span}'] = df['value'].ewm(span=span).mean()
+# Месяц (12 месяцев)
+df = encode_cyclical(df, 'month', 12)
 
-# Альфа вместо span
-df['ewm_alpha_02'] = df['value'].ewm(alpha=0.2).mean()
+# День недели (7 дней)
+df = encode_cyclical(df, 'dayofweek', 7)
 
-# EWM var
-df['ewm_var'] = df['value'].ewm(span=7).var()</code></pre>
-    
-    <p><strong>Преимущества EWM:</strong></p>
-    <ul>
-      <li>Больший вес недавним данным</li>
-      <li>Нет потери первых n наблюдений</li>
-      <li>Быстрая адаптация к изменениям</li>
-    </ul>
+# Час дня (24 часа)
+df = encode_cyclical(df, 'hour', 24)
+
+# День года (365/366 дней)
+df = encode_cyclical(df, 'dayofyear', 365)
+
+print(df[['month', 'month_sin', 
+         'month_cos']].head())</code></pre>
   </div>
 
   <div class="block">
-    <h2>7. Взаимодействия лагов</h2>
-    <p><strong>Lag interactions</strong> — комбинации лаговых признаков.</p>
-    
-    <pre><code># Отношения лагов
-df['lag_ratio_1_7'] = df['lag_1'] / (df['lag_7'] + 1e-8)
+    <h2>🔷 4. Лаговые признаки</h2>
+    <p>Прошлые значения целевой переменной:</p>
+    <pre><code># Создание лагов
+def create_lags(df, column, lags):
+    for lag in lags:
+        df[f'{column}_lag_{lag}'] = df[column].shift(lag)
+    return df
 
-# Разности между лагами
-df['lag_diff_1_7'] = df['lag_1'] - df['lag_7']
+# Лаги на 1, 7, 14, 30 дней
+df = create_lags(df, 'value', [1, 7, 14, 30])
 
-# Произведения
-df['lag_product'] = df['lag_1'] * df['lag_7']
+# Лаги для недельной сезонности
+df = create_lags(df, 'value', 
+                range(1, 8))  # lag_1 до lag_7
 
-# Средние нескольких лагов
-df['lag_mean_3'] = (df['lag_1'] + df['lag_2'] + df['lag_3']) / 3
+# Процентное изменение
+df['value_pct_change_1'] = df['value'].pct_change(1)
+df['value_pct_change_7'] = df['value'].pct_change(7)
 
-# Тренд между лагами
-df['lag_trend'] = df['lag_1'] - df['lag_7']
+# Разность
+df['value_diff_1'] = df['value'].diff(1)
+df['value_diff_7'] = df['value'].diff(7)
 
-# Комбинация с rolling
-df['lag_roll'] = df['lag_1'].rolling(3).mean()</code></pre>
-    
-    <p><strong>Полиномиальные признаки:</strong></p>
-    <pre><code>from sklearn.preprocessing import PolynomialFeatures
-
-# Создание полиномиальных признаков из лагов
-lag_features = df[['lag_1', 'lag_2', 'lag_3']]
-poly = PolynomialFeatures(degree=2, include_bias=False)
-poly_features = poly.fit_transform(lag_features)
-poly_df = pd.DataFrame(
-    poly_features, 
-    columns=poly.get_feature_names_out(),
-    index=df.index
-)</code></pre>
+print(df[['value', 'value_lag_1', 
+         'value_lag_7']].head(10))</code></pre>
   </div>
 
   <div class="block">
-    <h2>8. Fourier признаки</h2>
-    <p><strong>Fourier features</strong> — для моделирования периодичности.</p>
-    
-    <pre><code>def fourier_features(df, period, order=3):
-    """
-    Создаёт Fourier признаки для сезонности
-    period: период сезонности (напр., 365 для годовой)
-    order: количество гармоник
-    """
-    features = {}
-    t = np.arange(len(df))
-    
-    for k in range(1, order + 1):
-        features[f'sin_{period}_{k}'] = np.sin(2 * np.pi * k * t / period)
-        features[f'cos_{period}_{k}'] = np.cos(2 * np.pi * k * t / period)
-    
-    return pd.DataFrame(features, index=df.index)
+    <h2>🔷 5. Скользящие статистики</h2>
+    <pre><code># Скользящие окна
+windows = [7, 14, 30]
 
-# Применение
-# Годовая сезонность
-fourier_yearly = fourier_features(df, period=365, order=5)
-df = pd.concat([df, fourier_yearly], axis=1)
-
-# Недельная сезонность
-fourier_weekly = fourier_features(df, period=7, order=3)
-df = pd.concat([df, fourier_weekly], axis=1)</code></pre>
+for window in windows:
+    # Среднее
+    df[f'value_rolling_mean_{window}'] = \
+        df['value'].rolling(window).mean()
     
-    <p><strong>Преимущества:</strong></p>
-    <ul>
-      <li>Гладкое моделирование сезонности</li>
-      <li>Работает с любым периодом</li>
-      <li>Не требует категориальных переменных</li>
-    </ul>
+    # Стандартное отклонение
+    df[f'value_rolling_std_{window}'] = \
+        df['value'].rolling(window).std()
+    
+    # Минимум и максимум
+    df[f'value_rolling_min_{window}'] = \
+        df['value'].rolling(window).min()
+    df[f'value_rolling_max_{window}'] = \
+        df['value'].rolling(window).max()
+    
+    # Медиана
+    df[f'value_rolling_median_{window}'] = \
+        df['value'].rolling(window).median()
+    
+    # Квантили
+    df[f'value_rolling_q25_{window}'] = \
+        df['value'].rolling(window).quantile(0.25)
+    df[f'value_rolling_q75_{window}'] = \
+        df['value'].rolling(window).quantile(0.75)
+
+# Скользящая сумма
+df['value_rolling_sum_7'] = \
+    df['value'].rolling(7).sum()
+
+# Экспоненциальное скользящее среднее
+df['value_ewm_7'] = \
+    df['value'].ewm(span=7).mean()</code></pre>
   </div>
 
   <div class="block">
-    <h2>9. Target encoding для временных рядов</h2>
-    <p><strong>Time-aware target encoding</strong> — кодирование с учётом времени.</p>
-    
-    <pre><code>def time_series_target_encoding(df, categorical_col, target_col, 
-                                 time_col, smoothing=1):
-    """
-    Target encoding с предотвращением утечки данных
-    """
-    df = df.sort_values(time_col)
-    
-    # Глобальное среднее
-    global_mean = df[target_col].mean()
-    
-    # Expanding mean для каждой категории
-    encoded = []
-    for idx, row in df.iterrows():
-        category = row[categorical_col]
-        
-        # Только прошлые данные
-        past_data = df.loc[df[time_col] < row[time_col]]
-        cat_data = past_data[past_data[categorical_col] == category]
-        
-        if len(cat_data) == 0:
-            encoded.append(global_mean)
-        else:
-            # Smoothing
-            cat_mean = cat_data[target_col].mean()
-            cat_count = len(cat_data)
-            smoothed = (cat_mean * cat_count + global_mean * smoothing) / (cat_count + smoothing)
-            encoded.append(smoothed)
-    
-    return encoded
+    <h2>🔷 6. Expanding признаки</h2>
+    <p>Накопленные статистики с начала ряда:</p>
+    <pre><code># Накопленные значения
+df['value_expanding_mean'] = \
+    df['value'].expanding().mean()
 
-# Использование
-df['category_encoded'] = time_series_target_encoding(
-    df, 'category', 'target', 'date'
-)</code></pre>
+df['value_expanding_std'] = \
+    df['value'].expanding().std()
+
+df['value_expanding_min'] = \
+    df['value'].expanding().min()
+
+df['value_expanding_max'] = \
+    df['value'].expanding().max()
+
+# Кумулятивная сумма
+df['value_cumsum'] = df['value'].cumsum()
+
+# Расстояние от максимума/минимума
+df['dist_from_max'] = \
+    df['value_expanding_max'] - df['value']
+
+df['dist_from_min'] = \
+    df['value'] - df['value_expanding_min']
+
+# Позиция в диапазоне [0, 1]
+df['position_in_range'] = \
+    (df['value'] - df['value_expanding_min']) / \
+    (df['value_expanding_max'] - 
+     df['value_expanding_min'])</code></pre>
   </div>
 
   <div class="block">
-    <h2>10. Тренд признаки</h2>
-    <p><strong>Trend features</strong> — извлечение трендовой информации.</p>
-    
-    <pre><code># Линейный тренд
-df['time_index'] = np.arange(len(df))
+    <h2>🔷 7. Взаимодействия с лагами</h2>
+    <pre><code># Разности между лагами
+df['lag_diff_1_7'] = \
+    df['value_lag_1'] - df['value_lag_7']
 
-from scipy import stats
-def rolling_trend(series, window):
-    """Наклон линейной регрессии на окне"""
-    slopes = []
-    for i in range(len(series)):
-        if i < window - 1:
-            slopes.append(np.nan)
-        else:
-            y = series.iloc[i-window+1:i+1].values
-            x = np.arange(window)
-            slope, _, _, _, _ = stats.linregress(x, y)
-            slopes.append(slope)
-    return slopes
+df['lag_diff_7_30'] = \
+    df['value_lag_7'] - df['value_lag_30']
 
-df['trend_slope_7'] = rolling_trend(df['value'], 7)
-df['trend_slope_30'] = rolling_trend(df['value'], 30)
+# Отношения
+df['lag_ratio_1_7'] = \
+    df['value_lag_1'] / (df['value_lag_7'] + 1e-8)
 
-# Детрендированные значения
-from scipy.signal import detrend
-df['detrended'] = detrend(df['value'])</code></pre>
-    
-    <p><strong>Разложение на тренд и сезонность:</strong></p>
-    <pre><code>from statsmodels.tsa.seasonal import seasonal_decompose
+# Разница с скользящим средним
+df['diff_from_ma_7'] = \
+    df['value'] - df['value_rolling_mean_7']
 
-result = seasonal_decompose(df['value'], model='additive', period=7)
-df['trend'] = result.trend
-df['seasonal'] = result.seasonal
-df['residual'] = result.resid</code></pre>
+# Volatility (rolling std / rolling mean)
+df['volatility_7'] = \
+    df['value_rolling_std_7'] / \
+    (df['value_rolling_mean_7'] + 1e-8)
+
+# Z-score относительно скользящего окна
+df['zscore_30'] = \
+    (df['value'] - df['value_rolling_mean_30']) / \
+    (df['value_rolling_std_30'] + 1e-8)</code></pre>
   </div>
 
   <div class="block">
-    <h2>11. Праздники и события</h2>
-    <p><strong>Holiday features</strong> — специальные даты и события.</p>
-    
-    <pre><code>import holidays
+    <h2>🔷 8. Праздники и события</h2>
+    <pre><code>from pandas.tseries.holiday import USFederalHolidayCalendar
 
-# Российские праздники
-ru_holidays = holidays.Russia(years=range(2020, 2025))
-
-df['is_holiday'] = df['date'].isin(ru_holidays).astype(int)
-
-# Расстояние до ближайшего праздника
-def days_to_holiday(date, holidays_list):
-    if date in holidays_list:
-        return 0
-    future = [h for h in holidays_list if h > date]
-    if not future:
-        return 365
-    return (min(future) - date).days
-
-df['days_to_holiday'] = df['date'].apply(
-    lambda d: days_to_holiday(d, list(ru_holidays.keys()))
+# Праздники
+cal = USFederalHolidayCalendar()
+holidays = cal.holidays(
+    start='2023-01-01', 
+    end='2023-12-31'
 )
 
-# Дни после праздника
-df['days_after_holiday'] = df['date'].apply(
-    lambda d: (d - max([h for h in ru_holidays.keys() if h < d])).days
-    if any(h < d for h in ru_holidays.keys()) else 365
-)
+df['is_holiday'] = df['date'].isin(holidays)
+
+# Дни до/после праздника
+df['days_to_holiday'] = np.nan
+df['days_from_holiday'] = np.nan
+
+for holiday in holidays:
+    mask = df['date'] < holiday
+    days_to = (holiday - df.loc[mask, 'date']).dt.days
+    df.loc[mask, 'days_to_holiday'] = \
+        df.loc[mask, 'days_to_holiday'].fillna(
+            days_to
+        ).combine_first(days_to)
+    
+    mask = df['date'] > holiday
+    days_from = (df.loc[mask, 'date'] - holiday).dt.days
+    df.loc[mask, 'days_from_holiday'] = \
+        df.loc[mask, 'days_from_holiday'].fillna(
+            days_from
+        ).combine_first(days_from)
 
 # Кастомные события
-special_dates = pd.to_datetime(['2023-05-01', '2023-12-25'])
-df['is_special_event'] = df['date'].isin(special_dates).astype(int)</code></pre>
+special_dates = pd.to_datetime([
+    '2023-02-14',  # Valentine's Day
+    '2023-11-24',  # Black Friday
+    '2023-12-25'   # Christmas
+])
+
+df['is_special_event'] = df['date'].isin(special_dates)</code></pre>
   </div>
 
   <div class="block">
-    <h2>12. Окна переменной длины</h2>
-    <p><strong>Variable window features</strong> — адаптивные окна.</p>
-    
-    <pre><code># Окно до конца месяца
-df['days_in_month'] = df['date'].dt.days_in_month
-df['month_progress'] = df['date'].dt.day / df['days_in_month']
-
-# Окно выходных
-def weekend_window(series, date_col):
-    """Статистики только по выходным"""
-    is_weekend = date_col.dt.dayofweek.isin([5, 6])
-    weekend_data = series[is_weekend]
-    return weekend_data.rolling(4).mean()
-
-# Экспоненциальное затухание с переменным альфа
-def adaptive_ewm(series, volatility):
-    """EWM с альфа зависящим от волатильности"""
-    alpha = 0.1 + 0.4 * (volatility / volatility.max())
-    result = []
-    result.append(series.iloc[0])
-    for i in range(1, len(series)):
-        result.append(
-            alpha.iloc[i] * series.iloc[i] + 
-            (1 - alpha.iloc[i]) * result[-1]
-        )
-    return pd.Series(result, index=series.index)
-
-volatility = df['value'].rolling(7).std()
-df['adaptive_ewm'] = adaptive_ewm(df['value'], volatility)</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>13. Продвинутые техники</h2>
-    <p><strong>Wavelet features:</strong></p>
-    <pre><code>import pywt
-
-def wavelet_features(series, wavelet='db4', level=3):
-    """Вейвлет преобразование"""
-    coeffs = pywt.wavedec(series, wavelet, level=level)
-    
-    features = {}
-    for i, coeff in enumerate(coeffs):
-        features[f'wavelet_mean_{i}'] = np.mean(coeff)
-        features[f'wavelet_std_{i}'] = np.std(coeff)
-        features[f'wavelet_energy_{i}'] = np.sum(coeff**2)
-    
-    return features</code></pre>
-    
-    <p><strong>Autocorrelation features:</strong></p>
+    <h2>🔷 9. Автокорреляционные признаки</h2>
     <pre><code>from statsmodels.tsa.stattools import acf, pacf
 
-def autocorr_features(series, nlags=10):
-    """Автокорреляционные признаки"""
-    acf_vals = acf(series.dropna(), nlags=nlags)
-    pacf_vals = pacf(series.dropna(), nlags=nlags)
-    
-    features = {}
-    for i in range(1, nlags + 1):
-        features[f'acf_lag_{i}'] = acf_vals[i]
-        features[f'pacf_lag_{i}'] = pacf_vals[i]
-    
-    return features</code></pre>
-    
-    <p><strong>TSFresh (автоматический FE):</strong></p>
-    <pre><code>from tsfresh import extract_features
-from tsfresh.feature_extraction import MinimalFCParameters
+# Автокорреляция
+# (использовать для анализа, не как признак напрямую)
+autocorr_vals = acf(df['value'].dropna(), nlags=30)
 
-# Автоматическое извлечение признаков
-features = extract_features(
-    df, 
-    column_id='id', 
-    column_sort='time',
-    default_fc_parameters=MinimalFCParameters()
+# Но можем создать признаки на основе лагов
+# с высокой автокорреляцией
+significant_lags = np.where(
+    np.abs(autocorr_vals[1:]) > 0.3
+)[0] + 1
+
+print(f"Значимые лаги: {significant_lags}")
+
+# Создать признаки только для значимых лагов
+for lag in significant_lags:
+    df[f'value_lag_{lag}'] = df['value'].shift(lag)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Тренд и сезонность</h2>
+    <pre><code>from statsmodels.tsa.seasonal import seasonal_decompose
+
+# Декомпозиция
+decomposition = seasonal_decompose(
+    df.set_index('date')['value'],
+    model='additive',
+    period=7  # недельная сезонность
+)
+
+# Добавить компоненты как признаки
+df['trend'] = decomposition.trend.values
+df['seasonal'] = decomposition.seasonal.values
+df['residual'] = decomposition.resid.values
+
+# Линейный тренд (просто порядковый номер)
+df['time_index'] = np.arange(len(df))
+
+# Квадратичный тренд
+df['time_index_squared'] = df['time_index'] ** 2
+
+# Отклонение от тренда
+from sklearn.linear_model import LinearRegression
+
+X = df[['time_index']].values
+y = df['value'].values
+
+lr = LinearRegression()
+lr.fit(X, y)
+trend_pred = lr.predict(X)
+
+df['detrended'] = df['value'] - trend_pred
+df['trend_component'] = trend_pred</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Fourier признаки</h2>
+    <p>Для моделирования сезонности:</p>
+    <pre><code>def add_fourier_terms(df, period, order):
+    """
+    period: период сезонности (365 для годовой)
+    order: количество гармоник
+    """
+    for i in range(1, order + 1):
+        df[f'sin_{period}_{i}'] = np.sin(
+            2 * np.pi * i * df['time_index'] / period
+        )
+        df[f'cos_{period}_{i}'] = np.cos(
+            2 * np.pi * i * df['time_index'] / period
+        )
+    return df
+
+# Годовая сезонность (4 гармоники)
+df = add_fourier_terms(df, period=365, order=4)
+
+# Недельная сезонность (2 гармоники)
+df = add_fourier_terms(df, period=7, order=2)
+
+# Дневная сезонность (для почасовых данных)
+# df = add_fourier_terms(df, period=24, order=3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Группировки и агрегации</h2>
+    <pre><code># Статистики по группам
+# (например, среднее по дням недели)
+
+# Среднее значение для каждого дня недели
+df['value_mean_by_dow'] = df.groupby(
+    'dayofweek'
+)['value'].transform('mean')
+
+# Среднее по месяцам
+df['value_mean_by_month'] = df.groupby(
+    'month'
+)['value'].transform('mean')
+
+# Отклонение от группового среднего
+df['diff_from_dow_mean'] = \
+    df['value'] - df['value_mean_by_dow']
+
+df['diff_from_month_mean'] = \
+    df['value'] - df['value_mean_by_month']
+
+# Ранг внутри группы
+df['rank_in_month'] = df.groupby(
+    'month'
+)['value'].rank()
+
+# Процентиль в группе
+df['percentile_in_dow'] = df.groupby(
+    'dayofweek'
+)['value'].rank(pct=True)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Внешние признаки</h2>
+    <pre><code># Внешние данные (погода, экономика, и т.д.)
+# Пример с погодой
+
+weather_df = pd.DataFrame({
+    'date': df['date'],
+    'temperature': np.random.uniform(10, 30, len(df)),
+    'precipitation': np.random.uniform(0, 50, len(df)),
+    'humidity': np.random.uniform(30, 90, len(df))
+})
+
+# Объединение
+df = df.merge(weather_df, on='date', how='left')
+
+# Лаговые значения внешних признаков
+for col in ['temperature', 'precipitation']:
+    df[f'{col}_lag_1'] = df[col].shift(1)
+    df[f'{col}_lag_7'] = df[col].shift(7)
+    
+    # Скользящие средние
+    df[f'{col}_ma_7'] = df[col].rolling(7).mean()
+
+# Взаимодействия
+df['temp_x_humidity'] = \
+    df['temperature'] * df['humidity'] / 100
+
+df['is_rainy'] = df['precipitation'] > 10</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Полный пайплайн</h2>
+    <pre><code>def create_time_series_features(df, target_col, 
+                                date_col='date'):
+    df = df.copy()
+    
+    # 1. Временные признаки
+    df['year'] = df[date_col].dt.year
+    df['month'] = df[date_col].dt.month
+    df['dayofweek'] = df[date_col].dt.dayofweek
+    df['dayofyear'] = df[date_col].dt.dayofyear
+    df['is_weekend'] = df['dayofweek'].isin([5, 6])
+    
+    # 2. Циклические
+    df = encode_cyclical(df, 'month', 12)
+    df = encode_cyclical(df, 'dayofweek', 7)
+    
+    # 3. Лаги
+    for lag in [1, 7, 14, 30]:
+        df[f'{target_col}_lag_{lag}'] = \
+            df[target_col].shift(lag)
+    
+    # 4. Скользящие статистики
+    for window in [7, 14, 30]:
+        df[f'{target_col}_ma_{window}'] = \
+            df[target_col].rolling(window).mean()
+        df[f'{target_col}_std_{window}'] = \
+            df[target_col].rolling(window).std()
+    
+    # 5. Взаимодействия
+    df[f'{target_col}_diff_from_ma_7'] = \
+        df[target_col] - df[f'{target_col}_ma_7']
+    
+    return df
+
+# Использование
+df_features = create_time_series_features(
+    df, target_col='value'
 )</code></pre>
   </div>
 
   <div class="block">
-    <h2>14. Pipeline для feature engineering</h2>
-    <pre><code>class TimeSeriesFeatureEngineer:
-    def __init__(self, lags=[1,7,30], windows=[7,30]):
-        self.lags = lags
-        self.windows = windows
-    
-    def create_features(self, df, target_col='value'):
-        features = df.copy()
-        
-        # Лаги
-        for lag in self.lags:
-            features[f'lag_{lag}'] = features[target_col].shift(lag)
-        
-        # Rolling статистики
-        for window in self.windows:
-            features[f'roll_mean_{window}'] = features[target_col].rolling(window).mean()
-            features[f'roll_std_{window}'] = features[target_col].rolling(window).std()
-            features[f'roll_min_{window}'] = features[target_col].rolling(window).min()
-            features[f'roll_max_{window}'] = features[target_col].rolling(window).max()
-        
-        # Разности
-        features['diff_1'] = features[target_col].diff(1)
-        features['pct_change'] = features[target_col].pct_change()
-        
-        # Временные признаки
-        features['dayofweek'] = features.index.dayofweek
-        features['month'] = features.index.month
-        features['is_weekend'] = features.index.dayofweek.isin([5,6]).astype(int)
-        
-        # Циклические
-        features['month_sin'] = np.sin(2*np.pi*features['month']/12)
-        features['month_cos'] = np.cos(2*np.pi*features['month']/12)
-        
-        return features
-    
-    def fit_transform(self, df, target_col='value'):
-        return self.create_features(df, target_col)
+    <h2>🔷 15. Важные советы</h2>
+    <ul>
+      <li><strong>Утечка данных</strong>: не использовать будущие значения!</li>
+      <li><strong>Пропуски</strong>: лаги создают NaN в начале</li>
+      <li><strong>Мультиколлинеарность</strong>: лаги часто коррелируют</li>
+      <li><strong>Отбор признаков</strong>: не все признаки полезны</li>
+      <li><strong>Валидация</strong>: только forward validation!</li>
+    </ul>
+    <pre><code># Проверка на утечку данных
+# НЕПРАВИЛЬНО: скользящее среднее вперед
+# df['ma_future'] = df['value'].rolling(
+#     window=7, center=True
+# ).mean()
 
-# Использование
-fe = TimeSeriesFeatureEngineer(lags=[1,7,14,30], windows=[7,14,30])
-features_df = fe.fit_transform(df)</code></pre>
+# ПРАВИЛЬНО: только назад
+df['ma_past'] = df['value'].rolling(
+    window=7, 
+    center=False
+).mean()
+
+# Удаление строк с NaN
+df_clean = df.dropna()
+
+# Или заполнение
+df_filled = df.fillna(method='ffill')</code></pre>
   </div>
 
   <div class="block">
-    <h2>15. Валидация и выбор признаков</h2>
-    <p><strong>Важность признаков:</strong></p>
-    <pre><code>from sklearn.ensemble import RandomForestRegressor
-from sklearn.inspection import permutation_importance
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Создать базовые временные признаки</li>
+      <li>[ ] Добавить циклические преобразования</li>
+      <li>[ ] Создать лаговые признаки</li>
+      <li>[ ] Добавить скользящие статистики</li>
+      <li>[ ] Учесть праздники и события</li>
+      <li>[ ] Проанализировать автокорреляцию</li>
+      <li>[ ] Добавить тренд и сезонность</li>
+      <li>[ ] Проверить на утечку данных</li>
+      <li>[ ] Отобрать важные признаки</li>
+      <li>[ ] Валидировать на тестовой выборке</li>
+    </ul>
 
-# Обучение модели
-X = features_df.dropna()
-y = X.pop('target')
-
-rf = RandomForestRegressor(n_estimators=100, random_state=42)
-rf.fit(X, y)
-
-# Feature importance
-importances = pd.DataFrame({
-    'feature': X.columns,
-    'importance': rf.feature_importances_
-}).sort_values('importance', ascending=False)
-
-print(importances.head(20))
-
-# Permutation importance
-perm_importance = permutation_importance(rf, X, y, n_repeats=10)
-perm_df = pd.DataFrame({
-    'feature': X.columns,
-    'importance': perm_importance.importances_mean
-}).sort_values('importance', ascending=False)</code></pre>
-    
-    <p><strong>Коллинеарность:</strong></p>
-    <pre><code># Корреляционная матрица
-corr_matrix = X.corr()
-high_corr = (corr_matrix.abs() > 0.9) & (corr_matrix != 1.0)
-
-# Удаление высококоррелированных
-to_drop = set()
-for col in high_corr.columns:
-    if high_corr[col].any():
-        to_drop.add(col)
-
-X_reduced = X.drop(columns=to_drop)
-
-# VIF (Variance Inflation Factor)
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-
-vif_data = pd.DataFrame()
-vif_data["feature"] = X.columns
-vif_data["VIF"] = [variance_inflation_factor(X.values, i) 
-                   for i in range(len(X.columns))]
-print(vif_data.sort_values('VIF', ascending=False))</code></pre>
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Feature engineering для временных рядов — это извлечение скрытых паттернов из даты и времени. Например, мы можем учесть, что понедельники отличаются от пятниц, что есть сезонность по месяцам, и что текущие продажи связаны с продажами неделю назад. Все эти закономерности превращаются в признаки для модели».
+    </blockquote>
   </div>
 
 </div>

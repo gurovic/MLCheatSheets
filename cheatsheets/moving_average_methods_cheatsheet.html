@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Методы скользящих средних Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📈 Методы скользящих средних Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть метода</h2>
+    <ul>
+      <li><strong>Назначение</strong>: сглаживание временных рядов</li>
+      <li><strong>Принцип</strong>: усреднение соседних значений</li>
+      <li><strong>Цель</strong>: выявление тренда, устранение шума</li>
+      <li><strong>Простота</strong>: один из самых понятных методов</li>
+      <li><strong>Универсальность</strong>: применим к любым временным рядам</li>
+    </ul>
+    <p><strong>Простыми словами</strong>: вместо каждого значения берем среднее по нескольким соседним точкам.</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Простое скользящее среднее (SMA)</h2>
+    <p><strong>Формула:</strong></p>
+    <p>SMA(t) = (y[t] + y[t-1] + ... + y[t-n+1]) / n</p>
+    <p>где n — размер окна</p>
+    <pre><code>import pandas as pd
+import numpy as np
+
+# Простое скользящее среднее
+def simple_moving_average(data, window):
+    return data.rolling(window=window).mean()
+
+# Пример
+ts = pd.Series([10, 12, 15, 14, 16, 18, 20, 19])
+sma_3 = simple_moving_average(ts, window=3)
+
+print("Исходные:", ts.values)
+print("SMA(3):", sma_3.values)
+
+# С pandas напрямую
+sma = ts.rolling(window=3).mean()
+print(sma)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Взвешенное скользящее среднее (WMA)</h2>
+    <p>Даём больший вес последним наблюдениям:</p>
+    <p><strong>Формула:</strong></p>
+    <p>WMA(t) = (w₁·y[t] + w₂·y[t-1] + ... + wₙ·y[t-n+1]) / (w₁ + w₂ + ... + wₙ)</p>
+    <pre><code>def weighted_moving_average(data, window):
+    weights = np.arange(1, window + 1)
+    
+    def wma(x):
+        if len(x) < window:
+            return np.nan
+        return np.dot(x, weights) / weights.sum()
+    
+    return data.rolling(window=window).apply(
+        wma, raw=True
+    )
+
+# Пример
+ts = pd.Series([10, 12, 15, 14, 16, 18, 20, 19])
+wma_3 = weighted_moving_average(ts, window=3)
+
+print("WMA(3):", wma_3.values)
+
+# Веса: 1, 2, 3
+# WMA(3) для [10, 12, 15]:
+# (1*10 + 2*12 + 3*15) / (1+2+3) = 13.17</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Экспоненциальное скользящее среднее (EMA)</h2>
+    <p>Экспоненциально убывающие веса для старых значений:</p>
+    <p><strong>Формула:</strong></p>
+    <p>EMA(t) = α·y[t] + (1-α)·EMA(t-1)</p>
+    <p>где α = 2/(window + 1)</p>
+    <pre><code># С pandas
+def exponential_moving_average(data, span):
+    return data.ewm(span=span, adjust=False).mean()
+
+# Пример
+ts = pd.Series([10, 12, 15, 14, 16, 18, 20, 19])
+ema_3 = exponential_moving_average(ts, span=3)
+
+print("EMA(3):", ema_3.values)
+
+# Альтернатива: указать alpha напрямую
+ema_custom = ts.ewm(alpha=0.3, adjust=False).mean()
+
+# Или через halflife
+ema_halflife = ts.ewm(halflife=3, adjust=False).mean()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Центрированное скользящее среднее (CMA)</h2>
+    <p>Окно центрируется на текущей точке:</p>
+    <pre><code># Центрированное скользящее среднее
+def centered_moving_average(data, window):
+    # window должен быть нечетным
+    return data.rolling(
+        window=window, 
+        center=True
+    ).mean()
+
+# Пример
+ts = pd.Series([10, 12, 15, 14, 16, 18, 20, 19, 21])
+cma_3 = centered_moving_average(ts, window=3)
+
+print("CMA(3):", cma_3.values)
+# [NaN, 12.33, 13.67, 15.0, 16.0, 18.0, 19.33, 20.0, NaN]
+
+# Полезно для декомпозиции временных рядов</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Кумулятивное скользящее среднее</h2>
+    <p>Среднее всех значений от начала до текущего момента:</p>
+    <pre><code>def cumulative_moving_average(data):
+    return data.expanding().mean()
+
+# Пример
+ts = pd.Series([10, 12, 15, 14, 16, 18, 20, 19])
+cma = cumulative_moving_average(ts)
+
+print("Cumulative MA:", cma.values)
+# [10.0, 11.0, 12.33, 12.75, 13.4, 14.17, 15.0, 15.38]
+
+# Равносильно
+cma_manual = ts.cumsum() / (np.arange(len(ts)) + 1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Лаг</th><th>Гладкость</th><th>Веса</th><th>Применение</th></tr>
+      <tr><td><strong>SMA</strong></td><td>Средний</td><td>Средняя</td><td>Равные</td><td>Универсальное</td></tr>
+      <tr><td><strong>WMA</strong></td><td>Малый</td><td>Средняя</td><td>Линейные</td><td>Быстрые изменения</td></tr>
+      <tr><td><strong>EMA</strong></td><td>Малый</td><td>Высокая</td><td>Экспоненциальные</td><td>Финансы, трейдинг</td></tr>
+      <tr><td><strong>CMA</strong></td><td>Нет</td><td>Высокая</td><td>Равные</td><td>Декомпозиция</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Визуализация</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Генерация данных с шумом
+np.random.seed(42)
+t = np.arange(100)
+trend = 0.5 * t
+seasonal = 10 * np.sin(2 * np.pi * t / 20)
+noise = np.random.normal(0, 5, 100)
+ts = pd.Series(trend + seasonal + noise)
+
+# Разные методы
+sma = ts.rolling(window=10).mean()
+ema = ts.ewm(span=10, adjust=False).mean()
+wma = weighted_moving_average(ts, window=10)
+
+# Визуализация
+plt.figure(figsize=(14, 6))
+plt.plot(ts, label='Исходные данные', 
+        alpha=0.5, linewidth=1)
+plt.plot(sma, label='SMA(10)', linewidth=2)
+plt.plot(ema, label='EMA(10)', linewidth=2)
+plt.plot(wma, label='WMA(10)', linewidth=2)
+plt.legend()
+plt.xlabel('Время')
+plt.ylabel('Значение')
+plt.title('Сравнение методов скользящих средних')
+plt.grid(True, alpha=0.3)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Выбор размера окна</h2>
+    <ul>
+      <li><strong>Малое окно (3-5)</strong>: меньше сглаживания, быстрая реакция</li>
+      <li><strong>Среднее окно (10-20)</strong>: баланс между гладкостью и лагом</li>
+      <li><strong>Большое окно (50+)</strong>: сильное сглаживание, большой лаг</li>
+    </ul>
+    <pre><code># Сравнение разных размеров окна
+windows = [5, 10, 20, 50]
+
+plt.figure(figsize=(14, 6))
+plt.plot(ts, label='Исходные', alpha=0.3)
+
+for w in windows:
+    sma = ts.rolling(window=w).mean()
+    plt.plot(sma, label=f'SMA({w})', linewidth=2)
+
+plt.legend()
+plt.xlabel('Время')
+plt.ylabel('Значение')
+plt.title('Влияние размера окна')
+plt.grid(True, alpha=0.3)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Прогнозирование</h2>
+    <p>Простое прогнозирование с помощью скользящих средних:</p>
+    <pre><code># Прогноз на 1 шаг вперед
+def forecast_next_value(data, window, method='sma'):
+    if method == 'sma':
+        return data[-window:].mean()
+    elif method == 'ema':
+        ema = data.ewm(span=window, adjust=False).mean()
+        return ema.iloc[-1]
+    elif method == 'wma':
+        weights = np.arange(1, window + 1)
+        recent = data[-window:].values
+        return np.dot(recent, weights) / weights.sum()
+
+# Пример
+ts = pd.Series([10, 12, 15, 14, 16, 18, 20, 19])
+
+forecast_sma = forecast_next_value(ts, window=3, 
+                                   method='sma')
+forecast_ema = forecast_next_value(ts, window=3, 
+                                   method='ema')
+
+print(f"Прогноз SMA: {forecast_sma:.2f}")
+print(f"Прогноз EMA: {forecast_ema:.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Crossover стратегии</h2>
+    <p>Пересечение двух скользящих средних (трейдинг):</p>
+    <pre><code># Стратегия: быстрая MA пересекает медленную MA
+fast_window = 10
+slow_window = 30
+
+fast_ma = ts.rolling(window=fast_window).mean()
+slow_ma = ts.rolling(window=slow_window).mean()
+
+# Сигналы
+# 1 = купить, -1 = продать, 0 = держать
+signals = pd.DataFrame(index=ts.index)
+signals['signal'] = 0
+
+# Когда быстрая > медленной: buy
+signals['signal'][fast_ma > slow_ma] = 1
+# Когда быстрая < медленной: sell
+signals['signal'][fast_ma < slow_ma] = -1
+
+# Позиции (изменения сигнала)
+signals['positions'] = signals['signal'].diff()
+
+# Визуализация
+plt.figure(figsize=(14, 6))
+plt.plot(ts, label='Цена', alpha=0.5)
+plt.plot(fast_ma, label=f'Fast MA ({fast_window})')
+plt.plot(slow_ma, label=f'Slow MA ({slow_window})')
+
+# Маркеры покупки/продажи
+buy = signals[signals['positions'] == 2].index
+sell = signals[signals['positions'] == -2].index
+
+plt.scatter(buy, ts[buy], marker='^', 
+           color='g', s=100, label='Купить')
+plt.scatter(sell, ts[sell], marker='v', 
+           color='r', s=100, label='Продать')
+
+plt.legend()
+plt.title('Crossover стратегия')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Обработка пропусков</h2>
+    <pre><code># Данные с пропусками
+ts_missing = pd.Series([10, 12, np.nan, 14, 16, 
+                        np.nan, 20, 19])
+
+# По умолчанию пропускаются
+sma_default = ts_missing.rolling(window=3).mean()
+print("С пропусками:", sma_default.values)
+
+# min_periods: минимальное число непустых значений
+sma_min = ts_missing.rolling(
+    window=3, 
+    min_periods=2
+).mean()
+print("min_periods=2:", sma_min.values)
+
+# Интерполяция перед применением MA
+ts_interpolated = ts_missing.interpolate()
+sma_interp = ts_interpolated.rolling(
+    window=3
+).mean()
+print("После интерполяции:", sma_interp.values)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Сглаживание шумных данных</li>
+          <li>Выявление тренда</li>
+          <li>Финансовый анализ и трейдинг</li>
+          <li>Простое прогнозирование</li>
+          <li>Предобработка для других методов</li>
+          <li>Визуализация общей динамики</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Точное прогнозирование (используйте ARIMA)</li>
+          <li>Сезонные паттерны (используйте SARIMA)</li>
+          <li>Нестационарные ряды без преобразования</li>
+          <li>Данные с резкими изменениями</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать подходящий тип MA (SMA/EMA/WMA)</li>
+      <li>[ ] Определить размер окна</li>
+      <li>[ ] Проверить на пропуски и выбросы</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Оценить лаг и гладкость</li>
+      <li>[ ] Рассмотреть разные размеры окна</li>
+      <li>[ ] Для прогноза: оценить точность на тестовой выборке</li>
+      <li>[ ] Сравнить с более сложными методами</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Скользящие средние — это как "сглаживающий фильтр" для данных. Вместо того чтобы смотреть на каждое значение отдельно, мы усредняем несколько соседних точек. Это помогает увидеть общую тенденцию без лишнего шума. Например, в продажах мы можем увидеть рост или падение, не отвлекаясь на случайные колебания дня к дню».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

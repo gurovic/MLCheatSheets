@@ -4,490 +4,492 @@
   <meta charset="UTF-8">
   <title>Гиперпараметры градиентного бустинга Cheatsheet — 3 колонки</title>
   <style>
-    @media screen {body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;color: #333;background: #fafcff;padding: 10px;}}
-    @media print {body {background: white;padding: 0;}@page {size: A4 landscape;margin: 10mm;}}
-    .container {column-count: 3;column-gap: 20px;max-width: 100%;}
-    .block {break-inside: avoid;margin-bottom: 1.2em;padding: 12px;background: white;border-radius: 6px;box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
-    h1 {font-size: 1.6em;font-weight: 700;color: #1a5fb4;text-align: center;margin: 0 0 8px;column-span: all;}
-    .subtitle {text-align: center;color: #666;font-size: 0.9em;margin-bottom: 12px;column-span: all;}
-    h2 {font-size: 1.15em;font-weight: 700;color: #1a5fb4;margin: 0 0 8px;padding-bottom: 4px;border-bottom: 1px solid #e0e7ff;}
-    p, ul, ol {font-size: 0.92em;margin: 0.6em 0;}
-    ul, ol {padding-left: 18px;}
-    li {margin-bottom: 4px;}
-    code {font-family: 'Consolas', 'Courier New', monospace;background-color: #f0f4ff;padding: 1px 4px;border-radius: 3px;font-size: 0.88em;}
-    pre {background-color: #f0f4ff;padding: 8px;border-radius: 4px;overflow-x: auto;font-size: 0.84em;margin: 6px 0;}
-    pre code {padding: 0;background: none;white-space: pre-wrap;}
-    strong {color: #1a5fb4;font-weight: 600;}
-    .formula {background: #fff9e6;padding: 6px;border-left: 3px solid #ffcc00;margin: 8px 0;font-style: italic;}
-    table {width: 100%;border-collapse: collapse;font-size: 0.88em;margin: 8px 0;}
-    table th {background-color: #e0e7ff;padding: 6px;text-align: left;font-weight: 600;}
-    table td {padding: 5px 6px;border-bottom: 1px solid #e0e7ff;}
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
   </style>
 </head>
 <body>
 
-<h1>Гиперпараметры градиентного бустинга</h1>
-<div class="subtitle">Полное руководство по настройке XGBoost, LightGBM, CatBoost</div>
-
 <div class="container">
 
+  <h1>🎛️ Гиперпараметры градиентного бустинга Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
   <div class="block">
-    <h2>1. Базовые параметры деревьев</h2>
-    <p><strong>max_depth</strong> — максимальная глубина дерева.</p>
+    <h2>🔷 1. Основные параметры</h2>
     <ul>
-      <li><strong>Диапазон:</strong> 3-10</li>
-      <li><strong>Значение:</strong> 6 (по умолчанию)</li>
-      <li><strong>Эффект:</strong> больше → переобучение, меньше → недообучение</li>
-      <li><strong>XGBoost:</strong> max_depth=6</li>
-      <li><strong>LightGBM:</strong> max_depth=-1 (без ограничений)</li>
-      <li><strong>CatBoost:</strong> depth=6</li>
+      <li><strong>n_estimators</strong>: число деревьев</li>
+      <li><strong>learning_rate</strong>: скорость обучения (0.01-0.3)</li>
+      <li><strong>max_depth</strong>: глубина деревьев</li>
+      <li><strong>subsample</strong>: доля выборки для дерева</li>
+      <li><strong>colsample_bytree</strong>: доля признаков</li>
     </ul>
-    
-    <pre><code># XGBoost
-xgb_params = {'max_depth': 6}
-
-# LightGBM
-lgb_params = {'max_depth': -1}
-
-# CatBoost
-cat_params = {'depth': 6}</code></pre>
-    
-    <p><strong>Рекомендации:</strong></p>
-    <ul>
-      <li>Начните с 6-8</li>
-      <li>Уменьшайте при переобучении</li>
-      <li>Увеличивайте если недообучение</li>
-    </ul>
+    <p><strong>Правило</strong>: маленький learning_rate → больше n_estimators</p>
   </div>
 
   <div class="block">
-    <h2>2. Learning rate</h2>
-    <p><strong>learning_rate (eta, eta)</strong> — скорость обучения.</p>
-    
-    <div class="formula">
-      prediction = prediction + learning_rate × tree_prediction
-    </div>
-    
-    <ul>
-      <li><strong>Диапазон:</strong> 0.01-0.3</li>
-      <li><strong>Значение:</strong> 0.1 (по умолчанию)</li>
-      <li><strong>Правило:</strong> меньше lr → больше n_estimators</li>
-    </ul>
-    
-    <pre><code># XGBoost
-xgb.XGBClassifier(
-    learning_rate=0.05,
-    n_estimators=1000
-)
-
-# LightGBM
-lgb.LGBMClassifier(
-    learning_rate=0.05,
-    n_estimators=1000
-)
-
-# CatBoost
-CatBoostClassifier(
-    learning_rate=0.05,
-    iterations=1000
-)</code></pre>
-    
-    <p><strong>Стратегии:</strong></p>
-    <ul>
-      <li>0.1: быстрое обучение, хорошо для экспериментов</li>
-      <li>0.05: баланс скорости и качества</li>
-      <li>0.01-0.03: лучшее качество, долгое обучение</li>
-      <li>0.3+: риск переобучения</li>
-    </ul>
-  </div>
-
-  <div class="block">
-    <h2>3. Количество деревьев</h2>
-    <p><strong>n_estimators / num_boost_round</strong> — число деревьев в ансамбле.</p>
-    
-    <ul>
-      <li><strong>Диапазон:</strong> 100-10000+</li>
-      <li><strong>Значение:</strong> 100 (по умолчанию, обычно мало)</li>
-      <li><strong>Связь:</strong> зависит от learning_rate</li>
-    </ul>
-    
+    <h2>🔷 2. XGBoost параметры</h2>
     <table>
-      <tr>
-        <th>learning_rate</th>
-        <th>n_estimators</th>
-      </tr>
-      <tr>
-        <td>0.1</td>
-        <td>100-500</td>
-      </tr>
-      <tr>
-        <td>0.05</td>
-        <td>500-1500</td>
-      </tr>
-      <tr>
-        <td>0.01</td>
-        <td>2000-10000</td>
-      </tr>
+      <tr><th>Параметр</th><th>Диапазон</th><th>Описание</th></tr>
+      <tr><td><code>n_estimators</code></td><td>100-1000</td><td>Число деревьев</td></tr>
+      <tr><td><code>learning_rate</code></td><td>0.01-0.3</td><td>η (eta)</td></tr>
+      <tr><td><code>max_depth</code></td><td>3-10</td><td>Глубина дерева</td></tr>
+      <tr><td><code>subsample</code></td><td>0.5-1.0</td><td>Семплирование строк</td></tr>
+      <tr><td><code>colsample_bytree</code></td><td>0.5-1.0</td><td>Семплирование признаков</td></tr>
+      <tr><td><code>gamma</code></td><td>0-5</td><td>Мин. потеря для split</td></tr>
+      <tr><td><code>min_child_weight</code></td><td>1-10</td><td>Мин. вес в листе</td></tr>
+      <tr><td><code>reg_alpha</code></td><td>0-1</td><td>L1 регуляризация</td></tr>
+      <tr><td><code>reg_lambda</code></td><td>0-10</td><td>L2 регуляризация</td></tr>
     </table>
-    
-    <pre><code># С early stopping
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. XGBoost базовый</h2>
+    <pre><code>import xgboost as xgb
+from sklearn.model_selection import train_test_split
+
+# Подготовка данных
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Базовая модель
 model = xgb.XGBClassifier(
-    n_estimators=10000,
-    early_stopping_rounds=50,
-    learning_rate=0.01
+    n_estimators=100,
+    learning_rate=0.1,
+    max_depth=5,
+    subsample=0.8,
+    colsample_bytree=0.8,
+    random_state=42
 )
 
-model.fit(
-    X_train, y_train,
-    eval_set=[(X_val, y_val)],
-    verbose=100
-)
+model.fit(X_train, y_train)
 
-print(f"Best iteration: {model.best_iteration}")</code></pre>
+# Оценка
+train_score = model.score(X_train, y_train)
+test_score = model.score(X_test, y_test)
+
+print(f"Train: {train_score:.4f}")
+print(f"Test: {test_score:.4f}")</code></pre>
   </div>
 
   <div class="block">
-    <h2>4. Подвыборка данных</h2>
-    <p><strong>subsample</strong> — доля строк для каждого дерева.</p>
-    
-    <ul>
-      <li><strong>Диапазон:</strong> 0.5-1.0</li>
-      <li><strong>Значение:</strong> 1.0 (все данные)</li>
-      <li><strong>Эффект:</strong> < 1.0 → регуляризация, быстрее обучение</li>
-    </ul>
-    
-    <pre><code># XGBoost
-xgb_params = {
-    'subsample': 0.8,  # 80% строк
-    'colsample_bytree': 0.8  # 80% признаков
-}
-
-# LightGBM
-lgb_params = {
-    'bagging_fraction': 0.8,
-    'bagging_freq': 5,  # каждые 5 итераций
-    'feature_fraction': 0.8
-}
-
-# CatBoost
-cat_params = {
-    'subsample': 0.8,
-    'rsm': 0.8  # random subspace method
-}</code></pre>
-    
-    <p><strong>Рекомендации:</strong></p>
-    <ul>
-      <li>0.8-0.9: хорошая регуляризация</li>
-      <li>0.5-0.7: сильная регуляризация</li>
-      <li>1.0: если данных мало</li>
-    </ul>
+    <h2>🔷 4. LightGBM параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Диапазон</th><th>Отличия от XGBoost</th></tr>
+      <tr><td><code>num_leaves</code></td><td>31-255</td><td>Вместо max_depth</td></tr>
+      <tr><td><code>learning_rate</code></td><td>0.01-0.3</td><td>-</td></tr>
+      <tr><td><code>n_estimators</code></td><td>100-1000</td><td>-</td></tr>
+      <tr><td><code>min_child_samples</code></td><td>20-100</td><td>Мин. объектов в листе</td></tr>
+      <tr><td><code>feature_fraction</code></td><td>0.5-1.0</td><td>=colsample_bytree</td></tr>
+      <tr><td><code>bagging_fraction</code></td><td>0.5-1.0</td><td>=subsample</td></tr>
+      <tr><td><code>reg_alpha</code></td><td>0-1</td><td>L1 регуляризация</td></tr>
+      <tr><td><code>reg_lambda</code></td><td>0-10</td><td>L2 регуляризация</td></tr>
+    </table>
   </div>
 
   <div class="block">
-    <h2>5. Подвыборка признаков</h2>
-    <p><strong>colsample_by*</strong> — доля признаков.</p>
-    
-    <p><strong>XGBoost варианты:</strong></p>
-    <ul>
-      <li><strong>colsample_bytree:</strong> для каждого дерева</li>
-      <li><strong>colsample_bylevel:</strong> для каждого уровня</li>
-      <li><strong>colsample_bynode:</strong> для каждого разбиения</li>
-    </ul>
-    
-    <pre><code># Комбинированная стратегия
-xgb_params = {
-    'colsample_bytree': 0.8,    # 80% при построении дерева
-    'colsample_bylevel': 0.8,   # 80% на каждом уровне
-    'colsample_bynode': 0.8     # 80% в каждом узле
-}
+    <h2>🔷 5. LightGBM базовый</h2>
+    <pre><code>import lightgbm as lgb
 
-# Эффективная доля: 0.8 × 0.8 × 0.8 = 0.512 (51.2%)
+# DMatrix формат
+train_data = lgb.Dataset(X_train, label=y_train)
+test_data = lgb.Dataset(X_test, label=y_test, 
+                       reference=train_data)
 
-# LightGBM
-lgb_params = {
-    'feature_fraction': 0.8,
-    'feature_fraction_bynode': 0.8
-}
-
-# CatBoost
-cat_params = {
-    'rsm': 0.8  # Random Subspace Method
-}</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>6. Регуляризация</h2>
-    <p><strong>L1 и L2 регуляризация весов.</strong></p>
-    
-    <p><strong>XGBoost:</strong></p>
-    <ul>
-      <li><strong>reg_alpha:</strong> L1 (lasso)</li>
-      <li><strong>reg_lambda:</strong> L2 (ridge)</li>
-    </ul>
-    
-    <pre><code># XGBoost
-xgb_params = {
-    'reg_alpha': 0.1,   # L1
-    'reg_lambda': 1.0   # L2
-}
-
-# LightGBM
-lgb_params = {
-    'lambda_l1': 0.1,
-    'lambda_l2': 1.0
-}
-
-# CatBoost
-cat_params = {
-    'l2_leaf_reg': 3.0  # L2 регуляризация листьев
-}</code></pre>
-    
-    <p><strong>Когда использовать:</strong></p>
-    <ul>
-      <li>L1: для feature selection</li>
-      <li>L2: общая регуляризация</li>
-      <li>Увеличивайте при переобучении</li>
-      <li>Начинайте с L2 = 1.0</li>
-    </ul>
-  </div>
-
-  <div class="block">
-    <h2>7. Минимальные размеры</h2>
-    <p><strong>Ограничения на листья и разбиения.</strong></p>
-    
-    <p><strong>min_child_weight (XGBoost):</strong></p>
-    <ul>
-      <li>Минимальная сумма весов в листе</li>
-      <li>Диапазон: 0-100</li>
-      <li>По умолчанию: 1</li>
-      <li>Больше → консервативнее модель</li>
-    </ul>
-    
-    <pre><code># XGBoost
-xgb_params = {
-    'min_child_weight': 3,  # минимум 3 в leaf
-    'gamma': 0.1  # минимальный gain для split
-}
-
-# LightGBM
-lgb_params = {
-    'min_child_samples': 20,  # минимум сэмплов в leaf
-    'min_child_weight': 0.001,
-    'min_split_gain': 0.1  # минимальный gain
-}
-
-# CatBoost
-cat_params = {
-    'min_data_in_leaf': 1,
-    'max_leaves': 31  # максимум листьев
-}</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>8. Специфичные для LightGBM</h2>
-    <p><strong>num_leaves</strong> — максимальное число листьев.</p>
-    
-    <ul>
-      <li><strong>Диапазон:</strong> 20-255</li>
-      <li><strong>Правило:</strong> num_leaves < 2^max_depth</li>
-      <li><strong>Важно:</strong> ключевой параметр LightGBM</li>
-    </ul>
-    
-    <pre><code># Оптимальная настройка LightGBM
-lgb_params = {
-    'num_leaves': 31,  # 2^5 - 1
-    'max_depth': -1,
-    'min_child_samples': 20,
-    'min_child_weight': 0.001,
-    'feature_fraction': 0.8,
+# Параметры
+params = {
+    'objective': 'binary',
+    'metric': 'auc',
+    'num_leaves': 31,
+    'learning_rate': 0.05,
+    'feature_fraction': 0.9,
     'bagging_fraction': 0.8,
     'bagging_freq': 5,
-    'lambda_l1': 0.1,
-    'lambda_l2': 0.1,
-    'min_split_gain': 0.0
+    'verbose': 0
 }
 
-# Больше листьев = сложнее модель
-# 31 листьев — хороший старт
-# 255 листьев — для больших датасетов</code></pre>
-    
-    <p><strong>boosting_type:</strong></p>
-    <ul>
-      <li><strong>gbdt:</strong> традиционный (по умолчанию)</li>
-      <li><strong>dart:</strong> Dropout для деревьев</li>
-      <li><strong>goss:</strong> Gradient-based One-Side Sampling</li>
-    </ul>
+# Обучение
+model = lgb.train(
+    params,
+    train_data,
+    num_boost_round=100,
+    valid_sets=[test_data],
+    early_stopping_rounds=10
+)
+
+# Предсказания
+y_pred = model.predict(X_test)
+
+# С sklearn API
+lgb_clf = lgb.LGBMClassifier(
+    num_leaves=31,
+    learning_rate=0.05,
+    n_estimators=100
+)
+lgb_clf.fit(X_train, y_train)</code></pre>
   </div>
 
   <div class="block">
-    <h2>9. Специфичные для CatBoost</h2>
-    <p><strong>Параметры для категориальных признаков.</strong></p>
-    
-    <pre><code>cat_params = {
-    # Основные
-    'iterations': 1000,
-    'learning_rate': 0.05,
-    'depth': 6,
-    
-    # Регуляризация
-    'l2_leaf_reg': 3.0,
-    'bagging_temperature': 1.0,
-    'random_strength': 1.0,
-    
-    # Категориальные
-    'one_hot_max_size': 2,  # one-hot до 2 уникальных значений
-    'cat_features': [0, 1, 2],  # индексы категориальных
-    
-    # Бордеры
-    'border_count': 128,  # квантили для числовых
-    
-    # Ранняя остановка
-    'early_stopping_rounds': 50,
-    
-    # GPU
-    'task_type': 'GPU',
-    'devices': '0'
-}
-
-model = CatBoostClassifier(**cat_params)
-model.fit(
-    X_train, y_train,
-    eval_set=(X_val, y_val),
-    cat_features=['category', 'color'],
-    verbose=100
-)</code></pre>
+    <h2>🔷 6. CatBoost параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Диапазон</th><th>Особенность</th></tr>
+      <tr><td><code>iterations</code></td><td>100-1000</td><td>=n_estimators</td></tr>
+      <tr><td><code>learning_rate</code></td><td>0.01-0.3</td><td>-</td></tr>
+      <tr><td><code>depth</code></td><td>4-10</td><td>=max_depth</td></tr>
+      <tr><td><code>l2_leaf_reg</code></td><td>1-10</td><td>L2 регуляризация</td></tr>
+      <tr><td><code>border_count</code></td><td>32-255</td><td>Бинаризация признаков</td></tr>
+      <tr><td><code>bagging_temperature</code></td><td>0-1</td><td>Bayesian bootstrap</td></tr>
+      <tr><td><code>random_strength</code></td><td>0-10</td><td>Случайность splits</td></tr>
+    </table>
+    <p><strong>Фишка</strong>: автоматическая работа с категориальными</p>
   </div>
 
   <div class="block">
-    <h2>10. Стратегии настройки</h2>
-    <p><strong>Пошаговый подход:</strong></p>
-    
-    <p><strong>Шаг 1: Базовая модель</strong></p>
-    <pre><code>base_params = {
-    'learning_rate': 0.1,
-    'n_estimators': 100,
-    'max_depth': 6
-}
+    <h2>🔷 7. CatBoost базовый</h2>
+    <pre><code>from catboost import CatBoostClassifier, Pool
 
-model = xgb.XGBClassifier(**base_params)
-score = cross_val_score(model, X, y, cv=5).mean()
-print(f"Baseline: {score:.4f}")</code></pre>
-    
-    <p><strong>Шаг 2: Настройка структуры дерева</strong></p>
-    <pre><code>param_grid = {
-    'max_depth': [3, 5, 7, 9],
-    'min_child_weight': [1, 3, 5],
-    'gamma': [0, 0.1, 0.2]
-}
+# Указываем категориальные признаки
+cat_features = [0, 2]  # индексы
 
-grid = GridSearchCV(model, param_grid, cv=5, scoring='roc_auc')
-grid.fit(X_train, y_train)</code></pre>
-    
-    <p><strong>Шаг 3: Настройка подвыборки</strong></p>
-    <pre><code>param_grid = {
-    'subsample': [0.6, 0.8, 1.0],
-    'colsample_bytree': [0.6, 0.8, 1.0]
-}</code></pre>
-    
-    <p><strong>Шаг 4: Регуляризация</strong></p>
-    <pre><code>param_grid = {
-    'reg_alpha': [0, 0.1, 1, 10],
-    'reg_lambda': [0.1, 1, 10, 100]
-}</code></pre>
-    
-    <p><strong>Шаг 5: Точная настройка learning_rate</strong></p>
-    <pre><code># Уменьшить lr, увеличить n_estimators
-final_params = {
-    **best_params,
-    'learning_rate': 0.01,
-    'n_estimators': 5000
-}</code></pre>
+# Pool объект
+train_pool = Pool(X_train, y_train, 
+                 cat_features=cat_features)
+test_pool = Pool(X_test, y_test,
+                cat_features=cat_features)
+
+# Модель
+model = CatBoostClassifier(
+    iterations=100,
+    learning_rate=0.1,
+    depth=6,
+    l2_leaf_reg=3,
+    verbose=False
+)
+
+# Обучение
+model.fit(train_pool, eval_set=test_pool)
+
+# Feature importance
+feature_importance = model.get_feature_importance()
+print(feature_importance)</code></pre>
   </div>
 
   <div class="block">
-    <h2>11. Bayesian Optimization</h2>
-    <pre><code>from hyperopt import hp, fmin, tpe, Trials
+    <h2>🔷 8. Grid Search</h2>
+    <pre><code>from sklearn.model_selection import GridSearchCV
 
-space = {
-    'max_depth': hp.quniform('max_depth', 3, 10, 1),
-    'learning_rate': hp.loguniform('learning_rate', np.log(0.01), np.log(0.3)),
-    'n_estimators': hp.quniform('n_estimators', 100, 1000, 50),
-    'subsample': hp.uniform('subsample', 0.5, 1.0),
-    'colsample_bytree': hp.uniform('colsample_bytree', 0.5, 1.0),
-    'reg_alpha': hp.loguniform('reg_alpha', np.log(0.01), np.log(10)),
-    'reg_lambda': hp.loguniform('reg_lambda', np.log(0.01), np.log(10))
+# Параметры для поиска
+param_grid = {
+    'max_depth': [3, 5, 7],
+    'learning_rate': [0.01, 0.1, 0.3],
+    'n_estimators': [100, 300, 500],
+    'subsample': [0.8, 1.0],
+    'colsample_bytree': [0.8, 1.0]
 }
 
-def objective(params):
-    params = {
-        'max_depth': int(params['max_depth']),
-        'n_estimators': int(params['n_estimators']),
-        **{k: v for k, v in params.items() if k not in ['max_depth', 'n_estimators']}
+# XGBoost модель
+xgb_model = xgb.XGBClassifier(random_state=42)
+
+# Grid Search
+grid_search = GridSearchCV(
+    xgb_model,
+    param_grid,
+    cv=5,
+    scoring='roc_auc',
+    n_jobs=-1,
+    verbose=1
+)
+
+grid_search.fit(X_train, y_train)
+
+print(f"Best params: {grid_search.best_params_}")
+print(f"Best score: {grid_search.best_score_:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Optuna оптимизация</h2>
+    <pre><code>import optuna
+
+def objective(trial):
+    param = {
+        'max_depth': trial.suggest_int('max_depth', 3, 9),
+        'learning_rate': trial.suggest_float('learning_rate', 
+                                            0.01, 0.3, log=True),
+        'n_estimators': trial.suggest_int('n_estimators', 
+                                         50, 500),
+        'min_child_weight': trial.suggest_int('min_child_weight', 
+                                              1, 7),
+        'gamma': trial.suggest_float('gamma', 0, 5),
+        'subsample': trial.suggest_float('subsample', 0.5, 1.0),
+        'colsample_bytree': trial.suggest_float('colsample_bytree', 
+                                                0.5, 1.0),
+        'reg_alpha': trial.suggest_float('reg_alpha', 0, 1),
+        'reg_lambda': trial.suggest_float('reg_lambda', 0, 10)
     }
     
-    model = xgb.XGBClassifier(**params, random_state=42)
-    score = cross_val_score(model, X_train, y_train, cv=5, scoring='roc_auc').mean()
-    return -score  # минимизируем
+    model = xgb.XGBClassifier(**param, random_state=42)
+    model.fit(X_train, y_train)
+    
+    return model.score(X_test, y_test)
 
-trials = Trials()
-best = fmin(
-    fn=objective,
-    space=space,
-    algo=tpe.suggest,
-    max_evals=100,
-    trials=trials
-)</code></pre>
+# Оптимизация
+study = optuna.create_study(direction='maximize')
+study.optimize(objective, n_trials=50)
+
+print(f"Best trial: {study.best_trial.value:.4f}")
+print(f"Best params: {study.best_params}")</code></pre>
   </div>
 
   <div class="block">
-    <h2>12. Практические рекомендации</h2>
-    <p><strong>Начальные значения:</strong></p>
-    <pre><code># Хорошие стартовые параметры
-xgb_starter = {
-    'learning_rate': 0.05,
-    'n_estimators': 1000,
-    'max_depth': 6,
-    'min_child_weight': 3,
-    'gamma': 0.1,
-    'subsample': 0.8,
-    'colsample_bytree': 0.8,
-    'reg_alpha': 0.1,
-    'reg_lambda': 1.0,
-    'early_stopping_rounds': 50
-}
+    <h2>🔷 10. Early Stopping</h2>
+    <pre><code># XGBoost
+model = xgb.XGBClassifier(
+    n_estimators=1000,
+    learning_rate=0.01,
+    early_stopping_rounds=10
+)
 
-lgb_starter = {
-    'learning_rate': 0.05,
-    'n_estimators': 1000,
-    'num_leaves': 31,
-    'max_depth': -1,
-    'min_child_samples': 20,
-    'feature_fraction': 0.8,
-    'bagging_fraction': 0.8,
-    'bagging_freq': 5,
-    'lambda_l1': 0.1,
-    'lambda_l2': 0.1
-}
+model.fit(
+    X_train, y_train,
+    eval_set=[(X_test, y_test)],
+    verbose=False
+)
 
-cat_starter = {
-    'learning_rate': 0.05,
-    'iterations': 1000,
-    'depth': 6,
-    'l2_leaf_reg': 3.0,
-    'subsample': 0.8,
-    'random_strength': 1.0,
-    'bagging_temperature': 1.0
-}</code></pre>
-    
-    <p><strong>Общие советы:</strong></p>
+print(f"Best iteration: {model.best_iteration}")
+
+# LightGBM
+evals_result = {}
+lgb_model = lgb.train(
+    params,
+    train_data,
+    num_boost_round=1000,
+    valid_sets=[test_data],
+    early_stopping_rounds=10,
+    evals_result=evals_result
+)
+
+# CatBoost (автоматически с eval_set)
+cb_model = CatBoostClassifier(
+    iterations=1000,
+    learning_rate=0.01,
+    early_stopping_rounds=10
+)
+cb_model.fit(train_pool, eval_set=test_pool)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Стратегии настройки</h2>
+    <p><strong>Поэтапный подход:</strong></p>
+    <ol>
+      <li><strong>Шаг 1</strong>: Фиксировать learning_rate=0.1, настроить max_depth и min_child_weight</li>
+      <li><strong>Шаг 2</strong>: Настроить subsample и colsample_bytree</li>
+      <li><strong>Шаг 3</strong>: Добавить регуляризацию (gamma, reg_alpha, reg_lambda)</li>
+      <li><strong>Шаг 4</strong>: Уменьшить learning_rate, увеличить n_estimators</li>
+      <li><strong>Шаг 5</strong>: Fine-tuning с early stopping</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сравнение моделей</h2>
+    <table>
+      <tr><th>Аспект</th><th>XGBoost</th><th>LightGBM</th><th>CatBoost</th></tr>
+      <tr><td>Скорость</td><td>Средняя</td><td>Быстрая</td><td>Медленная</td></tr>
+      <tr><td>Память</td><td>Средняя</td><td>Низкая</td><td>Высокая</td></tr>
+      <tr><td>Категориальные</td><td>Нужно кодировать</td><td>Нужно кодировать</td><td>Автоматически</td></tr>
+      <tr><td>Переобучение</td><td>Умеренное</td><td>Риск выше</td><td>Риск ниже</td></tr>
+      <tr><td>GPU</td><td>Да</td><td>Да</td><td>Да</td></tr>
+      <tr><td>Документация</td><td>Отличная</td><td>Хорошая</td><td>Хорошая</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
     <ul>
-      <li>Используйте early stopping всегда</li>
-      <li>Мониторьте train vs validation loss</li>
-      <li>Начинайте с маленького lr + много деревьев</li>
-      <li>Регуляризируйте через sampling, а не только L1/L2</li>
-      <li>Сохраняйте лучшие параметры</li>
-      <li>Cross-validation для финальной оценки</li>
+      <li>[ ] Начать с базовых параметров</li>
+      <li>[ ] Настроить max_depth / num_leaves</li>
+      <li>[ ] Настроить learning_rate и n_estimators</li>
+      <li>[ ] Добавить subsample / bagging</li>
+      <li>[ ] Настроить регуляризацию</li>
+      <li>[ ] Использовать early stopping</li>
+      <li>[ ] Проверить на переобучение (train vs test)</li>
+      <li>[ ] Оценить feature importance</li>
+      <li>[ ] Попробовать разные библиотеки</li>
     </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Гиперпараметры градиентного бустинга — это "ручки настройки" алгоритма. Правильная настройка может улучшить качество модели на 5-15%, но требует времени. Мы начинаем с разумных значений, затем систематически оптимизируем, балансируя между точностью и скоростью обучения».
+    </blockquote>
   </div>
 
 </div>
