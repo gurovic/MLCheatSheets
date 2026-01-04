@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Affinity Propagation Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔗 Affinity Propagation Cheatsheet</h1>
+  <div class="subtitle">Передача сообщений • Автоопределение центров • Без K<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть метода</h2>
+    <ul>
+      <li><strong>Message passing</strong>: точки обмениваются сообщениями о пригодности быть центром</li>
+      <li><strong>Автоматическое K</strong>: сам определяет число кластеров и их центры (exemplars)</li>
+      <li><strong>Similarity-based</strong>: работает с матрицей схожести между точками</li>
+      <li><strong>Детерминированный</strong>: одинаковые результаты при фиксированных параметрах</li>
+      <li><strong>Основан на графах</strong>: каждая точка может быть центром кластера</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый код</h2>
+    <pre><code>from sklearn.cluster import AffinityPropagation
+import numpy as np
+
+# Базовое использование
+model = AffinityPropagation(
+    damping=0.5,
+    max_iter=200,
+    random_state=42
+)
+labels = model.fit_predict(X)
+
+# Получить exemplars (центры кластеров)
+exemplars = model.cluster_centers_indices_
+n_clusters = len(exemplars)
+
+print(f"Найдено кластеров: {n_clusters}")
+print(f"Индексы exemplars: {exemplars}")
+
+# С предвычисленной матрицей схожести
+from sklearn.metrics import pairwise_distances
+S = -pairwise_distances(X, metric='euclidean')
+model = AffinityPropagation(
+    affinity='precomputed'
+)
+labels = model.fit_predict(S)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Совет</th></tr>
+      <tr><td><code>damping</code></td><td>Коэффициент затухания (0.5-1)</td><td>0.5-0.9, больше = стабильнее</td></tr>
+      <tr><td><code>max_iter</code></td><td>Макс итераций</td><td>200-500, увеличить если не сходится</td></tr>
+      <tr><td><code>convergence_iter</code></td><td>Итераций без изменений</td><td>15 по умолчанию</td></tr>
+      <tr><td><code>preference</code></td><td>Предпочтение быть exemplar</td><td>Медиана S или None (авто)</td></tr>
+      <tr><td><code>affinity</code></td><td>Метрика схожести</td><td>'euclidean', 'precomputed'</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Алгоритм работы</h2>
+    <ol>
+      <li><strong>Инициализация</strong>: построить матрицу схожести S(i,k) между точками</li>
+      <li><strong>Responsibility</strong>: R(i,k) — насколько k подходит быть exemplar для i</li>
+      <li><strong>Availability</strong>: A(i,k) — насколько i должна выбрать k как exemplar</li>
+      <li><strong>Итерации</strong>: обновлять R и A с демпфированием</li>
+      <li><strong>Выбор exemplars</strong>: точки где R(k,k) + A(k,k) > 0</li>
+      <li><strong>Назначение кластеров</strong>: каждая точка к ближайшему exemplar</li>
+    </ol>
+    <p><strong>Формулы обновления</strong>:</p>
+    <ul>
+      <li>R(i,k) ← S(i,k) - max{A(i,k') + S(i,k')} для k' ≠ k</li>
+      <li>A(i,k) ← min{0, R(k,k) + Σ max{0, R(i',k)}} для i' ∉ {i,k}</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Параметр Preference</h2>
+    <p><strong>Что это</strong>: начальное значение S(i,i) — самоподобие точки</p>
+    <p><strong>Влияние</strong>:</p>
+    <ul>
+      <li>Больше preference → больше кластеров</li>
+      <li>Меньше preference → меньше кластеров</li>
+    </ul>
+    <p><strong>Выбор значения</strong>:</p>
+    <pre><code># Автоматический (медиана)
+preference = np.median(S)
+
+# Или квантили для контроля
+preference = np.percentile(S, 10)  # меньше кластеров
+preference = np.percentile(S, 50)  # средне
+preference = np.percentile(S, 90)  # больше кластеров
+
+model = AffinityPropagation(
+    preference=preference
+)</code></pre>
+    <p><strong>Подбор через поиск</strong>:</p>
+    <pre><code>from sklearn.metrics import silhouette_score
+
+S = -pairwise_distances(X, metric='euclidean')
+prefs = np.percentile(S, [10, 30, 50, 70, 90])
+
+best_score = -1
+for pref in prefs:
+    ap = AffinityPropagation(preference=pref)
+    labels = ap.fit_predict(S)
+    if len(np.unique(labels)) > 1:
+        score = silhouette_score(X, labels)
+        if score > best_score:
+            best_score = score
+            best_pref = pref</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Матрица схожести</h2>
+    <p><strong>Отрицательное квадратичное расстояние</strong>:</p>
+    <pre><code># По умолчанию в sklearn
+S(i,k) = -||x_i - x_k||²
+
+# Вручную
+from sklearn.metrics import pairwise_distances
+S = -pairwise_distances(X, metric='euclidean')**2</code></pre>
+    <p><strong>Другие метрики</strong>:</p>
+    <pre><code># Косинусная схожесть
+from sklearn.metrics.pairwise import cosine_similarity
+S = cosine_similarity(X)
+
+# Корреляция
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import StandardScaler
+X_scaled = StandardScaler().fit_transform(X)
+S = cosine_similarity(X_scaled)
+
+# Пользовательская
+def custom_similarity(X):
+    # Ваша логика
+    return S
+
+S = custom_similarity(X)
+ap = AffinityPropagation(affinity='precomputed')
+labels = ap.fit_predict(S)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Предобработка данных</h2>
+    <p>✅ <strong>Масштабирование важно</strong></p>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</code></pre>
+    <p>✅ <strong>Снижение размерности</strong></p>
+    <ul>
+      <li>AP работает с матрицей N×N — память O(N²)</li>
+      <li>PCA для больших данных перед AP</li>
+      <li>Или использовать выборку точек</li>
+    </ul>
+    <p>✅ <strong>Обработка выбросов</strong></p>
+    <ul>
+      <li>Выбросы могут стать отдельными exemplars</li>
+      <li>Предварительная фильтрация рекомендуется</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Неизвестное число кластеров</li>
+          <li>Нужны представители (exemplars)</li>
+          <li>Малые данные (&lt;5K точек)</li>
+          <li>Нестандартные метрики схожести</li>
+          <li>Важна стабильность результатов</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Большие данные (&gt;10K точек)</li>
+          <li>Ограничения памяти (O(N²))</li>
+          <li>Нужна быстрая работа</li>
+          <li>Высокая размерность без PCA</li>
+          <li>Много шума в данных</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Не сходится</td><td>Увеличить damping (0.5→0.9), max_iter</td></tr>
+      <tr><td>Слишком много кластеров</td><td>Уменьшить preference</td></tr>
+      <tr><td>Слишком мало кластеров</td><td>Увеличить preference</td></tr>
+      <tr><td>Медленная работа</td><td>Уменьшить данные, PCA, sparse matrix</td></tr>
+      <tr><td>Много памяти</td><td>Выборка данных, использовать mini-batch подход</td></tr>
+      <tr><td>Осцилляции</td><td>Увеличить damping, convergence_iter</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Метрики оценки</h2>
+    <pre><code>from sklearn.metrics import (
+    silhouette_score,
+    davies_bouldin_score,
+    calinski_harabasz_score
+)
+
+labels = model.fit_predict(X)
+n_clusters = len(model.cluster_centers_indices_)
+
+if n_clusters > 1:
+    sil = silhouette_score(X, labels)
+    db = davies_bouldin_score(X, labels)
+    ch = calinski_harabasz_score(X, labels)
+    
+    print(f"Кластеров: {n_clusters}")
+    print(f"Silhouette: {sil:.3f}")
+    print(f"Davies-Bouldin: {db:.3f}")
+    print(f"Calinski-Harabasz: {ch:.3f}")
+
+# Exemplar quality
+exemplar_indices = model.cluster_centers_indices_
+exemplars = X[exemplar_indices]
+print(f"Exemplars: {exemplar_indices}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Визуализация</h2>
+    <pre><code>import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+
+# 2D проекция
+pca = PCA(n_components=2)
+X_2d = pca.fit_transform(X)
+
+# Точки
+plt.scatter(X_2d[:, 0], X_2d[:, 1], 
+            c=labels, cmap='viridis', 
+            alpha=0.6, s=50)
+
+# Exemplars
+exemplar_indices = model.cluster_centers_indices_
+exemplars_2d = X_2d[exemplar_indices]
+plt.scatter(exemplars_2d[:, 0], exemplars_2d[:, 1],
+            c='red', marker='*', s=300,
+            edgecolors='black', linewidths=2,
+            label='Exemplars')
+
+# Связи с exemplars
+for i, label in enumerate(labels):
+    exemplar_idx = exemplar_indices[label]
+    plt.plot([X_2d[i, 0], X_2d[exemplar_idx, 0]],
+             [X_2d[i, 1], X_2d[exemplar_idx, 1]],
+             'k-', alpha=0.1, linewidth=0.5)
+
+plt.legend()
+plt.title(f'AP: {n_clusters} кластеров')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Преимущества AP</th><th>Недостатки AP</th></tr>
+      <tr><td><strong>K-means</strong></td><td>Авто K, exemplars</td><td>Медленнее, больше памяти</td></tr>
+      <tr><td><strong>Mean Shift</strong></td><td>Детерминированный, стабильнее</td><td>Медленнее</td></tr>
+      <tr><td><strong>DBSCAN</strong></td><td>Все точки в кластере</td><td>Нужно знать примерное K</td></tr>
+      <tr><td><strong>Hierarchical</strong></td><td>Плоская структура</td><td>Медленнее</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Применения</h2>
+    <p><strong>Биоинформатика</strong>:</p>
+    <ul>
+      <li>Кластеризация генов по экспрессии</li>
+      <li>Идентификация представительных последовательностей</li>
+    </ul>
+    <p><strong>Computer Vision</strong>:</p>
+    <ul>
+      <li>Распознавание лиц (exemplar faces)</li>
+      <li>Кластеризация изображений</li>
+    </ul>
+    <p><strong>Тексты и NLP</strong>:</p>
+    <ul>
+      <li>Кластеризация документов</li>
+      <li>Выбор представительных текстов</li>
+    </ul>
+    <p><strong>Социальные сети</strong>:</p>
+    <ul>
+      <li>Обнаружение сообществ</li>
+      <li>Выявление лидеров мнений (exemplars)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Продвинутые техники</h2>
+    <p><strong>Sparse Affinity Propagation</strong>:</p>
+    <pre><code># Для больших данных
+from sklearn.metrics import pairwise_distances
+from scipy.sparse import csr_matrix
+
+# Sparse similarity matrix
+distances = pairwise_distances(X, metric='euclidean')
+# Обнулить далекие точки
+threshold = np.percentile(distances, 90)
+distances[distances > threshold] = 0
+S_sparse = csr_matrix(-distances)
+
+# Использовать как обычно
+# (sklearn не поддерживает, нужна своя реализация)</code></pre>
+    <p><strong>Hierarchical Affinity Propagation</strong>:</p>
+    <ul>
+      <li>Применить AP на exemplars для мета-кластеризации</li>
+      <li>Создает иерархию кластеров</li>
+    </ul>
+    <pre><code># Уровень 1
+ap1 = AffinityPropagation()
+labels1 = ap1.fit_predict(X)
+exemplars1 = X[ap1.cluster_centers_indices_]
+
+# Уровень 2 (мета)
+ap2 = AffinityPropagation()
+labels2 = ap2.fit_predict(exemplars1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Масштабировать данные</li>
+      <li>[ ] Проверить размер данных (&lt;10K)</li>
+      <li>[ ] Выбрать метрику схожести</li>
+      <li>[ ] Подобрать preference (grid search)</li>
+      <li>[ ] Установить damping (0.5-0.9)</li>
+      <li>[ ] Проверить сходимость (увеличить max_iter если нужно)</li>
+      <li>[ ] Оценить качество кластеризации</li>
+      <li>[ ] Проанализировать exemplars</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Affinity Propagation выбирает наиболее типичных представителей (exemplars) из ваших данных и группирует остальные точки вокруг них. Метод сам определяет оптимальное число групп, анализируя связи между всеми точками данных».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Полный пример</h2>
+    <pre><code>from sklearn.cluster import AffinityPropagation
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import silhouette_score
+import numpy as np
+
+# Подготовка
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Подбор preference
+from sklearn.metrics import pairwise_distances
+S = -pairwise_distances(X_scaled, metric='euclidean')**2
+preferences = np.percentile(S, [10, 30, 50, 70])
+
+results = []
+for pref in preferences:
+    ap = AffinityPropagation(
+        preference=pref,
+        damping=0.7,
+        max_iter=300,
+        convergence_iter=15
+    )
+    labels = ap.fit_predict(X_scaled)
+    n_clusters = len(ap.cluster_centers_indices_)
+    
+    if n_clusters > 1:
+        score = silhouette_score(X_scaled, labels)
+        results.append({
+            'pref': pref,
+            'n_clusters': n_clusters,
+            'score': score,
+            'model': ap
+        })
+
+# Лучший результат
+best = max(results, key=lambda x: x['score'])
+print(f"Preference: {best['pref']:.2f}")
+print(f"Кластеров: {best['n_clusters']}")
+print(f"Silhouette: {best['score']:.3f}")
+
+# Exemplars
+exemplar_idx = best['model'].cluster_centers_indices_
+print(f"Exemplar indices: {exemplar_idx}")</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>
