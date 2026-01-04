@@ -220,7 +220,7 @@ seen_accuracy = accuracy_score(y_true_seen, y_pred_seen)
 unseen_accuracy = accuracy_score(y_true_unseen, y_pred_unseen)
 
 # Harmonic mean (H-mean)
-H = 2 * (seen_accuracy * unseen_accuracy) /     (seen_accuracy + unseen_accuracy)
+H = 2 * (seen_accuracy * unseen_accuracy) / (seen_accuracy + unseen_accuracy)
 
 print(f"Seen accuracy: {seen_accuracy:.3f}")
 print(f"Unseen accuracy: {unseen_accuracy:.3f}")
