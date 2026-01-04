@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Непараметрическая регрессия Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Непараметрическая регрессия Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть метода</h2>
+    <ul>
+      <li><strong>Идея</strong>: не предполагать фиксированную форму зависимости</li>
+      <li><strong>Гибкость</strong>: модель адаптируется к данным</li>
+      <li><strong>Без параметров</strong>: количество параметров растет с данными</li>
+      <li><strong>Локальность</strong>: предсказания основаны на близких точках</li>
+      <li><strong>Сглаживание</strong>: баланс между точностью и гладкостью</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Vs параметрическая регрессия</h2>
+    <table>
+      <tr><th>Аспект</th><th>Параметрическая</th><th>Непараметрическая</th></tr>
+      <tr><td>Форма</td><td>Фиксированная (y=wx+b)</td><td>Произвольная</td></tr>
+      <tr><td>Параметры</td><td>Постоянное число</td><td>Растет с данными</td></tr>
+      <tr><td>Гибкость</td><td>Низкая</td><td>Высокая</td></tr>
+      <tr><td>Интерпретация</td><td>Простая</td><td>Сложная</td></tr>
+      <tr><td>Малые данные</td><td>Лучше</td><td>Хуже</td></tr>
+      <tr><td>Переобучение</td><td>Ниже риск</td><td>Выше риск</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. k-NN регрессия</h2>
+    <p>Предсказание = среднее значений k ближайших соседей</p>
+    <pre><code>from sklearn.neighbors import KNeighborsRegressor
+from sklearn.preprocessing import StandardScaler
+
+# Масштабирование важно!
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# k-NN регрессия
+knn_reg = KNeighborsRegressor(
+    n_neighbors=5,
+    weights='distance',  # Взвешивание по расстоянию
+    metric='euclidean'
+)
+
+knn_reg.fit(X_train_scaled, y_train)
+y_pred = knn_reg.predict(X_test_scaled)
+
+from sklearn.metrics import mean_squared_error, r2_score
+print(f"MSE: {mean_squared_error(y_test, y_pred):.3f}")
+print(f"R²: {r2_score(y_test, y_pred):.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Kernel Ridge Regression</h2>
+    <p>Комбинация ядерного метода и регуляризации</p>
+    <pre><code>from sklearn.kernel_ridge import KernelRidge
+
+# Различные ядра
+kr_rbf = KernelRidge(
+    alpha=1.0,      # Регуляризация
+    kernel='rbf',   # Гауссово ядро
+    gamma=0.1       # Ширина ядра
+)
+
+kr_poly = KernelRidge(
+    alpha=1.0,
+    kernel='poly',
+    degree=3
+)
+
+kr_rbf.fit(X_train, y_train)
+y_pred = kr_rbf.predict(X_test)
+
+# Подбор гиперпараметров
+from sklearn.model_selection import GridSearchCV
+
+params = {
+    'alpha': [0.1, 1.0, 10.0],
+    'gamma': [0.01, 0.1, 1.0]
+}
+
+grid = GridSearchCV(KernelRidge(kernel='rbf'), 
+                   params, cv=5)
+grid.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. LOESS/LOWESS</h2>
+    <p>Locally Weighted Scatterplot Smoothing</p>
+    <pre><code>from scipy.signal import savgol_filter
+import statsmodels.api as sm
+
+# LOWESS сглаживание (для 1D)
+lowess = sm.nonparametric.lowess
+
+# frac = доля данных для локальной регрессии
+smoothed = lowess(y, X, frac=0.3)
+
+# Визуализация
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(10, 6))
+plt.scatter(X, y, alpha=0.5, label='Данные')
+plt.plot(smoothed[:, 0], smoothed[:, 1], 
+         'r-', linewidth=2, label='LOWESS')
+plt.xlabel('X')
+plt.ylabel('y')
+plt.legend()
+plt.show()</code></pre>
+
+    <p><strong>Параметры</strong>:</p>
+    <ul>
+      <li><code>frac</code>: доля точек в окне (0.3 = 30%)</li>
+      <li><code>it</code>: число робастных итераций</li>
+      <li>Меньше frac → более изломанная кривая</li>
+      <li>Больше frac → более гладкая кривая</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Gaussian Process Regression</h2>
+    <p>Байесовский непараметрический метод</p>
+    <pre><code>from sklearn.gaussian_process import GaussianProcessRegressor
+from sklearn.gaussian_process.kernels import RBF, WhiteKernel
+
+# Определить ядро
+kernel = RBF(length_scale=1.0) + WhiteKernel(noise_level=0.1)
+
+# Модель
+gp = GaussianProcessRegressor(
+    kernel=kernel,
+    n_restarts_optimizer=10,
+    alpha=0.1,
+    normalize_y=True
+)
+
+gp.fit(X_train, y_train)
+
+# Предсказание с доверительным интервалом
+y_pred, sigma = gp.predict(X_test, return_std=True)
+
+# Визуализация неопределенности
+plt.figure(figsize=(10, 6))
+plt.scatter(X_train, y_train, label='Обучающие данные')
+plt.plot(X_test, y_pred, 'r-', label='Предсказание')
+plt.fill_between(X_test.ravel(), 
+                 y_pred - 1.96*sigma, 
+                 y_pred + 1.96*sigma,
+                 alpha=0.2, label='95% CI')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Ядра для GP</h2>
+    <pre><code>from sklearn.gaussian_process.kernels import (
+    RBF, Matern, RationalQuadratic, 
+    ExpSineSquared, DotProduct, WhiteKernel
+)
+
+# RBF (гауссово) - гладкие функции
+kernel_rbf = RBF(length_scale=1.0)
+
+# Matérn - контроль гладкости
+kernel_matern = Matern(length_scale=1.0, nu=1.5)
+
+# Периодические функции
+kernel_periodic = ExpSineSquared(
+    length_scale=1.0,
+    periodicity=2.0
+)
+
+# Комбинации ядер
+kernel_combined = RBF(1.0) * Matern(1.0) + WhiteKernel(0.1)
+
+# Использование
+gp = GaussianProcessRegressor(kernel=kernel_combined)
+gp.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Nadaraya-Watson регрессор</h2>
+    <p>Ядерная регрессия с весами</p>
+    <pre><code>from sklearn.neighbors import KernelDensity
+import numpy as np
+
+def nadaraya_watson(X_train, y_train, X_test, bandwidth=1.0):
+    """Ядерная регрессия Nadaraya-Watson"""
+    predictions = []
+    
+    for x_test in X_test:
+        # Вычислить веса на основе расстояний
+        distances = np.linalg.norm(X_train - x_test, axis=1)
+        
+        # Гауссово ядро
+        weights = np.exp(-(distances**2) / (2 * bandwidth**2))
+        weights /= weights.sum()
+        
+        # Взвешенное среднее
+        y_pred = np.dot(weights, y_train)
+        predictions.append(y_pred)
+    
+    return np.array(predictions)
+
+# Использование
+y_pred = nadaraya_watson(X_train, y_train, X_test, bandwidth=0.5)
+
+# Подбор bandwidth через кросс-валидацию
+from sklearn.model_selection import cross_val_score
+
+bandwidths = np.logspace(-2, 1, 10)
+scores = []
+
+for bw in bandwidths:
+    y_cv_pred = nadaraya_watson(X_train, y_train, X_val, bandwidth=bw)
+    mse = mean_squared_error(y_val, y_cv_pred)
+    scores.append(mse)
+
+best_bandwidth = bandwidths[np.argmin(scores)]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Сплайны (Splines)</h2>
+    <p>Кусочно-полиномиальная регрессия</p>
+    <pre><code>from scipy.interpolate import UnivariateSpline, BSpline
+import numpy as np
+
+# B-splines через scipy
+spline = UnivariateSpline(X.ravel(), y, s=1.0)  # s = smoothing factor
+y_pred = spline(X_test.ravel())
+
+# Cubic spline (через numpy)
+from scipy.interpolate import CubicSpline
+cs = CubicSpline(X.ravel(), y)
+y_pred = cs(X_test.ravel())
+
+# Penalized B-splines через patsy
+import patsy
+from sklearn.linear_model import Ridge
+
+# Создать базис сплайнов
+bs_basis = patsy.dmatrix("bs(x, df=10)", {"x": X.ravel()})
+bs_test = patsy.dmatrix("bs(x, df=10)", {"x": X_test.ravel()})
+
+# Регрессия на базисе
+ridge = Ridge(alpha=1.0)
+ridge.fit(bs_basis, y)
+y_pred = ridge.predict(bs_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Локальная полиномиальная регрессия</h2>
+    <pre><code>def local_polynomial_regression(X_train, y_train, x_test, 
+                               degree=2, bandwidth=1.0):
+    """Локальная полиномиальная регрессия"""
+    from sklearn.preprocessing import PolynomialFeatures
+    from sklearn.linear_model import LinearRegression
+    
+    predictions = []
+    
+    for x in x_test:
+        # Расстояния до всех точек
+        distances = np.abs(X_train - x)
+        
+        # Вычислить веса (гауссово ядро)
+        weights = np.exp(-(distances**2) / (2 * bandwidth**2))
+        weights = weights.ravel()
+        
+        # Взвешенная полиномиальная регрессия
+        poly = PolynomialFeatures(degree=degree)
+        X_poly = poly.fit_transform(X_train)
+        
+        # Weighted least squares
+        lr = LinearRegression()
+        lr.fit(X_poly, y_train, sample_weight=weights)
+        
+        # Предсказание
+        x_poly = poly.transform([[x]])
+        y_pred = lr.predict(x_poly)
+        predictions.append(y_pred[0])
+    
+    return np.array(predictions)
+
+# Использование
+y_pred = local_polynomial_regression(
+    X_train, y_train, X_test, 
+    degree=2, bandwidth=0.5
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Decision Tree Regression</h2>
+    <p>Непараметрическая кусочно-константная регрессия</p>
+    <pre><code>from sklearn.tree import DecisionTreeRegressor
+
+# Дерево решений
+tree_reg = DecisionTreeRegressor(
+    max_depth=5,
+    min_samples_split=20,
+    min_samples_leaf=10
+)
+
+tree_reg.fit(X_train, y_train)
+y_pred = tree_reg.predict(X_test)
+
+# Визуализация дерева
+from sklearn.tree import plot_tree
+import matplotlib.pyplot as plt
+
+plt.figure(figsize=(20, 10))
+plot_tree(tree_reg, filled=True, feature_names=['X'])
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Random Forest Regression</h2>
+    <p>Ансамбль непараметрических регрессоров</p>
+    <pre><code>from sklearn.ensemble import RandomForestRegressor
+
+rf_reg = RandomForestRegressor(
+    n_estimators=100,
+    max_depth=10,
+    min_samples_split=5,
+    random_state=42
+)
+
+rf_reg.fit(X_train, y_train)
+y_pred = rf_reg.predict(X_test)
+
+# Feature importance
+importances = rf_reg.feature_importances_
+print("Feature importances:", importances)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Выбор bandwidth/smoothing</h2>
+    <p><strong>Кросс-валидация для bandwidth:</strong></p>
+    <pre><code>from sklearn.model_selection import KFold
+
+def cv_bandwidth_selection(X, y, bandwidths, n_splits=5):
+    """Выбрать оптимальный bandwidth через CV"""
+    kf = KFold(n_splits=n_splits)
+    cv_scores = {bw: [] for bw in bandwidths}
+    
+    for train_idx, val_idx in kf.split(X):
+        X_train, X_val = X[train_idx], X[val_idx]
+        y_train, y_val = y[train_idx], y[val_idx]
+        
+        for bw in bandwidths:
+            y_pred = nadaraya_watson(X_train, y_train, X_val, bandwidth=bw)
+            mse = mean_squared_error(y_val, y_pred)
+            cv_scores[bw].append(mse)
+    
+    # Усреднить по фолдам
+    avg_scores = {bw: np.mean(scores) for bw, scores in cv_scores.items()}
+    best_bw = min(avg_scores, key=avg_scores.get)
+    
+    return best_bw, avg_scores
+
+# Использование
+bandwidths = np.logspace(-2, 1, 20)
+best_bw, scores = cv_bandwidth_selection(X_train, y_train, bandwidths)
+print(f"Оптимальный bandwidth: {best_bw:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Bias-Variance Trade-off</h2>
+    <p>Баланс между недообучением и переобучением</p>
+    <ul>
+      <li><strong>Большой bandwidth/k</strong>: высокое смещение, низкая дисперсия (гладкая, но неточная)</li>
+      <li><strong>Малый bandwidth/k</strong>: низкое смещение, высокая дисперсия (точная, но изрезанная)</li>
+    </ul>
+    <pre><code># Визуализация разных bandwidth
+fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+
+bandwidths = [0.05, 0.1, 0.5, 1.0, 2.0, 5.0]
+
+for idx, bw in enumerate(bandwidths):
+    ax = axes[idx // 3, idx % 3]
+    
+    y_pred = nadaraya_watson(X_train, y_train, X_plot, bandwidth=bw)
+    
+    ax.scatter(X_train, y_train, alpha=0.3)
+    ax.plot(X_plot, y_pred, 'r-', linewidth=2)
+    ax.set_title(f'Bandwidth = {bw}')
+    ax.set_xlabel('X')
+    ax.set_ylabel('y')
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Сложность</th><th>Гладкость</th><th>Интерпретация</th></tr>
+      <tr><td><strong>k-NN</strong></td><td>O(n)</td><td>Кусочно-константная</td><td>Простая</td></tr>
+      <tr><td><strong>Kernel Ridge</strong></td><td>O(n³)</td><td>Гладкая</td><td>Средняя</td></tr>
+      <tr><td><strong>GP</strong></td><td>O(n³)</td><td>Очень гладкая</td><td>Сложная</td></tr>
+      <tr><td><strong>LOWESS</strong></td><td>O(n²)</td><td>Локально гладкая</td><td>Простая</td></tr>
+      <tr><td><strong>Splines</strong></td><td>O(n)</td><td>Кусочно-гладкая</td><td>Средняя</td></tr>
+      <tr><td><strong>Trees</strong></td><td>O(n log n)</td><td>Кусочно-константная</td><td>Простая</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Многомерная регрессия</h2>
+    <p>Для многомерных данных (X ∈ ℝᵈ)</p>
+    <pre><code># k-NN работает out-of-the-box
+from sklearn.neighbors import KNeighborsRegressor
+
+knn = KNeighborsRegressor(n_neighbors=10, weights='distance')
+knn.fit(X_train, y_train)  # X_train может быть многомерным
+
+# Kernel Ridge также работает
+from sklearn.kernel_ridge import KernelRidge
+
+kr = KernelRidge(alpha=1.0, kernel='rbf', gamma=0.1)
+kr.fit(X_train, y_train)
+
+# Для LOWESS нужна альтернатива
+# Используйте GAM (Generalized Additive Models)
+from pygam import LinearGAM, s
+
+gam = LinearGAM(s(0) + s(1) + s(2))  # По одному сплайну на признак
+gam.fit(X_train, y_train)
+y_pred = gam.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Генерализованные аддитивные модели (GAM)</h2>
+    <p>Аддитивная модель с непараметрическими компонентами</p>
+    <pre><code>from pygam import LinearGAM, s, f, te
+
+# y = f₁(x₁) + f₂(x₂) + ... + fₚ(xₚ)
+
+# Простая GAM
+gam = LinearGAM(s(0) + s(1) + s(2))
+gam.fit(X, y)
+
+# С взаимодействиями
+gam_interaction = LinearGAM(
+    s(0) + s(1) + te(0, 1)  # te = tensor product (взаимодействие)
+)
+gam_interaction.fit(X, y)
+
+# С факторными признаками
+gam_factor = LinearGAM(s(0) + f(1))  # f = factor (категориальный)
+gam_factor.fit(X, y)
+
+# Подбор лямбды (smoothing penalty)
+gam.gridsearch(X, y)
+
+# Визуализация эффектов
+import matplotlib.pyplot as plt
+fig, axes = plt.subplots(1, X.shape[1], figsize=(15, 5))
+
+for i, ax in enumerate(axes):
+    XX = gam.generate_X_grid(term=i)
+    ax.plot(XX[:, i], gam.partial_dependence(term=i, X=XX))
+    ax.set_title(f'Feature {i}')
+
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Неизвестная форма зависимости</li>
+          <li>Нелинейные, сложные паттерны</li>
+          <li>Достаточно данных (n > 100)</li>
+          <li>Низкая размерность (d < 10)</li>
+          <li>Нужна гибкость модели</li>
+          <li>Локальные паттерны важны</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Мало данных (n < 50)</li>
+          <li>Высокая размерность (d > 20)</li>
+          <li>Нужна интерпретация</li>
+          <li>Линейная зависимость</li>
+          <li>Требуется экстраполяция</li>
+          <li>Нужна быстрая инференс</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Диагностика и визуализация</h2>
+    <pre><code># Остатки (residuals)
+residuals = y_test - y_pred
+
+# График остатков
+plt.figure(figsize=(12, 5))
+
+plt.subplot(1, 2, 1)
+plt.scatter(y_pred, residuals)
+plt.axhline(y=0, color='r', linestyle='--')
+plt.xlabel('Предсказанные значения')
+plt.ylabel('Остатки')
+plt.title('Residual Plot')
+
+plt.subplot(1, 2, 2)
+plt.hist(residuals, bins=30, edgecolor='black')
+plt.xlabel('Остатки')
+plt.ylabel('Частота')
+plt.title('Распределение остатков')
+
+plt.tight_layout()
+plt.show()
+
+# Q-Q plot для нормальности
+from scipy import stats
+stats.probplot(residuals, dist="norm", plot=plt)
+plt.title('Q-Q Plot')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Чек-лист</h2>
+    <ul>
+      <li>[ ] Масштабировать признаки (для методов на основе расстояний)</li>
+      <li>[ ] Выбрать подходящий метод (k-NN, GP, splines, GAM)</li>
+      <li>[ ] Подобрать гиперпараметры (bandwidth, k, alpha) через CV</li>
+      <li>[ ] Проверить размерность данных (< 10 лучше)</li>
+      <li>[ ] Визуализировать предсказания и остатки</li>
+      <li>[ ] Проверить на переобучение (train vs test)</li>
+      <li>[ ] Оценить качество (MSE, R², MAE)</li>
+      <li>[ ] Рассмотреть комбинацию с параметрическими методами</li>
+      <li>[ ] Для многомерных данных — использовать GAM</li>
+      <li>[ ] Документировать выбор метода и параметров</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Непараметрическая регрессия — это как рисование кривой "на глаз" через точки данных, не предполагая заранее, что это прямая линия или парабола. Модель гибко адаптируется к любой форме зависимости, которую видит в данных, учитывая локальные паттерны».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

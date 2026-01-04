@@ -34,7 +34,7 @@
 1. [Случайный лес для регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/random_forest_regression_cheatsheet.html)
 1. [Градиентный бустинг для регрессии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gradient_boosting_regression_cheatsheet.html)
 1. [Методы регуляризации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/regularization_methods_cheatsheet.html)
-1. Непараметрическая регрессия
+1. [Непараметрическая регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/nonparametric_regression_cheatsheet.html)
 
 ### **4. Кластеризация**
 1. [K-means и K-means++](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/kmeans_cheatsheet.html)
@@ -66,7 +66,7 @@
 ### **7. Поиск гиперпараметров**
 1. [Grid Search / Random Search / Bayesian Optimization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hyperparameter_tuning_cheatsheet.html)
 1. [Bayesian Optimization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bayesian_optimization_cheatsheet.html)
-1. Optuna / Hyperopt
+1. [Optuna / Hyperopt](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/optuna_hyperopt_cheatsheet.html)
 1. [Стратегии поиска гиперпараметров](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hyperparameter_strategies_cheatsheet.html)
 
 ### **8. Работа с временными рядами (классические методы)**
@@ -80,12 +80,12 @@
 1. [Isolation Forest](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/isolation_forest_cheatsheet.html)
 1. [One-Class SVM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/one_class_svm_cheatsheet.html)
 1. [Local Outlier Factor](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/local_outlier_factor_cheatsheet.html)
-1. Elliptic Envelope
+1. [Elliptic Envelope](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/elliptic_envelope_cheatsheet.html)
 1. Статистические методы
 
 ### **10. Рекомендательные системы (классические)**
 1. [Коллаборативная фильтрация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/collaborative_filtering_cheatsheet.html)
-1. Контентная фильтрация
+1. [Контентная фильтрация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/content_based_filtering_cheatsheet.html)
 1. Матричная факторизация (SVD)
 1. ALS (Alternating Least Squares)
 
@@ -139,7 +139,7 @@
 1. EM-алгоритм
 
 ### **18. Визуализация в ML**
-1. Визуализация данных
+1. [Визуализация данных](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/data_visualization_ml_cheatsheet.html)
 1. Визуализация кластеров
 1. Визуализация деревьев
 1. Визуализация метрик
@@ -183,7 +183,7 @@
 ### **2. Сверточные нейронные сети (CNN)**
 1. [Основы свертки](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_basics_cheatsheet.html)
 1. [Пулинг-слои (Max, Average, Global Pooling)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pooling_layers_cheatsheet.html)
-1. Архитектуры CNN (LeNet, AlexNet, VGG)
+1. [Архитектуры CNN (LeNet, AlexNet, VGG)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_architectures_cheatsheet.html)
 1. Современные архитектуры ([ResNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/resnet_cheatsheet.html), Inception, EfficientNet)
 1. Transfer learning для CNN
 1. [Data augmentation для изображений](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/data_augmentation_cheatsheet.html)
@@ -384,7 +384,7 @@
 1. Динамическое программирование
 1. Монте-Карло методы
 1. Временная разница (TD-learning)
-1. Q-learning и SARSA
+1. [Q-learning и SARSA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/q_learning_sarsa_cheatsheet.html)
 1. Функции приближения (линейные, ядерные)
 1. Иерархическое RL
 1.10. Многозадачное RL
@@ -393,7 +393,7 @@
 ### **2. Байесовские методы и вероятностное ML**
 1. Байесовский вывод
 1. Скрытые марковские модели (HMM)
-1. Гауссовские процессы
+1. [Гауссовские процессы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gaussian_processes_cheatsheet.html)
 1. Вариационный вывод
 1. Марковские цепи Монте-Карло (MCMC)
 1. Expectation-Maximization (EM)
@@ -404,7 +404,7 @@
 
 ### **3. Ансамбли методов**
 1. Бэггинг (Bagging)
-1. Бустинг (Boosting) - классические версии (AdaBoost)
+1. [Бустинг (Boosting) - классические версии (AdaBoost)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adaboost_cheatsheet.html)
 1. Стекинг (Stacking)
 1. Блендинг (Blending)
 1. Voting классификаторы
@@ -413,7 +413,7 @@
 1. Диверсификация ансамблей
 
 ### **4. Снижение размерности (нелинейное)**
-1. Manifold learning
+1. [Manifold learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/manifold_learning_cheatsheet.html)
 1. Isomap
 1. LLE (Locally Linear Embedding)
 1. MDS (Multidimensional Scaling)
@@ -443,7 +443,7 @@
 1. Коллаборативная фильтрация (user-based, item-based)
 1. Матричная факторизация (SVD, NMF)
 1. ALS (Alternating Least Squares)
-1. Контентная фильтрация
+1. [Контентная фильтрация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/content_based_filtering_cheatsheet.html)
 1. Гибридные системы
 1. Context-aware рекомендации
 1. Sequence-aware рекомендации
@@ -479,7 +479,7 @@
 11. One-class SVM
 11. Isolation Forest
 11. Local Outlier Factor
-11. Elliptic Envelope
+11. [Elliptic Envelope](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/elliptic_envelope_cheatsheet.html)
 11. Clustering-based аномалии
 11. Autoencoder-based (неглубокие)
 

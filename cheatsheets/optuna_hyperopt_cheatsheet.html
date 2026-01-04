@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Optuna / Hyperopt Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Optuna / Hyperopt Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Optuna: Основы</h2>
+    <ul>
+      <li><strong>Идея</strong>: автоматическая оптимизация гиперпараметров</li>
+      <li><strong>Метод</strong>: байесовская оптимизация (TPE)</li>
+      <li><strong>Преимущества</strong>: pruning, параллелизация, визуализация</li>
+      <li><strong>Гибкость</strong>: определяем пространство поиска динамически</li>
+    </ul>
+    <pre><code># Установка
+pip install optuna
+
+import optuna
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
+
+# Определить целевую функцию
+def objective(trial):
+    # Предложить гиперпараметры
+    n_estimators = trial.suggest_int('n_estimators', 50, 300)
+    max_depth = trial.suggest_int('max_depth', 2, 32, log=True)
+    min_samples_split = trial.suggest_int('min_samples_split', 2, 20)
+    
+    # Создать модель
+    clf = RandomForestClassifier(
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        min_samples_split=min_samples_split,
+        random_state=42
+    )
+    
+    # Оценить
+    score = cross_val_score(clf, X_train, y_train, cv=3).mean()
+    
+    return score
+
+# Создать study и оптимизировать
+study = optuna.create_study(direction='maximize')
+study.optimize(objective, n_trials=100)
+
+# Лучшие параметры
+print("Лучшие параметры:", study.best_params)
+print("Лучший score:", study.best_value)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы параметров в Optuna</h2>
+    <pre><code># Целые числа
+n_estimators = trial.suggest_int('n_estimators', 10, 100)
+
+# С логарифмической шкалой
+max_depth = trial.suggest_int('max_depth', 2, 32, log=True)
+
+# Вещественные числа
+learning_rate = trial.suggest_float('lr', 0.001, 0.1, log=True)
+
+# Категориальные
+optimizer = trial.suggest_categorical('optimizer', 
+                                     ['adam', 'sgd', 'rmsprop'])
+
+# Дискретные значения
+dropout = trial.suggest_float('dropout', 0.1, 0.5, step=0.1)
+
+# Условные параметры
+if optimizer == 'adam':
+    beta1 = trial.suggest_float('beta1', 0.8, 0.99)
+    beta2 = trial.suggest_float('beta2', 0.9, 0.999)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Optuna: Pruning</h2>
+    <p>Остановка неперспективных испытаний</p>
+    <pre><code>import optuna
+from optuna.pruners import MedianPruner
+
+def objective_with_pruning(trial):
+    n_estimators = trial.suggest_int('n_estimators', 10, 100)
+    max_depth = trial.suggest_int('max_depth', 2, 20)
+    
+    clf = RandomForestClassifier(
+        n_estimators=n_estimators,
+        max_depth=max_depth
+    )
+    
+    # Инкрементальное обучение с pruning
+    for step in range(10):
+        # Обучить на подвыборке
+        subset_size = (step + 1) * len(X_train) // 10
+        X_subset = X_train[:subset_size]
+        y_subset = y_train[:subset_size]
+        
+        clf.fit(X_subset, y_subset)
+        score = clf.score(X_val, y_val)
+        
+        # Сообщить промежуточный результат
+        trial.report(score, step)
+        
+        # Проверить, нужно ли остановиться
+        if trial.should_prune():
+            raise optuna.TrialPruned()
+    
+    return score
+
+# Study с pruner
+study = optuna.create_study(
+    direction='maximize',
+    pruner=MedianPruner(n_startup_trials=5, n_warmup_steps=3)
+)
+
+study.optimize(objective_with_pruning, n_trials=50)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Optuna: Визуализация</h2>
+    <pre><code>import optuna.visualization as vis
+
+# История оптимизации
+fig = vis.plot_optimization_history(study)
+fig.show()
+
+# Важность параметров
+fig = vis.plot_param_importances(study)
+fig.show()
+
+# Параллельные координаты
+fig = vis.plot_parallel_coordinate(study)
+fig.show()
+
+# Contour plot для 2D
+fig = vis.plot_contour(study, params=['n_estimators', 'max_depth'])
+fig.show()
+
+# Slice plot
+fig = vis.plot_slice(study)
+fig.show()
+
+# EDF (Empirical Distribution Function)
+fig = vis.plot_edf(study)
+fig.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Hyperopt: Основы</h2>
+    <pre><code># Установка
+pip install hyperopt
+
+from hyperopt import hp, fmin, tpe, Trials, STATUS_OK
+from sklearn.ensemble import RandomForestClassifier
+
+# Определить пространство поиска
+space = {
+    'n_estimators': hp.quniform('n_estimators', 50, 300, 10),
+    'max_depth': hp.quniform('max_depth', 2, 32, 1),
+    'min_samples_split': hp.quniform('min_samples_split', 2, 20, 1),
+    'criterion': hp.choice('criterion', ['gini', 'entropy'])
+}
+
+# Целевая функция
+def objective(params):
+    # Преобразовать в int
+    params['n_estimators'] = int(params['n_estimators'])
+    params['max_depth'] = int(params['max_depth'])
+    params['min_samples_split'] = int(params['min_samples_split'])
+    
+    clf = RandomForestClassifier(**params, random_state=42)
+    
+    # Cross-validation
+    score = cross_val_score(clf, X_train, y_train, cv=3).mean()
+    
+    # Hyperopt минимизирует, поэтому инвертируем
+    return {'loss': -score, 'status': STATUS_OK}
+
+# Оптимизировать
+trials = Trials()
+best = fmin(
+    fn=objective,
+    space=space,
+    algo=tpe.suggest,  # Tree-structured Parzen Estimator
+    max_evals=100,
+    trials=trials
+)
+
+print("Лучшие параметры:", best)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Hyperopt: Пространство поиска</h2>
+    <pre><code>from hyperopt import hp
+
+# Uniform (равномерное)
+lr = hp.uniform('lr', 0.001, 0.1)
+
+# Log-uniform (логарифмическое равномерное)
+lr_log = hp.loguniform('lr', np.log(0.001), np.log(0.1))
+
+# Quantized uniform (дискретное равномерное)
+n_estimators = hp.quniform('n_estimators', 10, 100, 5)
+
+# Normal (нормальное)
+dropout = hp.normal('dropout', 0.5, 0.1)
+
+# Choice (категориальное)
+optimizer = hp.choice('optimizer', ['adam', 'sgd', 'rmsprop'])
+
+# Lognormal
+learning_rate = hp.lognormal('lr', -5, 1)
+
+# Conditional spaces
+space = {
+    'optimizer': hp.choice('optimizer', [
+        {
+            'type': 'adam',
+            'lr': hp.loguniform('adam_lr', np.log(0.0001), np.log(0.1))
+        },
+        {
+            'type': 'sgd',
+            'lr': hp.loguniform('sgd_lr', np.log(0.001), np.log(0.1)),
+            'momentum': hp.uniform('momentum', 0.5, 0.99)
+        }
+    ])
+}</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сравнение Optuna vs Hyperopt</h2>
+    <table>
+      <tr><th>Аспект</th><th>Optuna</th><th>Hyperopt</th></tr>
+      <tr><td>Синтаксис</td><td>Проще, pythonic</td><td>Сложнее</td></tr>
+      <tr><td>Pruning</td><td>Встроенный</td><td>Нет</td></tr>
+      <tr><td>Визуализация</td><td>Богатая</td><td>Базовая</td></tr>
+      <tr><td>Параллелизация</td><td>Простая</td><td>Сложнее</td></tr>
+      <tr><td>Storage</td><td>SQL, Redis</td><td>MongoDB</td></tr>
+      <tr><td>Активность</td><td>Высокая</td><td>Средняя</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. XGBoost с Optuna</h2>
+    <pre><code>import optuna
+import xgboost as xgb
+from sklearn.model_selection import cross_val_score
+
+def objective(trial):
+    param = {
+        'objective': 'binary:logistic',
+        'eval_metric': 'logloss',
+        'booster': trial.suggest_categorical('booster', ['gbtree', 'dart']),
+        'lambda': trial.suggest_float('lambda', 1e-8, 1.0, log=True),
+        'alpha': trial.suggest_float('alpha', 1e-8, 1.0, log=True),
+    }
+    
+    if param['booster'] == 'gbtree' or param['booster'] == 'dart':
+        param['max_depth'] = trial.suggest_int('max_depth', 1, 9)
+        param['eta'] = trial.suggest_float('eta', 1e-8, 1.0, log=True)
+        param['gamma'] = trial.suggest_float('gamma', 1e-8, 1.0, log=True)
+        param['grow_policy'] = trial.suggest_categorical(
+            'grow_policy', ['depthwise', 'lossguide']
+        )
+    
+    if param['booster'] == 'dart':
+        param['sample_type'] = trial.suggest_categorical(
+            'sample_type', ['uniform', 'weighted']
+        )
+        param['normalize_type'] = trial.suggest_categorical(
+            'normalize_type', ['tree', 'forest']
+        )
+        param['rate_drop'] = trial.suggest_float('rate_drop', 1e-8, 1.0, log=True)
+        param['skip_drop'] = trial.suggest_float('skip_drop', 1e-8, 1.0, log=True)
+    
+    # Train
+    model = xgb.XGBClassifier(**param, random_state=42)
+    score = cross_val_score(model, X_train, y_train, cv=3).mean()
+    
+    return score
+
+study = optuna.create_study(direction='maximize')
+study.optimize(objective, n_trials=100)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. LightGBM с Optuna</h2>
+    <pre><code>import lightgbm as lgb
+
+def objective(trial):
+    param = {
+        'objective': 'binary',
+        'metric': 'binary_logloss',
+        'verbosity': -1,
+        'boosting_type': 'gbdt',
+        'lambda_l1': trial.suggest_float('lambda_l1', 1e-8, 10.0, log=True),
+        'lambda_l2': trial.suggest_float('lambda_l2', 1e-8, 10.0, log=True),
+        'num_leaves': trial.suggest_int('num_leaves', 2, 256),
+        'feature_fraction': trial.suggest_float('feature_fraction', 0.4, 1.0),
+        'bagging_fraction': trial.suggest_float('bagging_fraction', 0.4, 1.0),
+        'bagging_freq': trial.suggest_int('bagging_freq', 1, 7),
+        'min_child_samples': trial.suggest_int('min_child_samples', 5, 100),
+    }
+    
+    model = lgb.LGBMClassifier(**param, random_state=42)
+    score = cross_val_score(model, X_train, y_train, cv=3).mean()
+    
+    return score
+
+study = optuna.create_study(direction='maximize')
+study.optimize(objective, n_trials=100)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Нейронные сети с Optuna</h2>
+    <pre><code>import optuna
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+def objective(trial):
+    # Архитектура
+    n_layers = trial.suggest_int('n_layers', 1, 3)
+    layers = []
+    in_features = X_train.shape[1]
+    
+    for i in range(n_layers):
+        out_features = trial.suggest_int(f'n_units_l{i}', 4, 128, log=True)
+        layers.append(nn.Linear(in_features, out_features))
+        layers.append(nn.ReLU())
+        
+        dropout = trial.suggest_float(f'dropout_l{i}', 0.1, 0.5)
+        layers.append(nn.Dropout(dropout))
+        
+        in_features = out_features
+    
+    layers.append(nn.Linear(in_features, 1))
+    layers.append(nn.Sigmoid())
+    
+    model = nn.Sequential(*layers)
+    
+    # Оптимизатор
+    optimizer_name = trial.suggest_categorical('optimizer', ['Adam', 'SGD'])
+    lr = trial.suggest_float('lr', 1e-5, 1e-1, log=True)
+    
+    if optimizer_name == 'Adam':
+        optimizer = optim.Adam(model.parameters(), lr=lr)
+    else:
+        optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
+    
+    # Обучение
+    criterion = nn.BCELoss()
+    
+    for epoch in range(10):
+        model.train()
+        optimizer.zero_grad()
+        outputs = model(X_train_tensor)
+        loss = criterion(outputs, y_train_tensor)
+        loss.backward()
+        optimizer.step()
+        
+        # Валидация
+        model.eval()
+        with torch.no_grad():
+            val_outputs = model(X_val_tensor)
+            val_loss = criterion(val_outputs, y_val_tensor)
+        
+        trial.report(val_loss.item(), epoch)
+        
+        if trial.should_prune():
+            raise optuna.TrialPruned()
+    
+    return val_loss.item()
+
+study = optuna.create_study(direction='minimize')
+study.optimize(objective, n_trials=50)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Распределенная оптимизация</h2>
+    <pre><code># Optuna с SQL storage (для параллелизации)
+import optuna
+
+# Создать storage
+storage = optuna.storages.RDBStorage(
+    url='sqlite:///optuna.db',
+    engine_kwargs={'connect_args': {'timeout': 10}}
+)
+
+# Создать study
+study = optuna.create_study(
+    study_name='distributed_optimization',
+    storage=storage,
+    load_if_exists=True,
+    direction='maximize'
+)
+
+# Запустить на нескольких процессах/машинах
+study.optimize(objective, n_trials=100)
+
+# На другой машине/процессе
+# study = optuna.load_study(
+#     study_name='distributed_optimization',
+#     storage=storage
+# )
+# study.optimize(objective, n_trials=100)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Multi-objective оптимизация</h2>
+    <p>Оптимизировать несколько метрик одновременно</p>
+    <pre><code>def objective_multi(trial):
+    # Параметры
+    n_estimators = trial.suggest_int('n_estimators', 50, 300)
+    max_depth = trial.suggest_int('max_depth', 2, 32)
+    
+    clf = RandomForestClassifier(
+        n_estimators=n_estimators,
+        max_depth=max_depth
+    )
+    
+    clf.fit(X_train, y_train)
+    
+    # Accuracy
+    accuracy = clf.score(X_test, y_test)
+    
+    # Время предсказания
+    import time
+    start = time.time()
+    _ = clf.predict(X_test)
+    inference_time = time.time() - start
+    
+    # Вернуть обе метрики
+    return accuracy, inference_time
+
+# Study с несколькими целями
+study = optuna.create_study(
+    directions=['maximize', 'minimize']  # max accuracy, min time
+)
+
+study.optimize(objective_multi, n_trials=100)
+
+# Получить Pareto front
+best_trials = study.best_trials
+
+for trial in best_trials:
+    print(f"Trial {trial.number}: Accuracy={trial.values[0]:.3f}, Time={trial.values[1]:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Callbacks в Optuna</h2>
+    <pre><code># Early stopping
+from optuna.study import MaxTrialsCallback
+
+max_trials = MaxTrialsCallback(100, states=(optuna.trial.TrialState.COMPLETE,))
+
+# Custom callback
+class MetricCallback:
+    def __init__(self, threshold):
+        self.threshold = threshold
+    
+    def __call__(self, study, trial):
+        if trial.value > self.threshold:
+            print(f"Достигнут порог {self.threshold}!")
+            study.stop()
+
+# Использование
+study = optuna.create_study(direction='maximize')
+study.optimize(
+    objective,
+    n_trials=100,
+    callbacks=[MetricCallback(0.95), max_trials]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Sampler в Optuna</h2>
+    <pre><code>import optuna
+from optuna.samplers import (
+    TPESampler, RandomSampler, GridSampler, 
+    CmaEsSampler, NSGAIISampler
+)
+
+# TPE (Tree-structured Parzen Estimator) - по умолчанию
+study = optuna.create_study(sampler=TPESampler())
+
+# Random Search
+study = optuna.create_study(sampler=RandomSampler())
+
+# Grid Search
+search_space = {
+    'n_estimators': [50, 100, 200],
+    'max_depth': [5, 10, 15]
+}
+study = optuna.create_study(sampler=GridSampler(search_space))
+
+# CMA-ES (для непрерывных параметров)
+study = optuna.create_study(sampler=CmaEsSampler())
+
+# NSGA-II (для multi-objective)
+study = optuna.create_study(
+    directions=['maximize', 'minimize'],
+    sampler=NSGAIISampler()
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Лучшие практики</h2>
+    <ul>
+      <li>Используйте <code>log=True</code> для параметров с широким диапазоном</li>
+      <li>Начните с Random Search (20-50 trials), затем TPE</li>
+      <li>Используйте pruning для ускорения</li>
+      <li>Сохраняйте study в БД для возможности продолжить</li>
+      <li>Визуализируйте результаты для insights</li>
+      <li>Используйте кросс-валидацию, не holdout</li>
+      <li>Логируйте все trials для анализа</li>
+      <li>Установите timeout или max_trials</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить пространство поиска гиперпараметров</li>
+      <li>[ ] Выбрать метрику оптимизации (accuracy, F1, AUC и т.д.)</li>
+      <li>[ ] Написать objective function</li>
+      <li>[ ] Использовать кросс-валидацию в objective</li>
+      <li>[ ] Настроить pruning для ускорения</li>
+      <li>[ ] Выбрать sampler (TPE рекомендуется)</li>
+      <li>[ ] Запустить оптимизацию (50-200 trials)</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Проанализировать важность параметров</li>
+      <li>[ ] Обучить финальную модель с лучшими параметрами</li>
+      <li>[ ] Валидировать на test set</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Optuna и Hyperopt — это как умные помощники, которые автоматически подбирают лучшие настройки для вашей модели машинного обучения. Вместо ручного перебора тысяч комбинаций, эти инструменты используют умные стратегии, чтобы быстро найти оптимальные параметры, повышающие точность модели».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
