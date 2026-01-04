@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Pandas для ML Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🐼 Pandas для Machine Learning Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Практический фокус • ML-специфичные операции<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы загрузки данных</h2>
+    <pre><code>import pandas as pd
+import numpy as np
+
+# Загрузка из CSV
+df = pd.read_csv('data.csv')
+
+# Параметры для ML
+df = pd.read_csv('data.csv',
+    sep=',',              # разделитель
+    header=0,             # строка заголовков
+    index_col=0,          # столбец индексов
+    na_values=['?', 'NA'] # значения NaN
+)
+
+# Другие форматы
+df = pd.read_excel('data.xlsx')
+df = pd.read_json('data.json')
+df = pd.read_sql('SELECT * FROM table', conn)
+df = pd.read_parquet('data.parquet')  # быстрый формат</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Быстрый анализ данных</h2>
+    <pre><code># Первичный осмотр
+df.head()           # первые 5 строк
+df.tail()           # последние 5 строк
+df.shape            # (rows, columns)
+df.info()           # типы данных, память
+df.describe()       # статистика числовых колонок
+
+# Типы данных
+df.dtypes           # типы всех колонок
+df.select_dtypes(include=['number'])   # только числовые
+df.select_dtypes(include=['object'])   # только строковые
+
+# Пропущенные значения
+df.isnull().sum()   # количество NaN в каждой колонке
+df.isnull().sum() / len(df) * 100  # процент NaN</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Обработка пропусков</h2>
+    <pre><code># Удаление строк с пропусками
+df_clean = df.dropna()              # удалить все строки с NaN
+df_clean = df.dropna(axis=1)        # удалить колонки с NaN
+df_clean = df.dropna(thresh=5)      # минимум 5 не-NaN
+
+# Заполнение пропусков
+df['age'].fillna(df['age'].mean(), inplace=True)  # среднее
+df['age'].fillna(df['age'].median(), inplace=True) # медиана
+df['category'].fillna('Unknown', inplace=True)     # константа
+
+# Forward/backward fill
+df['value'].fillna(method='ffill', inplace=True)   # предыдущее
+df['value'].fillna(method='bfill', inplace=True)   # следующее
+
+# Интерполяция
+df['value'].interpolate(method='linear', inplace=True)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Выбор и фильтрация</h2>
+    <pre><code># Выбор колонок
+df['age']                    # одна колонка (Series)
+df[['age', 'salary']]        # несколько (DataFrame)
+
+# Выбор строк по индексу
+df.iloc[0]                   # первая строка
+df.iloc[0:5]                 # первые 5 строк
+df.iloc[:, 0:3]              # первые 3 колонки
+
+# Выбор по условию
+df[df['age'] > 30]           # возраст > 30
+df[(df['age'] > 30) & (df['salary'] > 50000)]  # AND
+df[(df['city'] == 'Moscow') | (df['city'] == 'SPb')] # OR
+df[df['name'].str.contains('Alex')]  # содержит текст
+
+# Метод query (более читаемо)
+df.query('age > 30 and salary > 50000')
+df.query('city in ["Moscow", "SPb"]')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Создание новых признаков</h2>
+    <pre><code># Простые операции
+df['age_squared'] = df['age'] ** 2
+df['bmi'] = df['weight'] / (df['height'] / 100) ** 2
+df['price_per_sqm'] = df['price'] / df['area']
+
+# Логические признаки
+df['is_senior'] = (df['age'] >= 65).astype(int)
+df['high_income'] = (df['salary'] > df['salary'].median()).astype(int)
+
+# Бинаризация
+df['age_group'] = pd.cut(df['age'], 
+    bins=[0, 18, 30, 50, 100],
+    labels=['child', 'young', 'adult', 'senior'])
+
+# Взаимодействия признаков
+df['age_salary'] = df['age'] * df['salary']
+
+# Apply для сложной логики
+df['category'] = df['score'].apply(
+    lambda x: 'high' if x > 80 else ('medium' if x > 50 else 'low')
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Кодирование категорий</h2>
+    <pre><code># Label Encoding (порядковые)
+from sklearn.preprocessing import LabelEncoder
+le = LabelEncoder()
+df['city_encoded'] = le.fit_transform(df['city'])
+
+# One-Hot Encoding
+df_encoded = pd.get_dummies(df, columns=['city', 'gender'])
+# или с префиксом
+df_encoded = pd.get_dummies(df, columns=['city'], prefix='city')
+
+# Частотное кодирование
+freq_map = df['category'].value_counts() / len(df)
+df['category_freq'] = df['category'].map(freq_map)
+
+# Target encoding (с осторожностью!)
+target_mean = df.groupby('category')['target'].mean()
+df['category_target_enc'] = df['category'].map(target_mean)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Группировка и агрегация</h2>
+    <pre><code># Простая группировка
+df.groupby('city')['salary'].mean()
+df.groupby('city')['salary'].agg(['mean', 'median', 'std'])
+
+# Множественная группировка
+df.groupby(['city', 'gender'])['salary'].mean()
+
+# Пользовательская агрегация
+df.groupby('city').agg({
+    'salary': ['mean', 'std'],
+    'age': ['min', 'max'],
+    'score': lambda x: x.quantile(0.95)
+})
+
+# Transform (сохраняет размер исходного df)
+df['salary_mean_by_city'] = df.groupby('city')['salary'].transform('mean')
+df['salary_normalized'] = df.groupby('city')['salary'].transform(
+    lambda x: (x - x.mean()) / x.std()
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Объединение датасетов</h2>
+    <pre><code># Конкатенация (вертикальная)
+df_combined = pd.concat([df1, df2], axis=0, ignore_index=True)
+
+# Конкатенация (горизонтальная)
+df_combined = pd.concat([df1, df2], axis=1)
+
+# Merge (SQL-like join)
+# Inner join
+df_merged = pd.merge(df1, df2, on='user_id', how='inner')
+
+# Left join
+df_merged = pd.merge(df1, df2, on='user_id', how='left')
+
+# Merge по нескольким ключам
+df_merged = pd.merge(df1, df2, 
+    left_on=['user_id', 'date'], 
+    right_on=['id', 'timestamp'])
+
+# Join по индексу
+df_merged = df1.join(df2, on='user_id', how='left')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Работа с датами</h2>
+    <pre><code># Преобразование в datetime
+df['date'] = pd.to_datetime(df['date'])
+df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
+
+# Извлечение компонентов
+df['year'] = df['date'].dt.year
+df['month'] = df['date'].dt.month
+df['day'] = df['date'].dt.day
+df['dayofweek'] = df['date'].dt.dayofweek  # 0=Monday
+df['quarter'] = df['date'].dt.quarter
+df['is_weekend'] = df['date'].dt.dayofweek.isin([5, 6]).astype(int)
+
+# Разница во времени
+df['days_since'] = (pd.Timestamp.now() - df['date']).dt.days
+
+# Группировка по периодам
+df.groupby(df['date'].dt.to_period('M'))['sales'].sum()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Работа с текстом</h2>
+    <pre><code># Строковые операции
+df['name_lower'] = df['name'].str.lower()
+df['name_upper'] = df['name'].str.upper()
+df['name_length'] = df['name'].str.len()
+
+# Поиск и замена
+df['text_clean'] = df['text'].str.replace('[^a-zA-Z]', '', regex=True)
+df['has_keyword'] = df['text'].str.contains('keyword', case=False)
+
+# Split и extract
+df[['first_name', 'last_name']] = df['full_name'].str.split(' ', expand=True)
+
+# Удаление пробелов
+df['text'] = df['text'].str.strip()
+
+# Счетчики слов
+df['word_count'] = df['text'].str.split().str.len()
+df['char_count'] = df['text'].str.len()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Обработка выбросов</h2>
+    <pre><code># IQR метод
+Q1 = df['value'].quantile(0.25)
+Q3 = df['value'].quantile(0.75)
+IQR = Q3 - Q1
+lower_bound = Q1 - 1.5 * IQR
+upper_bound = Q3 + 1.5 * IQR
+
+# Удаление выбросов
+df_clean = df[(df['value'] >= lower_bound) & 
+              (df['value'] <= upper_bound)]
+
+# Замена выбросов на границы (clipping)
+df['value_clipped'] = df['value'].clip(lower=lower_bound, 
+                                        upper=upper_bound)
+
+# Z-score метод
+from scipy import stats
+z_scores = np.abs(stats.zscore(df['value']))
+df_clean = df[z_scores < 3]  # удаляем |z| > 3</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Подготовка для ML</h2>
+    <pre><code># Разделение на признаки и целевую переменную
+X = df.drop('target', axis=1)
+y = df['target']
+
+# Разделение на train/test
+from sklearn.model_selection import train_test_split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Преобразование в numpy
+X_array = X.values
+y_array = y.values
+
+# Сброс индекса после фильтрации
+df_clean = df_clean.reset_index(drop=True)
+
+# Удаление дубликатов
+df_clean = df.drop_duplicates()
+df_clean = df.drop_duplicates(subset=['user_id'])  # по колонке</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Масштабирование признаков</h2>
+    <pre><code># StandardScaler через pandas
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+numeric_cols = df.select_dtypes(include=['number']).columns
+df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
+
+# MinMaxScaler
+from sklearn.preprocessing import MinMaxScaler
+scaler = MinMaxScaler()
+df[numeric_cols] = scaler.fit_transform(df[numeric_cols])
+
+# Нормализация вручную
+df['value_norm'] = (df['value'] - df['value'].mean()) / df['value'].std()
+df['value_minmax'] = (df['value'] - df['value'].min()) / \
+                     (df['value'].max() - df['value'].min())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Временные ряды</h2>
+    <pre><code># Установка даты как индекс
+df.set_index('date', inplace=True)
+df.index = pd.to_datetime(df.index)
+
+# Ресамплинг
+df_monthly = df.resample('M').mean()      # месячные средние
+df_weekly = df.resample('W').sum()        # недельные суммы
+
+# Rolling window (скользящее окно)
+df['ma_7'] = df['value'].rolling(window=7).mean()
+df['std_7'] = df['value'].rolling(window=7).std()
+
+# Expanding window
+df['cumsum'] = df['value'].expanding().sum()
+df['cumavg'] = df['value'].expanding().mean()
+
+# Лаги (lag features)
+df['lag_1'] = df['value'].shift(1)
+df['lag_7'] = df['value'].shift(7)
+
+# Разница (differencing)
+df['diff_1'] = df['value'].diff(1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Производительность</h2>
+    <table>
+      <tr><th>Операция</th><th>Медленно ❌</th><th>Быстро ✅</th></tr>
+      <tr><td>Итерация</td><td><code>for i in range(len(df))</code></td><td><code>.apply()</code> или векторизация</td></tr>
+      <tr><td>Условие</td><td><code>.apply(lambda)</code></td><td><code>np.where()</code> или маска</td></tr>
+      <tr><td>Конкатенация</td><td>Цикл <code>append()</code></td><td>Одна операция <code>concat()</code></td></tr>
+      <tr><td>Группировка</td><td>Цикл по группам</td><td><code>.groupby().agg()</code></td></tr>
+    </table>
+    <pre><code># Векторизация вместо apply
+# Медленно
+df['result'] = df['value'].apply(lambda x: x * 2 + 1)
+# Быстро
+df['result'] = df['value'] * 2 + 1
+
+# np.where вместо apply с условием
+# Медленно
+df['category'] = df['score'].apply(
+    lambda x: 'high' if x > 80 else 'low'
+)
+# Быстро
+df['category'] = np.where(df['score'] > 80, 'high', 'low')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист для ML</h2>
+    <ul>
+      <li>[ ] Загрузить данные и проверить <code>df.info()</code></li>
+      <li>[ ] Проверить пропуски: <code>df.isnull().sum()</code></li>
+      <li>[ ] Проверить дубликаты: <code>df.duplicated().sum()</code></li>
+      <li>[ ] Проверить типы данных и преобразовать при необходимости</li>
+      <li>[ ] Обработать пропуски (удалить или заполнить)</li>
+      <li>[ ] Обнаружить и обработать выбросы</li>
+      <li>[ ] Создать новые признаки</li>
+      <li>[ ] Закодировать категориальные признаки</li>
+      <li>[ ] Масштабировать числовые признаки</li>
+      <li>[ ] Разделить на X и y, train и test</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Pandas — это Excel на стероидах для Python. Позволяет быстро загружать, анализировать и преобразовывать данные перед обучением моделей машинного обучения».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
