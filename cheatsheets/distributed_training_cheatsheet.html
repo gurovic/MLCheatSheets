@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Distributed Training Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🚀 Distributed Training Cheatsheet</h1>
+  <div class="subtitle">Multi-GPU • Multi-Node • Практический фокус<br>📅 4 января 2026</div>
+  <div class="block">
+    <h2>🔷 1. Типы параллелизма</h2>
+    <ul>
+      <li><strong>Data Parallelism</strong>: одна модель реплицируется на все GPU, данные распределяются</li>
+      <li><strong>Model Parallelism</strong>: модель разделена на части, каждая на своем GPU</li>
+      <li><strong>Pipeline Parallelism</strong>: слои модели на разных GPU, обработка по пайплайну</li>
+      <li><strong>Tensor Parallelism</strong>: отдельные тензоры разделены между GPU</li>
+      <li><strong>Hybrid</strong>: комбинация нескольких подходов</li>
+    </ul>
+  </div>
+  <div class="block">
+    <h2>🔷 2. Data Parallelism - PyTorch</h2>
+    <pre><code>import torch
+import torch.nn as nn
+from torch.nn.parallel import DistributedDataParallel as DDP
+
+# 1. Инициализация
+torch.distributed.init_process_group(backend='nccl')
+local_rank = torch.distributed.get_rank()
+torch.cuda.set_device(local_rank)
+
+# 2. Модель на GPU
+model = MyModel().cuda()
+model = DDP(model, device_ids=[local_rank])
+
+# 3. DataLoader с DistributedSampler
+sampler = torch.utils.data.distributed.DistributedSampler(
+    dataset, 
+    num_replicas=world_size,
+    rank=local_rank
+)
+dataloader = DataLoader(dataset, sampler=sampler)
+
+# 4. Обучение
+for epoch in range(num_epochs):
+    sampler.set_epoch(epoch)  # важно!
+    for batch in dataloader:
+        output = model(batch)
+        loss = criterion(output, target)
+        loss.backward()
+        optimizer.step()</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 3. Запуск distributed training</h2>
+    <pre><code># torchrun (PyTorch >= 1.9)
+torchrun --nproc_per_node=4 train.py
+
+# С несколькими узлами
+torchrun     --nnodes=2     --nproc_per_node=4     --node_rank=0     --master_addr="192.168.1.1"     --master_port=29500     train.py
+
+# Старый способ (torch.distributed.launch)
+python -m torch.distributed.launch     --nproc_per_node=4     train.py</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 4. Коммуникационные операции</h2>
+    <table>
+      <tr><th>Операция</th><th>Описание</th></tr>
+      <tr><td><strong>all_reduce</strong></td><td>Сумма/среднее с всех GPU → всем GPU</td></tr>
+      <tr><td><strong>broadcast</strong></td><td>Один GPU → все GPU</td></tr>
+      <tr><td><strong>gather</strong></td><td>Все GPU → один GPU</td></tr>
+      <tr><td><strong>scatter</strong></td><td>Один GPU → все GPU (распределить)</td></tr>
+      <tr><td><strong>all_gather</strong></td><td>Все GPU → все GPU</td></tr>
+      <tr><td><strong>reduce</strong></td><td>Все GPU → один GPU (агрегация)</td></tr>
+    </table>
+    <pre><code># Пример all_reduce для градиентов
+torch.distributed.all_reduce(tensor, op=torch.distributed.ReduceOp.SUM)
+tensor /= world_size  # усреднение</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 5. Backends сравнение</h2>
+    <table>
+      <tr><th>Backend</th><th>CPU</th><th>GPU</th><th>Скорость</th></tr>
+      <tr><td><strong>nccl</strong></td><td>❌</td><td>✅</td><td>Самый быстрый для GPU</td></tr>
+      <tr><td><strong>gloo</strong></td><td>✅</td><td>✅</td><td>Универсальный</td></tr>
+      <tr><td><strong>mpi</strong></td><td>✅</td><td>✅</td><td>Для HPC кластеров</td></tr>
+    </table>
+    <p><strong>Рекомендация</strong>: nccl для GPU, gloo для CPU</p>
+  </div>
+  <div class="block">
+    <h2>🔷 6. DeepSpeed ZeRO</h2>
+    <p><strong>ZeRO (Zero Redundancy Optimizer)</strong>: эффективное использование памяти</p>
+    <ul>
+      <li><strong>Stage 1</strong>: optimizer states партиционированы</li>
+      <li><strong>Stage 2</strong>: + gradients партиционированы</li>
+      <li><strong>Stage 3</strong>: + model parameters партиционированы</li>
+    </ul>
+    <pre><code>import deepspeed
+
+ds_config = {
+    "train_batch_size": 64,
+    "fp16": {"enabled": True},
+    "zero_optimization": {
+        "stage": 2,
+        "offload_optimizer": {"device": "cpu"}
+    }
+}
+
+model, optimizer, _, _ = deepspeed.initialize(
+    model=model,
+    config=ds_config
+)
+
+for batch in dataloader:
+    loss = model(batch)
+    model.backward(loss)
+    model.step()</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 7. Model Parallelism</h2>
+    <pre><code>class ModelParallelResNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Первая половина на GPU 0
+        self.seq1 = nn.Sequential(...).to('cuda:0')
+        # Вторая половина на GPU 1
+        self.seq2 = nn.Sequential(...).to('cuda:1')
+    
+    def forward(self, x):
+        x = x.to('cuda:0')
+        x = self.seq1(x)
+        # Перенос между GPU
+        x = x.to('cuda:1')
+        x = self.seq2(x)
+        return x</code></pre>
+    <p><strong>Проблема</strong>: GPU простаивают (один работает, другой ждет)</p>
+    <p><strong>Решение</strong>: Pipeline Parallelism</p>
+  </div>
+  <div class="block">
+    <h2>🔷 8. Pipeline Parallelism</h2>
+    <ul>
+      <li>Разделить batch на micro-batches</li>
+      <li>Каждый micro-batch проходит через pipeline</li>
+      <li>GPU работают параллельно над разными micro-batches</li>
+    </ul>
+    <pre><code>from torch.distributed.pipeline.sync import Pipe
+
+model = nn.Sequential(
+    nn.Linear(100, 100),  # GPU 0
+    nn.ReLU(),
+    nn.Linear(100, 100),  # GPU 1
+    nn.ReLU(),
+    nn.Linear(100, 10)    # GPU 2
+)
+
+model = Pipe(model, chunks=8)  # 8 micro-batches
+output = model(input)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 9. Tensor Parallelism (Megatron)</h2>
+    <p>Для очень больших моделей (GPT, BERT)</p>
+    <ul>
+      <li>Attention heads разделены между GPU</li>
+      <li>FFN layers разделены между GPU</li>
+      <li>Минимальная коммуникация</li>
+    </ul>
+    <pre><code># Псевдокод
+class TensorParallelAttention:
+    def __init__(self, hidden_size, num_heads, tp_size):
+        self.heads_per_gpu = num_heads // tp_size
+        self.qkv = ColumnParallelLinear(hidden_size, 3*hidden_size)
+        self.output = RowParallelLinear(hidden_size, hidden_size)
+    
+    def forward(self, x):
+        qkv = self.qkv(x)  # разделено по GPU
+        attention = self.attention(qkv)
+        output = self.output(attention)  # all-reduce здесь
+        return output</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 10. Gradient Accumulation</h2>
+    <pre><code># Симуляция большего batch size
+accumulation_steps = 4
+effective_batch_size = batch_size * accumulation_steps * world_size
+
+for i, batch in enumerate(dataloader):
+    output = model(batch)
+    loss = criterion(output, target) / accumulation_steps
+    loss.backward()
+    
+    if (i + 1) % accumulation_steps == 0:
+        optimizer.step()
+        optimizer.zero_grad()</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 11. Hugging Face Accelerate</h2>
+    <pre><code>from accelerate import Accelerator
+
+accelerator = Accelerator()
+
+model, optimizer, dataloader = accelerator.prepare(
+    model, optimizer, dataloader
+)
+
+for batch in dataloader:
+    output = model(batch)
+    loss = criterion(output, target)
+    accelerator.backward(loss)
+    optimizer.step()
+    optimizer.zero_grad()
+
+# Автоматически поддерживает:
+# - Multi-GPU (DDP)
+# - Mixed precision
+# - DeepSpeed
+# - FSDP</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 12. Fully Sharded Data Parallel (FSDP)</h2>
+    <pre><code>from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
+
+model = MyModel()
+model = FSDP(
+    model,
+    auto_wrap_policy=default_auto_wrap_policy,
+    mixed_precision=mixed_precision_policy,
+    sharding_strategy=ShardingStrategy.FULL_SHARD
+)
+
+# Преимущества над DDP:
+# - Меньше памяти (как DeepSpeed ZeRO-3)
+# - Встроено в PyTorch
+# - Хорошо для больших моделей</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 13. Отладка distributed training</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Зависание</td><td>Проверить синхронизацию, все процессы должны делать одинаковые collective operations</td></tr>
+      <tr><td>Разные loss на GPU</td><td>Проверить seeds, batch size, learning rate scaling</td></tr>
+      <tr><td>OOM на одном GPU</td><td>Неравномерные данные, использовать DistributedSampler</td></tr>
+      <tr><td>Медленная коммуникация</td><td>Проверить network, использовать gradient accumulation</td></tr>
+    </table>
+  </div>
+  <div class="block">
+    <h2>🔷 14. Оптимизация коммуникации</h2>
+    <ul>
+      <li><strong>Gradient bucketing</strong>: группировать небольшие тензоры</li>
+      <li><strong>Overlap communication</strong>: коммуникация параллельно с вычислениями</li>
+      <li><strong>Compression</strong>: сжимать градиенты (PowerSGD)</li>
+      <li><strong>Local SGD</strong>: синхронизировать раз в N шагов</li>
+    </ul>
+    <pre><code># PyTorch DDP с gradient bucketing
+model = DDP(
+    model,
+    bucket_cap_mb=25,  # размер bucket
+    gradient_as_bucket_view=True  # оптимизация памяти
+)</code></pre>
+  </div>
+  <div class="block">
+    <h2>🔷 15. Scaling efficiency</h2>
+    <p><strong>Ideal scaling</strong>: 8 GPU = 8x скорость</p>
+    <p><strong>Реальность</strong>:</p>
+    <ul>
+      <li>2 GPU: 1.9x</li>
+      <li>4 GPU: 3.6x</li>
+      <li>8 GPU: 6.8x</li>
+      <li>16 GPU: 12x</li>
+    </ul>
+    <p><strong>Причины</strong>: communication overhead, synchronization</p>
+    <p><strong>Улучшить</strong>: больше computation per iteration, gradient accumulation</p>
+  </div>
+  <div class="block">
+    <h2>🔷 16. Когда использовать что</h2>
+    <table>
+      <tr><th>Сценарий</th><th>Метод</th></tr>
+      <tr><td>Модель помещается на 1 GPU</td><td>Data Parallelism (DDP)</td></tr>
+      <tr><td>Модель не помещается</td><td>Model/Pipeline Parallelism</td></tr>
+      <tr><td>Очень большая модель (GPT)</td><td>Tensor Parallelism + Pipeline</td></tr>
+      <tr><td>Ограничена память</td><td>FSDP или DeepSpeed ZeRO-3</td></tr>
+      <tr><td>Много узлов</td><td>Data Parallel + gradient accumulation</td></tr>
+    </table>
+  </div>
+  <div class="block">
+    <h2>🔷 17. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать тип параллелизма</li>
+      <li>[ ] Настроить backend (nccl для GPU)</li>
+      <li>[ ] Использовать DistributedSampler</li>
+      <li>[ ] Синхронизировать seeds</li>
+      <li>[ ] Масштабировать learning rate (lr * world_size)</li>
+      <li>[ ] Включить gradient accumulation при необходимости</li>
+      <li>[ ] Мониторить GPU utilization</li>
+      <li>[ ] Измерить scaling efficiency</li>
+    </ul>
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Distributed Training — это как разделить большую задачу между командой. Каждый GPU работает над своей частью данных или модели, потом результаты объединяются. 8 GPU могут обучить модель примерно в 6-7 раз быстрее одного GPU».
+    </blockquote>
+  </div>
+</div>
+</body>
+</html>
