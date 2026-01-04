@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Metric Learning (Triplet Loss, ArcFace) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📏 Metric Learning (Triplet Loss, ArcFace) Cheatsheet</h1>
+  <div class="subtitle">Обучение метрик и embedding'ов • Face Recognition • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Metric Learning</h2>
+    <ul>
+      <li><strong>Цель</strong>: научить модель измерять похожесть объектов</li>
+      <li><strong>Идея</strong>: похожие близко, непохожие далеко в пространстве признаков</li>
+      <li><strong>Применение</strong>: face recognition, image retrieval, re-identification</li>
+      <li><strong>Результат</strong>: качественные embeddings для сравнения</li>
+      <li><strong>Ключевые функции потерь</strong>: Triplet, Center, ArcFace, CosFace</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>�� 2. Triplet Loss</h2>
+    <p><strong>Концепция</strong>: тройка (anchor, positive, negative)</p>
+    <ul>
+      <li>Anchor (A): базовый пример</li>
+      <li>Positive (P): похожий на anchor</li>
+      <li>Negative (N): непохожий на anchor</li>
+      <li>Цель: d(A, P) + margin < d(A, N)</li>
+    </ul>
+    <pre><code>import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class TripletLoss(nn.Module):
+    def __init__(self, margin=0.2):
+        super().__init__()
+        self.margin = margin
+    
+    def forward(self, anchor, positive, negative):
+        # Евклидово расстояние
+        distance_positive = F.pairwise_distance(anchor, positive, 2)
+        distance_negative = F.pairwise_distance(anchor, negative, 2)
+        
+        # Triplet loss
+        losses = F.relu(
+            distance_positive - distance_negative + self.margin
+        )
+        
+        return losses.mean()
+
+
+# Использование
+class EmbeddingNetwork(nn.Module):
+    def __init__(self, embedding_dim=128):
+        super().__init__()
+        self.conv1 = nn.Conv2d(3, 64, 3)
+        self.conv2 = nn.Conv2d(64, 128, 3)
+        self.fc1 = nn.Linear(128 * 6 * 6, 256)
+        self.fc2 = nn.Linear(256, embedding_dim)
+    
+    def forward(self, x):
+        x = F.relu(F.max_pool2d(self.conv1(x), 2))
+        x = F.relu(F.max_pool2d(self.conv2(x), 2))
+        x = x.view(x.size(0), -1)
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        # L2 normalization
+        return F.normalize(x, p=2, dim=1)
+
+
+# Training
+model = EmbeddingNetwork().cuda()
+criterion = TripletLoss(margin=0.2)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+for epoch in range(100):
+    for anchor_imgs, pos_imgs, neg_imgs in triplet_loader:
+        anchor_imgs = anchor_imgs.cuda()
+        pos_imgs = pos_imgs.cuda()
+        neg_imgs = neg_imgs.cuda()
+        
+        # Get embeddings
+        anchor_embed = model(anchor_imgs)
+        positive_embed = model(pos_imgs)
+        negative_embed = model(neg_imgs)
+        
+        # Loss
+        loss = criterion(anchor_embed, positive_embed, negative_embed)
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    
+    print(f'Epoch {epoch}, Loss: {loss.item():.4f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Triplet Mining</h2>
+    <p>Стратегии выбора триплетов критичны для качества:</p>
+    <pre><code>class TripletDataset(torch.utils.data.Dataset):
+    def __init__(self, images, labels):
+        self.images = images
+        self.labels = labels
+        
+        # Индексы по классам
+        self.label_to_indices = {}
+        for idx, label in enumerate(labels):
+            if label not in self.label_to_indices:
+                self.label_to_indices[label] = []
+            self.label_to_indices[label].append(idx)
+    
+    def __getitem__(self, idx):
+        anchor_label = self.labels[idx]
+        anchor_img = self.images[idx]
+        
+        # Positive: тот же класс
+        positive_idx = idx
+        while positive_idx == idx:
+            positive_idx = np.random.choice(
+                self.label_to_indices[anchor_label]
+            )
+        positive_img = self.images[positive_idx]
+        
+        # Negative: другой класс
+        negative_label = anchor_label
+        while negative_label == anchor_label:
+            negative_label = np.random.choice(
+                list(self.label_to_indices.keys())
+            )
+        negative_idx = np.random.choice(
+            self.label_to_indices[negative_label]
+        )
+        negative_img = self.images[negative_idx]
+        
+        return anchor_img, positive_img, negative_img
+
+
+# Hard Negative Mining
+class HardTripletLoss(nn.Module):
+    def __init__(self, margin=0.2):
+        super().__init__()
+        self.margin = margin
+    
+    def forward(self, embeddings, labels):
+        # Вычисляем все попарные расстояния
+        pairwise_dist = torch.cdist(embeddings, embeddings, p=2)
+        
+        # Для каждого anchor находим hardest positive и negative
+        loss = 0
+        num_triplets = 0
+        
+        for i in range(len(labels)):
+            # Hardest positive (максимальное расстояние среди positive)
+            positive_mask = labels == labels[i]
+            positive_mask[i] = False  # Исключаем сам anchor
+            
+            if positive_mask.sum() > 0:
+                hardest_positive_dist = pairwise_dist[i][positive_mask].max()
+                
+                # Hardest negative (минимальное расстояние среди negative)
+                negative_mask = labels != labels[i]
+                
+                if negative_mask.sum() > 0:
+                    hardest_negative_dist = pairwise_dist[i][negative_mask].min()
+                    
+                    triplet_loss = F.relu(
+                        hardest_positive_dist - hardest_negative_dist + self.margin
+                    )
+                    
+                    loss += triplet_loss
+                    num_triplets += 1
+        
+        return loss / max(num_triplets, 1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Center Loss</h2>
+    <pre><code>class CenterLoss(nn.Module):
+    """
+    Minimizes intra-class variations
+    Ref: Wen et al. "A Discriminative Feature Learning Approach"
+    """
+    def __init__(self, num_classes, feat_dim, lambda_c=0.003):
+        super().__init__()
+        self.num_classes = num_classes
+        self.feat_dim = feat_dim
+        self.lambda_c = lambda_c
+        
+        # Centers для каждого класса
+        self.centers = nn.Parameter(
+            torch.randn(num_classes, feat_dim)
+        )
+    
+    def forward(self, embeddings, labels):
+        batch_size = embeddings.size(0)
+        
+        # Расстояния до центров своих классов
+        centers_batch = self.centers[labels]
+        loss = ((embeddings - centers_batch) ** 2).sum() / batch_size
+        
+        return loss * self.lambda_c
+
+
+# Комбинированная функция потерь
+class CombinedLoss(nn.Module):
+    def __init__(self, num_classes, feat_dim):
+        super().__init__()
+        self.softmax_loss = nn.CrossEntropyLoss()
+        self.center_loss = CenterLoss(num_classes, feat_dim)
+    
+    def forward(self, embeddings, logits, labels):
+        # Softmax для классификации
+        loss_softmax = self.softmax_loss(logits, labels)
+        
+        # Center loss для компактности
+        loss_center = self.center_loss(embeddings, labels)
+        
+        return loss_softmax + loss_center
+
+
+# Model с классификацией
+class MetricLearningModel(nn.Module):
+    def __init__(self, num_classes, embedding_dim=128):
+        super().__init__()
+        self.backbone = EmbeddingNetwork(embedding_dim)
+        self.classifier = nn.Linear(embedding_dim, num_classes)
+    
+    def forward(self, x):
+        embeddings = self.backbone(x)
+        logits = self.classifier(embeddings)
+        return embeddings, logits</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. ArcFace Loss</h2>
+    <p>State-of-the-art для face recognition:</p>
+    <pre><code>import math
+
+class ArcFaceLoss(nn.Module):
+    """
+    ArcFace: Additive Angular Margin Loss
+    Ref: Deng et al. "ArcFace: Additive Angular Margin Loss"
+    """
+    def __init__(self, in_features, out_features, 
+                 scale=64.0, margin=0.5):
+        super().__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.scale = scale  # s
+        self.margin = margin  # m
+        
+        # Weight matrix (normalized)
+        self.weight = nn.Parameter(
+            torch.FloatTensor(out_features, in_features)
+        )
+        nn.init.xavier_uniform_(self.weight)
+    
+    def forward(self, embeddings, labels):
+        # Normalize embeddings and weights
+        embeddings = F.normalize(embeddings, p=2, dim=1)
+        weight = F.normalize(self.weight, p=2, dim=1)
+        
+        # Cosine similarity
+        cosine = F.linear(embeddings, weight)
+        
+        # Convert to angle
+        theta = torch.acos(torch.clamp(cosine, -1.0 + 1e-7, 1.0 - 1e-7))
+        
+        # Add angular margin
+        target_logits = torch.cos(theta + self.margin)
+        
+        # One-hot encoding
+        one_hot = torch.zeros_like(cosine)
+        one_hot.scatter_(1, labels.view(-1, 1), 1.0)
+        
+        # Combine
+        output = (one_hot * target_logits) + ((1.0 - one_hot) * cosine)
+        output = output * self.scale
+        
+        return output
+
+
+# Использование
+class ArcFaceModel(nn.Module):
+    def __init__(self, num_classes, embedding_dim=512):
+        super().__init__()
+        self.backbone = EmbeddingNetwork(embedding_dim)
+        self.arcface = ArcFaceLoss(
+            in_features=embedding_dim,
+            out_features=num_classes,
+            scale=64.0,
+            margin=0.5
+        )
+    
+    def forward(self, x, labels=None):
+        embeddings = self.backbone(x)
+        
+        if labels is not None:
+            logits = self.arcface(embeddings, labels)
+            return logits, embeddings
+        else:
+            return embeddings
+
+
+# Training
+model = ArcFaceModel(num_classes=10000).cuda()
+criterion = nn.CrossEntropyLoss()
+optimizer = torch.optim.SGD(
+    model.parameters(), 
+    lr=0.1,
+    momentum=0.9,
+    weight_decay=5e-4
+)
+
+for epoch in range(100):
+    for images, labels in dataloader:
+        images = images.cuda()
+        labels = labels.cuda()
+        
+        logits, embeddings = model(images, labels)
+        loss = criterion(logits, labels)
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    
+    print(f'Epoch {epoch}, Loss: {loss.item():.4f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. CosFace Loss</h2>
+    <pre><code>class CosFaceLoss(nn.Module):
+    """
+    CosFace: Large Margin Cosine Loss
+    Ref: Wang et al. "CosFace: Large Margin Cosine Loss"
+    """
+    def __init__(self, in_features, out_features,
+                 scale=64.0, margin=0.35):
+        super().__init__()
+        self.in_features = in_features
+        self.out_features = out_features
+        self.scale = scale  # s
+        self.margin = margin  # m
+        
+        self.weight = nn.Parameter(
+            torch.FloatTensor(out_features, in_features)
+        )
+        nn.init.xavier_uniform_(self.weight)
+    
+    def forward(self, embeddings, labels):
+        # Normalize
+        embeddings = F.normalize(embeddings, p=2, dim=1)
+        weight = F.normalize(self.weight, p=2, dim=1)
+        
+        # Cosine similarity
+        cosine = F.linear(embeddings, weight)
+        
+        # One-hot
+        one_hot = torch.zeros_like(cosine)
+        one_hot.scatter_(1, labels.view(-1, 1), 1.0)
+        
+        # Add cosine margin
+        output = cosine - one_hot * self.margin
+        output = output * self.scale
+        
+        return output</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Contrastive Loss</h2>
+    <pre><code>class ContrastiveLoss(nn.Module):
+    """
+    Contrastive Loss для пар
+    """
+    def __init__(self, margin=2.0):
+        super().__init__()
+        self.margin = margin
+    
+    def forward(self, embedding1, embedding2, label):
+        # label: 1 = similar, 0 = dissimilar
+        euclidean_distance = F.pairwise_distance(
+            embedding1, embedding2, keepdim=True
+        )
+        
+        # Positive pairs: minimize distance
+        loss_positive = label * torch.pow(euclidean_distance, 2)
+        
+        # Negative pairs: maximize distance (up to margin)
+        loss_negative = (1 - label) * torch.pow(
+            torch.clamp(self.margin - euclidean_distance, min=0.0),
+            2
+        )
+        
+        loss = torch.mean(loss_positive + loss_negative)
+        return loss
+
+
+# Пары для обучения
+class PairDataset(torch.utils.data.Dataset):
+    def __init__(self, images, labels):
+        self.images = images
+        self.labels = labels
+    
+    def __getitem__(self, idx):
+        # Первое изображение
+        img1 = self.images[idx]
+        label1 = self.labels[idx]
+        
+        # Второе изображение (50% same class)
+        if np.random.rand() > 0.5:
+            # Same class
+            same_class_indices = np.where(
+                self.labels == label1
+            )[0]
+            idx2 = np.random.choice(same_class_indices)
+            is_same = 1
+        else:
+            # Different class
+            diff_class_indices = np.where(
+                self.labels != label1
+            )[0]
+            idx2 = np.random.choice(diff_class_indices)
+            is_same = 0
+        
+        img2 = self.images[idx2]
+        
+        return img1, img2, is_same</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Сложность</th><th>Качество</th><th>Применение</th></tr>
+      <tr><td><strong>Contrastive</strong></td><td>Низкая</td><td>Среднее</td><td>Пары</td></tr>
+      <tr><td><strong>Triplet</strong></td><td>Средняя</td><td>Хорошее</td><td>Универсальное</td></tr>
+      <tr><td><strong>Center Loss</strong></td><td>Средняя</td><td>Хорошее</td><td>+ Softmax</td></tr>
+      <tr><td><strong>ArcFace</strong></td><td>Высокая</td><td>Отличное</td><td>Face Recognition</td></tr>
+      <tr><td><strong>CosFace</strong></td><td>Высокая</td><td>Отличное</td><td>Face Recognition</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Evaluation и Inference</h2>
+    <pre><code># Extraction embeddings
+model.eval()
+embeddings_list = []
+labels_list = []
+
+with torch.no_grad():
+    for images, labels in test_loader:
+        images = images.cuda()
+        embeddings = model.backbone(images)
+        embeddings_list.append(embeddings.cpu())
+        labels_list.append(labels)
+
+embeddings = torch.cat(embeddings_list)
+labels = torch.cat(labels_list)
+
+# Similarity matrix
+from sklearn.metrics.pairwise import cosine_similarity
+
+similarity = cosine_similarity(embeddings.numpy())
+
+# Verification (1:1 matching)
+def verify(embedding1, embedding2, threshold=0.5):
+    """Проверка, один ли это человек"""
+    similarity = F.cosine_similarity(
+        embedding1.unsqueeze(0),
+        embedding2.unsqueeze(0)
+    )
+    return similarity.item() > threshold
+
+# Identification (1:N matching)
+def identify(query_embedding, gallery_embeddings, top_k=5):
+    """Поиск в галерее"""
+    similarities = F.cosine_similarity(
+        query_embedding.unsqueeze(0),
+        gallery_embeddings
+    )
+    top_k_values, top_k_indices = torch.topk(similarities, top_k)
+    return top_k_indices, top_k_values
+
+# Metrics
+from sklearn.metrics import roc_auc_score, accuracy_score
+
+# Generate pairs for verification
+positive_pairs = []
+negative_pairs = []
+
+for i in range(len(labels)):
+    for j in range(i+1, len(labels)):
+        sim = similarity[i, j]
+        if labels[i] == labels[j]:
+            positive_pairs.append(sim)
+        else:
+            negative_pairs.append(sim)
+
+# ROC-AUC
+true_labels = [1] * len(positive_pairs) + [0] * len(negative_pairs)
+scores = positive_pairs + negative_pairs
+auc = roc_auc_score(true_labels, scores)
+print(f'ROC-AUC: {auc:.4f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Практические советы</h2>
+    <ul>
+      <li><strong>Margin</strong>: 0.2-0.5 для Triplet, 0.3-0.5 для ArcFace</li>
+      <li><strong>Scale</strong>: 30-64 для angular margins</li>
+      <li><strong>Embedding dim</strong>: 128-512</li>
+      <li><strong>Normalization</strong>: всегда L2-normalize embeddings</li>
+      <li><strong>Mining</strong>: hard negative mining критичен</li>
+      <li><strong>Augmentation</strong>: важно для generalization</li>
+      <li><strong>Batch size</strong>: больше = лучше (особенно для triplet)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Применения</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо работает</h3>
+        <ul>
+          <li>Face recognition и verification</li>
+          <li>Person re-identification</li>
+          <li>Image retrieval</li>
+          <li>Product matching</li>
+          <li>Signature verification</li>
+          <li>Few-shot learning</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Ограничения</h3>
+        <ul>
+          <li>Требует много данных</li>
+          <li>Сложность выбора триплетов</li>
+          <li>Долгое обучение</li>
+          <li>Чувствительность к гиперпараметрам</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать подходящую loss function</li>
+      <li>[ ] Настроить margin и scale</li>
+      <li>[ ] Реализовать эффективный triplet mining</li>
+      <li>[ ] L2-normalize embeddings</li>
+      <li>[ ] Использовать достаточный batch size</li>
+      <li>[ ] Добавить data augmentation</li>
+      <li>[ ] Мониторить качество на validation</li>
+      <li>[ ] Оценить через ROC-AUC и accuracy</li>
+      <li>[ ] Визуализировать embeddings (t-SNE)</li>
+      <li>[ ] Сравнить с baseline</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Metric Learning обучает модель понимать похожесть объектов — например, система распознавания лиц учится, что разные фотографии одного человека должны быть близки друг к другу, а фотографии разных людей должны быть далеки».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
