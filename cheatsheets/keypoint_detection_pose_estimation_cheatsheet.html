@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Keypoint Detection и Pose Estimation — Cheatsheet</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      font-size: 0.9em;
+      color: #666;
+      text-align: center;
+      margin-bottom: 20px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-top: 0;
+      color: #1a5fb4;
+      border-bottom: 2px solid #e0e8f5;
+      padding-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 0.95em;
+      font-weight: 600;
+      margin: 8px 0 4px;
+      color: #26a269;
+    }
+
+    p, ul, ol {
+      margin: 6px 0;
+      font-size: 0.88em;
+      line-height: 1.5;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 3px;
+    }
+
+    code {
+      background: #f6f8fa;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.9em;
+      color: #c7254e;
+    }
+
+    pre {
+      background: #282c34;
+      color: #abb2bf;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.8em;
+      line-height: 1.4;
+      margin: 8px 0;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+      font-size: 0.85em;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #e0e8f5;
+      font-weight: 600;
+      color: #1a5fb4;
+    }
+
+    tr:nth-child(even) {
+      background: #f9fbff;
+    }
+
+    blockquote {
+      background: #fff9e6;
+      border-left: 4px solid #f6d32d;
+      padding: 8px 12px;
+      margin: 8px 0;
+      font-size: 0.88em;
+      font-style: italic;
+    }
+
+    .formula {
+      background: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      margin: 8px 0;
+      font-family: 'Cambria', 'Times New Roman', serif;
+      font-size: 0.9em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🎯 Keypoint Detection и Pose Estimation</h1>
+<div class="subtitle">Детекция ключевых точек и оценка позы человека</div>
+
+<div class="container">
+
+  <div class="block">
+    <h2>🔷 1. Основы Keypoint Detection</h2>
+    <p>Обнаружение характерных точек на объектах: суставы человека, углы зданий, черты лица.</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно обнаружение характерных точек на объектах: суставы человека, углы зданий, черты лица....
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔷 2. Pose Estimation Overview</h2>
+    <p>Определение позы человека по 2D/3D координатам ключевых точек (скелет).</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно определение позы человека по 2d/3d координатам ключевых точек (скелет)....
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔷 3. Top-down vs Bottom-up</h2>
+    <p>Top-down: сначала детекция людей, затем keypoints. Bottom-up: все keypoints, затем группировка.</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно top-down: сначала детекция людей, затем keypoints. bottom-up: все keypoints, затем группировка....
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔷 4. OpenPose Architecture</h2>
+    <p>Bottom-up подход с Part Affinity Fields (PAFs) для связывания keypoints.</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно bottom-up подход с part affinity fields (pafs) для связывания keypoints....
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔷 5. HRNet (High-Resolution Net)</h2>
+    <p>Поддерживает высокое разрешение через все слои, лучше для мелких деталей.</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно поддерживает высокое разрешение через все слои, лучше для мелких деталей....
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔷 6. MediaPipe Pose</h2>
+    <p>Легковесное real-time решение от Google для мобильных устройств.</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно легковесное real-time решение от google для мобильных устройств....
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔷 7. Dataset Annotations</h2>
+    <p>COCO Keypoints (17 точек), MPII Human Pose (16 точек), форматы аннотаций.</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно coco keypoints (17 точек), mpii human pose (16 точек), форматы аннотаций....
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔷 8. Loss Functions</h2>
+    <p>MSE для heatmaps, OKS (Object Keypoint Similarity) metric.</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно mse для heatmaps, oks (object keypoint similarity) metric....
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔷 9. 3D Pose Estimation</h2>
+    <p>Восстановление 3D координат из 2D изображений, depth estimation.</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно восстановление 3d координат из 2d изображений, depth estimation....
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔷 10. Multi-person Pose</h2>
+    <p>Обработка сцен с несколькими людьми, non-maximum suppression.</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно обработка сцен с несколькими людьми, non-maximum suppression....
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔷 11. Real-time Applications</h2>
+    <p>Спорт аналитика, AR/VR, фитнес приложения, жестовое управление.</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно спорт аналитика, ar/vr, фитнес приложения, жестовое управление....
+    </blockquote>
+  </div>
+  <div class="block">
+    <h2>🔷 12. Implementation Tips</h2>
+    <p>Data augmentation для robustness, post-processing heatmaps, temporal smoothing для видео.</p>
+    <h3>Детали реализации:</h3>
+    <ul>
+      <li>Математические основы и формулы</li>
+      <li>Алгоритмы и оптимизация</li>
+      <li>Параметры и их влияние на результат</li>
+      <li>Типичные проблемы и решения</li>
+      <li>Сравнение с альтернативными подходами</li>
+    </ul>
+    <pre><code># Детекция ключевых точек
+import torch
+from torchvision.models.detection import keypointrcnn_resnet50_fpn
+import numpy as np
+
+model = keypointrcnn_resnet50_fpn(weights="DEFAULT")
+model.eval()
+
+image = torch.rand(3, 224, 224)
+with torch.no_grad():
+    outputs = model([image])
+
+pred_keypoints = outputs[0]["keypoints"][0, :, :2].cpu().numpy()
+gt_keypoints = pred_keypoints + np.random.normal(scale=2.0, size=pred_keypoints.shape)
+
+def pck(pred, gt, thr=0.05, img_size=224):
+    dists = np.linalg.norm(pred - gt, axis=1)
+    correct = dists < thr * img_size
+    return correct.sum() / len(pred)
+
+score = pck(pred_keypoints, gt_keypoints)
+print(f"PCK: {score:.3f}")</code></pre>
+    <h3>💡 Когда использовать:</h3>
+    <blockquote>
+      Этот метод особенно эффективен когда нужно data augmentation для robustness, post-processing heatmaps, temporal smoothing для видео....
+    </blockquote>
+  </div>
+</div>
+
+</body>
+</html>

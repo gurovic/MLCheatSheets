@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Cost-Sensitive Learning и веса классов — Cheatsheet</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      font-size: 0.9em;
+      color: #666;
+      text-align: center;
+      margin-bottom: 20px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-top: 0;
+      color: #1a5fb4;
+      border-bottom: 2px solid #e0e8f5;
+      padding-bottom: 4px;
+    }
+
+    h3 {
+      font-size: 0.95em;
+      font-weight: 600;
+      margin: 8px 0 4px;
+      color: #26a269;
+    }
+
+    p, ul, ol {
+      margin: 6px 0;
+      font-size: 0.88em;
+      line-height: 1.5;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 3px;
+    }
+
+    code {
+      background: #f6f8fa;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.9em;
+      color: #c7254e;
+    }
+
+    pre {
+      background: #282c34;
+      color: #abb2bf;
+      padding: 10px;
+      border-radius: 6px;
+      overflow-x: auto;
+      font-size: 0.8em;
+      line-height: 1.4;
+      margin: 8px 0;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0;
+      font-size: 0.85em;
+    }
+
+    th, td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: left;
+    }
+
+    th {
+      background: #e0e8f5;
+      font-weight: 600;
+      color: #1a5fb4;
+    }
+
+    tr:nth-child(even) {
+      background: #f9fbff;
+    }
+
+    blockquote {
+      background: #fff9e6;
+      border-left: 4px solid #f6d32d;
+      padding: 8px 12px;
+      margin: 8px 0;
+      font-size: 0.88em;
+      font-style: italic;
+    }
+
+    .formula {
+      background: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      margin: 8px 0;
+      font-family: 'Cambria', 'Times New Roman', serif;
+      font-size: 0.9em;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<h1>⚖️ Cost-Sensitive Learning и веса классов</h1>
+<div class="subtitle">Обучение с учётом стоимости ошибок и несбалансированности классов</div>
+
+<div class="container">
+
+  <div class="block">
+    <h2>🔷 1. Основная идея</h2>
+    <p><strong>Cost-Sensitive Learning</strong> — подход, где разные типы ошибок имеют разную стоимость.</p>
+
+    <h3>Мотивация:</h3>
+    <ul>
+      <li>Пропустить больного раком (FN) ≠ Ложная тревога (FP)</li>
+      <li>Не заблокировать мошенническую транзакцию ≠ Заблокировать легитимную</li>
+      <li>Несбалансированные классы: 99% негативных, 1% позитивных</li>
+    </ul>
+
+    <h3>Матрица стоимости (Cost Matrix):</h3>
+    <table>
+      <tr><th></th><th>Предсказано 0</th><th>Предсказано 1</th></tr>
+      <tr><td><strong>Истинный 0</strong></td><td>0 (TN)</td><td>C(0→1) (FP)</td></tr>
+      <tr><td><strong>Истинный 1</strong></td><td>C(1→0) (FN)</td><td>0 (TP)</td></tr>
+    </table>
+    <p>Обычно: C(1→0) >> C(0→1)</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Веса классов в sklearn</h2>
+    <h3>Автоматический расчёт весов:</h3>
+    <pre><code>from sklearn.utils.class_weight import compute_class_weight
+import numpy as np
+
+# Вычисляем веса для балансировки
+classes = np.unique(y_train)
+weights = compute_class_weight(
+    class_weight='balanced',
+    classes=classes,
+    y=y_train
+)
+
+# weights = n_samples / (n_classes * n_samples_per_class)
+print(f"Веса классов: {dict(zip(classes, weights))}")
+
+# Пример: 900 объектов класса 0, 100 класса 1
+# Веса: {0: 0.56, 1: 5.0}</code></pre>
+
+    <h3>Применение к моделям:</h3>
+    <pre><code>from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+
+# Вариант 1: Автоматические веса
+lr = LogisticRegression(class_weight='balanced')
+rf = RandomForestClassifier(class_weight='balanced')
+svc = SVC(class_weight='balanced')
+
+# Вариант 2: Ручные веса
+lr = LogisticRegression(class_weight={0: 1, 1: 10})
+rf = RandomForestClassifier(class_weight={0: 1, 1: 5})</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Веса для sample_weight</h2>
+    <p>Некоторые модели не поддерживают <code>class_weight</code>, но принимают <code>sample_weight</code>.</p>
+
+    <pre><code>from sklearn.utils.class_weight import compute_sample_weight
+
+# Вычисляем веса для каждого объекта
+sample_weights = compute_sample_weight(
+    class_weight='balanced',
+    y=y_train
+)
+
+# XGBoost
+from xgboost import XGBClassifier
+xgb = XGBClassifier()
+xgb.fit(X_train, y_train, sample_weight=sample_weights)
+
+# Neural networks
+from sklearn.neural_network import MLPClassifier
+mlp = MLPClassifier()
+mlp.fit(X_train, y_train, sample_weight=sample_weights)
+
+# AdaBoost
+from sklearn.ensemble import AdaBoostClassifier
+ada = AdaBoostClassifier()
+ada.fit(X_train, y_train, sample_weight=sample_weights)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Кастомная матрица стоимости</h2>
+    <h3>Определение стоимости ошибок:</h3>
+    <pre><code>import numpy as np
+
+# Матрица стоимости
+# cost[i, j] = стоимость предсказания j для класса i
+cost_matrix = np.array([
+    [0, 1],    # TN, FP: стоимость FP = 1
+    [10, 0]    # FN, TP: стоимость FN = 10
+])
+
+def cost_sensitive_predict(model, X, cost_matrix):
+    """
+    Предсказания с учётом стоимости
+    """
+    # Получаем вероятности
+    proba = model.predict_proba(X)
+    
+    # Ожидаемая стоимость для каждого класса
+    expected_costs = proba @ cost_matrix
+    
+    # Выбираем класс с минимальной стоимостью
+    predictions = np.argmin(expected_costs, axis=1)
+    
+    return predictions
+
+# Использование
+lr = LogisticRegression()
+lr.fit(X_train, y_train)
+
+y_pred = cost_sensitive_predict(lr, X_test, cost_matrix)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Подбор оптимальных весов</h2>
+    <h3>Метод 1: Grid Search</h3>
+    <pre><code>from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import make_scorer, f1_score
+
+# Перебор весов для minority класса
+param_grid = {
+    'class_weight': [
+        {0: 1, 1: 1},
+        {0: 1, 1: 3},
+        {0: 1, 1: 5},
+        {0: 1, 1: 10},
+        {0: 1, 1: 20},
+        'balanced'
+    ]
+}
+
+grid = GridSearchCV(
+    LogisticRegression(),
+    param_grid,
+    scoring='f1',  # или кастомная метрика
+    cv=5
+)
+
+grid.fit(X_train, y_train)
+print(f"Лучшие веса: {grid.best_params_['class_weight']}")</code></pre>
+
+    <h3>Метод 2: Оптимизация</h3>
+    <pre><code>from scipy.optimize import minimize
+from sklearn.model_selection import cross_val_score
+
+def objective(weight):
+    """Минимизируем валидационную ошибку"""
+    model = LogisticRegression(
+        class_weight={0: 1, 1: weight[0]}
+    )
+    score = -cross_val_score(
+        model, X_train, y_train, 
+        cv=5, scoring='f1'
+    ).mean()
+    return score
+
+result = minimize(
+    objective,
+    x0=[5.0],  # начальное значение
+    bounds=[(1, 50)],  # диапазон поиска
+    method='L-BFGS-B'
+)
+
+optimal_weight = result.x[0]
+print(f"Оптимальный вес: {optimal_weight:.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Threshold moving</h2>
+    <p>Альтернатива весам — изменение порога принятия решения.</p>
+
+    <h3>Поиск оптимального порога:</h3>
+    <pre><code>from sklearn.metrics import f1_score, precision_recall_curve
+
+# Обучаем модель без весов
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Получаем вероятности
+y_proba = model.predict_proba(X_val)[:, 1]
+
+# Перебираем пороги
+thresholds = np.arange(0.05, 0.95, 0.05)
+scores = []
+
+for threshold in thresholds:
+    y_pred = (y_proba >= threshold).astype(int)
+    score = f1_score(y_val, y_pred)
+    scores.append((threshold, score))
+
+# Находим лучший порог
+best_threshold, best_score = max(scores, key=lambda x: x[1])
+print(f"Лучший порог: {best_threshold:.2f}")
+
+# Финальные предсказания
+y_pred = (y_proba >= best_threshold).astype(int)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Focal Loss для несбалансированных данных</h2>
+    <p><strong>Focal Loss</strong> — функция потерь, фокусирующаяся на сложных примерах.</p>
+
+    <div class="formula">
+      FL(p<sub>t</sub>) = -α<sub>t</sub>(1 - p<sub>t</sub>)<sup>γ</sup> log(p<sub>t</sub>)
+    </div>
+
+    <h3>Реализация в Keras/TensorFlow:</h3>
+    <pre><code>import tensorflow as tf
+
+def focal_loss(gamma=2., alpha=0.25):
+    def focal_loss_fixed(y_true, y_pred):
+        epsilon = tf.keras.backend.epsilon()
+        y_pred = tf.clip_by_value(y_pred, epsilon, 1. - epsilon)
+        
+        # Focal loss
+        pt = tf.where(
+            tf.equal(y_true, 1), 
+            y_pred, 
+            1 - y_pred
+        )
+        
+        loss = -alpha * tf.pow(1. - pt, gamma) * tf.log(pt)
+        return tf.reduce_mean(loss)
+    
+    return focal_loss_fixed
+
+# Использование
+model = tf.keras.Sequential([...])
+model.compile(
+    optimizer='adam',
+    loss=focal_loss(gamma=2, alpha=0.75),
+    metrics=['accuracy']
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Взвешенная функция потерь</h2>
+    <h3>Custom loss для PyTorch:</h3>
+    <pre><code>import torch
+import torch.nn as nn
+
+class WeightedBCELoss(nn.Module):
+    def __init__(self, pos_weight=1.0):
+        super().__init__()
+        self.pos_weight = pos_weight
+    
+    def forward(self, y_pred, y_true):
+        # Веса для каждого класса
+        weights = torch.where(
+            y_true == 1, 
+            self.pos_weight,
+            1.0
+        )
+        
+        # Взвешенная binary cross-entropy
+        loss = nn.functional.binary_cross_entropy(
+            y_pred, 
+            y_true, 
+            weight=weights
+        )
+        return loss
+
+# Использование
+criterion = WeightedBCELoss(pos_weight=10.0)
+loss = criterion(predictions, targets)</code></pre>
+
+    <h3>sklearn с кастомной метрикой:</h3>
+    <pre><code>from sklearn.metrics import make_scorer
+
+def custom_cost_score(y_true, y_pred):
+    """Кастомная метрика с учётом стоимости"""
+    tn = ((y_true == 0) & (y_pred == 0)).sum()
+    fp = ((y_true == 0) & (y_pred == 1)).sum()
+    fn = ((y_true == 1) & (y_pred == 0)).sum()
+    tp = ((y_true == 1) & (y_pred == 1)).sum()
+    
+    # Стоимость ошибок
+    cost = fn * 10 + fp * 1
+    
+    # Минимизируем стоимость (возвращаем -cost)
+    return -cost
+
+scorer = make_scorer(custom_cost_score)
+
+# GridSearchCV с кастомной метрикой
+grid = GridSearchCV(model, param_grid, scoring=scorer)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Метапридикат CostSensitiveClassifier</h2>
+    <pre><code>from sklearn.base import BaseEstimator, ClassifierMixin
+
+class CostSensitiveClassifier(BaseEstimator, ClassifierMixin):
+    def __init__(self, estimator, cost_matrix):
+        self.estimator = estimator
+        self.cost_matrix = cost_matrix
+    
+    def fit(self, X, y):
+        self.estimator.fit(X, y)
+        return self
+    
+    def predict_proba(self, X):
+        return self.estimator.predict_proba(X)
+    
+    def predict(self, X):
+        proba = self.predict_proba(X)
+        
+        # Ожидаемая стоимость для каждого класса
+        n_samples = X.shape[0]
+        n_classes = len(self.cost_matrix)
+        
+        expected_costs = np.zeros((n_samples, n_classes))
+        for i in range(n_classes):
+            for j in range(n_classes):
+                expected_costs[:, j] += (
+                    proba[:, i] * self.cost_matrix[i, j]
+                )
+        
+        # Предсказываем класс с минимальной стоимостью
+        return np.argmin(expected_costs, axis=1)
+
+# Использование
+cost_matrix = np.array([[0, 1], [10, 0]])
+clf = CostSensitiveClassifier(
+    LogisticRegression(),
+    cost_matrix
+)
+clf.fit(X_train, y_train)
+y_pred = clf.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Стратегии для многоклассовой классификации</h2>
+    <h3>Веса для 3+ классов:</h3>
+    <pre><code># Автоматические веса
+from sklearn.utils.class_weight import compute_class_weight
+
+classes = np.unique(y_train)
+weights = compute_class_weight('balanced', classes=classes, y=y_train)
+class_weight_dict = dict(zip(classes, weights))
+
+# Пример: {0: 0.5, 1: 2.0, 2: 4.0}
+
+# Применение
+model = RandomForestClassifier(class_weight=class_weight_dict)
+model.fit(X_train, y_train)</code></pre>
+
+    <h3>Матрица стоимости для многих классов:</h3>
+    <pre><code># 3 класса: здоров (0), лёгкая болезнь (1), тяжёлая (2)
+cost_matrix = np.array([
+    [0,  1,  5],   # 0: TN, ошибка как 1 (cost=1), как 2 (cost=5)
+    [1,  0,  3],   # 1: ошибка как 0 (1), TN, ошибка как 2 (3)
+    [10, 5,  0]    # 2: ошибка как 0 (10), как 1 (5), TN
+])
+
+# Самая дорогая ошибка: пропустить тяжёлую болезнь (cost=10)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Комбинирование со SMOTE</h2>
+    <p>Веса классов + синтетические данные = двойной эффект!</p>
+
+    <pre><code>from imblearn.over_sampling import SMOTE
+from imblearn.pipeline import Pipeline
+
+# Сначала SMOTE, потом model с весами
+pipeline = Pipeline([
+    ('smote', SMOTE(sampling_strategy=0.5)),  # доводим до 50%
+    ('classifier', LogisticRegression(
+        class_weight={0: 1, 1: 3}  # дополнительный вес
+    ))
+])
+
+pipeline.fit(X_train, y_train)
+y_pred = pipeline.predict(X_test)</code></pre>
+
+    <h3>Когда использовать:</h3>
+    <ul>
+      <li><strong>Только SMOTE</strong>: мало данных minority класса (< 100)</li>
+      <li><strong>Только веса</strong>: достаточно данных, но разный дисбаланс</li>
+      <li><strong>Оба</strong>: сильный дисбаланс (1:100+) и важна точность</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Мониторинг качества</h2>
+    <h3>Метрики для несбалансированных данных:</h3>
+    <table>
+      <tr><th>Метрика</th><th>Когда использовать</th><th>Оптимум</th></tr>
+      <tr><td><strong>F1-score</strong></td><td>Баланс precision/recall</td><td>→ 1</td></tr>
+      <tr><td><strong>F-beta</strong></td><td>Больший вес recall или precision</td><td>→ 1</td></tr>
+      <tr><td><strong>Balanced Accuracy</strong></td><td>Среднее между классами</td><td>→ 1</td></tr>
+      <tr><td><strong>MCC</strong></td><td>Универсальная метрика</td><td>→ 1</td></tr>
+      <tr><td><strong>ROC-AUC</strong></td><td>Общее качество ранжирования</td><td>→ 1</td></tr>
+    </table>
+
+    <pre><code>from sklearn.metrics import (
+    f1_score, fbeta_score, balanced_accuracy_score,
+    matthews_corrcoef, roc_auc_score
+)
+
+y_pred = model.predict(X_test)
+y_proba = model.predict_proba(X_test)[:, 1]
+
+print(f"F1:         {f1_score(y_test, y_pred):.3f}")
+print(f"F2 (recall):{fbeta_score(y_test, y_pred, beta=2):.3f}")
+print(f"F0.5 (prec):{fbeta_score(y_test, y_pred, beta=0.5):.3f}")
+print(f"Bal Acc:    {balanced_accuracy_score(y_test, y_pred):.3f}")
+print(f"MCC:        {matthews_corrcoef(y_test, y_pred):.3f}")
+print(f"ROC-AUC:    {roc_auc_score(y_test, y_proba):.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Сравнение подходов</h2>
+    <table>
+      <tr><th>Подход</th><th>Плюсы</th><th>Минусы</th></tr>
+      <tr>
+        <td><strong>class_weight</strong></td>
+        <td>Просто, быстро</td>
+        <td>Не всегда оптимально</td>
+      </tr>
+      <tr>
+        <td><strong>sample_weight</strong></td>
+        <td>Гибкость</td>
+        <td>Нужно вычислять вручную</td>
+      </tr>
+      <tr>
+        <td><strong>Threshold moving</strong></td>
+        <td>Не меняет модель</td>
+        <td>Требует валидации</td>
+      </tr>
+      <tr>
+        <td><strong>SMOTE</strong></td>
+        <td>Увеличивает данные</td>
+        <td>Может создать шум</td>
+      </tr>
+      <tr>
+        <td><strong>Focal Loss</strong></td>
+        <td>Фокус на сложных</td>
+        <td>Только для DL</td>
+      </tr>
+      <tr>
+        <td><strong>Cost Matrix</strong></td>
+        <td>Точный контроль</td>
+        <td>Сложнее настроить</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Практические советы</h2>
+    <h3>Для слабого дисбаланса (1:5 до 1:20):</h3>
+    <ul>
+      <li>Используйте <code>class_weight='balanced'</code></li>
+      <li>Мониторьте F1-score</li>
+      <li>SMOTE не обязателен</li>
+    </ul>
+
+    <h3>Для сильного дисбаланса (1:20 до 1:100):</h3>
+    <ul>
+      <li>Комбинируйте SMOTE + веса классов</li>
+      <li>Используйте threshold moving</li>
+      <li>Попробуйте Focal Loss для DL</li>
+      <li>Мониторьте Balanced Accuracy и MCC</li>
+    </ul>
+
+    <h3>Для экстремального дисбаланса (1:100+):</h3>
+    <ul>
+      <li>Используйте anomaly detection подходы</li>
+      <li>Cost-sensitive learning с матрицей стоимости</li>
+      <li>Ensemble methods с разными весами</li>
+      <li>Few-shot learning techniques</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Проверить баланс классов (<code>value_counts()</code>)</li>
+      <li>[ ] Определить стоимость ошибок (FN vs FP)</li>
+      <li>[ ] Попробовать <code>class_weight='balanced'</code></li>
+      <li>[ ] Если не работает — подобрать веса вручную</li>
+      <li>[ ] Рассмотреть threshold moving</li>
+      <li>[ ] Для сильного дисбаланса — добавить SMOTE</li>
+      <li>[ ] Использовать правильные метрики (F1, MCC, не Accuracy!)</li>
+      <li>[ ] Проверить quality на обоих классах отдельно</li>
+      <li>[ ] Визуализировать Precision-Recall кривую</li>
+      <li>[ ] Валидировать на отложенной выборке</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Представьте аэропорт: пропустить террориста (ложноотрицательное решение) намного опаснее, чем лишний раз проверить невинного пассажира (ложноположительное). Cost-sensitive learning учит модель учитывать разную важность ошибок, делая систему безопаснее там, где это критично».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
