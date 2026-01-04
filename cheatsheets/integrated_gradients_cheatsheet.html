@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Integrated Gradients Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Integrated Gradients Cheatsheet</h1>
+  <div class="subtitle">Интегрированные градиенты • Attribution method • XAI<br>📅 Январь 2026</div>
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Метод attribution</strong>: какой вклад каждого пикселя в решение</li>
+      <li><strong>Формула</strong>: интеграл градиента от baseline до input</li>
+      <li><strong>Свойства</strong>: completeness, sensitivity, implementation invariance</li>
+      <li><strong>Baseline</strong>: обычно чёрное изображение или blurred</li>
+    </ul>  </div>
+
+  <div class="block">
+    <h2>🔷 2. Формула</h2>
+    <p><strong>Математика Integrated Gradients</strong></p>
+    <p>IG(x) = (x - x') × ∫₀¹ ∂F(x' + α(x - x'))/∂x dα</p>
+    <p>где:</p>
+    <ul>
+      <li>x - входное изображение</li>
+      <li>x' - baseline (обычно zeros)</li>
+      <li>F - функция модели</li>
+      <li>α - шаги интеграции от 0 до 1</li>
+    </ul>  </div>
+
+  <div class="block">
+    <h2>🔷 3. Реализация</h2>
+    <pre><code>import torch
+
+def integrated_gradients(model, image, target_class, baseline=None, steps=50):
+    if baseline is None:
+        baseline = torch.zeros_like(image)
+    
+    # Линейная интерполяция от baseline к image
+    alphas = torch.linspace(0, 1, steps)
+    
+    # Накопление градиентов
+    integrated_grads = torch.zeros_like(image)
+    
+    for alpha in alphas:
+        # Интерполированное изображение
+        interpolated = baseline + alpha * (image - baseline)
+        interpolated.requires_grad = True
+        
+        # Forward + backward
+        output = model(interpolated)
+        model.zero_grad()
+        output[0, target_class].backward()
+        
+        # Добавляем градиент
+        integrated_grads += interpolated.grad.data
+    
+    # Усредняем и умножаем на (x - x')
+    integrated_grads = integrated_grads / steps
+    attributions = (image - baseline) * integrated_grads
+    
+    return attributions</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 4. Выбор Baseline</h2>
+    <table>
+      <tr><th>Baseline</th><th>Когда использовать</th><th>Пример</th></tr>
+      <tr><td><strong>Zero (чёрный)</strong></td><td>Общий случай</td><td>Большинство задач</td></tr>
+      <tr><td><strong>Blurred image</strong></td><td>Сохранить структуру</td><td>Медицинские изображения</td></tr>
+      <tr><td><strong>Mean pixel</strong></td><td>Нейтральный baseline</td><td>Когда zero не подходит</td></tr>
+      <tr><td><strong>Random noise</strong></td><td>Стохастический baseline</td><td>Исследовательские задачи</td></tr>
+    </table>
+    <pre><code># Blurred baseline
+from PIL import ImageFilter
+
+def create_blurred_baseline(image, radius=10):
+    # Конвертируем в PIL
+    pil_img = transforms.ToPILImage()(image.cpu())
+    # Размытие
+    blurred = pil_img.filter(ImageFilter.GaussianBlur(radius=radius))
+    # Обратно в tensor
+    return transforms.ToTensor()(blurred).to(image.device)</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 5. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Свойство</th><th>IG</th><th>Saliency</th><th>Grad-CAM</th></tr>
+      <tr><td><strong>Completeness</strong></td><td>✓</td><td>✗</td><td>✗</td></tr>
+      <tr><td><strong>Sensitivity</strong></td><td>✓</td><td>✓</td><td>~</td></tr>
+      <tr><td><strong>Шум</strong></td><td>Низкий</td><td>Высокий</td><td>Низкий</td></tr>
+      <tr><td><strong>Скорость</strong></td><td>Медленно</td><td>Быстро</td><td>Быстро</td></tr>
+      <tr><td><strong>Разрешение</strong></td><td>Pixel-level</td><td>Pixel-level</td><td>Coarse</td></tr>
+    </table>  </div>
+
+  <div class="block">
+    <h2>🔷 6. Использование с PyTorch Captum</h2>
+    <pre><code>from captum.attr import IntegratedGradients
+from captum.attr import visualization as viz
+
+# Создание IG объекта
+ig = IntegratedGradients(model)
+
+# Вычисление attributions
+attributions = ig.attribute(
+    image, 
+    target=target_class,
+    n_steps=50,
+    internal_batch_size=32
+)
+
+# Визуализация
+attr_np = attributions.squeeze().cpu().detach().numpy()
+attr_np = np.transpose(attr_np, (1, 2, 0))
+
+viz.visualize_image_attr(
+    attr_np,
+    original_image.squeeze().permute(1,2,0).cpu().numpy(),
+    method="blended_heat_map",
+    sign="all",
+    show_colorbar=True
+)</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 7. Оптимизация производительности</h2>
+    <p><strong>Проблема</strong>: много forward passes (50-300 шагов)</p>
+    <p><strong>Решения</strong>:</p>
+    <ul>
+      <li><strong>Batch processing</strong>: вычислять несколько α одновременно</li>
+      <li><strong>Меньше шагов</strong>: 20-50 часто достаточно</li>
+      <li><strong>Adaptive steps</strong>: больше шагов где градиент меняется</li>
+      <li><strong>GPU batching</strong>: использовать internal_batch_size</li>
+    </ul>
+    <pre><code># Batch processing для ускорения
+def integrated_gradients_batch(model, image, target_class, steps=50, batch_size=10):
+    baseline = torch.zeros_like(image)
+    alphas = torch.linspace(0, 1, steps)
+    
+    all_grads = []
+    
+    for i in range(0, steps, batch_size):
+        batch_alphas = alphas[i:i+batch_size]
+        # Создаём batch интерполяций
+        interpolated_batch = torch.stack([
+            baseline + alpha * (image - baseline) 
+            for alpha in batch_alphas
+        ])
+        interpolated_batch.requires_grad = True
+        
+        # Batch forward
+        outputs = model(interpolated_batch)
+        
+        # Backward для target класса
+        model.zero_grad()
+        target_outputs = outputs[:, target_class].sum()
+        target_outputs.backward()
+        
+        all_grads.append(interpolated_batch.grad.data)
+    
+    # Усреднение
+    integrated_grads = torch.cat(all_grads).mean(dim=0)
+    attributions = (image - baseline) * integrated_grads
+    
+    return attributions</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 8. Применения</h2>
+    <ul>
+      <li><strong>Медицина</strong>: показать врачу важные области для диагностики</li>
+      <li><strong>Финансы</strong>: какие факторы влияют на кредитное решение</li>
+      <li><strong>NLP</strong>: важные слова в тексте (работает и для текста!)</li>
+      <li><strong>Debugging</strong>: понять, почему модель ошиблась</li>
+      <li><strong>Compliance</strong>: объяснение решений для регуляторов</li>
+    </ul>
+    <blockquote>
+      💡 <strong>Объяснение заказчику:</strong> "Integrated Gradients показывает вклад каждого пикселя в решение модели. В отличие от простых методов, он математически гарантирует, что суммарный вклад всех пикселей равен изменению предсказания от нейтрального изображения к реальному".
+    </blockquote>  </div>
+
+  <div class="block">
+    <h2>🔷 9. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Рекомендуется</h3>
+        <ul>
+          <li>50-100 шагов для хорошего качества</li>
+          <li>Попробовать разные baselines</li>
+          <li>Batch processing для ускорения</li>
+          <li>Использовать Captum library</li>
+          <li>Сравнение с другими методами</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Избегать</h3>
+        <ul>
+          <li>Слишком мало шагов (&lt;20)</li>
+          <li>Неподходящий baseline</li>
+          <li>Игнорирование computational cost</li>
+          <li>Интерпретация без контекста</li>
+        </ul>
+      </div>
+    </div>  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать baseline (zero/blurred/mean)</li>
+      <li>[ ] Определить количество шагов (50-100)</li>
+      <li>[ ] Реализовать интеграцию градиентов</li>
+      <li>[ ] Оптимизировать с batch processing</li>
+      <li>[ ] Вычислить attributions для примеров</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Проверить completeness property</li>
+      <li>[ ] Сравнить с другими XAI методами</li>
+      <li>[ ] Оценить interpretability</li>
+    </ul>  </div>
+
+</div>
+</body>
+</html>

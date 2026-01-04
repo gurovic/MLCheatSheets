@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Transfer Learning (Deep Learning) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔄 Transfer Learning (Deep Learning) Cheatsheet</h1>
+  <div class="subtitle">Перенос обучения • Pre-trained модели • Fine-tuning<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Идея</strong>: использование знаний из одной задачи для другой</li>
+      <li><strong>Зачем</strong>: меньше данных, быстрее обучение, лучше качество</li>
+      <li><strong>Ключ</strong>: pre-trained модели на больших датасетах</li>
+      <li><strong>Методы</strong>: feature extraction, fine-tuning, domain adaptation</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Стратегии Transfer Learning</h2>
+    <table>
+      <tr><th>Стратегия</th><th>Когда использовать</th></tr>
+      <tr><td><strong>Feature Extraction</strong></td><td>Малый датасет, похожая задача</td></tr>
+      <tr><td><strong>Fine-tuning</strong></td><td>Средний датасет, схожий домен</td></tr>
+      <tr><td><strong>Full Training</strong></td><td>Большой датасет, любая задача</td></tr>
+      <tr><td><strong>Few-shot Learning</strong></td><td>Очень мало примеров (5-50)</td></tr>
+      <tr><td><strong>Domain Adaptation</strong></td><td>Разные, но связанные домены</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Feature Extraction</h2>
+    <p><strong>Принцип</strong>: замораживаем backbone, обучаем только новую голову</p>
+    <pre><code>import torch
+import torchvision.models as models
+import torch.nn as nn
+
+# Загрузка pre-trained модели
+model = models.resnet50(pretrained=True)
+
+# Заморозка всех слоев
+for param in model.parameters():
+    param.requires_grad = False
+
+# Замена последнего слоя
+num_classes = 10
+model.fc = nn.Linear(model.fc.in_features, num_classes)
+
+# Только fc обучается
+optimizer = torch.optim.Adam(model.fc.parameters(), lr=0.001)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Fine-tuning</h2>
+    <p><strong>Полный fine-tuning</strong></p>
+    <pre><code># Загрузка pre-trained модели
+model = models.resnet50(pretrained=True)
+model.fc = nn.Linear(model.fc.in_features, num_classes)
+
+# Обучаем все параметры
+optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
+
+# Важно: маленький learning rate!</code></pre>
+    <p><strong>Постепенное размораживание (Gradual Unfreezing)</strong></p>
+    <pre><code># Этап 1: только голова (10 эпох)
+for param in model.parameters():
+    param.requires_grad = False
+model.fc.requires_grad = True
+# train...
+
+# Этап 2: последние 2 блока (10 эпох)
+for param in model.layer4.parameters():
+    param.requires_grad = True
+# train...
+
+# Этап 3: вся модель (10 эпох)
+for param in model.parameters():
+    param.requires_grad = True
+# train...</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Discriminative Learning Rates</h2>
+    <p><strong>Разные LR для разных слоев</strong></p>
+    <pre><code># Более ранние слои - меньший LR
+optimizer = torch.optim.Adam([
+    {'params': model.layer1.parameters(), 'lr': 1e-5},
+    {'params': model.layer2.parameters(), 'lr': 5e-5},
+    {'params': model.layer3.parameters(), 'lr': 1e-4},
+    {'params': model.layer4.parameters(), 'lr': 5e-4},
+    {'params': model.fc.parameters(), 'lr': 1e-3}
+])
+
+# Или автоматически
+def get_layer_lr(base_lr, layer_idx, num_layers, factor=0.95):
+    """LR уменьшается для ранних слоев"""
+    return base_lr * (factor ** (num_layers - layer_idx))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Популярные pre-trained модели</h2>
+    <p><strong>Computer Vision</strong></p>
+    <table>
+      <tr><th>Модель</th><th>Датасет</th><th>Применение</th></tr>
+      <tr><td><strong>ResNet</strong></td><td>ImageNet</td><td>Общие задачи CV</td></tr>
+      <tr><td><strong>EfficientNet</strong></td><td>ImageNet</td><td>Эффективность</td></tr>
+      <tr><td><strong>ViT</strong></td><td>ImageNet-21k</td><td>Transformer-based</td></tr>
+      <tr><td><strong>CLIP</strong></td><td>400M пар</td><td>Multi-modal</td></tr>
+      <tr><td><strong>DINOv2</strong></td><td>Self-supervised</td><td>Universal features</td></tr>
+    </table>
+    <p><strong>NLP</strong></p>
+    <table>
+      <tr><th>Модель</th><th>Применение</th></tr>
+      <tr><td><strong>BERT</strong></td><td>Понимание текста</td></tr>
+      <tr><td><strong>GPT</strong></td><td>Генерация текста</td></tr>
+      <tr><td><strong>T5</strong></td><td>Seq2seq задачи</td></tr>
+      <tr><td><strong>RoBERTa</strong></td><td>Улучшенный BERT</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Использование Hugging Face</h2>
+    <pre><code>from transformers import AutoModel, AutoTokenizer
+
+# Computer Vision
+model = AutoModel.from_pretrained("google/vit-base-patch16-224")
+
+# NLP
+tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
+model = AutoModel.from_pretrained("bert-base-uncased")
+
+# Fine-tuning для классификации
+from transformers import AutoModelForImageClassification
+
+model = AutoModelForImageClassification.from_pretrained(
+    "google/vit-base-patch16-224",
+    num_labels=10,
+    ignore_mismatched_sizes=True
+)
+
+# Обучение
+from transformers import Trainer, TrainingArguments
+
+training_args = TrainingArguments(
+    output_dir="./results",
+    num_train_epochs=3,
+    per_device_train_batch_size=16,
+    learning_rate=2e-5
+)
+
+trainer = Trainer(
+    model=model,
+    args=training_args,
+    train_dataset=train_dataset
+)
+trainer.train()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Data Augmentation при Transfer Learning</h2>
+    <pre><code>from torchvision import transforms
+
+# Для fine-tuning важна augmentation
+train_transform = transforms.Compose([
+    transforms.RandomResizedCrop(224),
+    transforms.RandomHorizontalFlip(),
+    transforms.ColorJitter(0.4, 0.4, 0.4),
+    transforms.RandomRotation(15),
+    transforms.ToTensor(),
+    # Важно: те же нормализация, что при pre-training
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    )
+])
+
+# Для валидации - минимальные трансформации
+val_transform = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize(
+        mean=[0.485, 0.456, 0.406],
+        std=[0.229, 0.224, 0.225]
+    )
+])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Learning Rate Scheduling</h2>
+    <pre><code>from torch.optim.lr_scheduler import CosineAnnealingLR, OneCycleLR
+
+# Cosine Annealing
+scheduler = CosineAnnealingLR(
+    optimizer, 
+    T_max=num_epochs,
+    eta_min=1e-6
+)
+
+# One Cycle Policy (часто лучше для fine-tuning)
+scheduler = OneCycleLR(
+    optimizer,
+    max_lr=1e-3,
+    epochs=num_epochs,
+    steps_per_epoch=len(train_loader)
+)
+
+# Warmup + Cosine Decay
+from transformers import get_cosine_schedule_with_warmup
+
+scheduler = get_cosine_schedule_with_warmup(
+    optimizer,
+    num_warmup_steps=len(train_loader),  # 1 эпоха warmup
+    num_training_steps=len(train_loader) * num_epochs
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Regularization techniques</h2>
+    <p><strong>Dropout</strong></p>
+    <ul>
+      <li>Для новых слоев: dropout=0.3-0.5</li>
+      <li>Для fine-tuning: dropout=0.1-0.2</li>
+    </ul>
+    <p><strong>Weight Decay</strong></p>
+    <ul>
+      <li>L2 регуляризация помогает избежать переобучения</li>
+      <li>Типичные значения: 1e-4 до 1e-2</li>
+    </ul>
+    <p><strong>Label Smoothing</strong></p>
+    <pre><code>import torch.nn.functional as F
+
+def label_smoothing_loss(outputs, targets, smoothing=0.1):
+    n_classes = outputs.size(-1)
+    confidence = 1.0 - smoothing
+    smooth_label = smoothing / (n_classes - 1)
+    
+    with torch.no_grad():
+        true_dist = torch.zeros_like(outputs)
+        true_dist.fill_(smooth_label)
+        true_dist.scatter_(1, targets.unsqueeze(1), confidence)
+    
+    return F.kl_div(F.log_softmax(outputs, -1), true_dist, reduction='batchmean')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Рекомендуется</h3>
+        <ul>
+          <li>Начинать с feature extraction</li>
+          <li>Маленький LR для pre-trained слоев</li>
+          <li>Использовать те же нормализации</li>
+          <li>Data augmentation</li>
+          <li>Gradual unfreezing</li>
+          <li>Early stopping</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Избегать</h3>
+        <ul>
+          <li>Большой LR для всей модели сразу</li>
+          <li>Обучение с нуля при малом датасете</li>
+          <li>Игнорирование нормализации</li>
+          <li>Fine-tuning без валидации</li>
+          <li>Слишком много эпох (переобучение)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда что использовать</h2>
+    <table>
+      <tr><th>Размер данных</th><th>Похожесть задач</th><th>Стратегия</th></tr>
+      <tr><td>Малый (&lt;1K)</td><td>Очень похожи</td><td>Feature extraction</td></tr>
+      <tr><td>Малый (&lt;1K)</td><td>Разные</td><td>Few-shot / Meta-learning</td></tr>
+      <tr><td>Средний (1K-100K)</td><td>Похожи</td><td>Fine-tuning последних слоев</td></tr>
+      <tr><td>Средний (1K-100K)</td><td>Разные</td><td>Full fine-tuning</td></tr>
+      <tr><td>Большой (&gt;100K)</td><td>Любые</td><td>Full training возможен</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Мониторинг обучения</h2>
+    <pre><code>from torch.utils.tensorboard import SummaryWriter
+
+writer = SummaryWriter()
+
+for epoch in range(num_epochs):
+    train_loss = train_one_epoch(model, train_loader)
+    val_loss, val_acc = validate(model, val_loader)
+    
+    # Логирование
+    writer.add_scalar('Loss/train', train_loss, epoch)
+    writer.add_scalar('Loss/val', val_loss, epoch)
+    writer.add_scalar('Accuracy/val', val_acc, epoch)
+    
+    # Learning rate
+    writer.add_scalar('LR', optimizer.param_groups[0]['lr'], epoch)
+    
+    # Визуализация весов
+    for name, param in model.named_parameters():
+        if 'weight' in name:
+            writer.add_histogram(name, param, epoch)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Применения</h2>
+    <ul>
+      <li><strong>Медицина</strong>: классификация медицинских изображений (мало данных)</li>
+      <li><strong>E-commerce</strong>: категоризация товаров</li>
+      <li><strong>Безопасность</strong>: детекция аномалий</li>
+      <li><strong>Производство</strong>: контроль качества</li>
+      <li><strong>Сельское хозяйство</strong>: анализ посевов</li>
+      <li><strong>Robotics</strong>: распознавание объектов</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Представьте, что нейросеть уже училась распознавать миллионы изображений. Мы берем эти знания 
+      и "дообучаем" её на ваших специфических данных. Это как нанять опытного специалиста и научить 
+      его особенностям вашего бизнеса — быстрее и эффективнее, чем растить новичка с нуля».
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать подходящую pre-trained модель</li>
+      <li>[ ] Определить стратегию (extraction/fine-tuning)</li>
+      <li>[ ] Настроить правильную нормализацию</li>
+      <li>[ ] Подобрать learning rate (маленький!)</li>
+      <li>[ ] Применить data augmentation</li>
+      <li>[ ] Настроить regularization (dropout, weight decay)</li>
+      <li>[ ] Использовать early stopping</li>
+      <li>[ ] Мониторить train/val loss</li>
+      <li>[ ] Попробовать gradual unfreezing</li>
+      <li>[ ] Оценить на тестовых данных</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

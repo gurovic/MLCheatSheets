@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Saliency Maps Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Saliency Maps Cheatsheet</h1>
+  <div class="subtitle">Карты значимости • Визуализация важных регионов • Interpretability<br>📅 Январь 2026</div>
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Задача</strong>: визуализировать важные для решения регионы изображения</li>
+      <li><strong>Метод</strong>: градиенты выхода по входу</li>
+      <li><strong>Результат</strong>: heatmap значимости пикселей</li>
+      <li><strong>Применение</strong>: объяснимость CNN решений</li>
+    </ul>  </div>
+
+  <div class="block">
+    <h2>🔷 2. Vanilla Gradient Saliency</h2>
+    <p><strong>Простейший метод: ∂y/∂x</strong></p>
+    <pre><code>import torch
+
+def vanilla_saliency(model, image, target_class):
+    image.requires_grad = True
+    
+    # Forward pass
+    output = model(image)
+    
+    # Backward для target класса
+    model.zero_grad()
+    output[0, target_class].backward()
+    
+    # Градиенты = saliency
+    saliency = image.grad.data.abs().max(dim=1)[0]
+    
+    return saliency</code></pre>
+    <p><strong>Проблемы</strong>: зашумлённость, чувствительность к малым изменениям</p>  </div>
+
+  <div class="block">
+    <h2>🔷 3. SmoothGrad</h2>
+    <p><strong>Усреднение по зашумлённым входам</strong></p>
+    <pre><code>def smooth_grad(model, image, target_class, n_samples=50, noise_level=0.15):
+    saliency_maps = []
+    
+    for _ in range(n_samples):
+        # Добавляем гауссовский шум
+        noise = torch.randn_like(image) * noise_level
+        noisy_image = image + noise
+        noisy_image.requires_grad = True
+        
+        # Вычисляем saliency
+        output = model(noisy_image)
+        model.zero_grad()
+        output[0, target_class].backward()
+        
+        saliency = noisy_image.grad.data.abs()
+        saliency_maps.append(saliency)
+    
+    # Усредняем
+    smooth_saliency = torch.stack(saliency_maps).mean(dim=0)
+    return smooth_saliency.max(dim=1)[0]</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 4. Guided Backpropagation</h2>
+    <p><strong>Модификация ReLU в backprop</strong></p>
+    <pre><code>class GuidedReLU(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, input):
+        ctx.save_for_backward(input)
+        return input.clamp(min=0)
+    
+    @staticmethod
+    def backward(ctx, grad_output):
+        input, = ctx.saved_tensors
+        # Оба должны быть > 0
+        grad_input = grad_output.clone()
+        grad_input[input < 0] = 0
+        grad_input[grad_output < 0] = 0
+        return grad_input
+
+# Замена ReLU в модели на GuidedReLU
+def replace_relu_with_guided_relu(model):
+    for module in model.modules():
+        if isinstance(module, nn.ReLU):
+            module.forward = GuidedReLU.apply</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 5. GradCAM Integration</h2>
+    <p><strong>Комбинация Grad-CAM и Guided Backprop</strong></p>
+    <pre><code>def guided_gradcam(model, image, target_class, target_layer):
+    # 1. Grad-CAM на target слое
+    gradcam_mask = gradcam(model, image, target_class, target_layer)
+    
+    # 2. Guided backpropagation
+    guided_grads = guided_backprop(model, image, target_class)
+    
+    # 3. Поэлементное умножение
+    guided_gradcam = guided_grads * gradcam_mask.unsqueeze(0)
+    
+    return guided_gradcam</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 6. Visualization</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import numpy as np
+
+def visualize_saliency(image, saliency, alpha=0.5):
+    # Нормализация saliency к [0, 1]
+    saliency = (saliency - saliency.min()) / (saliency.max() - saliency.min())
+    
+    # Применение colormap
+    heatmap = plt.cm.jet(saliency.cpu().numpy())[..., :3]
+    
+    # Наложение на изображение
+    image_np = image.permute(1, 2, 0).cpu().numpy()
+    overlay = alpha * heatmap + (1 - alpha) * image_np
+    
+    plt.figure(figsize=(15, 5))
+    plt.subplot(131)
+    plt.imshow(image_np)
+    plt.title("Original")
+    plt.subplot(132)
+    plt.imshow(saliency.cpu(), cmap="hot")
+    plt.title("Saliency Map")
+    plt.subplot(133)
+    plt.imshow(overlay)
+    plt.title("Overlay")
+    plt.show()</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Качество</th><th>Скорость</th><th>Шум</th></tr>
+      <tr><td><strong>Vanilla Gradients</strong></td><td>Среднее</td><td>Быстро</td><td>Высокий</td></tr>
+      <tr><td><strong>SmoothGrad</strong></td><td>Хорошее</td><td>Средне</td><td>Низкий</td></tr>
+      <tr><td><strong>Guided Backprop</strong></td><td>Хорошее</td><td>Быстро</td><td>Средний</td></tr>
+      <tr><td><strong>Integrated Gradients</strong></td><td>Отличное</td><td>Медленно</td><td>Очень низкий</td></tr>
+      <tr><td><strong>Grad-CAM</strong></td><td>Хорошее</td><td>Быстро</td><td>Низкий (грубый)</td></tr>
+    </table>  </div>
+
+  <div class="block">
+    <h2>🔷 8. Применения</h2>
+    <ul>
+      <li><strong>Медицина</strong>: показать врачу, на что смотрит модель</li>
+      <li><strong>Безопасность</strong>: проверка корректности детекции</li>
+      <li><strong>Отладка</strong>: понимание ошибок модели</li>
+      <li><strong>Доверие</strong>: объяснение решений пользователям</li>
+      <li><strong>Adversarial robustness</strong>: анализ уязвимостей</li>
+    </ul>
+    <blockquote>
+      💡 <strong>Объяснение заказчику:</strong> "Saliency maps показывают, какие части изображения были важны для решения модели. Это как подсветить, куда смотрела нейросеть перед тем, как сказать 'это кот'".
+    </blockquote>  </div>
+
+  <div class="block">
+    <h2>🔷 9. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Рекомендуется</h3>
+        <ul>
+          <li>SmoothGrad для снижения шума</li>
+          <li>Grad-CAM для быстрой визуализации</li>
+          <li>Нормализация saliency перед viz</li>
+          <li>Проверка на multiple изображениях</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Избегать</h3>
+        <ul>
+          <li>Использование только Vanilla Gradients</li>
+          <li>Интерпретация без контекста</li>
+          <li>Игнорирование baseline</li>
+        </ul>
+      </div>
+    </div>  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать метод (Vanilla/SmoothGrad/Guided/Integrated)</li>
+      <li>[ ] Реализовать backward pass</li>
+      <li>[ ] Вычислить saliency для target класса</li>
+      <li>[ ] Нормализовать и визуализировать</li>
+      <li>[ ] Проверить на разных изображениях</li>
+      <li>[ ] Сравнить с baseline (random/edge detectors)</li>
+      <li>[ ] Оценить качество объяснений</li>
+      <li>[ ] Документировать результаты</li>
+    </ul>  </div>
+
+</div>
+</body>
+</html>

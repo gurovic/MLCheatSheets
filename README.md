@@ -257,14 +257,14 @@
 1. [Модели для синтеза речи (TTS)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tts_models_cheatsheet.html)
 1. [Классификация звуков](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/audio_classification_cheatsheet.html)
 1. [Source separation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/source_separation_cheatsheet.html)
-1. Audio generation
+1. [Audio generation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/audio_generation_cheatsheet.html)
 
 ### **10. Мультимодальное обучение**
-1. Модели для изображений и текста
+1. [Модели для изображений и текста](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/image_text_models_cheatsheet.html)
 1. [CLIP и похожие архитектуры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/clip_multimodal_models_cheatsheet.html)
-1. Видео-аудио модели
-1. Cross-modal retrieval
-1. Мультимодальные трансформеры
+1. [Видео-аудио модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/video_audio_models_cheatsheet.html)
+1. [Cross-modal retrieval](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cross_modal_retrieval_cheatsheet.html)
+1. [Мультимодальные трансформеры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multimodal_transformers_cheatsheet.html)
 
 ### **11. Малоресурсное обучение**
 1. [Few-shot Learning (Siamese, Prototypical Networks, MAML)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/few_shot_learning_cheatsheet.html)
@@ -273,14 +273,14 @@
 1. [Contrastive Learning (SimCLR, MoCo, BYOL)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/contrastive_learning_cheatsheet.html)
 1. [Curriculum Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/curriculum_learning_cheatsheet.html)
 1. [Zero-shot learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/zero_shot_learning_cheatsheet.html)
-1. Transfer learning
-1. Meta-learning (MAML, Prototypical Networks)
-1. Domain adaptation
+1. [Transfer learning (Deep Learning)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transfer_learning_deep_cheatsheet.html)
+1. [Meta-learning (MAML, Prototypical Networks)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/meta_learning_maml_cheatsheet.html)
+1. [Domain adaptation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/domain_adaptation_cheatsheet.html)
 
 ### **12. Объяснимость и интерпретируемость**
 1. [CAM и Grad-CAM](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/grad_cam_cheatsheet.html)
-1. Saliency maps
-1. Integrated gradients
+1. [Saliency maps](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/saliency_maps_cheatsheet.html)
+1. [Integrated gradients](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/integrated_gradients_cheatsheet.html)
 1. LIME для нейросетей
 1. SHAP для нейросетей
 1. Concept activation vectors

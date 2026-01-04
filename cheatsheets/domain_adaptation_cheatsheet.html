@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Domain Adaptation Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Domain Adaptation Cheatsheet</h1>
+  <div class="subtitle">Адаптация домена • Domain Shift • Transfer across domains<br>📅 Январь 2026</div>
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Проблема</strong>: модель обучена на source домене, применяется на target</li>
+      <li><strong>Domain shift</strong>: P_source(X) ≠ P_target(X)</li>
+      <li><strong>Цель</strong>: адаптация без меток (или с минимумом) в target</li>
+      <li><strong>Подходы</strong>: feature alignment, adversarial methods, self-training</li>
+    </ul>  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы задач</h2>
+    <table>
+      <tr><th>Тип</th><th>Данные target</th><th>Методы</th></tr>
+      <tr><td><strong>Unsupervised DA</strong></td><td>Нет меток</td><td>DANN, ADDA, CORAL</td></tr>
+      <tr><td><strong>Semi-supervised DA</strong></td><td>Немного меток</td><td>MME, CDAC</td></tr>
+      <tr><td><strong>Open-set DA</strong></td><td>Новые классы</td><td>OSBP, STA</td></tr>
+      <tr><td><strong>Multi-source DA</strong></td><td>Много source</td><td>MDAN, M3SDA</td></tr>
+    </table>  </div>
+
+  <div class="block">
+    <h2>🔷 3. DANN (Domain Adversarial NN)</h2>
+    <pre><code>import torch.nn as nn
+
+class DANN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.feature_extractor = nn.Sequential(...)
+        self.classifier = nn.Linear(256, num_classes)
+        self.domain_classifier = nn.Sequential(
+            nn.Linear(256, 100),
+            nn.ReLU(),
+            nn.Linear(100, 1)
+        )
+    
+    def forward(self, x, alpha=1.0):
+        features = self.feature_extractor(x)
+        # Gradient reversal layer
+        features_reversed = GradientReversalLayer.apply(features, alpha)
+        class_pred = self.classifier(features)
+        domain_pred = self.domain_classifier(features_reversed)
+        return class_pred, domain_pred</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 4. CORAL (Correlation Alignment)</h2>
+    <p><strong>Идея</strong>: выравнивание корреляций source и target</p>
+    <pre><code>def coral_loss(source_features, target_features):
+    # Вычисление ковариационных матриц
+    source_cov = torch.cov(source_features.T)
+    target_cov = torch.cov(target_features.T)
+    
+    # CORAL loss = Frobenius norm разности
+    loss = torch.norm(source_cov - target_cov, p="fro")
+    return loss
+
+# В обучении
+loss = classification_loss + lambda_coral * coral_loss(src_feat, tgt_feat)</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 5. Self-training</h2>
+    <p><strong>Псевдо-метки для target домена</strong></p>
+    <pre><code># Шаг 1: обучить на source
+model.train_on_source(source_data, source_labels)
+
+# Шаг 2: предсказать на target с высокой уверенностью
+model.eval()
+with torch.no_grad():
+    preds = model(target_data)
+    probs = F.softmax(preds, dim=1)
+    confidence, pseudo_labels = probs.max(dim=1)
+    
+# Шаг 3: отобрать уверенные предсказания
+mask = confidence > 0.95
+target_confident = target_data[mask]
+pseudo_labels_confident = pseudo_labels[mask]
+
+# Шаг 4: дообучить на target с псевдо-метками
+model.train_on_target(target_confident, pseudo_labels_confident)</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 6. MMD (Maximum Mean Discrepancy)</h2>
+    <p><strong>Метрика различия распределений</strong></p>
+    <pre><code>def mmd_loss(source_features, target_features):
+    # Kernel Mean Embedding
+    xx = torch.mm(source_features, source_features.t())
+    yy = torch.mm(target_features, target_features.t())
+    xy = torch.mm(source_features, target_features.t())
+    
+    # RBF kernel
+    def rbf_kernel(x, sigma=1.0):
+        return torch.exp(-x / (2 * sigma**2))
+    
+    K_xx = rbf_kernel(xx)
+    K_yy = rbf_kernel(yy)
+    K_xy = rbf_kernel(xy)
+    
+    # MMD^2
+    mmd = K_xx.mean() + K_yy.mean() - 2 * K_xy.mean()
+    return mmd</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 7. Датасеты</h2>
+    <table>
+      <tr><th>Датасет</th><th>Домены</th><th>Задача</th></tr>
+      <tr><td><strong>Office-31</strong></td><td>Amazon, DSLR, Webcam</td><td>Объекты офиса</td></tr>
+      <tr><td><strong>VisDA</strong></td><td>Synthetic → Real</td><td>Визуальная классификация</td></tr>
+      <tr><td><strong>DomainNet</strong></td><td>6 доменов</td><td>Большой multi-domain</td></tr>
+      <tr><td><strong>PACS</strong></td><td>Photo, Art, Cartoon, Sketch</td><td>Domain generalization</td></tr>
+    </table>  </div>
+
+  <div class="block">
+    <h2>🔷 8. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Рекомендуется</h3>
+        <ul>
+          <li>Визуализировать feature distributions (t-SNE)</li>
+          <li>Использовать pre-trained энкодеры</li>
+          <li>Постепенно увеличивать вес domain loss</li>
+          <li>Валидация на target domain</li>
+          <li>Self-training с высоким порогом уверенности</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Избегать</h3>
+        <ul>
+          <li>Игнорирование label shift</li>
+          <li>Слишком агрессивная адаптация</li>
+          <li>Валидация только на source</li>
+          <li>Низкий порог для псевдо-меток</li>
+        </ul>
+      </div>
+    </div>  </div>
+
+  <div class="block">
+    <h2>🔷 9. Метрики и оценка</h2>
+    <ul>
+      <li><strong>Target accuracy</strong>: главная метрика</li>
+      <li><strong>A-distance</strong>: измерение domain shift</li>
+      <li><strong>Feature visualization</strong>: t-SNE, UMAP для визуализации</li>
+      <li><strong>Per-class analysis</strong>: какие классы хуже адаптируются</li>
+    </ul>
+    <pre><code># A-distance между доменами
+def compute_a_distance(source_feat, target_feat):
+    # Обучить бинарный классификатор различать домены
+    X = torch.cat([source_feat, target_feat])
+    y = torch.cat([torch.zeros(len(source_feat)), 
+                   torch.ones(len(target_feat))])
+    
+    from sklearn.linear_model import LogisticRegression
+    clf = LogisticRegression().fit(X.cpu(), y.cpu())
+    acc = clf.score(X.cpu(), y.cpu())
+    
+    # A-distance = 2(1 - 2*error)
+    a_dist = 2 * (1 - 2 * (1 - acc))
+    return a_dist</code></pre>  </div>
+
+  <div class="block">
+    <h2>🔷 10. Чек-лист</h2>
+    <ul>
+      <li>[ ] Проанализировать domain shift (визуализация)</li>
+      <li>[ ] Выбрать метод (unsupervised/semi-supervised)</li>
+      <li>[ ] Подготовить source и target данные</li>
+      <li>[ ] Обучить baseline (только на source)</li>
+      <li>[ ] Применить domain adaptation</li>
+      <li>[ ] Оценить на target test set</li>
+      <li>[ ] Провести ablation studies</li>
+      <li>[ ] Визуализировать результаты (t-SNE)</li>
+      <li>[ ] Проанализировать по классам</li>
+    </ul>
+    <blockquote>
+      💡 <strong>Объяснение заказчику:</strong> "Модель училась на одних данных (например, картинках с Amazon), но нужно применить на других (фотографии с камеры). Domain adaptation помогает модели адаптироваться к новым условиям без полного переобучения".
+    </blockquote>  </div>
+
+</div>
+</body>
+</html>
