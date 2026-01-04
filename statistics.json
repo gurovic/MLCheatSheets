@@ -1,0 +1,1299 @@
+{
+  "summary": {
+    "total_cheatsheets": 227,
+    "total_without_cheatsheets": 235,
+    "total_topics": 462
+  },
+  "sections": [
+    {
+      "name": "Классическое машинное обучение",
+      "section_number": "I",
+      "cheatsheets": 119,
+      "without_cheatsheets": 0,
+      "total": 119,
+      "subsections": [
+        {
+          "number": "1",
+          "name": "Подготовка данных",
+          "cheatsheets": 8,
+          "without_cheatsheets": 0,
+          "total": 8,
+          "topics_with_cheatsheets": [
+            "Предобработка данных (Preprocessing)",
+            "Data Preprocessing (missing values, encoding)",
+            "Обработка выбросов",
+            "Кодирование категориальных признаков",
+            "Масштабирование и нормализация",
+            "Выбор признаков (Feature Selection)",
+            "Снижение размерности (Dimensionality Reduction)",
+            "Балансировка классов (Imbalanced Data)"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "2",
+          "name": "Классификация",
+          "cheatsheets": 7,
+          "without_cheatsheets": 0,
+          "total": 7,
+          "topics_with_cheatsheets": [
+            "Логистическая регрессия",
+            "Метод опорных векторов (SVM)",
+            "Наивный Байес (Naive Bayes)",
+            "k-ближайших соседей (k-NN)",
+            "Деревья решений для классификации",
+            "Случайный лес для классификации",
+            "Ансамбли методов (Voting, Stacking)"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "3",
+          "name": "Регрессия",
+          "cheatsheets": 7,
+          "without_cheatsheets": 0,
+          "total": 7,
+          "topics_with_cheatsheets": [
+            "Линейная регрессия",
+            "Полиномиальная регрессия",
+            "Ридж, Лассо, ElasticNet",
+            "Деревья решений для регрессии",
+            "Случайный лес для регрессии",
+            "Методы регуляризации",
+            "Непараметрическая регрессия"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "4",
+          "name": "Кластеризация",
+          "cheatsheets": 7,
+          "without_cheatsheets": 0,
+          "total": 7,
+          "topics_with_cheatsheets": [
+            "K-means и K-means++",
+            "Иерархическая кластеризация",
+            "DBSCAN",
+            "OPTICS",
+            "Gaussian Mixture Models (GMM)",
+            "Метрики оценки кластеризации",
+            "Выбор числа кластеров"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "5",
+          "name": "Понижение размерности",
+          "cheatsheets": 6,
+          "without_cheatsheets": 0,
+          "total": 6,
+          "topics_with_cheatsheets": [
+            "PCA (Principal Component Analysis)",
+            "t-SNE",
+            "UMAP",
+            "LDA (Linear Discriminant Analysis)",
+            "SVD (Singular Value Decomposition)",
+            "Автоэнкодеры (линейные)"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "6",
+          "name": "Оценка моделей и валидация",
+          "cheatsheets": 8,
+          "without_cheatsheets": 0,
+          "total": 8,
+          "topics_with_cheatsheets": [
+            "Метрики классификации",
+            "Матрица ошибок (Confusion Matrix)",
+            "ROC и AUC",
+            "Метрики регрессии",
+            "Кросс-валидация",
+            "Кривые обучения",
+            "Калибровка моделей",
+            "Статистические тесты для сравнения моделей"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "7",
+          "name": "Поиск гиперпараметров",
+          "cheatsheets": 4,
+          "without_cheatsheets": 0,
+          "total": 4,
+          "topics_with_cheatsheets": [
+            "Grid Search / Random Search",
+            "Bayesian Optimization",
+            "Optuna / Hyperopt",
+            "Стратегии поиска гиперпараметров"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "8",
+          "name": "Работа с временными рядами (классические методы)",
+          "cheatsheets": 5,
+          "without_cheatsheets": 0,
+          "total": 5,
+          "topics_with_cheatsheets": [
+            "ARIMA / SARIMA",
+            "Экспоненциальное сглаживание",
+            "Методы на основе скользящих средних",
+            "Feature Engineering для временных рядов",
+            "Валидация временных рядов"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "9",
+          "name": "Обнаружение аномалий",
+          "cheatsheets": 5,
+          "without_cheatsheets": 0,
+          "total": 5,
+          "topics_with_cheatsheets": [
+            "Isolation Forest",
+            "One-Class SVM",
+            "Local Outlier Factor",
+            "Elliptic Envelope",
+            "Статистические методы"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "10",
+          "name": "Рекомендательные системы (классические)",
+          "cheatsheets": 4,
+          "without_cheatsheets": 0,
+          "total": 4,
+          "topics_with_cheatsheets": [
+            "Коллаборативная фильтрация",
+            "Контентная фильтрация",
+            "Матричная факторизация (SVD)",
+            "ALS (Alternating Least Squares)"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "11",
+          "name": "Градиентный бустинг",
+          "cheatsheets": 7,
+          "without_cheatsheets": 0,
+          "total": 7,
+          "topics_with_cheatsheets": [
+            "Градиентный бустинг для классификации",
+            "Градиентный бустинг для регрессии",
+            "XGBoost",
+            "LightGBM",
+            "CatBoost",
+            "Гиперпараметры градиентного бустинга",
+            "Особенности и тонкости настройки ансамблей"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "12",
+          "name": "Статистические методы",
+          "cheatsheets": 6,
+          "without_cheatsheets": 0,
+          "total": 6,
+          "topics_with_cheatsheets": [
+            "Статистические методы для ML (Bootstrap, тесты)",
+            "Линейные модели (GLM)",
+            "Множественная регрессия",
+            "Дисперсионный анализ (ANOVA)",
+            "Bootstrap",
+            "Статистическая проверка гипотез"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "13",
+          "name": "Проектирование признаков (Feature Engineering)",
+          "cheatsheets": 6,
+          "without_cheatsheets": 0,
+          "total": 6,
+          "topics_with_cheatsheets": [
+            "Feature Engineering (основы)",
+            "Feature Engineering (подробно)",
+            "Создание полиномиальных признаков и взаимодействия",
+            "Биннинг (дискретизация)",
+            "Target Encoding",
+            "Дата-специфичные признаки (временные, текстовые)"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "14",
+          "name": "Работа с несбалансированными данными",
+          "cheatsheets": 4,
+          "without_cheatsheets": 0,
+          "total": 4,
+          "topics_with_cheatsheets": [
+            "Методы семплирования (SMOTE и др.)",
+            "Cost-Sensitive Learning и веса классов",
+            "Метрики для несбалансированных данных",
+            "Алгоритмические подходы"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "15",
+          "name": "Интерпретация моделей",
+          "cheatsheets": 6,
+          "without_cheatsheets": 0,
+          "total": 6,
+          "topics_with_cheatsheets": [
+            "Важность признаков (Feature Importance)",
+            "SHAP значения",
+            "LIME",
+            "Частичные зависимости (Partial Dependence Plots)",
+            "Explainable AI (XAI) - Полный обзор",
+            "Surrogate models"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "16",
+          "name": "Производственные аспекты",
+          "cheatsheets": 4,
+          "without_cheatsheets": 0,
+          "total": 4,
+          "topics_with_cheatsheets": [
+            "Production ML Best Practices",
+            "Сериализация моделей",
+            "Дрейф данных и концептуальный дрейф",
+            "Пайплайны ML"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "17",
+          "name": "Специальные алгоритмы",
+          "cheatsheets": 5,
+          "without_cheatsheets": 0,
+          "total": 5,
+          "topics_with_cheatsheets": [
+            "Метод главных компонент (PCA)",
+            "Линейный дискриминантный анализ (LDA)",
+            "Канонический корреляционный анализ",
+            "Скрытые марковские модели (HMM)",
+            "EM-алгоритм"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "18",
+          "name": "Визуализация в ML",
+          "cheatsheets": 4,
+          "without_cheatsheets": 0,
+          "total": 4,
+          "topics_with_cheatsheets": [
+            "Визуализация данных",
+            "Визуализация кластеров",
+            "Визуализация деревьев",
+            "Визуализация метрик"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "19",
+          "name": "Основы теории",
+          "cheatsheets": 7,
+          "without_cheatsheets": 0,
+          "total": 7,
+          "topics_with_cheatsheets": [
+            "Смещение-дисперсия",
+            "Переобучение и недообучение (Overfitting/Underfitting)",
+            "Градиентный спуск (Gradient Descent)",
+            "Теория вероятностей для ML",
+            "Регуляризация",
+            "Байесовский подход",
+            "Теория информации в ML"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "20",
+          "name": "Инструменты и библиотеки",
+          "cheatsheets": 4,
+          "without_cheatsheets": 0,
+          "total": 4,
+          "topics_with_cheatsheets": [
+            "Scikit-learn полный обзор",
+            "Pandas для ML",
+            "NumPy для ML",
+            "Matplotlib/Seaborn для визуализации"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "21",
+          "name": "Дополнительные темы",
+          "cheatsheets": 5,
+          "without_cheatsheets": 0,
+          "total": 5,
+          "topics_with_cheatsheets": [
+            "Active Learning",
+            "Transfer Learning (классические подходы)",
+            "Multi-task Learning",
+            "Multi-output регрессионные модели",
+            "Квантильная регрессия"
+          ],
+          "topics_without_cheatsheets": []
+        }
+      ]
+    },
+    {
+      "name": "Глубокое обучение",
+      "section_number": "II",
+      "cheatsheets": 86,
+      "without_cheatsheets": 78,
+      "total": 164,
+      "subsections": [
+        {
+          "number": "1",
+          "name": "Основы нейронных сетей",
+          "cheatsheets": 11,
+          "without_cheatsheets": 0,
+          "total": 11,
+          "topics_with_cheatsheets": [
+            "Искусственный нейрон (перцептрон)",
+            "Архитектура MLP (многослойный перцептрон)",
+            "Функции активации (ReLU, Sigmoid, Tanh, Softmax)",
+            "Функции потерь для классификации и регрессии",
+            "Обратное распространение ошибки (Backpropagation)",
+            "Оптимизаторы (SGD, Momentum, Adam, RMSProp)",
+            "Продвинутые оптимизаторы (AdaGrad, RMSProp, AdamW, Nadam)",
+            "Learning Rate Scheduling",
+            "Инициализация весов (Weight Initialization)",
+            "Ранняя остановка и кривые обучения (Early Stopping)",
+            "Регуляризация нейронных сетей (Dropout и др.)"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "2",
+          "name": "Сверточные нейронные сети (CNN)",
+          "cheatsheets": 10,
+          "without_cheatsheets": 1,
+          "total": 11,
+          "topics_with_cheatsheets": [
+            "Основы свертки",
+            "Пулинг-слои (Max, Average, Global Pooling)",
+            "Архитектуры CNN (LeNet, AlexNet, VGG)",
+            "Attention для Computer Vision (CBAM, SENet)",
+            "Neural Architecture Design Patterns",
+            "Transfer learning для CNN",
+            "Data augmentation для изображений",
+            "Batch Normalization",
+            "Визуализация CNN",
+            "1D-CNN и 3D-CNN"
+          ],
+          "topics_without_cheatsheets": [
+            "Современные архитектуры ([ResNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/resnet_cheatsheet.html), Inception, EfficientNet)"
+          ]
+        },
+        {
+          "number": "3",
+          "name": "Рекуррентные нейронные сети (RNN)",
+          "cheatsheets": 8,
+          "without_cheatsheets": 0,
+          "total": 8,
+          "topics_with_cheatsheets": [
+            "Основы RNN",
+            "Temporal Convolutional Networks (TCN)",
+            "Проблема исчезающего градиента",
+            "LSTM (Long Short-Term Memory)",
+            "GRU (Gated Recurrent Units)",
+            "Регуляризация RNN (Dropout, Recurrent Dropout, Zoneout)",
+            "Двунаправленные RNN",
+            "Архитектура Encoder-Decoder"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "4",
+          "name": "Трансформеры и механизмы внимания",
+          "cheatsheets": 8,
+          "without_cheatsheets": 0,
+          "total": 8,
+          "topics_with_cheatsheets": [
+            "Механизм внимания (attention)",
+            "Self-attention",
+            "Multi-head Attention",
+            "Архитектура Transformer",
+            "Positional Encoding",
+            "BERT и языковые модели",
+            "Vision Transformers (ViT)",
+            "Efficient Transformers (Memory-efficient attention)"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "5",
+          "name": "Генеративные модели",
+          "cheatsheets": 7,
+          "without_cheatsheets": 0,
+          "total": 7,
+          "topics_with_cheatsheets": [
+            "Автоэнкодеры",
+            "Вариационные автоэнкодеры (VAE)",
+            "Генеративно-состязательные сети (GAN)",
+            "DCGAN и Conditional GAN",
+            "StyleGAN",
+            "Diffusion модели",
+            "Нормализующие потоки (Normalizing Flows)"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "6",
+          "name": "Обучение с подкреплением (Deep RL)",
+          "cheatsheets": 7,
+          "without_cheatsheets": 0,
+          "total": 7,
+          "topics_with_cheatsheets": [
+            "Deep Q-Networks (DQN)",
+            "Policy Gradient методы",
+            "Actor-Critic методы",
+            "PPO (Proximal Policy Optimization)",
+            "Многозадачное RL",
+            "Иерархическое RL",
+            "Имитационное обучение (Imitation Learning)"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "7",
+          "name": "Обработка естественного языка (NLP)",
+          "cheatsheets": 8,
+          "without_cheatsheets": 0,
+          "total": 8,
+          "topics_with_cheatsheets": [
+            "Векторные представления слов (Word2Vec, GloVe, FastText)",
+            "RNN/LSTM для NLP",
+            "Transformer для NLP",
+            "BERT и его вариации",
+            "GPT-архитектуры",
+            "Prompt Engineering для LLM (ChatGPT, GPT-4, Claude)",
+            "Токенизация (BPE, WordPiece, SentencePiece)",
+            "Задачи NLP (NER, классификация, суммаризация)"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "8",
+          "name": "Компьютерное зрение (Computer Vision)",
+          "cheatsheets": 8,
+          "without_cheatsheets": 0,
+          "total": 8,
+          "topics_with_cheatsheets": [
+            "Классификация изображений",
+            "Детекция объектов (YOLO, SSD, Faster R-CNN)",
+            "Детекция объектов - Faster R-CNN, SSD, RetinaNet, EfficientDet",
+            "Сегментация изображений (U-Net, DeepLab, Mask R-CNN)",
+            "Детекция ключевых точек и оценка позы",
+            "Слежение за объектами",
+            "Оценка позы человека",
+            "3D Computer Vision"
+          ],
+          "topics_without_cheatsheets": []
+        },
+        {
+          "number": "9",
+          "name": "Обработка аудио и речь",
+          "cheatsheets": 5,
+          "without_cheatsheets": 1,
+          "total": 6,
+          "topics_with_cheatsheets": [
+            "Спектрограммы и MFCC",
+            "Модели для распознавания речи (ASR)",
+            "Модели для синтеза речи (TTS)",
+            "Классификация звуков",
+            "Source separation"
+          ],
+          "topics_without_cheatsheets": [
+            "Audio generation"
+          ]
+        },
+        {
+          "number": "10",
+          "name": "Мультимодальное обучение",
+          "cheatsheets": 1,
+          "without_cheatsheets": 4,
+          "total": 5,
+          "topics_with_cheatsheets": [
+            "CLIP и похожие архитектуры"
+          ],
+          "topics_without_cheatsheets": [
+            "Модели для изображений и текста",
+            "Видео-аудио модели",
+            "Cross-modal retrieval",
+            "Мультимодальные трансформеры"
+          ]
+        },
+        {
+          "number": "11",
+          "name": "Малоресурсное обучение",
+          "cheatsheets": 6,
+          "without_cheatsheets": 3,
+          "total": 9,
+          "topics_with_cheatsheets": [
+            "Few-shot Learning (Siamese, Prototypical Networks, MAML)",
+            "Metric Learning (Triplet Loss, ArcFace)",
+            "Self-Supervised Learning",
+            "Contrastive Learning (SimCLR, MoCo, BYOL)",
+            "Curriculum Learning",
+            "Zero-shot learning"
+          ],
+          "topics_without_cheatsheets": [
+            "Transfer learning",
+            "Meta-learning (MAML, Prototypical Networks)",
+            "Domain adaptation"
+          ]
+        },
+        {
+          "number": "12",
+          "name": "Объяснимость и интерпретируемость",
+          "cheatsheets": 1,
+          "without_cheatsheets": 5,
+          "total": 6,
+          "topics_with_cheatsheets": [
+            "CAM и Grad-CAM"
+          ],
+          "topics_without_cheatsheets": [
+            "Saliency maps",
+            "Integrated gradients",
+            "LIME для нейросетей",
+            "SHAP для нейросетей",
+            "Concept activation vectors"
+          ]
+        },
+        {
+          "number": "13",
+          "name": "Оптимизация и ускорение",
+          "cheatsheets": 2,
+          "without_cheatsheets": 3,
+          "total": 5,
+          "topics_with_cheatsheets": [
+            "Сжатие моделей (Квантизация, Прунинг, Knowledge Distillation)",
+            "Neural Architecture Search (NAS)"
+          ],
+          "topics_without_cheatsheets": [
+            "Mixed precision training",
+            "Gradient checkpointing",
+            "Distributed training"
+          ]
+        },
+        {
+          "number": "14",
+          "name": "Графовые нейронные сети (GNN)",
+          "cheatsheets": 1,
+          "without_cheatsheets": 4,
+          "total": 5,
+          "topics_with_cheatsheets": [
+            "Graph Neural Networks Basics (GCN, GAT, GraphSAGE)"
+          ],
+          "topics_without_cheatsheets": [
+            "Graph Convolutional Networks (GCN)",
+            "Graph Attention Networks (GAT)",
+            "Message Passing Networks",
+            "Применения GNN"
+          ]
+        },
+        {
+          "number": "15",
+          "name": "Временные ряды и прогнозирование",
+          "cheatsheets": 0,
+          "without_cheatsheets": 6,
+          "total": 6,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "RNN/LSTM для временных рядов",
+            "CNN для временных рядов (TCN)",
+            "Transformers для временных рядов",
+            "Многомерные временные ряды",
+            "Аномалии во временных рядах",
+            "Прогнозирование спроса и трафика"
+          ]
+        },
+        {
+          "number": "16",
+          "name": "Нейросети для табличных данных",
+          "cheatsheets": 0,
+          "without_cheatsheets": 5,
+          "total": 5,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "MLP для табличных данных",
+            "TabNet",
+            "Neural Oblivious Decision Ensembles",
+            "AutoML для нейросетей",
+            "Сравнение с классическими методами"
+          ]
+        },
+        {
+          "number": "17",
+          "name": "Этичные аспекты и безопасность",
+          "cheatsheets": 0,
+          "without_cheatsheets": 7,
+          "total": 7,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Adversarial attacks",
+            "Defensive distillation",
+            "Adversarial training",
+            "Bias в нейросетях",
+            "Fairness в ML",
+            "Federated learning",
+            "Differential privacy"
+          ]
+        },
+        {
+          "number": "18",
+          "name": "Производство и MLOps",
+          "cheatsheets": 0,
+          "without_cheatsheets": 8,
+          "total": 8,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Model Deployment",
+            "Сериализация нейросетей",
+            "ONNX формат",
+            "TensorFlow Serving",
+            "TorchServe",
+            "Мониторинг моделей",
+            "CI/CD для ML",
+            "Feature stores"
+          ]
+        },
+        {
+          "number": "19",
+          "name": "Фреймворки и библиотеки",
+          "cheatsheets": 3,
+          "without_cheatsheets": 3,
+          "total": 6,
+          "topics_with_cheatsheets": [
+            "PyTorch полный гайд",
+            "TensorFlow/Keras полный гайд",
+            "Hugging Face Transformers"
+          ],
+          "topics_without_cheatsheets": [
+            "JAX и Flax",
+            "PyTorch Lightning",
+            "FastAI"
+          ]
+        },
+        {
+          "number": "20",
+          "name": "Теория глубокого обучения",
+          "cheatsheets": 0,
+          "without_cheatsheets": 5,
+          "total": 5,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Теорема универсальной аппроксимации",
+            "Теория обобщения для нейросетей",
+            "Динамика обучения нейросетей",
+            "Neural tangent kernel",
+            "Information bottleneck theory"
+          ]
+        },
+        {
+          "number": "21",
+          "name": "Специальные архитектуры",
+          "cheatsheets": 0,
+          "without_cheatsheets": 6,
+          "total": 6,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Capsule networks",
+            "Spiking neural networks",
+            "Neural ODEs",
+            "Differentiable programming",
+            "Memory networks",
+            "Hypernetworks"
+          ]
+        },
+        {
+          "number": "22",
+          "name": "Нейронаука и биологически правдоподобные модели",
+          "cheatsheets": 0,
+          "without_cheatsheets": 3,
+          "total": 3,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Биологически вдохновленные архитектуры",
+            "Нейроморфные вычисления",
+            "Связь нейросетей и мозга"
+          ]
+        },
+        {
+          "number": "23",
+          "name": "Креативные приложения",
+          "cheatsheets": 0,
+          "without_cheatsheets": 5,
+          "total": 5,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Neural style transfer",
+            "Image-to-image translation",
+            "Text-to-image generation",
+            "Музыкальные нейросети",
+            "Генерация видео"
+          ]
+        },
+        {
+          "number": "24",
+          "name": "Научные применения",
+          "cheatsheets": 0,
+          "without_cheatsheets": 5,
+          "total": 5,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Нейросети в физике",
+            "Нейросети в химии",
+            "Нейросети в биологии",
+            "Нейросети в медицине",
+            "Нейросети в астрономии"
+          ]
+        },
+        {
+          "number": "25",
+          "name": "История и эволюция",
+          "cheatsheets": 0,
+          "without_cheatsheets": 4,
+          "total": 4,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Хронология глубокого обучения",
+            "Ключевые прорывы",
+            "Современные тенденции",
+            "Будущее глубокого обучения"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Разные темы машинного обучения",
+      "section_number": "III",
+      "cheatsheets": 22,
+      "without_cheatsheets": 157,
+      "total": 179,
+      "subsections": [
+        {
+          "number": "1",
+          "name": "Обучение с подкреплением (Reinforcement Learning)",
+          "cheatsheets": 2,
+          "without_cheatsheets": 10,
+          "total": 12,
+          "topics_with_cheatsheets": [
+            "Reinforcement Learning Basics (RL основы)",
+            "Q-learning и SARSA"
+          ],
+          "topics_without_cheatsheets": [
+            "Классическое RL (табличное, без нейросетей)",
+            "Многорукие бандиты (Multi-armed bandits)",
+            "Марковские процессы принятия решений",
+            "Динамическое программирование",
+            "Монте-Карло методы",
+            "Временная разница (TD-learning)",
+            "Функции приближения (линейные, ядерные)",
+            "Иерархическое RL",
+            "Многозадачное RL",
+            "Инверсное RL"
+          ]
+        },
+        {
+          "number": "2",
+          "name": "Байесовские методы и вероятностное ML",
+          "cheatsheets": 2,
+          "without_cheatsheets": 8,
+          "total": 10,
+          "topics_with_cheatsheets": [
+            "Гауссовские процессы",
+            "Марковские цепи Монте-Карло (MCMC) и Байесовский вывод"
+          ],
+          "topics_without_cheatsheets": [
+            "Байесовский вывод",
+            "Скрытые марковские модели (HMM)",
+            "Вариационный вывод",
+            "Expectation-Maximization (EM)",
+            "Графические модели",
+            "Наивный Байес (как байесовский метод)",
+            "Байесовская оптимизация",
+            "Байесовские нейронные сети (отдельно от DL)"
+          ]
+        },
+        {
+          "number": "3",
+          "name": "Ансамбли методов",
+          "cheatsheets": 4,
+          "without_cheatsheets": 4,
+          "total": 8,
+          "topics_with_cheatsheets": [
+            "Бэггинг (Bagging)",
+            "Бустинг (Boosting) - классические версии (AdaBoost)",
+            "Стекинг и Voting (Stacking, Voting)",
+            "Advanced Model Ensembling"
+          ],
+          "topics_without_cheatsheets": [
+            "Блендинг (Blending)",
+            "Ансамбли деревьев (не только случайный лес)",
+            "Ансамбли линейных моделей",
+            "Диверсификация ансамблей"
+          ]
+        },
+        {
+          "number": "4",
+          "name": "Продвинутые методы снижения размерности",
+          "cheatsheets": 1,
+          "without_cheatsheets": 6,
+          "total": 7,
+          "topics_with_cheatsheets": [
+            "Manifold learning"
+          ],
+          "topics_without_cheatsheets": [
+            "Isomap",
+            "LLE (Locally Linear Embedding)",
+            "MDS (Multidimensional Scaling)",
+            "Spectral embedding",
+            "Kernel PCA",
+            "Autoencoders (линейные и неглубокие)"
+          ]
+        },
+        {
+          "number": "5",
+          "name": "Кластеризация (продвинутые методы)",
+          "cheatsheets": 0,
+          "without_cheatsheets": 8,
+          "total": 8,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Spectral clustering",
+            "Mean shift",
+            "Affinity propagation",
+            "BIRCH",
+            "CURE",
+            "CLARANS",
+            "Методы на основе плотности (DBSCAN, OPTICS, HDBSCAN)",
+            "Subspace clustering"
+          ]
+        },
+        {
+          "number": "6",
+          "name": "Графовые алгоритмы и методы",
+          "cheatsheets": 0,
+          "without_cheatsheets": 6,
+          "total": 6,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Алгоритмы на графах (кластеризация, поиск путей)",
+            "Социальный сетевой анализ",
+            "Графовые эмбеддинги (Node2Vec, DeepWalk)",
+            "Community detection",
+            "Графовые ядра (Graph kernels)",
+            "Influence maximization"
+          ]
+        },
+        {
+          "number": "7",
+          "name": "Матричная факторизация и рекомендательные системы",
+          "cheatsheets": 0,
+          "without_cheatsheets": 6,
+          "total": 6,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Коллаборативная фильтрация (user-based, item-based)",
+            "Матричная факторизация (SVD, NMF)",
+            "ALS (Alternating Least Squares)",
+            "Гибридные системы",
+            "Context-aware рекомендации",
+            "Sequence-aware рекомендации"
+          ]
+        },
+        {
+          "number": "8",
+          "name": "Обработка временных рядов (классические методы)",
+          "cheatsheets": 1,
+          "without_cheatsheets": 6,
+          "total": 7,
+          "topics_with_cheatsheets": [
+            "Prophet и современные методы временных рядов"
+          ],
+          "topics_without_cheatsheets": [
+            "ARIMA/SARIMA",
+            "Экспоненциальное сглаживание",
+            "State space models",
+            "Kalman filters",
+            "Сезонная декомпозиция",
+            "Теория временных рядов Box-Jenkins"
+          ]
+        },
+        {
+          "number": "9",
+          "name": "Методы обработки текста (традиционные NLP)",
+          "cheatsheets": 0,
+          "without_cheatsheets": 7,
+          "total": 7,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Тематическое моделирование (LDA, NMF)",
+            "TF-IDF и векторное пространство",
+            "Латентно-семантический анализ (LSA)",
+            "Стемминг, лемматизация",
+            "Правила и паттерны (regex, finite-state)",
+            "CRF (Conditional Random Fields) для NER",
+            "Синтаксический разбор (constituency, dependency)"
+          ]
+        },
+        {
+          "number": "10",
+          "name": "Feature engineering и selection",
+          "cheatsheets": 0,
+          "without_cheatsheets": 6,
+          "total": 6,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Доменный feature engineering",
+            "Автоматический feature engineering (Featuretools)",
+            "Методы отбора признаков (фильтры, обертки, встроенные)",
+            "Feature interaction и polynomial features",
+            "Binning и discretization",
+            "Target encoding (без нейросетей)"
+          ]
+        },
+        {
+          "number": "11",
+          "name": "Полуавтоматическое обучение (Semi-supervised)",
+          "cheatsheets": 1,
+          "without_cheatsheets": 6,
+          "total": 7,
+          "topics_with_cheatsheets": [
+            "Semi-supervised Learning"
+          ],
+          "topics_without_cheatsheets": [
+            "Self-training",
+            "Co-training",
+            "Label propagation",
+            "Graph-based SSL",
+            "Pseudo-labeling",
+            "Generative models (без глубоких)"
+          ]
+        },
+        {
+          "number": "12",
+          "name": "Мета-обучение (Meta-learning)",
+          "cheatsheets": 0,
+          "without_cheatsheets": 5,
+          "total": 5,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Model-agnostic meta-learning (MAML)",
+            "Metric-based (Siamese networks, Matching networks)",
+            "Optimization-based meta-learning",
+            "Few-shot learning (традиционные подходы)",
+            "Meta-features и meta-learning"
+          ]
+        },
+        {
+          "number": "13",
+          "name": "Онлайн обучение и streaming ML",
+          "cheatsheets": 2,
+          "without_cheatsheets": 5,
+          "total": 7,
+          "topics_with_cheatsheets": [
+            "Online Learning (SGD, Perceptron, Concept Drift)",
+            "Incremental Learning (Инкрементное обучение)"
+          ],
+          "topics_without_cheatsheets": [
+            "Concept drift detection",
+            "Adaptive windowing",
+            "Ensemble methods для streaming",
+            "Reservoir sampling",
+            "Hoeffding trees"
+          ]
+        },
+        {
+          "number": "14",
+          "name": "Обучение на несбалансированных данных",
+          "cheatsheets": 0,
+          "without_cheatsheets": 5,
+          "total": 5,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Sampling методы (undersampling, oversampling)",
+            "SMOTE и его варианты",
+            "Cost-sensitive learning",
+            "Threshold moving",
+            "Метрики для несбалансированных данных"
+          ]
+        },
+        {
+          "number": "15",
+          "name": "Выбор и сравнение моделей",
+          "cheatsheets": 0,
+          "without_cheatsheets": 4,
+          "total": 4,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Статистические тесты (t-test, McNemar)",
+            "Кривые обучения и валидации",
+            "Bias-variance decomposition",
+            "Неметрические критерии (интерпретируемость, скорость)"
+          ]
+        },
+        {
+          "number": "16",
+          "name": "Автоматическое ML (AutoML)",
+          "cheatsheets": 1,
+          "without_cheatsheets": 5,
+          "total": 6,
+          "topics_with_cheatsheets": [
+            "AutoML: полный обзор"
+          ],
+          "topics_without_cheatsheets": [
+            "Hyperparameter optimization (Grid, Random, Bayesian)",
+            "Neural Architecture Search (классические подходы)",
+            "Automated feature engineering",
+            "Automated pipeline construction",
+            "Meta-learning для AutoML"
+          ]
+        },
+        {
+          "number": "17",
+          "name": "Интерпретируемость и Explainable AI",
+          "cheatsheets": 0,
+          "without_cheatsheets": 6,
+          "total": 6,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "LIME и SHAP (для любых моделей)",
+            "Partial dependence plots",
+            "Individual conditional expectation",
+            "Rule extraction",
+            "Counterfactual explanations",
+            "Feature importance (разные методы)"
+          ]
+        },
+        {
+          "number": "18",
+          "name": "Многозадачное обучение (Multi-task)",
+          "cheatsheets": 1,
+          "without_cheatsheets": 3,
+          "total": 4,
+          "topics_with_cheatsheets": [
+            "Multi-task Learning"
+          ],
+          "topics_without_cheatsheets": [
+            "Task clustering",
+            "Multi-output models",
+            "Hierarchical multi-task"
+          ]
+        },
+        {
+          "number": "19",
+          "name": "Мультимодальное обучение (классическое)",
+          "cheatsheets": 1,
+          "without_cheatsheets": 4,
+          "total": 5,
+          "topics_with_cheatsheets": [
+            "Canonical Correlation Analysis (CCA)"
+          ],
+          "topics_without_cheatsheets": [
+            "Early fusion и late fusion",
+            "Kernel CCA",
+            "Multi-view learning",
+            "Co-training"
+          ]
+        },
+        {
+          "number": "20",
+          "name": "Обучение с ограничениями",
+          "cheatsheets": 0,
+          "without_cheatsheets": 4,
+          "total": 4,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Constrained optimization в ML",
+            "Fairness constraints",
+            "Monotonic constraints",
+            "Shape constraints"
+          ]
+        },
+        {
+          "number": "21",
+          "name": "Непараметрическая статистика и ML",
+          "cheatsheets": 0,
+          "without_cheatsheets": 4,
+          "total": 4,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Kernel methods (SVM, kernel PCA)",
+            "k-NN и его варианты",
+            "Local regression (LOESS)",
+            "Splines и smoothing"
+          ]
+        },
+        {
+          "number": "22",
+          "name": "Комбинаторная оптимизация и ML",
+          "cheatsheets": 0,
+          "without_cheatsheets": 5,
+          "total": 5,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Генетические алгоритмы",
+            "Эволюционные стратегии",
+            "Swarm intelligence (PSO, ant colony)",
+            "Simulated annealing",
+            "Tabu search"
+          ]
+        },
+        {
+          "number": "23",
+          "name": "Математические основы ML",
+          "cheatsheets": 0,
+          "without_cheatsheets": 5,
+          "total": 5,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Теория вероятностей для ML",
+            "Линейная алгебра и оптимизация",
+            "Информационная теория в ML",
+            "Теория графов для ML",
+            "Теория решений"
+          ]
+        },
+        {
+          "number": "24",
+          "name": "Промышленное ML и MLOps",
+          "cheatsheets": 2,
+          "without_cheatsheets": 3,
+          "total": 5,
+          "topics_with_cheatsheets": [
+            "MLOps Best Practices",
+            "Мониторинг моделей и A/B тестирование"
+          ],
+          "topics_without_cheatsheets": [
+            "Модельные реестры",
+            "Feature stores",
+            "CI/CD для ML"
+          ]
+        },
+        {
+          "number": "25",
+          "name": "Специализированные прикладные области",
+          "cheatsheets": 0,
+          "without_cheatsheets": 6,
+          "total": 6,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Биоинформатика и computational biology",
+            "Computational chemistry",
+            "Астрофизика и космология",
+            "Геоинформационные системы",
+            "Цифровая гуманитаристика",
+            "Computational social science"
+          ]
+        },
+        {
+          "number": "26",
+          "name": "Этика, безопасность и приватность",
+          "cheatsheets": 3,
+          "without_cheatsheets": 3,
+          "total": 6,
+          "topics_with_cheatsheets": [
+            "Fairness в ML (Справедливость)",
+            "Adversarial Attacks (Состязательные атаки)",
+            "Federated Learning"
+          ],
+          "topics_without_cheatsheets": [
+            "Adversarial robustness (классические атаки)",
+            "Differential privacy",
+            "Explainability и accountability"
+          ]
+        },
+        {
+          "number": "27",
+          "name": "Квантовое машинное обучение",
+          "cheatsheets": 0,
+          "without_cheatsheets": 3,
+          "total": 3,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Квантовые алгоритмы для ML",
+            "Квантовые нейронные сети",
+            "Квантовое усиление классических алгоритмов"
+          ]
+        },
+        {
+          "number": "28",
+          "name": "Нейро-символьное ИИ",
+          "cheatsheets": 0,
+          "without_cheatsheets": 3,
+          "total": 3,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Гибридные нейро-символьные системы",
+            "Rule-based системы с ML",
+            "Логический вывод с обучением"
+          ]
+        },
+        {
+          "number": "29",
+          "name": "Композиционное и структурное обучение",
+          "cheatsheets": 0,
+          "without_cheatsheets": 3,
+          "total": 3,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Grammatical inference",
+            "Inductive logic programming",
+            "Program synthesis"
+          ]
+        },
+        {
+          "number": "30",
+          "name": "Материаловедение и ML",
+          "cheatsheets": 0,
+          "without_cheatsheets": 3,
+          "total": 3,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Материальные информатики",
+            "Свойства материалов и ML",
+            "Дизайн материалов"
+          ]
+        },
+        {
+          "number": "31",
+          "name": "Компьютерная безопасность и ML",
+          "cheatsheets": 1,
+          "without_cheatsheets": 2,
+          "total": 3,
+          "topics_with_cheatsheets": [
+            "Fraud detection"
+          ],
+          "topics_without_cheatsheets": [
+            "Обнаружение вторжений",
+            "Malware detection"
+          ]
+        },
+        {
+          "number": "32",
+          "name": "Финансовое ML",
+          "cheatsheets": 0,
+          "without_cheatsheets": 3,
+          "total": 3,
+          "topics_with_cheatsheets": [],
+          "topics_without_cheatsheets": [
+            "Алгоритмический трейдинг",
+            "Кредитный скоринг",
+            "Risk management"
+          ]
+        }
+      ]
+    }
+  ]
+}
