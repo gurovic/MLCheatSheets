@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>MDS (Multidimensional Scaling) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📐 MDS (Multidimensional Scaling) Cheatsheet</h1>
+  <div class="subtitle">Многомерное шкалирование • Визуализация • Анализ расстояний<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: отображение объектов в низкоразмерное пространство</li>
+      <li><strong>Сохранение расстояний</strong>: главная задача MDS</li>
+      <li><strong>Вход</strong>: матрица расстояний или попарных несходств</li>
+      <li><strong>Выход</strong>: координаты объектов в 2D или 3D</li>
+      <li><strong>Применение</strong>: визуализация, анализ сходства, снижение размерности</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы MDS</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Когда использовать</th></tr>
+      <tr><td><strong>Classical (Metric)</strong></td><td>Сохраняет точные расстояния</td><td>Евклидовы расстояния</td></tr>
+      <tr><td><strong>Non-metric</strong></td><td>Сохраняет порядок расстояний</td><td>Ординальные данные</td></tr>
+      <tr><td><strong>Weighted</strong></td><td>Разные веса для расстояний</td><td>Разная важность связей</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код (Classical MDS)</h2>
+    <pre><code>from sklearn.manifold import MDS
+import numpy as np
+
+# Создание модели
+mds = MDS(n_components=2, 
+          metric=True,
+          random_state=42)
+
+# Преобразование данных
+X_transformed = mds.fit_transform(X)
+
+# Или из матрицы расстояний
+from sklearn.metrics import pairwise_distances
+D = pairwise_distances(X)
+X_mds = mds.fit_transform(D)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендация</th></tr>
+      <tr><td><code>n_components</code></td><td>Размерность выхода</td><td>2 или 3 для визуализации</td></tr>
+      <tr><td><code>metric</code></td><td>True/False</td><td>True для метрических данных</td></tr>
+      <tr><td><code>n_init</code></td><td>Количество инициализаций</td><td>4-10 для стабильности</td></tr>
+      <tr><td><code>max_iter</code></td><td>Максимум итераций</td><td>300 по умолчанию</td></tr>
+      <tr><td><code>dissimilarity</code></td><td>'euclidean' или 'precomputed'</td><td>'precomputed' для матрицы расстояний</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Функция стресса</h2>
+    <p><strong>Стресс</strong> измеряет качество отображения:</p>
+    <pre><code># Стресс-1 (нормализованный)
+stress = np.sqrt(np.sum((D_original - D_embedded)**2) 
+                  / np.sum(D_original**2))
+
+# Получение стресса из модели
+print(f"Stress: {mds.stress_:.4f}")</code></pre>
+    <p><strong>Интерпретация стресса</strong>:</p>
+    <ul>
+      <li>&lt; 0.05: отлично</li>
+      <li>0.05-0.10: хорошо</li>
+      <li>0.10-0.20: приемлемо</li>
+      <li>&gt; 0.20: плохо</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Предобработка данных</h2>
+    <p>✅ <strong>Для признаковых данных</strong>:</p>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)</code></pre>
+    <p>✅ <strong>Выбор метрики расстояния</strong>:</p>
+    <ul>
+      <li><code>euclidean</code>: для непрерывных признаков</li>
+      <li><code>manhattan</code>: для разреженных данных</li>
+      <li><code>cosine</code>: для текстовых данных</li>
+      <li><code>correlation</code>: для временных рядов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Non-metric MDS</h2>
+    <pre><code># Non-metric MDS (сохраняет порядок)
+nmds = MDS(n_components=2,
+           metric=False,
+           random_state=42)
+
+X_nmds = nmds.fit_transform(X)
+
+# Оценка качества
+print(f"Stress: {nmds.stress_:.4f}")</code></pre>
+    <p><strong>Преимущества</strong>:</p>
+    <ul>
+      <li>Работает с ординальными данными</li>
+      <li>Менее чувствителен к выбросам</li>
+      <li>Лучше для психологических шкал</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Особенность</th><th>Скорость</th></tr>
+      <tr><td><strong>PCA</strong></td><td>Линейный, сохраняет дисперсию</td><td>Быстро</td></tr>
+      <tr><td><strong>t-SNE</strong></td><td>Локальная структура, нелинейный</td><td>Медленно</td></tr>
+      <tr><td><strong>MDS</strong></td><td>Глобальные расстояния</td><td>Средне</td></tr>
+      <tr><td><strong>UMAP</strong></td><td>Баланс локального и глобального</td><td>Быстро</td></tr>
+      <tr><td><strong>Isomap</strong></td><td>Геодезические расстояния</td><td>Средне</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Визуализация результатов</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# 2D визуализация
+plt.figure(figsize=(10, 8))
+plt.scatter(X_mds[:, 0], X_mds[:, 1], 
+            c=y, cmap='viridis', s=50)
+plt.xlabel('MDS Component 1')
+plt.ylabel('MDS Component 2')
+plt.title('MDS Visualization')
+plt.colorbar(label='Class')
+plt.show()
+
+# 3D визуализация
+from mpl_toolkits.mplot3d import Axes3D
+mds_3d = MDS(n_components=3)
+X_3d = mds_3d.fit_transform(X)
+
+fig = plt.figure(figsize=(10, 8))
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(X_3d[:, 0], X_3d[:, 1], X_3d[:, 2],
+           c=y, cmap='viridis')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применения MDS</h2>
+    <ul>
+      <li><strong>Маркетинг</strong>: карты восприятия брендов</li>
+      <li><strong>Психология</strong>: шкалирование стимулов</li>
+      <li><strong>Биология</strong>: анализ генетических расстояний</li>
+      <li><strong>Социология</strong>: анализ социальных сетей</li>
+      <li><strong>География</strong>: восстановление карт</li>
+      <li><strong>Документы</strong>: визуализация схожести текстов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Есть матрица расстояний/несходств</li>
+          <li>Важны глобальные расстояния</li>
+          <li>Нужна 2D/3D визуализация</li>
+          <li>Небольшие датасеты (&lt;5000 объектов)</li>
+          <li>Интерпретация расстояний важна</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Большие данные (&gt;10000 объектов)</li>
+          <li>Нужна только локальная структура</li>
+          <li>Высокая размерность выхода</li>
+          <li>Очень зашумленные данные</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Медленная работа</td><td>Использовать sampling, Landmark MDS</td></tr>
+      <tr><td>Локальный минимум</td><td>Увеличить <code>n_init</code></td></tr>
+      <tr><td>Высокий стресс</td><td>Увеличить <code>n_components</code></td></tr>
+      <tr><td>Разная шкала признаков</td><td>Стандартизация данных</td></tr>
+      <tr><td>Выбросы</td><td>Non-metric MDS или робастные метрики</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Оценка качества</h2>
+    <pre><code># Shepard диаграмма
+from scipy.spatial.distance import pdist, squareform
+
+D_original = squareform(pdist(X))
+D_embedded = squareform(pdist(X_mds))
+
+plt.scatter(D_original.flatten(), 
+            D_embedded.flatten(), 
+            alpha=0.3, s=1)
+plt.xlabel('Original distances')
+plt.ylabel('Embedded distances')
+plt.title('Shepard Diagram')
+plt.plot([0, D_original.max()], 
+         [0, D_original.max()], 'r--')
+plt.show()
+
+# Коэффициент корреляции
+from scipy.stats import pearsonr
+corr, _ = pearsonr(D_original.flatten(), 
+                    D_embedded.flatten())
+print(f"Correlation: {corr:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Продвинутые техники</h2>
+    <p><strong>Landmark MDS</strong> для больших данных:</p>
+    <pre><code># Выбираем подмножество точек (landmarks)
+n_landmarks = 100
+landmark_idx = np.random.choice(
+    len(X), n_landmarks, replace=False)
+X_landmarks = X[landmark_idx]
+
+# MDS на landmarks
+mds_land = MDS(n_components=2)
+X_land_embedded = mds_land.fit_transform(X_landmarks)
+
+# Проецируем остальные точки
+# используя интерполацию</code></pre>
+    <p><strong>Weighted MDS</strong>:</p>
+    <pre><code># Разные веса для разных расстояний
+weights = np.ones_like(D)
+weights[important_pairs] = 2.0
+# Используйте библиотеку smacof с весами</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать тип MDS (metric/non-metric)</li>
+      <li>[ ] Стандартизировать признаки</li>
+      <li>[ ] Выбрать метрику расстояния</li>
+      <li>[ ] Задать <code>n_components</code> (обычно 2-3)</li>
+      <li>[ ] Установить <code>n_init</code> для стабильности</li>
+      <li>[ ] Оценить стресс модели</li>
+      <li>[ ] Построить Shepard диаграмму</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Интерпретировать оси</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «MDS создает карту объектов, где расстояние между точками показывает их схожесть. 
+      Похожие объекты располагаются близко, различные — далеко друг от друга. 
+      Это как создание географической карты городов по времени в пути между ними».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

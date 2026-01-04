@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Spectral Embedding Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🌐 Spectral Embedding Cheatsheet</h1>
+  <div class="subtitle">Спектральное вложение • Графы • Нелинейное снижение размерности<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: отображение данных в низкоразмерное пространство</li>
+      <li><strong>Основа</strong>: собственные векторы лапласиана графа</li>
+      <li><strong>Граф</strong>: строится из данных (по близости)</li>
+      <li><strong>Нелинейный</strong>: находит сложные структуры</li>
+      <li><strong>Применение</strong>: кластеризация, визуализация, manifold learning</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый код</h2>
+    <pre><code>from sklearn.manifold import SpectralEmbedding
+
+# Создание модели
+se = SpectralEmbedding(
+    n_components=2,
+    affinity='nearest_neighbors',
+    n_neighbors=10,
+    random_state=42
+)
+
+# Трансформация данных
+X_embedded = se.fit_transform(X)
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.scatter(X_embedded[:, 0], 
+            X_embedded[:, 1],
+            c=y, cmap='viridis')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Ключевые параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендация</th></tr>
+      <tr><td><code>n_components</code></td><td>Размерность выхода</td><td>2 для визуализации</td></tr>
+      <tr><td><code>affinity</code></td><td>Способ построения графа</td><td>'nearest_neighbors' или 'rbf'</td></tr>
+      <tr><td><code>n_neighbors</code></td><td>Число соседей</td><td>5-20, зависит от данных</td></tr>
+      <tr><td><code>gamma</code></td><td>Параметр для RBF ядра</td><td>1/n_features или подбор</td></tr>
+      <tr><td><code>eigen_solver</code></td><td>Метод решения</td><td>'arpack' или 'lobpcg'</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Типы Affinity</h2>
+    <p><strong>1. Nearest Neighbors</strong>:</p>
+    <pre><code>se = SpectralEmbedding(
+    affinity='nearest_neighbors',
+    n_neighbors=10
+)</code></pre>
+    <ul>
+      <li>Локальная структура</li>
+      <li>Быстрее для больших данных</li>
+    </ul>
+    <p><strong>2. RBF Kernel</strong>:</p>
+    <pre><code>se = SpectralEmbedding(
+    affinity='rbf',
+    gamma=1.0
+)</code></pre>
+    <ul>
+      <li>Глобальная структура</li>
+      <li>Чувствителен к масштабу</li>
+    </ul>
+    <p><strong>3. Precomputed</strong>:</p>
+    <pre><code>from sklearn.metrics.pairwise import rbf_kernel
+affinity_matrix = rbf_kernel(X, gamma=0.5)
+se = SpectralEmbedding(
+    affinity='precomputed'
+)
+X_embedded = se.fit_transform(affinity_matrix)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Математическая основа</h2>
+    <p><strong>Лапласиан графа</strong>:</p>
+    <ul>
+      <li><strong>W</strong>: матрица весов (affinity matrix)</li>
+      <li><strong>D</strong>: диагональная матрица степеней вершин</li>
+      <li><strong>L = D - W</strong>: ненормализованный лапласиан</li>
+      <li><strong>L_norm = D^(-1/2) L D^(-1/2)</strong>: нормализованный</li>
+    </ul>
+    <p><strong>Алгоритм</strong>:</p>
+    <ol>
+      <li>Построить граф близости</li>
+      <li>Вычислить лапласиан</li>
+      <li>Найти k наименьших собственных векторов</li>
+      <li>Использовать их как координаты</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Предобработка данных</h2>
+    <p>✅ <strong>Масштабирование обязательно</strong>:</p>
+    <pre><code>from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+se = SpectralEmbedding(n_components=2)
+X_embedded = se.fit_transform(X_scaled)</code></pre>
+    <p>✅ <strong>Обработка разреженных данных</strong>:</p>
+    <ul>
+      <li>Использовать разреженные матрицы для больших данных</li>
+      <li>Выбирать <code>eigen_solver='lobpcg'</code> для разреженных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Связь со Spectral Clustering</h2>
+    <pre><code>from sklearn.cluster import SpectralClustering
+
+# Spectral Clustering = 
+# Spectral Embedding + KMeans
+sc = SpectralClustering(
+    n_clusters=3,
+    affinity='nearest_neighbors',
+    n_neighbors=10
+)
+labels = sc.fit_predict(X)
+
+# Эквивалентно:
+se = SpectralEmbedding(n_components=3)
+X_embedded = se.fit_transform(X)
+
+from sklearn.cluster import KMeans
+kmeans = KMeans(n_clusters=3)
+labels = kmeans.fit_predict(X_embedded)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Особенность</th><th>Когда использовать</th></tr>
+      <tr><td><strong>PCA</strong></td><td>Линейный</td><td>Линейные структуры</td></tr>
+      <tr><td><strong>t-SNE</strong></td><td>Локальная структура</td><td>Визуализация кластеров</td></tr>
+      <tr><td><strong>UMAP</strong></td><td>Быстрый, топология</td><td>Большие данные</td></tr>
+      <tr><td><strong>Spectral Emb.</strong></td><td>Глобальная геометрия</td><td>Графовые данные</td></tr>
+      <tr><td><strong>Isomap</strong></td><td>Геодезические</td><td>Manifolds</td></tr>
+      <tr><td><strong>LLE</strong></td><td>Локальная линейность</td><td>Свернутые данные</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Подбор гиперпараметров</h2>
+    <pre><code>import numpy as np
+from sklearn.metrics import silhouette_score
+
+# Подбор n_neighbors
+neighbors_range = [5, 10, 15, 20, 30]
+scores = []
+
+for n_neigh in neighbors_range:
+    se = SpectralEmbedding(
+        n_components=2,
+        affinity='nearest_neighbors',
+        n_neighbors=n_neigh
+    )
+    X_emb = se.fit_transform(X)
+    
+    # Оценка через кластеризацию
+    from sklearn.cluster import KMeans
+    kmeans = KMeans(n_clusters=3)
+    labels = kmeans.fit_predict(X_emb)
+    score = silhouette_score(X_emb, labels)
+    scores.append(score)
+    
+best_n = neighbors_range[np.argmax(scores)]
+print(f"Best n_neighbors: {best_n}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применения</h2>
+    <ul>
+      <li><strong>Кластеризация</strong>: обнаружение неявных групп</li>
+      <li><strong>Визуализация</strong>: 2D/3D отображение</li>
+      <li><strong>Графовый анализ</strong>: социальные сети</li>
+      <li><strong>Обработка изображений</strong>: сегментация</li>
+      <li><strong>Биоинформатика</strong>: анализ генных сетей</li>
+      <li><strong>Рекомендации</strong>: user-item графы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Данные на многообразиях (manifolds)</li>
+          <li>Сложная нелинейная структура</li>
+          <li>Графовые данные</li>
+          <li>Нужна визуализация кластеров</li>
+          <li>Средний размер датасета</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень большие данные (&gt;50K)</li>
+          <li>Простая линейная структура</li>
+          <li>Нужна интерпретация осей</li>
+          <li>Нужна трансформация новых данных</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Медленная работа</td><td>Уменьшить n_neighbors, использовать 'lobpcg'</td></tr>
+      <tr><td>Плохая сходимость</td><td>Изменить eigen_solver на 'arpack'</td></tr>
+      <tr><td>Разрыв кластеров</td><td>Увеличить n_neighbors</td></tr>
+      <tr><td>Слишком плотно</td><td>Уменьшить n_neighbors или gamma</td></tr>
+      <tr><td>Не работает для новых точек</td><td>Использовать out-of-sample extension</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Визуализация и анализ</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Визуализация с метками
+fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+
+# Исходные данные (если 2D)
+axes[0].scatter(X[:, 0], X[:, 1], 
+                c=y, cmap='viridis')
+axes[0].set_title('Original Space')
+
+# После Spectral Embedding
+axes[1].scatter(X_embedded[:, 0], 
+                X_embedded[:, 1],
+                c=y, cmap='viridis')
+axes[1].set_title('Spectral Embedding')
+plt.show()
+
+# Анализ собственных значений
+# (требует доступ к внутренним данным)
+eigenvalues = se.embedding_
+plt.plot(sorted(eigenvalues[:, 0]))
+plt.title('Eigenvalue Spectrum')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Продвинутые техники</h2>
+    <p><strong>Out-of-sample extension</strong>:</p>
+    <pre><code># Для новых данных нужна аппроксимация
+# Можно использовать KNN регрессию
+from sklearn.neighbors import KNeighborsRegressor
+
+# Обучаем на embedded данных
+knn = KNeighborsRegressor(n_neighbors=5)
+knn.fit(X, X_embedded)
+
+# Предсказываем для новых данных
+X_new_embedded = knn.predict(X_new)</code></pre>
+    <p><strong>Landmark Spectral Embedding</strong>:</p>
+    <pre><code># Для больших данных
+# 1. Выбрать landmarks
+n_landmarks = 1000
+idx = np.random.choice(len(X), n_landmarks)
+X_landmarks = X[idx]
+
+# 2. Spectral Embedding на landmarks
+se = SpectralEmbedding(n_components=2)
+X_land_emb = se.fit_transform(X_landmarks)
+
+# 3. Nyström approximation для остальных</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Стандартизировать данные</li>
+      <li>[ ] Выбрать affinity ('nearest_neighbors' или 'rbf')</li>
+      <li>[ ] Подобрать n_neighbors (5-30) или gamma</li>
+      <li>[ ] Задать n_components (2-3 для визуализации)</li>
+      <li>[ ] Выбрать eigen_solver ('arpack' по умолчанию)</li>
+      <li>[ ] Проверить качество через кластеризацию</li>
+      <li>[ ] Визуализировать результаты</li>
+      <li>[ ] Сравнить с другими методами (PCA, t-SNE)</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Spectral Embedding находит скрытую структуру в данных, представляя их как граф связей. 
+      Алгоритм анализирует, как объекты связаны друг с другом, и создает простое 2D или 3D 
+      представление, сохраняя важные связи. Похоже объекты оказываются рядом, разные — далеко».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

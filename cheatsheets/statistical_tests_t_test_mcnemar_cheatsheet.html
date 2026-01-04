@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Статистические тесты (t-test, McNemar) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 Статистические тесты (t-test, McNemar) Cheatsheet</h1>
+  <div class="subtitle">Сравнение моделей • Статистическая значимость • A/B тестирование<br>📅 4 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Зачем нужны статистические тесты в ML</h2>
+    <ul>
+      <li><strong>Сравнение моделей</strong>: какая модель действительно лучше?</li>
+      <li><strong>Значимость</strong>: разница случайна или реальна?</li>
+      <li><strong>A/B тесты</strong>: влияет ли изменение на метрики?</li>
+      <li><strong>Проверка гипотез</strong>: корректность предположений</li>
+      <li><strong>Confidence</strong>: уверенность в результатах</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. t-test: Основы</h2>
+    <p><strong>Цель</strong>: сравнить средние значения</p>
+    <p><strong>Типы</strong>:</p>
+    <ul>
+      <li><strong>One-sample</strong>: среднее vs константа</li>
+      <li><strong>Independent</strong>: две независимые группы</li>
+      <li><strong>Paired</strong>: парные наблюдения (до/после)</li>
+    </ul>
+    <p><strong>Предположения</strong>:</p>
+    <ul>
+      <li>Нормальное распределение</li>
+      <li>Независимость наблюдений</li>
+      <li>Равные дисперсии (для independent)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. t-test: Код</h2>
+    <pre><code>from scipy import stats
+import numpy as np
+
+# Independent t-test (две модели)
+model1_scores = cross_val_score(model1, X, y, cv=10)
+model2_scores = cross_val_score(model2, X, y, cv=10)
+
+t_stat, p_value = stats.ttest_ind(
+    model1_scores, 
+    model2_scores
+)
+
+print(f"t-statistic: {t_stat:.4f}")
+print(f"p-value: {p_value:.4f}")
+
+if p_value < 0.05:
+    print("Модели статистически различаются")
+else:
+    print("Нет значимой разницы")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Paired t-test для ML</h2>
+    <p><strong>Когда использовать</strong>: сравнение моделей на одних и тех же фолдах CV</p>
+    <pre><code># Парный t-test
+from sklearn.model_selection import cross_val_score
+
+scores1 = cross_val_score(model1, X, y, cv=10)
+scores2 = cross_val_score(model2, X, y, cv=10)
+
+# Парный тест (одни и те же фолды)
+t_stat, p_value = stats.ttest_rel(scores1, scores2)
+
+print(f"Paired t-test p-value: {p_value:.4f}")
+
+# Размер эффекта (Cohen's d)
+diff = scores1 - scores2
+cohens_d = diff.mean() / diff.std()
+print(f"Cohen's d: {cohens_d:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. McNemar Test: Основы</h2>
+    <p><strong>Цель</strong>: сравнение классификаторов</p>
+    <p><strong>Особенность</strong>: работает с парными бинарными данными</p>
+    <p><strong>Применение</strong>:</p>
+    <ul>
+      <li>Сравнение двух моделей классификации</li>
+      <li>Проверка изменений в модели</li>
+      <li>A/B тест для классификаторов</li>
+    </ul>
+    <p><strong>Предположения</strong>:</p>
+    <ul>
+      <li>Бинарная классификация</li>
+      <li>Парные наблюдения</li>
+      <li>Одни и те же тестовые данные</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. McNemar Test: Код</h2>
+    <pre><code>from statsmodels.stats.contingency_tables import mcnemar
+
+# Предсказания двух моделей
+y_pred1 = model1.predict(X_test)
+y_pred2 = model2.predict(X_test)
+
+# Таблица сопряженности
+# Строки: model1, Столбцы: model2
+contingency_table = np.array([
+    [np.sum((y_pred1 == y_test) & (y_pred2 == y_test)),
+     np.sum((y_pred1 == y_test) & (y_pred2 != y_test))],
+    [np.sum((y_pred1 != y_test) & (y_pred2 == y_test)),
+     np.sum((y_pred1 != y_test) & (y_pred2 != y_test))]
+])
+
+# McNemar тест
+result = mcnemar(contingency_table, exact=True)
+print(f"McNemar p-value: {result.pvalue:.4f}")
+
+if result.pvalue < 0.05:
+    print("Модели статистически различаются")
+else:
+    print("Нет значимой разницы")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Сравнение t-test и McNemar</h2>
+    <table>
+      <tr><th>Аспект</th><th>t-test</th><th>McNemar</th></tr>
+      <tr><td>Тип данных</td><td>Непрерывные метрики</td><td>Бинарные (правильно/нет)</td></tr>
+      <tr><td>Задачи</td><td>Регрессия, любые метрики</td><td>Классификация</td></tr>
+      <tr><td>Что сравнивает</td><td>Средние значения</td><td>Согласованность предсказаний</td></tr>
+      <tr><td>Размер выборки</td><td>Малая/средняя</td><td>Любая</td></tr>
+      <tr><td>Парность</td><td>Опционально</td><td>Обязательно</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Другие полезные тесты</h2>
+    <p><strong>Wilcoxon Signed-Rank Test</strong> (непараметрический аналог paired t-test):</p>
+    <pre><code>from scipy.stats import wilcoxon
+
+statistic, p_value = wilcoxon(scores1, scores2)
+print(f"Wilcoxon p-value: {p_value:.4f}")</code></pre>
+    <p><strong>Mann-Whitney U Test</strong> (непараметрический аналог independent t-test):</p>
+    <pre><code>from scipy.stats import mannwhitneyu
+
+statistic, p_value = mannwhitneyu(
+    scores1, scores2, alternative='two-sided'
+)
+print(f"Mann-Whitney p-value: {p_value:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Проверка нормальности</h2>
+    <p><strong>Shapiro-Wilk Test</strong>:</p>
+    <pre><code>from scipy.stats import shapiro
+
+# Проверка нормальности
+stat, p_value = shapiro(scores)
+
+if p_value > 0.05:
+    print("Данные нормально распределены")
+    # Можно использовать t-test
+else:
+    print("Данные не нормальны")
+    # Лучше использовать Wilcoxon</code></pre>
+    <p><strong>Q-Q Plot</strong>:</p>
+    <pre><code>import matplotlib.pyplot as plt
+from scipy import stats
+
+stats.probplot(scores, dist="norm", plot=plt)
+plt.title("Q-Q Plot")
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Множественные сравнения</h2>
+    <p><strong>Проблема</strong>: при множественных тестах растет вероятность ошибки I рода</p>
+    <p><strong>Bonferroni коррекция</strong>:</p>
+    <pre><code># Сравниваем 3 модели (3 теста)
+n_comparisons = 3
+alpha = 0.05
+bonferroni_alpha = alpha / n_comparisons
+
+print(f"Adjusted alpha: {bonferroni_alpha:.4f}")
+
+# Используем скорректированный уровень
+if p_value < bonferroni_alpha:
+    print("Значимо после коррекции")</code></pre>
+    <p><strong>Holm-Bonferroni</strong> (менее консервативный):</p>
+    <pre><code>from scipy.stats import false_discovery_control
+
+# p-значения всех тестов
+p_values = [0.01, 0.03, 0.08, 0.12]
+reject = false_discovery_control(p_values)
+print(f"Reject: {reject}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Размер эффекта</h2>
+    <p><strong>Cohen's d</strong> (для t-test):</p>
+    <pre><code>def cohens_d(x1, x2):
+    """Размер эффекта для двух групп"""
+    mean_diff = np.mean(x1) - np.mean(x2)
+    pooled_std = np.sqrt(
+        (np.std(x1)**2 + np.std(x2)**2) / 2
+    )
+    return mean_diff / pooled_std
+
+d = cohens_d(scores1, scores2)
+print(f"Cohen's d: {d:.4f}")
+
+# Интерпретация:
+# |d| < 0.2: малый эффект
+# 0.2 < |d| < 0.8: средний
+# |d| > 0.8: большой</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. 5x2 CV Paired t-test</h2>
+    <p><strong>Специально для сравнения ML моделей</strong>:</p>
+    <pre><code>from mlxtend.evaluate import paired_ttest_5x2cv
+
+# 5 повторений 2-fold CV
+t_stat, p_value = paired_ttest_5x2cv(
+    estimator1=model1,
+    estimator2=model2,
+    X=X, y=y,
+    random_seed=42
+)
+
+print(f"5x2 CV p-value: {p_value:.4f}")</code></pre>
+    <p><strong>Преимущества</strong>:</p>
+    <ul>
+      <li>Учитывает вариабельность CV</li>
+      <li>Корректный для ML моделей</li>
+      <li>Рекомендуется в исследованиях</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Когда использовать каждый тест</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ t-test</h3>
+        <ul>
+          <li>Сравнение метрик регрессии (MSE, MAE)</li>
+          <li>Нормально распределенные данные</li>
+          <li>Небольшие выборки (n > 30)</li>
+          <li>Непрерывные метрики</li>
+        </ul>
+      </div>
+      <div class="good" style="border-color: #2e8b57;">
+        <h3>✅ McNemar</h3>
+        <ul>
+          <li>Сравнение классификаторов</li>
+          <li>Бинарная классификация</li>
+          <li>Одни и те же тестовые данные</li>
+          <li>Малые выборки</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Практический пример</h2>
+    <pre><code># Полный пайплайн сравнения моделей
+from sklearn.datasets import load_breast_cancer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import cross_val_score
+
+# Данные
+X, y = load_breast_cancer(return_X_y=True)
+
+# Модели
+rf = RandomForestClassifier(random_state=42)
+lr = LogisticRegression(random_state=42, max_iter=1000)
+
+# Cross-validation scores
+rf_scores = cross_val_score(rf, X, y, cv=10, scoring='accuracy')
+lr_scores = cross_val_score(lr, X, y, cv=10, scoring='accuracy')
+
+# Проверка нормальности
+_, p_rf = shapiro(rf_scores)
+_, p_lr = shapiro(lr_scores)
+print(f"Normality p-values: RF={p_rf:.4f}, LR={p_lr:.4f}")
+
+# Выбор теста
+if p_rf > 0.05 and p_lr > 0.05:
+    # Нормальные - используем paired t-test
+    t_stat, p_val = stats.ttest_rel(rf_scores, lr_scores)
+    test_name = "Paired t-test"
+else:
+    # Не нормальные - используем Wilcoxon
+    t_stat, p_val = wilcoxon(rf_scores, lr_scores)
+    test_name = "Wilcoxon"
+
+print(f"\n{test_name} results:")
+print(f"Statistic: {t_stat:.4f}")
+print(f"p-value: {p_val:.4f}")
+
+if p_val < 0.05:
+    winner = "RF" if rf_scores.mean() > lr_scores.mean() else "LR"
+    print(f"{winner} significantly better")
+else:
+    print("No significant difference")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить тип данных (непрерывные/бинарные)</li>
+      <li>[ ] Проверить нормальность (Shapiro-Wilk)</li>
+      <li>[ ] Выбрать подходящий тест</li>
+      <li>[ ] Использовать парный тест для CV</li>
+      <li>[ ] Применить коррекцию для множественных сравнений</li>
+      <li>[ ] Рассчитать размер эффекта</li>
+      <li>[ ] Интерпретировать p-value (обычно α=0.05)</li>
+      <li>[ ] Документировать результаты</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Статистические тесты помогают понять, действительно ли одна модель лучше другой, 
+      или различие случайно. Это как проверка — если бросить монетку 10 раз и 6 раз 
+      выпал орел, это случайность или монетка нечестная? Тесты дают математическую 
+      уверенность в наших выводах».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
