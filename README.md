@@ -161,7 +161,7 @@
 ### **21. Дополнительные темы**
 1. [Active Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/active_learning_cheatsheet.html)
 1. [Transfer Learning (классические подходы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transfer_learning_cheatsheet.html)
-1. Multi-task Learning
+1. [Multi-task Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multi_task_learning_deep_dive_cheatsheet.html)
 1. [Multi-output регрессионные модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multi_output_regression_cheatsheet.html)
 1. [Квантильная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantile_regression_cheatsheet.html)
 
@@ -190,8 +190,8 @@
 1. [Transfer learning для CNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transfer_learning_cnn_cheatsheet.html)
 1. [Data augmentation для изображений](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/data_augmentation_cheatsheet.html)
 1. [Batch Normalization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/batch_normalization_cheatsheet.html)
-1. Визуализация CNN
-1. 1D-CNN и 3D-CNN
+1. [Визуализация CNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_visualization_techniques_cheatsheet.html)
+1. [1D-CNN и 3D-CNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/1d_3d_cnn_cheatsheet.html)
 
 ### **3. Рекуррентные нейронные сети (RNN)**
 1. [Основы RNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rnn_basics_cheatsheet.html)
@@ -218,7 +218,7 @@
 1. [Вариационные автоэнкодеры (VAE)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/vae_cheatsheet.html)
 1. [Генеративно-состязательные сети (GAN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gan_cheatsheet.html)
 1. [DCGAN и Conditional GAN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dcgan_conditional_gan_cheatsheet.html)
-1. StyleGAN
+1. [StyleGAN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/stylegan_architecture_cheatsheet.html)
 1. [Diffusion модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/diffusion_models_cheatsheet.html)
 1. [Нормализующие потоки (Normalizing Flows)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/normalizing_flows_cheatsheet.html)
 
@@ -233,7 +233,7 @@
 
 ### **7. Обработка естественного языка (NLP)**
 1. [Векторные представления слов (Word2Vec, GloVe, FastText)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/word_embeddings_cheatsheet.html)
-1. RNN/LSTM для NLP
+1. [RNN/LSTM для NLP](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rnn_lstm_nlp_cheatsheet.html)
 1. Transformer для NLP
 1. [BERT и его вариации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bert_finetuning_cheatsheet.html)
 1. [GPT-архитектуры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gpt_architectures_cheatsheet.html)
@@ -247,12 +247,12 @@
 1. [Детекция объектов - Faster R-CNN, SSD, RetinaNet, EfficientDet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/object_detection_cheatsheet.html)
 1. [Сегментация изображений (U-Net, DeepLab, Mask R-CNN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/image_segmentation_cheatsheet.html)
 1. [Детекция ключевых точек и оценка позы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/keypoint_detection_pose_estimation_cheatsheet.html)
-1. Слежение за объектами
+1. [Слежение за объектами](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/object_tracking_video_cheatsheet.html)
 1. [Оценка позы человека](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pose_estimation_cheatsheet.html)
-1. 3D Computer Vision
+1. [3D Computer Vision](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/3d_computer_vision_cheatsheet.html)
 
 ### **9. Обработка аудио и речь**
-1. Спектрограммы и MFCC
+1. [Спектрограммы и MFCC](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/audio_processing_spectrograms_mfcc_cheatsheet.html)
 1. Модели для распознавания речи (ASR)
 1. Модели для синтеза речи (TTS)
 1. Классификация звуков
@@ -261,7 +261,7 @@
 
 ### **10. Мультимодальное обучение**
 1. Модели для изображений и текста
-1. CLIP и похожие архитектуры
+1. [CLIP и похожие архитектуры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/clip_multimodal_models_cheatsheet.html)
 1. Видео-аудио модели
 1. Cross-modal retrieval
 1. Мультимодальные трансформеры

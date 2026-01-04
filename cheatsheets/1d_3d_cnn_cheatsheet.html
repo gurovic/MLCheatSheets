@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>1D-CNN and 3D-CNN Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔷 1D-CNN and 3D-CNN Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Обзор размерностей</h2>
+    <table>
+      <tr><th>Тип</th><th>Входные данные</th><th>Применение</th></tr>
+      <tr><td><strong>1D-CNN</strong></td><td>(batch, channels, length)</td><td>Временные ряды, текст, аудио</td></tr>
+      <tr><td><strong>2D-CNN</strong></td><td>(batch, channels, H, W)</td><td>Изображения</td></tr>
+      <tr><td><strong>3D-CNN</strong></td><td>(batch, channels, D, H, W)</td><td>Видео, медицинские 3D снимки</td></tr>
+    </table>
+    <p><strong>D</strong> — глубина (depth), <strong>H</strong> — высота, <strong>W</strong> — ширина</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. 1D-CNN: Основы</h2>
+    <ul>
+      <li><strong>Идея</strong>: свёртка вдоль одной оси (времени)</li>
+      <li><strong>Kernel</strong>: скользит по последовательности</li>
+      <li><strong>Преимущества</strong>: быстрее RNN, параллелизуется</li>
+      <li><strong>Применение</strong>: анализ сигналов, NLP, биоинформатика</li>
+    </ul>
+    <p><strong>Формула выходного размера</strong>:</p>
+    <pre><code>output_length = (input_length + 2*padding - kernel_size) / stride + 1</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. 1D-CNN в PyTorch</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class CNN1D(nn.Module):
+    def __init__(self, input_channels=1, num_classes=10):
+        super(CNN1D, self).__init__()
+        
+        self.conv1 = nn.Conv1d(
+            in_channels=input_channels,
+            out_channels=64,
+            kernel_size=7,
+            stride=1,
+            padding=3
+        )
+        self.bn1 = nn.BatchNorm1d(64)
+        self.relu = nn.ReLU()
+        self.pool = nn.MaxPool1d(kernel_size=2)
+        
+        self.conv2 = nn.Conv1d(64, 128, kernel_size=5, padding=2)
+        self.bn2 = nn.BatchNorm1d(128)
+        
+        self.conv3 = nn.Conv1d(128, 256, kernel_size=3, padding=1)
+        self.bn3 = nn.BatchNorm1d(256)
+        
+        self.global_pool = nn.AdaptiveAvgPool1d(1)
+        self.fc = nn.Linear(256, num_classes)
+    
+    def forward(self, x):
+        # x: (batch, channels, length)
+        x = self.relu(self.bn1(self.conv1(x)))
+        x = self.pool(x)
+        
+        x = self.relu(self.bn2(self.conv2(x)))
+        x = self.pool(x)
+        
+        x = self.relu(self.bn3(self.conv3(x)))
+        x = self.pool(x)
+        
+        x = self.global_pool(x)  # (batch, 256, 1)
+        x = x.squeeze(-1)         # (batch, 256)
+        x = self.fc(x)
+        return x
+
+# Использование
+model = CNN1D(input_channels=1, num_classes=10)
+x = torch.randn(32, 1, 1000)  # batch, channels, length
+output = model(x)
+print(output.shape)  # (32, 10)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. 1D-CNN: Применения</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Временные ряды</h3>
+        <ul>
+          <li>Финансовые данные</li>
+          <li>Прогнозирование спроса</li>
+          <li>Сенсорные данные IoT</li>
+          <li>ЭКГ, ЭЭГ сигналы</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>✅ Обработка текста</h3>
+        <ul>
+          <li>Классификация текстов</li>
+          <li>Sentiment analysis</li>
+          <li>Named Entity Recognition</li>
+          <li>Быстрая альтернатива RNN</li>
+        </ul>
+      </div>
+    </div>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Обработка аудио</h3>
+        <ul>
+          <li>Распознавание речи</li>
+          <li>Классификация звуков</li>
+          <li>Детекция ключевых слов</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>✅ Биоинформатика</h3>
+        <ul>
+          <li>Анализ ДНК последовательностей</li>
+          <li>Предсказание структуры белков</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. 1D-CNN с Keras/TensorFlow</h2>
+    <pre><code>from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import (
+    Conv1D, MaxPooling1D, GlobalAveragePooling1D,
+    Dense, Dropout, BatchNormalization
+)
+
+model = Sequential([
+    # Первый блок
+    Conv1D(64, kernel_size=7, activation='relu', 
+           padding='same', input_shape=(1000, 1)),
+    BatchNormalization(),
+    MaxPooling1D(pool_size=2),
+    
+    # Второй блок
+    Conv1D(128, kernel_size=5, activation='relu', padding='same'),
+    BatchNormalization(),
+    MaxPooling1D(pool_size=2),
+    
+    # Третий блок
+    Conv1D(256, kernel_size=3, activation='relu', padding='same'),
+    BatchNormalization(),
+    MaxPooling1D(pool_size=2),
+    
+    # Классификатор
+    GlobalAveragePooling1D(),
+    Dense(128, activation='relu'),
+    Dropout(0.5),
+    Dense(10, activation='softmax')
+])
+
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+model.summary()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Dilated (Atrous) Convolutions</h2>
+    <ul>
+      <li><strong>Идея</strong>: увеличение receptive field без увеличения параметров</li>
+      <li><strong>Dilation rate</strong>: шаг между элементами ядра</li>
+      <li><strong>Применение</strong>: WaveNet, TCN</li>
+    </ul>
+    <pre><code># PyTorch
+conv_dilated = nn.Conv1d(
+    in_channels=64,
+    out_channels=128,
+    kernel_size=3,
+    dilation=2  # расстояние между элементами
+)
+
+# Keras
+from tensorflow.keras.layers import Conv1D
+Conv1D(128, kernel_size=3, dilation_rate=2)
+
+# Receptive field с dilation:
+# dilation=1: kernel видит 3 точки подряд
+# dilation=2: kernel видит 3 точки с шагом 2 (5 позиций)
+# dilation=4: kernel видит 3 точки с шагом 4 (9 позиций)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. 3D-CNN: Основы</h2>
+    <ul>
+      <li><strong>Идея</strong>: свёртка в пространстве и времени одновременно</li>
+      <li><strong>Kernel</strong>: 3D куб (глубина × высота × ширина)</li>
+      <li><strong>Преимущество</strong>: захват временной динамики</li>
+      <li><strong>Недостаток</strong>: много параметров, медленнее</li>
+    </ul>
+    <p><strong>Форма входа</strong>: <code>(batch, channels, depth, height, width)</code></p>
+    <p>Для видео: <strong>depth = количество кадров</strong></p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. 3D-CNN в PyTorch</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class CNN3D(nn.Module):
+    def __init__(self, num_classes=400):
+        super(CNN3D, self).__init__()
+        
+        self.conv1 = nn.Conv3d(
+            in_channels=3,     # RGB
+            out_channels=64,
+            kernel_size=(3, 7, 7),  # (depth, height, width)
+            stride=(1, 2, 2),
+            padding=(1, 3, 3)
+        )
+        self.bn1 = nn.BatchNorm3d(64)
+        self.relu = nn.ReLU()
+        self.pool = nn.MaxPool3d(kernel_size=(1, 2, 2))
+        
+        self.conv2 = nn.Conv3d(64, 128, kernel_size=(3, 5, 5), 
+                              stride=(1, 1, 1), padding=(1, 2, 2))
+        self.bn2 = nn.BatchNorm3d(128)
+        
+        self.conv3 = nn.Conv3d(128, 256, kernel_size=(3, 3, 3), 
+                              stride=(1, 1, 1), padding=(1, 1, 1))
+        self.bn3 = nn.BatchNorm3d(256)
+        
+        self.global_pool = nn.AdaptiveAvgPool3d((1, 1, 1))
+        self.fc = nn.Linear(256, num_classes)
+    
+    def forward(self, x):
+        # x: (batch, channels, depth, height, width)
+        x = self.relu(self.bn1(self.conv1(x)))
+        x = self.pool(x)
+        
+        x = self.relu(self.bn2(self.conv2(x)))
+        x = self.pool(x)
+        
+        x = self.relu(self.bn3(self.conv3(x)))
+        x = self.pool(x)
+        
+        x = self.global_pool(x)
+        x = x.view(x.size(0), -1)
+        x = self.fc(x)
+        return x
+
+# Использование
+model = CNN3D(num_classes=400)
+# batch=2, RGB, 16 frames, 224x224
+x = torch.randn(2, 3, 16, 224, 224)
+output = model(x)
+print(output.shape)  # (2, 400)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. 3D-CNN: Применения</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Распознавание действий в видео</h3>
+        <ul>
+          <li>C3D, I3D, R(2+1)D</li>
+          <li>Спортивная аналитика</li>
+          <li>Системы безопасности</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>✅ Медицинская визуализация</h3>
+        <ul>
+          <li>CT, MRI сканы (3D объёмы)</li>
+          <li>Сегментация опухолей</li>
+          <li>Детекция аномалий</li>
+        </ul>
+      </div>
+    </div>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Анализ видео</h3>
+        <ul>
+          <li>Детекция событий</li>
+          <li>Временная сегментация</li>
+          <li>Video captioning</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Популярные 3D архитектуры</h2>
+    <table>
+      <tr><th>Архитектура</th><th>Особенности</th><th>Год</th></tr>
+      <tr><td><strong>C3D</strong></td><td>Базовая 3D CNN, 3×3×3 ядра</td><td>2014</td></tr>
+      <tr><td><strong>I3D</strong></td><td>Inflated 2D → 3D, ImageNet pretrain</td><td>2017</td></tr>
+      <tr><td><strong>R(2+1)D</strong></td><td>Разделение на 2D spatial + 1D temporal</td><td>2018</td></tr>
+      <tr><td><strong>SlowFast</strong></td><td>Два пути: медленный (spatial) + быстрый (temporal)</td><td>2019</td></tr>
+      <tr><td><strong>X3D</strong></td><td>Эффективная 3D CNN с прогрессивным расширением</td><td>2020</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. R(2+1)D: Decomposed Convolution</h2>
+    <p><strong>Идея</strong>: разделить 3D свёртку на 2D spatial + 1D temporal</p>
+    <ul>
+      <li>3D conv (3×3×3) → 2D conv (1×3×3) + 1D conv (3×1×1)</li>
+      <li>Меньше параметров</li>
+      <li>Больше нелинейностей (больше ReLU)</li>
+      <li>Лучше производительность</li>
+    </ul>
+    <pre><code># Вместо одной 3D свёртки
+nn.Conv3d(in_ch, out_ch, kernel_size=(3, 3, 3))
+
+# Используем две последовательные
+nn.Sequential(
+    nn.Conv3d(in_ch, mid_ch, kernel_size=(1, 3, 3)),  # spatial
+    nn.ReLU(),
+    nn.Conv3d(mid_ch, out_ch, kernel_size=(3, 1, 1))  # temporal
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. I3D (Inflated 3D ConvNet)</h2>
+    <p><strong>Идея</strong>: "раздуть" 2D CNN в 3D</p>
+    <ul>
+      <li>Взять предобученную 2D CNN (Inception)</li>
+      <li>Повторить 2D веса N раз вдоль временной оси</li>
+      <li>Разделить на N для сохранения выходов</li>
+      <li>Fine-tune на видео данных</li>
+    </ul>
+    <pre><code># Пример инфлирования
+# 2D фильтр: K × K
+# 3D фильтр: N × K × K (повтор N раз)
+
+# Веса инициализации:
+# w_3d[t, i, j] = w_2d[i, j] / N  для всех t</code></pre>
+    <p><strong>Преимущество</strong>: transfer learning из ImageNet</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. 1D vs 3D CNN: Сравнение</h2>
+    <table>
+      <tr><th>Аспект</th><th>1D-CNN</th><th>3D-CNN</th></tr>
+      <tr><td><strong>Параметры</strong></td><td>Мало</td><td>Много</td></tr>
+      <tr><td><strong>Скорость</strong></td><td>Быстро</td><td>Медленно</td></tr>
+      <tr><td><strong>Память</strong></td><td>Низкая</td><td>Высокая</td></tr>
+      <tr><td><strong>Receptive field</strong></td><td>1D (время)</td><td>3D (время+пространство)</td></tr>
+      <tr><td><strong>Применение</strong></td><td>Последовательности</td><td>Видео, 3D данные</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Оптимизация 3D-CNN</h2>
+    <ul>
+      <li><strong>Снижение разрешения</strong>: 112×112 вместо 224×224</li>
+      <li><strong>Меньше кадров</strong>: 8-16 вместо 32-64</li>
+      <li><strong>Temporal downsampling</strong>: stride>1 по времени</li>
+      <li><strong>Mixed precision</strong>: FP16 вместо FP32</li>
+      <li><strong>Gradient checkpointing</strong>: экономия памяти</li>
+      <li><strong>Decomposed conv</strong>: (2+1)D вместо 3D</li>
+    </ul>
+    <pre><code># Gradient checkpointing в PyTorch
+from torch.utils.checkpoint import checkpoint
+
+class OptimizedBlock(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv = nn.Conv3d(64, 128, 3, padding=1)
+        self.bn = nn.BatchNorm3d(128)
+        self.relu = nn.ReLU()
+    
+    def forward(self, x):
+        # Использовать checkpointing для экономии памяти
+        return checkpoint(self._forward, x)
+    
+    def _forward(self, x):
+        return self.relu(self.bn(self.conv(x)))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Подготовка данных для видео</h2>
+    <pre><code>import cv2
+import numpy as np
+
+def load_video_clip(video_path, num_frames=16, size=(224, 224)):
+    """Загрузить видео клип"""
+    cap = cv2.VideoCapture(video_path)
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    
+    # Равномерная выборка кадров
+    frame_indices = np.linspace(0, total_frames-1, num_frames, dtype=int)
+    
+    frames = []
+    for idx in frame_indices:
+        cap.set(cv2.CAP_PROP_POS_FRAMES, idx)
+        ret, frame = cap.read()
+        if ret:
+            frame = cv2.resize(frame, size)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frames.append(frame)
+    
+    cap.release()
+    
+    # (num_frames, H, W, C) → (C, num_frames, H, W)
+    video = np.array(frames).transpose(3, 0, 1, 2)
+    video = video / 255.0  # нормализация
+    
+    return video
+
+# Использование
+video_clip = load_video_clip('video.mp4', num_frames=16)
+print(video_clip.shape)  # (3, 16, 224, 224)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <h3>Для 1D-CNN:</h3>
+    <ul>
+      <li>[ ] Нормализовать входные данные</li>
+      <li>[ ] Выбрать kernel size (3, 5, 7, 9)</li>
+      <li>[ ] Использовать dilated conv для большого context</li>
+      <li>[ ] BatchNormalization после каждой свёртки</li>
+      <li>[ ] Global pooling перед классификатором</li>
+    </ul>
+    <h3>Для 3D-CNN:</h3>
+    <ul>
+      <li>[ ] Снизить разрешение (112×112 или 128×128)</li>
+      <li>[ ] Использовать 8-16 кадров</li>
+      <li>[ ] Рассмотреть (2+1)D вместо 3D</li>
+      <li>[ ] Использовать предобученные веса (I3D)</li>
+      <li>[ ] Mixed precision training</li>
+      <li>[ ] Gradient checkpointing для экономии памяти</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «1D-CNN анализирует последовательности данных (как тренды во времени), а 3D-CNN видит видео целиком — не только что происходит в каждом кадре, но и как объекты движутся между кадрами».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
