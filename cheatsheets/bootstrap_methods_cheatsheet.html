@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Bootstrap методы Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔁 Bootstrap методы Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы Bootstrap</h2>
+    <ul>
+      <li><strong>Цель</strong>: оценка статистик и доверительных интервалов</li>
+      <li><strong>Идея</strong>: ресемплинг (повторная выборка) из данных</li>
+      <li><strong>Преимущество</strong>: не требует предположений о распределении</li>
+      <li><strong>Применение</strong>: оценка uncertainty, валидация моделей</li>
+      <li><strong>Создатель</strong>: Bradley Efron (1979)</li>
+    </ul>
+    <p><strong>Простыми словами</strong>: представьте, что у вас есть мешок с шариками (ваша выборка). Bootstrap — это многократное вытаскивание шариков с возвратом, чтобы понять разброс результатов.</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Алгоритм Bootstrap</h2>
+    <ol>
+      <li>Имеется выборка X = {x₁, x₂, ..., xₙ}</li>
+      <li>Создать B bootstrap-выборок размера n с возвратом</li>
+      <li>Для каждой выборки вычислить статистику θ*</li>
+      <li>Получить распределение {θ*₁, θ*₂, ..., θ*ᵦ}</li>
+      <li>Оценить доверительный интервал, стандартную ошибку</li>
+    </ol>
+    <p><strong>Важно</strong>: выборка <em>с возвратом</em> — каждый элемент может быть выбран несколько раз.</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Простой пример</h2>
+    <pre><code>import numpy as np
+import matplotlib.pyplot as plt
+
+# Исходные данные
+data = np.array([23, 25, 27, 29, 31, 33, 35, 37, 39, 41])
+
+# Параметры bootstrap
+n_bootstrap = 10000
+bootstrap_means = []
+
+# Bootstrap ресемплинг
+np.random.seed(42)
+for i in range(n_bootstrap):
+    # Выборка с возвратом
+    sample = np.random.choice(data, size=len(data), 
+                             replace=True)
+    bootstrap_means.append(np.mean(sample))
+
+# Результаты
+bootstrap_means = np.array(bootstrap_means)
+print(f"Среднее оригинальной выборки: {np.mean(data):.2f}")
+print(f"Bootstrap SE: {np.std(bootstrap_means):.2f}")
+
+# 95% доверительный интервал
+ci_lower = np.percentile(bootstrap_means, 2.5)
+ci_upper = np.percentile(bootstrap_means, 97.5)
+print(f"95% CI: [{ci_lower:.2f}, {ci_upper:.2f}]")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Доверительные интервалы</h2>
+    <p><strong>Percentile метод</strong>: самый простой</p>
+    <pre><code>def bootstrap_ci_percentile(data, statistic_func, 
+                            n_bootstrap=10000, 
+                            confidence=0.95):
+    bootstrap_stats = []
+    
+    for _ in range(n_bootstrap):
+        sample = np.random.choice(data, size=len(data), 
+                                 replace=True)
+        stat = statistic_func(sample)
+        bootstrap_stats.append(stat)
+    
+    bootstrap_stats = np.array(bootstrap_stats)
+    alpha = 1 - confidence
+    
+    ci_lower = np.percentile(bootstrap_stats, 
+                            100 * alpha / 2)
+    ci_upper = np.percentile(bootstrap_stats, 
+                            100 * (1 - alpha / 2))
+    
+    return ci_lower, ci_upper
+
+# Использование
+data = np.random.normal(100, 15, 100)
+ci = bootstrap_ci_percentile(data, np.mean, 
+                            n_bootstrap=10000)
+print(f"95% CI: [{ci[0]:.2f}, {ci[1]:.2f}]")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. BCa (Bias-Corrected Accelerated)</h2>
+    <p>Более точный метод, учитывающий смещение и асимметрию:</p>
+    <pre><code>from scipy import stats
+
+def bootstrap_bca(data, statistic_func, 
+                 n_bootstrap=10000, confidence=0.95):
+    n = len(data)
+    
+    # Bootstrap replicates
+    bootstrap_stats = []
+    for _ in range(n_bootstrap):
+        sample = np.random.choice(data, size=n, 
+                                 replace=True)
+        bootstrap_stats.append(statistic_func(sample))
+    
+    bootstrap_stats = np.array(bootstrap_stats)
+    theta_hat = statistic_func(data)
+    
+    # Bias correction
+    z0 = stats.norm.ppf(
+        np.mean(bootstrap_stats < theta_hat)
+    )
+    
+    # Acceleration (jackknife)
+    jackknife_stats = []
+    for i in range(n):
+        jack_sample = np.delete(data, i)
+        jackknife_stats.append(statistic_func(jack_sample))
+    
+    jackknife_stats = np.array(jackknife_stats)
+    jack_mean = np.mean(jackknife_stats)
+    
+    numerator = np.sum((jack_mean - jackknife_stats)**3)
+    denominator = 6 * (np.sum((jack_mean - jackknife_stats)**2)**1.5)
+    a = numerator / denominator if denominator != 0 else 0
+    
+    # Adjusted percentiles
+    alpha = 1 - confidence
+    z_alpha = stats.norm.ppf(alpha / 2)
+    z_1_alpha = stats.norm.ppf(1 - alpha / 2)
+    
+    p1 = stats.norm.cdf(z0 + (z0 + z_alpha) / (1 - a * (z0 + z_alpha)))
+    p2 = stats.norm.cdf(z0 + (z0 + z_1_alpha) / (1 - a * (z0 + z_1_alpha)))
+    
+    ci_lower = np.percentile(bootstrap_stats, 100 * p1)
+    ci_upper = np.percentile(bootstrap_stats, 100 * p2)
+    
+    return ci_lower, ci_upper
+
+# Использование
+ci_bca = bootstrap_bca(data, np.median)
+print(f"BCa 95% CI: [{ci_bca[0]:.2f}, {ci_bca[1]:.2f}]")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Стандартная ошибка</h2>
+    <pre><code>def bootstrap_se(data, statistic_func, n_bootstrap=10000):
+    """Оценка стандартной ошибки через bootstrap"""
+    bootstrap_stats = []
+    
+    for _ in range(n_bootstrap):
+        sample = np.random.choice(data, size=len(data), 
+                                 replace=True)
+        bootstrap_stats.append(statistic_func(sample))
+    
+    return np.std(bootstrap_stats)
+
+# Примеры для разных статистик
+data = np.random.normal(50, 10, 100)
+
+# SE для среднего
+se_mean = bootstrap_se(data, np.mean)
+print(f"SE(mean): {se_mean:.3f}")
+
+# SE для медианы
+se_median = bootstrap_se(data, np.median)
+print(f"SE(median): {se_median:.3f}")
+
+# SE для стандартного отклонения
+se_std = bootstrap_se(data, np.std)
+print(f"SE(std): {se_std:.3f}")
+
+# SE для 90-го перцентиля
+se_p90 = bootstrap_se(data, lambda x: np.percentile(x, 90))
+print(f"SE(p90): {se_p90:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Параметрический Bootstrap</h2>
+    <p>Когда известно распределение данных:</p>
+    <pre><code>from scipy import stats as sp_stats
+
+def parametric_bootstrap(data, distribution='norm', 
+                        n_bootstrap=10000):
+    """
+    Параметрический bootstrap: 
+    подгоняем распределение, затем семплируем
+    """
+    if distribution == 'norm':
+        # Оценка параметров
+        mu, sigma = sp_stats.norm.fit(data)
+        
+        bootstrap_means = []
+        for _ in range(n_bootstrap):
+            # Генерация из подогнанного распределения
+            sample = sp_stats.norm.rvs(mu, sigma, 
+                                       size=len(data))
+            bootstrap_means.append(np.mean(sample))
+        
+        return np.array(bootstrap_means)
+    
+    elif distribution == 'expon':
+        loc, scale = sp_stats.expon.fit(data)
+        
+        bootstrap_means = []
+        for _ in range(n_bootstrap):
+            sample = sp_stats.expon.rvs(loc, scale, 
+                                        size=len(data))
+            bootstrap_means.append(np.mean(sample))
+        
+        return np.array(bootstrap_means)
+
+# Использование
+data = np.random.normal(100, 15, 50)
+boot_stats = parametric_bootstrap(data, 'norm')
+
+ci = np.percentile(boot_stats, [2.5, 97.5])
+print(f"Параметрический 95% CI: [{ci[0]:.2f}, {ci[1]:.2f}]")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Bootstrap для регрессии</h2>
+    <pre><code>from sklearn.linear_model import LinearRegression
+from sklearn.utils import resample
+
+def bootstrap_regression(X, y, n_bootstrap=1000):
+    """Bootstrap для оценки коэффициентов регрессии"""
+    coef_bootstrap = []
+    
+    for _ in range(n_bootstrap):
+        # Ресемплинг наблюдений (пар X, y)
+        X_boot, y_boot = resample(X, y, 
+                                  replace=True, 
+                                  n_samples=len(X))
+        
+        # Обучение модели
+        model = LinearRegression()
+        model.fit(X_boot, y_boot)
+        
+        coef_bootstrap.append(model.coef_)
+    
+    coef_bootstrap = np.array(coef_bootstrap)
+    
+    # Доверительные интервалы для коэффициентов
+    ci_lower = np.percentile(coef_bootstrap, 2.5, axis=0)
+    ci_upper = np.percentile(coef_bootstrap, 97.5, axis=0)
+    
+    return coef_bootstrap, ci_lower, ci_upper
+
+# Пример
+X = np.random.randn(100, 3)
+y = 2*X[:, 0] + 3*X[:, 1] - X[:, 2] + np.random.randn(100)
+
+coefs, ci_low, ci_high = bootstrap_regression(X, y)
+
+print("Коэффициенты регрессии (95% CI):")
+for i in range(X.shape[1]):
+    print(f"  β{i}: [{ci_low[i]:.3f}, {ci_high[i]:.3f}]")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Валидация моделей ML</h2>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score
+
+def bootstrap_model_performance(X, y, model, 
+                               n_bootstrap=1000):
+    """Оценка производительности модели"""
+    scores = []
+    
+    for _ in range(n_bootstrap):
+        # Bootstrap выборка
+        indices = np.random.choice(len(X), size=len(X), 
+                                  replace=True)
+        X_boot = X[indices]
+        y_boot = y[indices]
+        
+        # OOB (Out-of-Bag) индексы
+        oob_indices = np.array(list(
+            set(range(len(X))) - set(indices)
+        ))
+        
+        if len(oob_indices) == 0:
+            continue
+        
+        # Обучение и оценка
+        model.fit(X_boot, y_boot)
+        y_pred = model.predict(X[oob_indices])
+        score = accuracy_score(y[oob_indices], y_pred)
+        scores.append(score)
+    
+    scores = np.array(scores)
+    
+    return {
+        'mean': np.mean(scores),
+        'std': np.std(scores),
+        'ci_95': np.percentile(scores, [2.5, 97.5])
+    }
+
+# Использование
+from sklearn.datasets import make_classification
+
+X, y = make_classification(n_samples=200, n_features=10, 
+                          random_state=42)
+model = RandomForestClassifier(n_estimators=50)
+
+results = bootstrap_model_performance(X, y, model)
+print(f"Accuracy: {results['mean']:.3f} ± {results['std']:.3f}")
+print(f"95% CI: [{results['ci_95'][0]:.3f}, {results['ci_95'][1]:.3f}]")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Сравнение моделей</h2>
+    <pre><code>def bootstrap_model_comparison(X, y, model1, model2, 
+                               n_bootstrap=1000):
+    """Сравнение двух моделей через bootstrap"""
+    diff_scores = []
+    
+    for _ in range(n_bootstrap):
+        # Bootstrap выборка
+        indices = np.random.choice(len(X), size=len(X), 
+                                  replace=True)
+        X_boot = X[indices]
+        y_boot = y[indices]
+        
+        # OOB оценка
+        oob_indices = np.array(list(
+            set(range(len(X))) - set(indices)
+        ))
+        
+        if len(oob_indices) < 10:
+            continue
+        
+        # Модель 1
+        model1.fit(X_boot, y_boot)
+        score1 = accuracy_score(y[oob_indices], 
+                               model1.predict(X[oob_indices]))
+        
+        # Модель 2
+        model2.fit(X_boot, y_boot)
+        score2 = accuracy_score(y[oob_indices], 
+                               model2.predict(X[oob_indices]))
+        
+        diff_scores.append(score1 - score2)
+    
+    diff_scores = np.array(diff_scores)
+    
+    # p-value (двусторонний тест)
+    p_value = 2 * min(
+        np.mean(diff_scores >= 0),
+        np.mean(diff_scores <= 0)
+    )
+    
+    return {
+        'mean_diff': np.mean(diff_scores),
+        'ci_95': np.percentile(diff_scores, [2.5, 97.5]),
+        'p_value': p_value
+    }
+
+# Использование
+from sklearn.linear_model import LogisticRegression
+
+model1 = RandomForestClassifier(n_estimators=50)
+model2 = LogisticRegression()
+
+results = bootstrap_model_comparison(X, y, model1, model2)
+print(f"Разница: {results['mean_diff']:.4f}")
+print(f"95% CI: {results['ci_95']}")
+print(f"p-value: {results['p_value']:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Библиотека scipy.stats</h2>
+    <pre><code>from scipy.stats import bootstrap
+
+# Простой способ с scipy
+data_tuple = (data,)  # данные как tuple
+
+# Функция статистики
+def mean_func(sample):
+    return np.mean(sample)
+
+# Bootstrap
+res = bootstrap(data_tuple, mean_func, 
+               n_resamples=10000,
+               confidence_level=0.95,
+               method='percentile',
+               random_state=42)
+
+print(f"95% CI: {res.confidence_interval}")
+print(f"SE: {res.standard_error}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Малые выборки (n < 30-50)</li>
+          <li>Неизвестное распределение</li>
+          <li>Сложные статистики (медиана, квантили)</li>
+          <li>Оценка uncertainty в ML</li>
+          <li>Сравнение моделей</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень малые выборки (n < 10)</li>
+          <li>Сильная зависимость данных</li>
+          <li>Экстремальные значения (используйте другие методы)</li>
+          <li>Когда есть теоретическое распределение</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить статистику для оценки</li>
+      <li>[ ] Выбрать число бутстреп-итераций (обычно 1000-10000)</li>
+      <li>[ ] Выбрать метод (непараметрический/параметрический)</li>
+      <li>[ ] Проверить размер выборки (n > 20)</li>
+      <li>[ ] Выбрать метод CI (percentile/BCa)</li>
+      <li>[ ] Визуализировать bootstrap распределение</li>
+      <li>[ ] Проверить стабильность результатов</li>
+      <li>[ ] Использовать random seed для воспроизводимости</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Bootstrap — это метод оценки надежности наших результатов. Представьте, что мы многократно пересемплируем наши данные (как будто проводим эксперимент снова и снова) и смотрим, насколько стабильны наши выводы. Это помогает понять, можем ли мы доверять нашим результатам или они случайны».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

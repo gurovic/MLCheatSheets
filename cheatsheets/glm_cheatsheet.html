@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Обобщенные линейные модели (GLM) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 Обобщенные линейные модели (GLM) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы GLM</h2>
+    <ul>
+      <li><strong>Цель</strong>: обобщение линейной регрессии на другие распределения</li>
+      <li><strong>Компоненты</strong>: линейный предиктор, функция связи, распределение</li>
+      <li><strong>Семейства</strong>: Gaussian, Binomial, Poisson, Gamma и др.</li>
+      <li><strong>Функция связи</strong>: связывает линейный предиктор и матожидание</li>
+    </ul>
+    <p><strong>Структура</strong>: g(μ) = Xβ, где g — функция связи</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные семейства</h2>
+    <table>
+      <tr><th>Семейство</th><th>Функция связи</th><th>Применение</th></tr>
+      <tr><td>Gaussian</td><td>Identity</td><td>Линейная регрессия</td></tr>
+      <tr><td>Binomial</td><td>Logit</td><td>Классификация</td></tr>
+      <tr><td>Poisson</td><td>Log</td><td>Счетные данные</td></tr>
+      <tr><td>Gamma</td><td>Inverse</td><td>Положительные непрерывные</td></tr>
+      <tr><td>Inverse Gaussian</td><td>1/μ²</td><td>Время ожидания</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Логистическая регрессия</h2>
+    <pre><code>import numpy as np
+import statsmodels.api as sm
+from sklearn.linear_model import LogisticRegression
+
+# Данные
+X = np.random.randn(100, 3)
+y = (X[:, 0] + X[:, 1] > 0).astype(int)
+
+# С statsmodels (полная статистика)
+X_with_const = sm.add_constant(X)
+model = sm.GLM(y, X_with_const, 
+              family=sm.families.Binomial())
+result = model.fit()
+print(result.summary())
+
+# С sklearn (быстрее)
+lr = LogisticRegression()
+lr.fit(X, y)
+print(f"Coefficients: {lr.coef_}")
+print(f"Intercept: {lr.intercept_}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Poisson регрессия</h2>
+    <pre><code># Для счетных данных (число событий)
+from scipy import stats
+
+# Генерация данных
+np.random.seed(42)
+X = np.random.randn(200, 2)
+# Истинные коэффициенты
+true_beta = np.array([0.5, -0.3])
+true_intercept = 1.0
+
+# Линейный предиктор
+eta = true_intercept + X @ true_beta
+# Математическое ожидание через link function
+mu = np.exp(eta)
+# Генерация счетных данных
+y = stats.poisson.rvs(mu)
+
+# Обучение модели
+X_const = sm.add_constant(X)
+poisson_model = sm.GLM(y, X_const,
+                      family=sm.families.Poisson())
+poisson_result = poisson_model.fit()
+
+print(poisson_result.summary())
+
+# Предсказания
+y_pred = poisson_result.predict(X_const)
+print(f"Средние предсказания: {y_pred.mean():.2f}")
+print(f"Средние факт: {y.mean():.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Gamma регрессия</h2>
+    <pre><code># Для положительных непрерывных данных
+X = np.random.randn(100, 2)
+# Gamma-распределенные данные
+shape = 2.0
+scale = np.exp(1.0 + 0.5*X[:, 0] - 0.3*X[:, 1])
+y = stats.gamma.rvs(shape, scale=scale)
+
+# GLM с Gamma семейством
+X_const = sm.add_constant(X)
+gamma_model = sm.GLM(y, X_const,
+                    family=sm.families.Gamma())
+gamma_result = gamma_model.fit()
+
+print(gamma_result.summary())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Функции связи</h2>
+    <pre><code># Разные link functions для одного семейства
+# Binomial с разными связями
+
+# Logit (по умолчанию)
+logit_model = sm.GLM(y_binary, X_const,
+                    family=sm.families.Binomial(
+                        link=sm.families.links.Logit()))
+
+# Probit
+probit_model = sm.GLM(y_binary, X_const,
+                     family=sm.families.Binomial(
+                         link=sm.families.links.Probit()))
+
+# Complementary log-log
+cloglog_model = sm.GLM(y_binary, X_const,
+                      family=sm.families.Binomial(
+                          link=sm.families.links.CLogLog()))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Оценка качества</h2>
+    <pre><code># Deviance
+deviance = result.deviance
+null_deviance = result.null_deviance
+
+# Pseudo R²
+pseudo_r2 = 1 - (deviance / null_deviance)
+print(f"Pseudo R²: {pseudo_r2:.4f}")
+
+# AIC/BIC
+print(f"AIC: {result.aic:.2f}")
+print(f"BIC: {result.bic:.2f}")
+
+# Likelihood Ratio Test
+lr_stat = null_deviance - deviance
+df = result.df_model
+p_value = 1 - stats.chi2.cdf(lr_stat, df)
+print(f"LR test: χ²={lr_stat:.2f}, p={p_value:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Overdispersion</h2>
+    <pre><code># Проверка overdispersion в Poisson
+residual_deviance = poisson_result.deviance
+df_resid = poisson_result.df_resid
+dispersion = residual_deviance / df_resid
+
+print(f"Dispersion: {dispersion:.4f}")
+
+if dispersion > 1.5:
+    print("⚠ Overdispersion detected!")
+    print("Используйте Quasi-Poisson или Negative Binomial")
+    
+    # Quasi-Poisson
+    quasi_model = sm.GLM(y, X_const,
+                        family=sm.families.Poisson())
+    quasi_result = quasi_model.fit(scale='X2')  # корректирует SE
+    print(quasi_result.summary())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Диагностика</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Residuals
+residuals = result.resid_pearson
+
+# Residuals vs Fitted
+plt.figure(figsize=(12, 4))
+
+plt.subplot(131)
+plt.scatter(result.fittedvalues, residuals, alpha=0.5)
+plt.axhline(y=0, color='r', linestyle='--')
+plt.xlabel('Fitted values')
+plt.ylabel('Pearson residuals')
+plt.title('Residuals vs Fitted')
+
+# Q-Q plot
+plt.subplot(132)
+stats.probplot(residuals, dist="norm", plot=plt)
+plt.title('Q-Q Plot')
+
+# Histogram of residuals
+plt.subplot(133)
+plt.hist(residuals, bins=20, edgecolor='black')
+plt.xlabel('Residuals')
+plt.ylabel('Frequency')
+plt.title('Residual Distribution')
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Интерпретация коэффициентов</h2>
+    <pre><code># Logistic regression: odds ratios
+odds_ratios = np.exp(result.params)
+conf_int = np.exp(result.conf_int())
+
+print("Odds Ratios (95% CI):")
+for i, (name, or_val) in enumerate(zip(result.params.index, odds_ratios)):
+    ci_low, ci_high = conf_int.iloc[i]
+    print(f"{name}: {or_val:.3f} [{ci_low:.3f}, {ci_high:.3f}]")
+
+# Poisson: Incidence Rate Ratios
+irr = np.exp(poisson_result.params)
+print(f"\nIncidence Rate Ratios: {irr}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Сравнение моделей</h2>
+    <pre><code># Nested models
+# Model 1: только intercept
+model1 = sm.GLM(y, np.ones((len(y), 1)),
+               family=sm.families.Binomial())
+result1 = model1.fit()
+
+# Model 2: с предикторами
+model2 = sm.GLM(y, X_const,
+               family=sm.families.Binomial())
+result2 = model2.fit()
+
+# Likelihood ratio test
+lr_stat = result1.deviance - result2.deviance
+df_diff = result1.df_resid - result2.df_resid
+p_value = 1 - stats.chi2.cdf(lr_stat, df_diff)
+
+print(f"LR statistic: {lr_stat:.4f}")
+print(f"p-value: {p_value:.4f}")
+print("Model 2 significantly better" if p_value < 0.05 else "No improvement")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Не-Gaussian распределения</li>
+          <li>Бинарные исходы (logistic)</li>
+          <li>Счетные данные (Poisson)</li>
+          <li>Нужна интерпретируемость</li>
+          <li>Статистические выводы важны</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Сложные нелинейные зависимости</li>
+          <li>Высокая размерность (используйте regularization)</li>
+          <li>Предсказание важнее интерпретации</li>
+          <li>Сильные нарушения предположений</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать подходящее семейство распределения</li>
+      <li>[ ] Выбрать функцию связи</li>
+      <li>[ ] Проверить на overdispersion</li>
+      <li>[ ] Диагностика остатков</li>
+      <li>[ ] Оценить значимость коэффициентов</li>
+      <li>[ ] Сравнить с null model (LR test)</li>
+      <li>[ ] Интерпретировать коэффициенты</li>
+      <li>[ ] Проверить predictions на holdout</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «GLM — это гибкая framework для моделирования различных типов данных. Если обычная регрессия работает только для непрерывных данных, то GLM может работать с бинарными исходами (да/нет), счетными данными (число событий), и другими типами. При этом сохраняется интерпретируемость и статистическая строгость».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
