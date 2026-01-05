@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Современные тенденции глубокого обучения Cheatsheet</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🌟 Современные тенденции глубокого обучения</h1>
+  <div class="subtitle">2023-2026 • Актуальные направления • Будущее DL<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Foundation Models</h2>
+    <p><strong>Концепция</strong>: универсальные базовые модели для всех задач</p>
+    <p><strong>Характеристики</strong>:</p>
+    <ul>
+      <li><strong>Масштаб</strong>: миллиарды параметров</li>
+      <li><strong>Pre-training</strong>: на огромных датасетах</li>
+      <li><strong>Адаптация</strong>: fine-tuning или prompting</li>
+      <li><strong>Универсальность</strong>: множество downstream задач</li>
+    </ul>
+    <p><strong>Примеры</strong>:</p>
+    <ul>
+      <li><strong>NLP</strong>: GPT-4, Claude, LLaMA</li>
+      <li><strong>Vision</strong>: CLIP, SAM, DINOv2</li>
+      <li><strong>Multimodal</strong>: Gemini, GPT-4V</li>
+      <li><strong>Code</strong>: Codex, CodeLlama</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Мультимодальность</h2>
+    <p><strong>Тренд</strong>: объединение разных модальностей (text, image, audio, video)</p>
+    <p><strong>Ключевые модели</strong>:</p>
+    <ul>
+      <li><strong>CLIP</strong>: vision + language</li>
+      <li><strong>Flamingo</strong>: few-shot multimodal</li>
+      <li><strong>GPT-4V</strong>: vision understanding + reasoning</li>
+      <li><strong>Gemini</strong>: native multimodal</li>
+      <li><strong>ImageBind (Meta)</strong>: 6 модальностей</li>
+    </ul>
+    <p><strong>Применения</strong>:</p>
+    <ul>
+      <li>Visual question answering</li>
+      <li>Image captioning</li>
+      <li>Text-to-image/video generation</li>
+      <li>Multimodal reasoning</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Prompt Engineering и In-Context Learning</h2>
+    <p><strong>Новая парадигма</strong>: программирование через промпты</p>
+    <p><strong>Техники</strong>:</p>
+    <ul>
+      <li><strong>Zero-shot prompting</strong>: просто спросить</li>
+      <li><strong>Few-shot learning</strong>: примеры в промпте</li>
+      <li><strong>Chain-of-Thought</strong>: "подумай шаг за шагом"</li>
+      <li><strong>ReAct</strong>: reasoning + acting</li>
+      <li><strong>Tree-of-Thoughts</strong>: исследование вариантов</li>
+    </ul>
+    <pre><code># Chain-of-Thought пример
+prompt = """
+Q: У Роджера 5 теннисных мячей. 
+Он купил еще 2 банки по 3 мяча.
+Сколько у него теннисных мячей?
+
+A: Давайте подумаем шаг за шагом.
+1. Сначала у него было 5 мячей
+2. Он купил 2 банки по 3 мяча = 6 мячей
+3. Всего: 5 + 6 = 11 мячей
+
+Q: [ваш вопрос]
+A: Давайте подумаем шаг за шагом.
+"""</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Эффективность и оптимизация</h2>
+    <p><strong>Проблема</strong>: огромные модели → большие затраты</p>
+    <p><strong>Решения</strong>:</p>
+    <ul>
+      <li><strong>Model compression</strong>:
+        <ul>
+          <li>Quantization (INT8, INT4)</li>
+          <li>Pruning (удаление весов)</li>
+          <li>Knowledge distillation</li>
+        </ul>
+      </li>
+      <li><strong>Efficient architectures</strong>:
+        <ul>
+          <li>MobileNet, EfficientNet</li>
+          <li>Sparse transformers</li>
+          <li>FlashAttention</li>
+        </ul>
+      </li>
+      <li><strong>Parameter-Efficient Fine-Tuning (PEFT)</strong>:
+        <ul>
+          <li>LoRA (Low-Rank Adaptation)</li>
+          <li>Adapters</li>
+          <li>Prompt tuning</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Retrieval-Augmented Generation (RAG)</h2>
+    <p><strong>Идея</strong>: дополнить генерацию внешними знаниями</p>
+    <p><strong>Архитектура</strong>:</p>
+    <ul>
+      <li><strong>Retriever</strong>: находит релевантные документы</li>
+      <li><strong>Generator</strong>: использует документы для ответа</li>
+      <li><strong>База знаний</strong>: векторная БД (Pinecone, Weaviate)</li>
+    </ul>
+    <p><strong>Преимущества</strong>:</p>
+    <ul>
+      <li>Актуальная информация</li>
+      <li>Уменьшение галлюцинаций</li>
+      <li>Прозрачность источников</li>
+      <li>Меньше параметров модели</li>
+    </ul>
+    <pre><code># RAG pipeline
+1. Векторизация базы знаний (embeddings)
+2. Поиск релевантных документов (vector search)
+3. Дополнение промпта найденной информацией
+4. Генерация ответа LLM</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Alignment и безопасность</h2>
+    <p><strong>Проблема</strong>: модели должны быть безопасными и полезными</p>
+    <p><strong>Техники</strong>:</p>
+    <ul>
+      <li><strong>RLHF</strong> (Reinforcement Learning from Human Feedback):
+        <ul>
+          <li>Reward model из человеческих предпочтений</li>
+          <li>PPO для fine-tuning</li>
+          <li>Используется в ChatGPT, Claude</li>
+        </ul>
+      </li>
+      <li><strong>Constitutional AI</strong> (Anthropic):
+        <ul>
+          <li>Модель следует набору принципов</li>
+          <li>Self-critique и revision</li>
+        </ul>
+      </li>
+      <li><strong>Red teaming</strong>: поиск уязвимостей</li>
+      <li><strong>Safety filters</strong>: контент-модерация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Открытые модели и демократизация</h2>
+    <p><strong>Тренд</strong>: доступность мощных моделей</p>
+    <p><strong>Открытые модели</strong>:</p>
+    <ul>
+      <li><strong>LLaMA, LLaMA-2</strong> (Meta): 7B-70B параметров</li>
+      <li><strong>Mistral, Mixtral</strong>: эффективные открытые модели</li>
+      <li><strong>Falcon</strong>: обучена на качественных данных</li>
+      <li><strong>BLOOM</strong>: многоязычная модель</li>
+      <li><strong>StableLM, MPT</strong>: коммерческие лицензии</li>
+    </ul>
+    <p><strong>Экосистема</strong>:</p>
+    <ul>
+      <li><strong>Hugging Face</strong>: hub для моделей</li>
+      <li><strong>vLLM, TGI</strong>: эффективный inference</li>
+      <li><strong>LocalAI, Ollama</strong>: локальный запуск</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Diffusion Models для генерации</h2>
+    <p><strong>Революция в генерации изображений</strong></p>
+    <p><strong>Модели</strong>:</p>
+    <ul>
+      <li><strong>Stable Diffusion</strong>: открытая, высокое качество</li>
+      <li><strong>DALL-E 3</strong>: точное следование промпту</li>
+      <li><strong>Midjourney</strong>: художественный стиль</li>
+      <li><strong>Imagen</strong> (Google): photorealistic</li>
+    </ul>
+    <p><strong>Расширения</strong>:</p>
+    <ul>
+      <li><strong>ControlNet</strong>: контроль композиции</li>
+      <li><strong>DreamBooth</strong>: персонализация</li>
+      <li><strong>Inpainting, outpainting</strong>: редактирование</li>
+      <li><strong>Video diffusion</strong>: Gen-2, Pika</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Code Generation и AI-ассистенты</h2>
+    <p><strong>Программирование с ИИ</strong></p>
+    <p><strong>Инструменты</strong>:</p>
+    <ul>
+      <li><strong>GitHub Copilot</strong>: автодополнение кода</li>
+      <li><strong>ChatGPT</strong>: объяснения и генерация</li>
+      <li><strong>Cursor, Replit</strong>: AI-native IDE</li>
+      <li><strong>Tabnine, Codeium</strong>: альтернативы</li>
+    </ul>
+    <p><strong>Модели</strong>:</p>
+    <ul>
+      <li><strong>Codex</strong> (OpenAI): основа Copilot</li>
+      <li><strong>CodeLlama</strong> (Meta): открытая модель</li>
+      <li><strong>StarCoder</strong>: обучена на GitHub</li>
+      <li><strong>AlphaCode</strong> (DeepMind): соревнования</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Agent systems и Tool use</h2>
+    <p><strong>LLM как reasoning engine</strong></p>
+    <p><strong>Концепция</strong>:</p>
+    <ul>
+      <li><strong>Agents</strong>: автономные системы с LLM</li>
+      <li><strong>Tools</strong>: API, калькуляторы, браузеры</li>
+      <li><strong>Planning</strong>: разбиение на подзадачи</li>
+      <li><strong>Memory</strong>: долгосрочная память</li>
+    </ul>
+    <p><strong>Фреймворки</strong>:</p>
+    <ul>
+      <li><strong>LangChain</strong>: оркестрация LLM</li>
+      <li><strong>AutoGPT</strong>: автономные агенты</li>
+      <li><strong>BabyAGI</strong>: управление задачами</li>
+      <li><strong>Function calling</strong> (OpenAI)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Long context и Memory</h2>
+    <p><strong>Проблема</strong>: ограничение контекста (4K-128K токенов)</p>
+    <p><strong>Решения</strong>:</p>
+    <ul>
+      <li><strong>Расширение контекста</strong>:
+        <ul>
+          <li>GPT-4 Turbo: 128K tokens</li>
+          <li>Claude 3: 200K tokens</li>
+          <li>Gemini 1.5: 1M tokens</li>
+        </ul>
+      </li>
+      <li><strong>Efficient attention</strong>:
+        <ul>
+          <li>FlashAttention 2</li>
+          <li>Sparse attention</li>
+          <li>RoPE (Rotary Position Embeddings)</li>
+        </ul>
+      </li>
+      <li><strong>External memory</strong>:
+        <ul>
+          <li>Vector databases</li>
+          <li>Memory networks</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Mixture of Experts (MoE)</h2>
+    <p><strong>Эффективное масштабирование</strong></p>
+    <p><strong>Идея</strong>: активировать только часть параметров</p>
+    <p><strong>Архитектура</strong>:</p>
+    <ul>
+      <li><strong>Experts</strong>: специализированные sub-networks</li>
+      <li><strong>Router</strong>: выбирает экспертов</li>
+      <li><strong>Sparse activation</strong>: только 2-4 эксперта</li>
+    </ul>
+    <p><strong>Модели</strong>:</p>
+    <ul>
+      <li><strong>Mixtral 8x7B</strong>: 47B параметров, 13B активных</li>
+      <li><strong>Switch Transformer</strong>: 1.6T параметров</li>
+      <li><strong>GPT-4</strong>: предположительно MoE</li>
+    </ul>
+    <p><strong>Преимущества</strong>:</p>
+    <ul>
+      <li>Больше параметров при тех же вычислениях</li>
+      <li>Специализация экспертов</li>
+      <li>Лучшее качество</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Synthetic data и Self-improvement</h2>
+    <p><strong>Модели учатся на собственных данных</strong></p>
+    <p><strong>Подходы</strong>:</p>
+    <ul>
+      <li><strong>Self-Instruct</strong>: генерация инструкций</li>
+      <li><strong>Constitutional AI</strong>: self-critique</li>
+      <li><strong>STaR</strong> (Self-Taught Reasoner)</li>
+      <li><strong>Data augmentation</strong> LLM</li>
+    </ul>
+    <p><strong>AlphaGo Zero pattern</strong>:</p>
+    <ul>
+      <li>Обучение без человеческих данных</li>
+      <li>Self-play и самоулучшение</li>
+      <li>Применение в reasoning tasks</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Специализированные домены</h2>
+    <p><strong>Domain-specific foundation models</strong></p>
+    <ul>
+      <li><strong>Медицина</strong>:
+        <ul>
+          <li>Med-PaLM 2: медицинские вопросы</li>
+          <li>BioGPT: биомедицинская литература</li>
+        </ul>
+      </li>
+      <li><strong>Наука</strong>:
+        <ul>
+          <li>Galactica: научные знания</li>
+          <li>AlphaFold 3: структура белков</li>
+        </ul>
+      </li>
+      <li><strong>Финансы</strong>:
+        <ul>
+          <li>BloombergGPT: финансовые данные</li>
+        </ul>
+      </li>
+      <li><strong>Юриспруденция</strong>:
+        <ul>
+          <li>LegalBERT, CaseLaw models</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Edge AI и On-device ML</h2>
+    <p><strong>Тренд</strong>: ML на устройствах</p>
+    <p><strong>Технологии</strong>:</p>
+    <ul>
+      <li><strong>Модели</strong>:
+        <ul>
+          <li>MobileNet, EfficientNet</li>
+          <li>TinyLlama (1.1B параметров)</li>
+          <li>Phi-2 (2.7B, качество 7B)</li>
+        </ul>
+      </li>
+      <li><strong>Фреймворки</strong>:
+        <ul>
+          <li>TensorFlow Lite</li>
+          <li>ONNX Runtime</li>
+          <li>Core ML (Apple)</li>
+        </ul>
+      </li>
+      <li><strong>Hardware</strong>:
+        <ul>
+          <li>Apple Neural Engine</li>
+          <li>Google Tensor</li>
+          <li>Qualcomm AI Engine</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Emergent abilities и Scaling laws</h2>
+    <p><strong>Наблюдение</strong>: новые способности при масштабировании</p>
+    <p><strong>Scaling laws</strong>:</p>
+    <ul>
+      <li><strong>Chinchilla scaling</strong>: оптимум параметров vs данных</li>
+      <li><strong>Performance prediction</strong>: по масштабу</li>
+      <li><strong>Emergent thresholds</strong>: резкое улучшение</li>
+    </ul>
+    <p><strong>Emergent abilities</strong>:</p>
+    <ul>
+      <li>Multi-step reasoning</li>
+      <li>Few-shot learning</li>
+      <li>Instruction following</li>
+      <li>Chain-of-thought</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Выводы: куда движется DL</h2>
+    <ul>
+      <li><strong>От монолитных к модульным</strong>: agents, tools, MoE</li>
+      <li><strong>От специализации к универсальности</strong>: foundation models</li>
+      <li><strong>От черных ящиков к интерпретируемости</strong>: alignment, XAI</li>
+      <li><strong>От облака к edge</strong>: эффективные модели</li>
+      <li><strong>От текста к мультимодальности</strong>: unified models</li>
+      <li><strong>От supervised к self-supervised</strong>: меньше аннотаций</li>
+    </ul>
+    <blockquote>
+      «Современный DL — это не просто большие модели, это экосистема инструментов, техник и подходов для создания универсального ИИ».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
