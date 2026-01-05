@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>🔥 TorchServe Cheatsheet</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔥 TorchServe Cheatsheet</h1>
+  <div class="subtitle">PyTorch Model Serving • Production deployment<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое TorchServe</h2>
+    <ul>
+      <li><strong>TorchServe</strong>: official PyTorch serving framework</li>
+      <li><strong>Создатели</strong>: AWS и Facebook</li>
+      <li><strong>Особенности</strong>: REST/gRPC APIs, multi-model serving</li>
+      <li><strong>Использование</strong>: production deployment PyTorch моделей</li>
+    </ul>
+    <blockquote>
+      TorchServe поддерживает динамическое scaling и A/B testing out of the box.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Установка</h2>
+    <pre><code># Установка TorchServe
+pip install torchserve torch-model-archiver torch-workflow-archiver
+
+# Проверка установки
+torchserve --version
+
+# Запуск сервера
+torchserve --start --model-store model_store \
+  --models all
+
+# Остановка
+torchserve --stop</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Model Archive (.mar)</h2>
+    <pre><code># Создание .mar файла
+torch-model-archiver --model-name densenet161 \
+  --version 1.0 \
+  --model-file model.py \
+  --serialized-file model.pth \
+  --handler image_classifier \
+  --extra-files index_to_name.json \
+  --export-path model_store
+
+# Структура .mar файла
+# - model.py: определение модели
+# - model.pth: веса
+# - handler: inference logic</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Custom Handler</h2>
+    <pre><code>from ts.torch_handler.base_handler import BaseHandler
+
+class MyHandler(BaseHandler):
+    def __init__(self):
+        super().__init__()
+    
+    def initialize(self, context):
+        self.manifest = context.manifest
+        properties = context.system_properties
+        model_dir = properties.get("model_dir")
+        
+        # Load model
+        self.model = torch.jit.load(
+            os.path.join(model_dir, "model.pt")
+        )
+        self.model.eval()
+    
+    def preprocess(self, data):
+        # Обработка входных данных
+        images = []
+        for row in data:
+            image = row.get("data") or row.get("body")
+            image = Image.open(io.BytesIO(image))
+            image = self.transform(image)
+            images.append(image)
+        return torch.stack(images)
+    
+    def inference(self, data):
+        with torch.no_grad():
+            predictions = self.model(data)
+        return predictions
+    
+    def postprocess(self, data):
+        return data.tolist()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. REST API</h2>
+    <pre><code># Регистрация модели
+curl -X POST "http://localhost:8081/models?url=densenet161.mar"
+
+# Inference
+curl http://localhost:8080/predictions/densenet161 \
+  -T kitten.jpg
+
+# Получение метрик
+curl http://localhost:8082/metrics
+
+# Unregister модели
+curl -X DELETE http://localhost:8081/models/densenet161/1.0</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Конфигурация</h2>
+    <pre><code># config.properties
+inference_address=http://0.0.0.0:8080
+management_address=http://0.0.0.0:8081
+metrics_address=http://0.0.0.0:8082
+
+# Workers и threading
+number_of_netty_threads=32
+job_queue_size=1000
+default_workers_per_model=4
+
+# Batching
+max_batch_delay=100
+max_response_size=65535
+batch_size=8</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Multi-model serving</h2>
+    <ul>
+      <li><strong>Несколько моделей</strong>: одновременное обслуживание</li>
+      <li><strong>Dynamic loading</strong>: загрузка/выгрузка на лету</li>
+      <li><strong>Version management</strong>: несколько версий одной модели</li>
+      <li><strong>Resource allocation</strong>: управление памятью GPU</li>
+    </ul>
+    
+    <pre><code># Register multiple models
+curl -X POST "http://localhost:8081/models?url=model1.mar"
+curl -X POST "http://localhost:8081/models?url=model2.mar"
+
+# List all models
+curl http://localhost:8081/models</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Мониторинг и метрики</h2>
+    <table>
+      <tr><th>Endpoint</th><th>Описание</th></tr>
+      <tr><td>/metrics</td><td>Prometheus metrics</td></tr>
+      <tr><td>/models</td><td>Список моделей</td></tr>
+      <tr><td>/models/{model}</td><td>Детали модели</td></tr>
+      <tr><td>/ping</td><td>Health check</td></tr>
+    </table>
+    
+    <pre><code># Prometheus интеграция
+ts_inference_requests_total
+ts_inference_latency_microseconds
+ts_queue_latency_microseconds
+model_metric_mem_usage</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Scaling</h2>
+    <pre><code># Увеличение workers
+curl -X PUT "http://localhost:8081/models/densenet161?min_worker=3&max_worker=6"
+
+# Auto-scaling на основе load
+# Настройка в config.properties
+min_workers=2
+max_workers=10
+
+# Использование с Kubernetes
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: torchserve
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+      - name: torchserve
+        image: pytorch/torchserve:latest
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Оптимизация</h2>
+    <ul>
+      <li><strong>TorchScript</strong>: оптимизированное представление</li>
+      <li><strong>ONNX</strong>: экспорт для ускорения</li>
+      <li><strong>Quantization</strong>: INT8 inference</li>
+      <li><strong>GPU batching</strong>: эффективное использование GPU</li>
+      <li><strong>Model compilation</strong>: torch.compile() для ускорения</li>
+    </ul>
+    
+    <pre><code># TorchScript export
+scripted_model = torch.jit.script(model)
+scripted_model.save("model.pt")</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>

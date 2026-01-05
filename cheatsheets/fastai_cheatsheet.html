@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>FastAI Cheatsheet</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⚡ FastAI Cheatsheet</h1>
+  <div class="subtitle">Deep Learning библиотека • Практический подход<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое FastAI</h2>
+    <ul>
+      <li><strong>FastAI</strong>: high-level deep learning библиотека</li>
+      <li><strong>Основа</strong>: построена на PyTorch</li>
+      <li><strong>Философия</strong>: делать DL доступным для всех</li>
+      <li><strong>Создатель</strong>: Jeremy Howard и команда</li>
+      <li><strong>Особенности</strong>: best practices по умолчанию</li>
+    </ul>
+    <blockquote>
+      FastAI позволяет создавать state-of-the-art модели с минимумом кода.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Установка</h2>
+    <pre><code># Установка через pip
+pip install fastai
+
+# Или через conda
+conda install -c fastai -c pytorch fastai
+
+# Проверка
+python -c "import fastai; print(fastai.__version__)"
+
+# GPU support (CUDA)
+pip install fastai torch torchvision --extra-index-url https://download.pytorch.org/whl/cu118</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Computer Vision</h2>
+    <p><strong>Классификация изображений</strong>:</p>
+    <pre><code>from fastai.vision.all import *
+
+# Загрузка данных
+path = untar_data(URLs.PETS)/'images'
+
+# DataLoader
+dls = ImageDataLoaders.from_name_re(
+    path, 
+    get_image_files(path),
+    pat=r'(.+)_\d+.jpg$',
+    item_tfms=Resize(460),
+    batch_tfms=aug_transforms(size=224)
+)
+
+# Создание модели
+learn = vision_learner(
+    dls, 
+    resnet34, 
+    metrics=error_rate
+)
+
+# Обучение
+learn.fine_tune(3)</code></pre>
+
+    <p><strong>Доступные архитектуры</strong>:</p>
+    <ul>
+      <li>ResNet (18, 34, 50, 101, 152)</li>
+      <li>EfficientNet (b0-b7)</li>
+      <li>DenseNet, VGG, SqueezeNet</li>
+      <li>Vision Transformer (ViT)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Transfer Learning</h2>
+    <ul>
+      <li><strong>Discriminative learning rates</strong>: разные LR для слоёв</li>
+      <li><strong>Gradual unfreezing</strong>: постепенное размораживание</li>
+      <li><strong>Fine-tuning</strong>: автоматическая настройка</li>
+    </ul>
+
+    <pre><code># Freeze backbone
+learn.freeze()
+learn.fit_one_cycle(2)
+
+# Unfreeze и train с разными LR
+learn.unfreeze()
+learn.fit_one_cycle(5, lr_max=slice(1e-6, 1e-4))
+
+# Learning rate finder
+learn.lr_find()</code></pre>
+
+    <table>
+      <tr><th>Метод</th><th>Описание</th></tr>
+      <tr><td>fine_tune()</td><td>Freeze → Train → Unfreeze</td></tr>
+      <tr><td>fit_one_cycle()</td><td>One-cycle policy обучение</td></tr>
+      <tr><td>lr_find()</td><td>Поиск оптимального LR</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. NLP с FastAI</h2>
+    <p><strong>Text Classification</strong>:</p>
+    <pre><code>from fastai.text.all import *
+
+# Загрузка данных
+path = untar_data(URLs.IMDB)
+
+# DataLoader
+dls = TextDataLoaders.from_folder(
+    path, 
+    valid='test',
+    text_vocab=None
+)
+
+# Модель
+learn = text_classifier_learner(
+    dls, 
+    AWD_LSTM, 
+    drop_mult=0.5,
+    metrics=accuracy
+)
+
+# Fine-tuning
+learn.fine_tune(4, 1e-2)</code></pre>
+
+    <p><strong>Language Model</strong>:</p>
+    <pre><code># Обучение language model
+learn_lm = language_model_learner(
+    dls_lm, 
+    AWD_LSTM, 
+    drop_mult=0.3,
+    metrics=[accuracy, Perplexity()]
+)
+
+learn_lm.fit_one_cycle(1, 2e-2)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Tabular Data</h2>
+    <pre><code>from fastai.tabular.all import *
+
+# Подготовка данных
+path = untar_data(URLs.ADULT_SAMPLE)
+df = pd.read_csv(path/'adult.csv')
+
+# DataLoader
+dls = TabularDataLoaders.from_csv(
+    path/'adult.csv',
+    path=path,
+    y_names="salary",
+    cat_names=['workclass', 'education', 'marital-status'],
+    cont_names=['age', 'fnlwgt', 'education-num'],
+    procs=[Categorify, FillMissing, Normalize]
+)
+
+# Модель
+learn = tabular_learner(
+    dls, 
+    metrics=accuracy
+)
+
+learn.fit_one_cycle(3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Data Augmentation</h2>
+    <p><strong>Встроенные трансформации</strong>:</p>
+    <pre><code># Image augmentation
+aug_transforms(
+    mult=1.0,           # multiplier
+    do_flip=True,       # horizontal flip
+    flip_vert=False,    # vertical flip  
+    max_rotate=10.0,    # rotation degrees
+    max_zoom=1.1,       # zoom factor
+    max_lighting=0.2,   # lighting change
+    max_warp=0.2,       # perspective warp
+    p_affine=0.75,      # probability
+    p_lighting=0.75
+)
+
+# Custom transforms
+item_tfms = [Resize(460)]
+batch_tfms = [
+    *aug_transforms(size=224),
+    Normalize.from_stats(*imagenet_stats)
+]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Learning Rate Policies</h2>
+    <p><strong>1cycle Policy</strong>:</p>
+    <ul>
+      <li>Warm-up: постепенное увеличение LR</li>
+      <li>Annealing: постепенное уменьшение</li>
+      <li>Momentum: обратно пропорционально LR</li>
+    </ul>
+
+    <pre><code># 1cycle training
+learn.fit_one_cycle(
+    n_epoch=10,
+    lr_max=1e-3,
+    moms=(0.95, 0.85),  # momentum range
+    div=25.0,            # initial LR division
+    pct_start=0.3        # warmup percentage
+)
+
+# Flat + cosine annealing
+learn.fit_flat_cos(
+    n_epoch=10,
+    lr=1e-3,
+    pct_start=0.75
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Callbacks</h2>
+    <table>
+      <tr><th>Callback</th><th>Назначение</th></tr>
+      <tr><td>EarlyStoppingCallback</td><td>Остановка при plateau</td></tr>
+      <tr><td>SaveModelCallback</td><td>Сохранение best модели</td></tr>
+      <tr><td>CSVLogger</td><td>Логирование в CSV</td></tr>
+      <tr><td>ReduceLROnPlateau</td><td>Уменьшение LR</td></tr>
+      <tr><td>MixedPrecision</td><td>FP16 training</td></tr>
+      <tr><td>GradientClip</td><td>Gradient clipping</td></tr>
+    </table>
+
+    <pre><code># Использование callbacks
+learn.fit_one_cycle(
+    10,
+    cbs=[
+        EarlyStoppingCallback(patience=3),
+        SaveModelCallback(),
+        CSVLogger()
+    ]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Inference и Export</h2>
+    <pre><code># Inference на одном примере
+img = PILImage.create('test.jpg')
+pred_class, pred_idx, probs = learn.predict(img)
+
+# Batch inference
+dl = learn.dls.test_dl(test_items)
+preds, _ = learn.get_preds(dl=dl)
+
+# Export модели
+learn.export('model.pkl')
+
+# Load для inference
+learn_inf = load_learner('model.pkl')
+pred = learn_inf.predict(img)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Interpretation</h2>
+    <pre><code># Classification interpretation
+interp = ClassificationInterpretation.from_learner(learn)
+
+# Confusion matrix
+interp.plot_confusion_matrix(figsize=(12,12))
+
+# Top losses
+interp.plot_top_losses(9, figsize=(15,11))
+
+# Most confused
+interp.most_confused(min_val=2)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Best Practices</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Рекомендации</h3>
+        <ul>
+          <li>Использовать lr_find()</li>
+          <li>Применять fit_one_cycle()</li>
+          <li>Начинать с small models</li>
+          <li>Использовать mixed precision</li>
+          <li>Progressive resizing</li>
+          <li>Test time augmentation</li>
+        </ul>
+      </div>
+      
+      <div class="bad">
+        <h3>❌ Избегать</h3>
+        <ul>
+          <li>Случайный выбор LR</li>
+          <li>Игнорирование validation</li>
+          <li>Переобучение с первого раза</li>
+          <li>Слишком большой batch size</li>
+          <li>Отсутствие augmentation</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
