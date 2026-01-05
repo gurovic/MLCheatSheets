@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Нейросети в астрономии Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🌌 Нейросети в астрономии Cheatsheet</h1>
+  <div class="subtitle">ML для анализа космических данных • От галактик до экзопланет<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Введение</h2>
+    <p><strong>ML в астрономии</strong> — революция в обработке огромных объемов данных.</p><ul><li><strong>Телескопы</strong>: генерируют петабайты данных</li><li><strong>Задачи</strong>: классификация, детекция, регрессия</li><li><strong>Данные</strong>: изображения, спектры, временные ряды</li><li><strong>Преимущества</strong>: автоматизация, новые открытия</li></ul><blockquote>💡 Один современный телескоп генерирует больше данных, чем могут обработать астрономы вручную</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Классификация галактик</h2>
+    <p>Автоматическое определение морфологии галактик.</p><p><strong>Классы галактик</strong>:</p><ul><li>Спиральные (Sa, Sb, Sc)</li><li>Эллиптические (E0-E7)</li><li>Линзовидные (S0)</li><li>Неправильные</li></ul><pre><code># CNN для классификации галактик
+import torch.nn as nn
+
+class GalaxyClassifier(nn.Module):
+    def __init__(self, num_classes=4):
+        super().__init__()
+        self.features = nn.Sequential(
+            nn.Conv2d(3, 32, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(32, 64, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(64, 128, 3, padding=1),
+            nn.ReLU(),
+            nn.AdaptiveAvgPool2d(1)
+        )
+        self.classifier = nn.Linear(128, num_classes)
+    
+    def forward(self, x):
+        x = self.features(x)
+        x = x.view(x.size(0), -1)
+        return self.classifier(x)</code></pre><p><strong>Датасеты</strong>: Galaxy Zoo, SDSS, HST</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Поиск экзопланет</h2>
+    <p>Детекция планет по кривым блеска звезд (транзитный метод).</p><p><strong>Подход</strong>:</p><ul><li>Временные ряды яркости звезды</li><li>Поиск периодических провалов</li><li>Отсев ложных срабатываний</li></ul><pre><code># CNN + LSTM для поиска экзопланет
+class ExoplanetDetector(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.conv = nn.Sequential(
+            nn.Conv1d(1, 16, 5),
+            nn.ReLU(),
+            nn.MaxPool1d(2),
+            nn.Conv1d(16, 32, 5),
+            nn.ReLU(),
+            nn.MaxPool1d(2)
+        )
+        self.lstm = nn.LSTM(32, 64, 2, batch_first=True)
+        self.fc = nn.Linear(64, 1)
+        
+    def forward(self, x):
+        x = self.conv(x)
+        x = x.transpose(1, 2)
+        x, _ = self.lstm(x)
+        x = self.fc(x[:, -1, :])
+        return torch.sigmoid(x)</code></pre><p><strong>Известные успехи</strong>: Kepler mission использует ML</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Классификация звезд по спектрам</h2>
+    <p>Определение типа звезды (O, B, A, F, G, K, M) по спектру.</p><p><strong>Спектральные классы</strong>:</p><ul><li>O: самые горячие, голубые</li><li>B: горячие, сине-белые</li><li>A: белые</li><li>F: желто-белые</li><li>G: желтые (наше Солнце)</li><li>K: оранжевые</li><li>M: холодные, красные</li></ul><pre><code># 1D CNN для спектральной классификации
+model = nn.Sequential(
+    nn.Conv1d(1, 32, kernel_size=5),
+    nn.ReLU(),
+    nn.MaxPool1d(2),
+    nn.Conv1d(32, 64, kernel_size=5),
+    nn.ReLU(),
+    nn.MaxPool1d(2),
+    nn.Conv1d(64, 128, kernel_size=5),
+    nn.ReLU(),
+    nn.AdaptiveAvgPool1d(1),
+    nn.Flatten(),
+    nn.Linear(128, 7)  # 7 классов
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Детекция гравитационных волн</h2>
+    <p>ML для поиска сигналов в данных LIGO/Virgo.</p><p><strong>Задача</strong>:</p><ul><li>Сигнал очень слабый, погружен в шум</li><li>Нужна высокая чувствительность</li><li>Время имеет значение для триангуляции</li></ul><pre><code># CNN для детекции GW
+class GWDetector(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Входят спектрограммы от двух детекторов
+        self.encoder = nn.Sequential(
+            nn.Conv2d(2, 32, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(32, 64, 3, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2)
+        )
+        self.classifier = nn.Sequential(
+            nn.AdaptiveAvgPool2d(1),
+            nn.Flatten(),
+            nn.Linear(64, 1)
+        )
+        
+    def forward(self, x):
+        features = self.encoder(x)
+        return torch.sigmoid(self.classifier(features))</code></pre><p><strong>Результат</strong>: ML помогает находить слабые сигналы, пропущенные традиционными методами</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Автоматическое обнаружение транзиентов</h2>
+    <p>Поиск быстро меняющихся объектов: сверхновые, гамма-всплески, и т.д.</p><p><strong>Методы</strong>:</p><ul><li>Image differencing: вычитание старых снимков</li><li>Real-time classification</li><li>Фильтрация артефактов</li></ul><pre><code># Pipeline для транзиентов
+class TransientDetector:
+    def __init__(self):
+        self.cnn = ...  # CNN для классификации
+        
+    def process_image(self, new_img, reference_img):
+        # 1. Image subtraction
+        diff = new_img - reference_img
+        
+        # 2. Детекция кандидатов
+        candidates = find_sources(diff)
+        
+        # 3. Классификация
+        for cand in candidates:
+            cutout = extract_cutout(diff, cand)
+            prob = self.cnn(cutout)
+            
+            if prob > threshold:
+                yield {{
+                    'position': cand,
+                    'class': classify(prob),
+                    'confidence': prob
+                }}
+</code></pre><p><strong>Проекты</strong>: ZTF, LSST используют ML</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Измерение красных смещений (redshift)</h2>
+    <p>Определение расстояний до галактик по спектрам.</p><p><strong>Фотометрический redshift</strong>:</p><ul><li>Быстрее спектроскопического</li><li>Использует многоканальную фотометрию</li><li>ML для повышения точности</li></ul><pre><code># MLP для photo-z
+import torch.nn as nn
+
+class PhotoZNet(nn.Module):
+    def __init__(self, n_filters=5):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(n_filters, 128),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(128, 256),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Linear(128, 1)  # redshift
+        )
+        
+    def forward(self, magnitudes):
+        return self.net(magnitudes)
+
+# Потери учитывают ошибку
+def photo_z_loss(pred, true, sigma=0.15):
+    return torch.mean(
+        (pred - true) ** 2 / (1 + true) ** 2
+    )</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Моделирование космологии</h2>
+    <p>ML для эмуляции сложных космологических симуляций.</p><p><strong>Применения</strong>:</p><ul><li>Ускорение N-body симуляций</li><li>Инференс космологических параметров</li><li>Генеративные модели галактик</li></ul><pre><code># Эмулятор космологической симуляции
+class CosmologyEmulator(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Входы: космологические параметры
+        # Выход: предсказание power spectrum
+        self.net = nn.Sequential(
+            nn.Linear(6, 256),  # 6 параметров
+            nn.ReLU(),
+            nn.Linear(256, 512),
+            nn.ReLU(),
+            nn.Linear(512, 512),
+            nn.ReLU(),
+            nn.Linear(512, 100)  # 100 bins k-space
+        )
+        
+    def forward(self, cosmo_params):
+        # Предсказывает P(k) за миллисекунды
+        # вместо часов симуляции!
+        return self.net(cosmo_params)</code></pre><blockquote>⚡ ML может ускорить симуляции в 1000+ раз</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Обработка изображений с телескопов</h2>
+    <p>Удаление шума, артефактов, повышение качества.</p><p><strong>Задачи</strong>:</p><ul><li>Denoising: удаление шума</li><li>Deconvolution: восстановление четкости</li><li>Inpainting: заполнение пропусков</li><li>Super-resolution: увеличение разрешения</li></ul><pre><code># U-Net для denoising астрономических изображений
+class AstroDenoiser(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Encoder
+        self.enc1 = nn.Conv2d(1, 64, 3, padding=1)
+        self.enc2 = nn.Conv2d(64, 128, 3, padding=1)
+        self.enc3 = nn.Conv2d(128, 256, 3, padding=1)
+        
+        # Decoder
+        self.dec3 = nn.Conv2d(256, 128, 3, padding=1)
+        self.dec2 = nn.Conv2d(256, 64, 3, padding=1)  # +skip
+        self.dec1 = nn.Conv2d(128, 1, 3, padding=1)   # +skip
+        
+    def forward(self, x):
+        # Encoder with skip connections
+        e1 = F.relu(self.enc1(x))
+        e2 = F.relu(self.enc2(F.max_pool2d(e1, 2)))
+        e3 = F.relu(self.enc3(F.max_pool2d(e2, 2)))
+        
+        # Decoder
+        d3 = F.relu(self.dec3(F.upsample(e3, scale_factor=2)))
+        d2 = F.relu(self.dec2(torch.cat([d3, e2], 1)))
+        d2 = F.upsample(d2, scale_factor=2)
+        d1 = self.dec1(torch.cat([d2, e1], 1))
+        return d1</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Sloan Digital Sky Survey (SDSS) и Big Data</h2>
+    <p>SDSS содержит миллиарды объектов — идеальный тестовый полигон для ML.</p><p><strong>Данные SDSS</strong>:</p><ul><li>~1 миллиард галактик</li><li>~200 миллионов звезд</li><li>Спектры, фотометрия, изображения</li><li>Открытый доступ</li></ul><pre><code># Работа с SDSS данными
+import astropy
+from astroquery.sdss import SDSS
+
+# Запрос данных
+query = '''
+    SELECT TOP 10000
+        g, r, i, z,  -- magnitudes
+        specClass    -- class
+    FROM PhotoObj
+    WHERE specClass > 0
+'''
+
+data = SDSS.query_sql(query)
+
+# Подготовка для ML
+X = data[['g', 'r', 'i', 'z']].values
+y = data['specClass'].values
+
+# Обучение
+from sklearn.ensemble import RandomForestClassifier
+model = RandomForestClassifier(n_estimators=100)
+model.fit(X, y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Time-domain астрономия</h2>
+    <p>Изучение переменных объектов через временные ряды.</p><p><strong>Объекты</strong>:</p><ul><li>Переменные звезды (цефеиды, RR Лиры)</li><li>Затменные двойные</li><li>Активные галактические ядра (AGN)</li><li>Квазары</li></ul><pre><code># RNN для классификации кривых блеска
+class LightCurveClassifier(nn.Module):
+    def __init__(self, n_classes=10):
+        super().__init__()
+        self.lstm = nn.LSTM(
+            input_size=1,
+            hidden_size=128,
+            num_layers=2,
+            batch_first=True,
+            bidirectional=True
+        )
+        self.fc = nn.Linear(256, n_classes)
+        
+    def forward(self, x):
+        # x: (batch, time, 1)
+        lstm_out, _ = self.lstm(x)
+        # Используем последний выход
+        return self.fc(lstm_out[:, -1, :])
+
+# Feature extraction для временных рядов
+def extract_features(lightcurve):
+    from astropy.stats import sigma_clipped_stats
+    
+    mean, median, std = sigma_clipped_stats(lightcurve)
+    
+    features = {{
+        'mean': mean,
+        'std': std,
+        'amplitude': np.ptp(lightcurve),
+        'skewness': skew(lightcurve),
+        'kurtosis': kurtosis(lightcurve)
+    }}
+    return features</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Инструменты и библиотеки</h2>
+    <p><strong>Основные библиотеки</strong>:</p><ul><li><strong>Astropy</strong>: базовая астрономическая библиотека</li><li><strong>AstroML</strong>: ML для астрономии</li><li><strong>Photutils</strong>: фотометрия</li><li><strong>Astroquery</strong>: доступ к архивам</li><li><strong>SEP</strong>: source extraction</li><li><strong>Gal sim</strong>: симуляция галактик</li></ul><pre><code># Пример использования astropy + ML
+from astropy.io import fits
+from astropy.wcs import WCS
+import torch
+
+# Загрузка FITS изображения
+hdu = fits.open('galaxy.fits')
+image = hdu[0].data
+wcs = WCS(hdu[0].header)
+
+# Предобработка
+image_norm = (image - image.mean()) / image.std()
+
+# Inference
+model = load_model('galaxy_classifier.pt')
+with torch.no_grad():
+    pred = model(torch.FloatTensor(image_norm[None, None]))
+    
+print(f'Galaxy type: {{pred.argmax()}}')</code></pre>
+  </div>
+
+
+</div>
+
+</body>
+</html>
