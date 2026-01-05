@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Динамика обучения нейросетей Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🧠 Динамика обучения нейросетей Cheatsheet</h1>
+  <div class="subtitle">Понимание процесса обучения • Оптимизация и сходимость<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Введение в динамику обучения</h2>
+    <p><strong>Динамика обучения</strong> — это изучение того, как параметры нейросети изменяются во время обучения.</p>
+    <ul>
+      <li><strong>Траектория весов</strong>: путь параметров в пространстве</li>
+      <li><strong>Скорость сходимости</strong>: как быстро достигается минимум</li>
+      <li><strong>Стабильность</strong>: устойчивость к возмущениям</li>
+      <li><strong>Обобщение</strong>: связь с качеством на тесте</li>
+    </ul>
+    <blockquote>💡 Понимание динамики помогает выбрать правильную архитектуру и гиперпараметры</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Ландшафт функции потерь</h2>
+    <p><strong>Loss landscape</strong> — геометрия функции потерь в пространстве параметров.</p>
+    
+    <p><strong>Характеристики</strong>:</p>
+    <ul>
+      <li>Локальные минимумы и максимумы</li>
+      <li>Седловые точки (преобладают в высоких размерностях)</li>
+      <li>Плато (области с малым градиентом)</li>
+      <li>Острые vs плоские минимумы</li>
+    </ul>
+
+    <p><strong>Важное наблюдение</strong>: Плоские минимумы обычно обобщают лучше, чем острые.</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Градиентный спуск и вариации</h2>
+    <p><strong>Основное уравнение</strong>:</p>
+    <p>θ(t+1) = θ(t) - η ∇L(θ(t))</p>
+    
+    <p><strong>Факторы влияния</strong>:</p>
+    <ul>
+      <li><strong>Learning rate (η)</strong>: скорость обновления</li>
+      <li><strong>Batch size</strong>: шум в градиентах</li>
+      <li><strong>Momentum</strong>: инерция движения</li>
+      <li><strong>Adaptive rates</strong>: Adam, RMSProp</li>
+    </ul>
+
+    <pre><code># Траектория параметров
+import matplotlib.pyplot as plt
+import numpy as np
+
+# Логируем веса во время обучения
+weights_history = []
+
+for epoch in range(epochs):
+    optimizer.zero_grad()
+    loss = criterion(model(X), y)
+    loss.backward()
+    optimizer.step()
+    
+    # Сохраняем снимок весов
+    weights_history.append(
+        model.state_dict()['layer.weight'].clone()
+    )</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Фазы обучения</h2>
+    <p>Обучение нейросети проходит несколько фаз:</p>
+    
+    <p><strong>1. Warm-up (разогрев)</strong>:</p>
+    <ul>
+      <li>Начальная адаптация параметров</li>
+      <li>Быстрое снижение loss</li>
+      <li>Learning rate может расти</li>
+    </ul>
+
+    <p><strong>2. Linear regime (линейная фаза)</strong>:</p>
+    <ul>
+      <li>Стабильное обучение</li>
+      <li>Примерно линейное снижение loss</li>
+      <li>Основная работа происходит здесь</li>
+    </ul>
+
+    <p><strong>3. Fine-tuning (тонкая настройка)</strong>:</p>
+    <ul>
+      <li>Медленная сходимость</li>
+      <li>Малые изменения loss</li>
+      <li>Часто используют меньший learning rate</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Learning rate scheduling</h2>
+    <p>Изменение learning rate во время обучения критически важно.</p>
+
+    <p><strong>Популярные стратегии</strong>:</p>
+    <pre><code># Step decay
+scheduler = StepLR(optimizer, step_size=30, gamma=0.1)
+
+# Cosine annealing
+scheduler = CosineAnnealingLR(optimizer, T_max=100)
+
+# ReduceLROnPlateau
+scheduler = ReduceLROnPlateau(
+    optimizer, 
+    mode='min',
+    factor=0.1,
+    patience=10
+)
+
+# Циклический LR
+scheduler = CyclicLR(
+    optimizer,
+    base_lr=0.001,
+    max_lr=0.01,
+    step_size_up=2000
+)</code></pre>
+
+    <blockquote>⚡ Правильный schedule может ускорить сходимость в 2-3 раза</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Warm-up стратегии</h2>
+    <p>Постепенное увеличение LR в начале обучения:</p>
+
+    <pre><code># Linear warm-up
+def get_lr(epoch, warmup_epochs=5, max_lr=0.001):
+    if epoch < warmup_epochs:
+        return max_lr * (epoch + 1) / warmup_epochs
+    return max_lr
+
+# В PyTorch
+from torch.optim.lr_scheduler import LambdaLR
+
+def warmup_lambda(epoch):
+    if epoch < 5:
+        return (epoch + 1) / 5
+    return 1.0
+
+scheduler = LambdaLR(optimizer, lr_lambda=warmup_lambda)</code></pre>
+
+    <p><strong>Зачем нужен warm-up?</strong></p>
+    <ul>
+      <li>Стабилизация в начале обучения</li>
+      <li>Избежание больших градиентов</li>
+      <li>Лучше для больших batch size</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Batch size и динамика</h2>
+    <p>Размер batch сильно влияет на динамику обучения.</p>
+
+    <table>
+      <tr><th>Параметр</th><th>Малый batch</th><th>Большой batch</th></tr>
+      <tr>
+        <td><strong>Шум градиента</strong></td>
+        <td>Высокий</td>
+        <td>Низкий</td>
+      </tr>
+      <tr>
+        <td><strong>Сходимость</strong></td>
+        <td>Медленная</td>
+        <td>Быстрая</td>
+      </tr>
+      <tr>
+        <td><strong>Обобщение</strong></td>
+        <td>Лучше</td>
+        <td>Хуже</td>
+      </tr>
+      <tr>
+        <td><strong>Минимумы</strong></td>
+        <td>Плоские</td>
+        <td>Острые</td>
+      </tr>
+      <tr>
+        <td><strong>Память GPU</strong></td>
+        <td>Меньше</td>
+        <td>Больше</td>
+      </tr>
+    </table>
+
+    <p><strong>Правило масштабирования LR</strong>:</p>
+    <p>При увеличении batch в k раз, увеличьте LR в √k раз</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Gradient accumulation</h2>
+    <p>Эмуляция большого batch при ограниченной памяти:</p>
+
+    <pre><code>accumulation_steps = 4
+model.zero_grad()
+
+for i, (X, y) in enumerate(train_loader):
+    # Forward pass
+    output = model(X)
+    loss = criterion(output, y)
+    
+    # Нормализуем loss
+    loss = loss / accumulation_steps
+    
+    # Backward pass (накапливаем градиенты)
+    loss.backward()
+    
+    # Обновляем каждые N шагов
+    if (i + 1) % accumulation_steps == 0:
+        optimizer.step()
+        optimizer.zero_grad()</code></pre>
+
+    <p>Эффективный batch size = batch_size × accumulation_steps</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Momentum и инерция</h2>
+    <p>Momentum добавляет "память" прошлых градиентов:</p>
+    <p>v(t) = β·v(t-1) + ∇L(θ)</p>
+    <p>θ(t+1) = θ(t) - η·v(t)</p>
+
+    <p><strong>Эффекты</strong>:</p>
+    <ul>
+      <li>Сглаживание траектории</li>
+      <li>Ускорение в постоянных направлениях</li>
+      <li>Преодоление локальных минимумов</li>
+      <li>Снижение колебаний</li>
+    </ul>
+
+    <pre><code># SGD с momentum
+optimizer = torch.optim.SGD(
+    model.parameters(),
+    lr=0.01,
+    momentum=0.9,
+    nesterov=True  # Nesterov momentum
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Адаптивные оптимизаторы</h2>
+    <p><strong>Adam</strong>: адаптирует LR для каждого параметра</p>
+    <p>m(t) = β₁·m(t-1) + (1-β₁)·∇L</p>
+    <p>v(t) = β₂·v(t-1) + (1-β₂)·∇L²</p>
+    <p>θ(t+1) = θ(t) - η·m̂(t) / (√v̂(t) + ε)</p>
+
+    <pre><code># Различные адаптивные оптимизаторы
+from torch import optim
+
+# Adam (по умолчанию β₁=0.9, β₂=0.999)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+
+# AdamW (с weight decay)
+optimizer = optim.AdamW(
+    model.parameters(),
+    lr=0.001,
+    weight_decay=0.01
+)
+
+# RMSprop
+optimizer = optim.RMSprop(
+    model.parameters(),
+    lr=0.01,
+    alpha=0.99
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Gradient clipping</h2>
+    <p>Предотвращает взрывные градиенты (exploding gradients):</p>
+
+    <pre><code># Gradient clipping по норме
+import torch.nn as nn
+
+max_norm = 1.0
+
+for epoch in range(epochs):
+    optimizer.zero_grad()
+    loss = criterion(model(X), y)
+    loss.backward()
+    
+    # Обрезаем градиенты
+    nn.utils.clip_grad_norm_(
+        model.parameters(), 
+        max_norm
+    )
+    
+    optimizer.step()
+
+# Clipping по значению
+nn.utils.clip_grad_value_(
+    model.parameters(),
+    clip_value=0.5
+)</code></pre>
+
+    <p><strong>Когда использовать</strong>:</p>
+    <ul>
+      <li>RNN и LSTM (обязательно!)</li>
+      <li>Очень глубокие сети</li>
+      <li>Нестабильное обучение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Инициализация и динамика</h2>
+    <p>Начальные веса определяют траекторию обучения.</p>
+
+    <p><strong>Основные методы</strong>:</p>
+    <pre><code># Xavier/Glorot initialization
+nn.init.xavier_uniform_(layer.weight)
+
+# He initialization (для ReLU)
+nn.init.kaiming_normal_(
+    layer.weight,
+    mode='fan_in',
+    nonlinearity='relu'
+)
+
+# Orthogonal (для RNN)
+nn.init.orthogonal_(layer.weight)
+
+# Нормальное распределение
+nn.init.normal_(layer.weight, mean=0, std=0.01)</code></pre>
+
+    <blockquote>⚠️ Плохая инициализация может привести к gradient vanishing/exploding</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Mode connectivity</h2>
+    <p>Два найденных минимума часто соединены путем с низким loss.</p>
+
+    <p><strong>Наблюдение</strong>: Можно интерполировать между двумя обученными моделями:</p>
+    <pre><code># Линейная интерполяция
+alpha = 0.5  # середина пути
+theta_mid = alpha * theta_1 + (1 - alpha) * theta_2
+
+# Загружаем веса интерполяции
+model.load_state_dict(theta_mid)
+
+# Проверяем loss (часто остается низким!)
+loss_mid = evaluate(model, test_loader)</code></pre>
+
+    <p><strong>Применение</strong>:</p>
+    <ul>
+      <li>Model averaging (ансамбль)</li>
+      <li>Понимание ландшафта</li>
+      <li>Fast geometric ensembling (FGE)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Loss curve analysis</h2>
+    <p>Анализ кривой loss помогает диагностировать проблемы:</p>
+
+    <pre><code>import matplotlib.pyplot as plt
+
+# Визуализация обучения
+plt.figure(figsize=(12, 4))
+
+plt.subplot(1, 2, 1)
+plt.plot(train_losses, label='Train')
+plt.plot(val_losses, label='Validation')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.legend()
+plt.title('Learning Curves')
+
+plt.subplot(1, 2, 2)
+plt.plot(learning_rates)
+plt.xlabel('Epoch')
+plt.ylabel('Learning Rate')
+plt.title('LR Schedule')
+plt.show()</code></pre>
+
+    <p><strong>Признаки проблем</strong>:</p>
+    <ul>
+      <li>Loss не убывает → слишком малый LR</li>
+      <li>Loss взрывается → слишком большой LR</li>
+      <li>Колебания → batch size или LR</li>
+      <li>Train &lt;&lt; Val → переобучение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Learning rate finder</h2>
+    <p>Автоматический поиск оптимального LR:</p>
+
+    <pre><code>def find_lr(model, train_loader, optimizer, 
+            start_lr=1e-7, end_lr=10, num_iter=100):
+    lr_mult = (end_lr / start_lr) ** (1 / num_iter)
+    lr = start_lr
+    optimizer.param_groups[0]['lr'] = lr
+    
+    lrs = []
+    losses = []
+    
+    for i, (X, y) in enumerate(train_loader):
+        if i >= num_iter:
+            break
+            
+        optimizer.zero_grad()
+        loss = criterion(model(X), y)
+        loss.backward()
+        optimizer.step()
+        
+        lrs.append(lr)
+        losses.append(loss.item())
+        
+        lr *= lr_mult
+        optimizer.param_groups[0]['lr'] = lr
+    
+    # Визуализация
+    plt.plot(lrs, losses)
+    plt.xscale('log')
+    plt.xlabel('Learning Rate')
+    plt.ylabel('Loss')
+    plt.show()
+    
+    return lrs, losses</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Catastrophic forgetting</h2>
+    <p>При обучении на новых данных модель "забывает" старые:</p>
+
+    <p><strong>Стратегии борьбы</strong>:</p>
+    <ul>
+      <li><strong>Elastic Weight Consolidation (EWC)</strong>: штраф за изменение важных весов</li>
+      <li><strong>Progressive networks</strong>: добавление новых слоев</li>
+      <li><strong>Rehearsal</strong>: переобучение на старых данных</li>
+      <li><strong>Knowledge distillation</strong>: сохранение выходов старой модели</li>
+    </ul>
+
+    <pre><code># Простой rehearsal
+old_data = ...  # сохраненные старые данные
+
+for epoch in range(epochs):
+    # Обучение на новых данных
+    for X_new, y_new in new_loader:
+        loss = criterion(model(X_new), y_new)
+        
+    # Переобучение на старых
+    for X_old, y_old in old_loader:
+        loss += criterion(model(X_old), y_old)
+        
+    loss.backward()
+    optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Double descent phenomenon</h2>
+    <p>Неожиданное явление: после "переобучения" качество снова улучшается!</p>
+
+    <p><strong>Три режима</strong>:</p>
+    <ul>
+      <li><strong>Underparameterized</strong>: классический bias-variance tradeoff</li>
+      <li><strong>Interpolation threshold</strong>: пик test error</li>
+      <li><strong>Overparameterized</strong>: test error снова падает!</li>
+    </ul>
+
+    <p>Наблюдается при увеличении:</p>
+    <ul>
+      <li>Размера модели (параметров)</li>
+      <li>Числа эпох обучения</li>
+      <li>Количества данных</li>
+    </ul>
+
+    <blockquote>🤯 Противоречит классической теории обучения!</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Lottery ticket hypothesis</h2>
+    <p>В случайно инициализированной сети есть подсеть, которая обучается также хорошо.</p>
+
+    <p><strong>Процедура</strong>:</p>
+    <ol>
+      <li>Обучить полную сеть</li>
+      <li>Удалить k% наименьших весов (pruning)</li>
+      <li>Вернуть оставшиеся веса к начальным значениям</li>
+      <li>Переобучить → получаем то же качество!</li>
+    </ol>
+
+    <pre><code># Находим "выигрышный билет"
+original_weights = copy.deepcopy(model.state_dict())
+
+# Обучаем
+train(model)
+
+# Находим маску (топ-20% весов)
+mask = create_mask(model, keep_ratio=0.2)
+
+# Возвращаем к начальным весам
+model.load_state_dict(original_weights)
+
+# Применяем маску и переобучаем
+apply_mask(model, mask)
+train(model)  # достигает того же качества!</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>

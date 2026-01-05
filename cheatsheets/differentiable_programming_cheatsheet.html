@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Дифференцируемое программирование Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>∂ Дифференцируемое программирование Cheatsheet</h1>
+  <div class="subtitle">Автоматическое дифференцирование • JAX, PyTorch, TensorFlow<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Differentiable Programming?</h2>
+    <p><strong>Differentiable Programming</strong> — парадигма программирования, где любые вычисления автоматически дифференцируемы.</p>
+    <ul>
+      <li><strong>Идея</strong>: писать программы как обычно, получать градиенты бесплатно</li>
+      <li><strong>Основа</strong>: автоматическое дифференцирование (AD)</li>
+      <li><strong>Применение</strong>: оптимизация, машинное обучение, научные расчеты</li>
+      <li><strong>Преимущество</strong>: не нужно писать градиенты вручную</li>
+    </ul>
+    <blockquote>💡 "Deep Learning — это частный случай дифференцируемого программирования"</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Автоматическое дифференцирование (AD)</h2>
+    <p>AD вычисляет точные производные программ.</p>
+    
+    <p><strong>Три подхода</strong>:</p>
+    <ul>
+      <li><strong>Символьное</strong>: аналитические формулы (медленно, точно)</li>
+      <li><strong>Численное</strong>: конечные разности (быстро, неточно)</li>
+      <li><strong>Автоматическое</strong>: композиция правил (быстро, точно)</li>
+    </ul>
+
+    <p><strong>Правило цепочки</strong>:</p>
+    <p>∂z/∂x = (∂z/∂y) × (∂y/∂x)</p>
+
+    <p><strong>Режимы AD</strong>:</p>
+    <ul>
+      <li><strong>Forward mode</strong>: слева направо (для малого числа входов)</li>
+      <li><strong>Reverse mode</strong>: справа налево (backpropagation, для ML)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. PyTorch Autograd</h2>
+    <p>PyTorch использует динамический computational graph:</p>
+
+    <pre><code>import torch
+
+# Включаем отслеживание градиентов
+x = torch.tensor([2.0, 3.0], requires_grad=True)
+
+# Вычисления
+y = x ** 2 + 3 * x + 1  # y = x² + 3x + 1
+
+# Вычисляем градиент ∂y/∂x
+y.backward(torch.ones_like(y))
+
+print(x.grad)  # [7.0, 9.0] = 2x + 3
+
+# Отключение gradients (inference)
+with torch.no_grad():
+    z = x ** 2  # градиенты не вычисляются</code></pre>
+
+    <p><strong>Управление графом</strong>:</p>
+    <pre><code># Очистка градиентов
+x.grad.zero_()
+
+# Отсоединение от графа
+y_detached = y.detach()
+
+# Остановка градиентов
+y_stopped = y.requires_grad_(False)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. JAX: функциональное AD</h2>
+    <p>JAX — библиотека от Google для высокопроизводительных численных вычислений.</p>
+
+    <pre><code>import jax
+import jax.numpy as jnp
+from jax import grad, jit, vmap
+
+# Простая функция
+def f(x):
+    return x ** 3 + 2 * x ** 2 - 5 * x + 3
+
+# Автоматический градиент
+df = grad(f)
+
+x = 2.0
+print(f"f({x}) = {f(x)}")
+print(f"f'({x}) = {df(x)}")  # 3x² + 4x - 5
+
+# Вторая производная
+d2f = grad(grad(f))
+print(f"f''({x}) = {d2f(x)}")  # 6x + 4</code></pre>
+
+    <blockquote>⚡ JAX компилирует в XLA для максимальной производительности</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. JAX transformations</h2>
+    <p>JAX предоставляет композируемые трансформации:</p>
+
+    <pre><code>from jax import grad, jit, vmap, pmap
+
+# grad: автоматическое дифференцирование
+df = grad(f)
+
+# jit: JIT-компиляция
+f_fast = jit(f)
+
+# vmap: автоматическая векторизация
+f_batch = vmap(f)
+
+# pmap: параллельное выполнение на GPU/TPU
+f_parallel = pmap(f)
+
+# Композиция трансформаций
+fast_grad = jit(grad(f))
+batch_grad = vmap(grad(f))</code></pre>
+
+    <p><strong>Пример векторизации</strong>:</p>
+    <pre><code># Без vmap: цикл
+def apply_to_batch(xs):
+    return jnp.array([f(x) for x in xs])
+
+# С vmap: автоматическая векторизация
+apply_to_batch = vmap(f)
+
+xs = jnp.array([1.0, 2.0, 3.0, 4.0])
+print(apply_to_batch(xs))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Градиенты высших порядков</h2>
+    <p>Вычисление производных любого порядка:</p>
+
+    <pre><code># PyTorch
+x = torch.tensor(2.0, requires_grad=True)
+y = x ** 4
+
+# Первая производная
+dy_dx = torch.autograd.grad(
+    y, x, 
+    create_graph=True  # сохраняем граф
+)[0]
+
+# Вторая производная
+d2y_dx2 = torch.autograd.grad(dy_dx, x)[0]
+
+print(f"dy/dx = {dy_dx}")    # 4x³ = 32
+print(f"d²y/dx² = {d2y_dx2}") # 12x² = 48
+
+# JAX: еще проще
+from jax import grad
+
+f = lambda x: x ** 4
+df = grad(f)          # первая производная
+d2f = grad(df)        # вторая производная
+d3f = grad(d2f)       # третья производная
+
+print(d3f(2.0))       # 24x = 48</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Jacobian и Hessian матрицы</h2>
+    <p>Вычисление матриц производных:</p>
+
+    <pre><code>from jax import jacfwd, jacrev, hessian
+
+# Функция R^n → R^m
+def f(x):
+    return jnp.array([
+        x[0] ** 2 + x[1],
+        x[0] * x[1],
+        x[1] ** 3
+    ])
+
+# Jacobian матрица (∂f_i/∂x_j)
+J_forward = jacfwd(f)   # forward mode
+J_reverse = jacrev(f)   # reverse mode
+
+x = jnp.array([2.0, 3.0])
+print(J_forward(x))
+
+# Hessian матрица (вторые производные)
+def g(x):
+    return x[0] ** 2 + 2 * x[1] ** 2 + x[0] * x[1]
+
+H = hessian(g)
+print(H(x))  # [[2, 1], [1, 4]]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Custom градиенты</h2>
+    <p>Определение собственных правил дифференцирования:</p>
+
+    <pre><code># PyTorch: custom autograd Function
+class MyFunction(torch.autograd.Function):
+    @staticmethod
+    def forward(ctx, x):
+        ctx.save_for_backward(x)
+        return x.clamp(min=0)  # ReLU
+    
+    @staticmethod
+    def backward(ctx, grad_output):
+        x, = ctx.saved_tensors
+        grad_input = grad_output.clone()
+        grad_input[x < 0] = 0
+        return grad_input
+
+my_relu = MyFunction.apply
+
+# JAX: custom_vjp (vector-Jacobian product)
+from jax import custom_vjp
+
+@custom_vjp
+def f(x):
+    return jnp.sin(x)
+
+def f_fwd(x):
+    return f(x), x  # return primal, residuals
+
+def f_bwd(x, g):
+    return (g * jnp.cos(x),)  # custom gradient
+
+f.defvjp(f_fwd, f_bwd)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Дифференцируемая оптимизация</h2>
+    <p>Встраивание оптимизации внутри модели:</p>
+
+    <pre><code>import jax.numpy as jnp
+from jax import grad
+from jax.scipy.optimize import minimize
+
+# Внутренняя задача оптимизации
+def inner_loss(x, params):
+    return jnp.sum((x - params) ** 2)
+
+# Внешняя функция (мета-обучение)
+def outer_loss(params, data):
+    # Решаем внутреннюю задачу
+    result = minimize(
+        lambda x: inner_loss(x, params),
+        x0=jnp.zeros_like(params),
+        method='BFGS'
+    )
+    x_star = result.x
+    
+    # Оценка на данных
+    return jnp.sum((x_star - data) ** 2)
+
+# Градиент по params проходит через оптимизацию!
+grad_outer = grad(outer_loss)
+
+params = jnp.array([1.0, 2.0, 3.0])
+data = jnp.array([2.0, 3.0, 4.0])
+print(grad_outer(params, data))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Neural ODEs</h2>
+    <p>Дифференцируемые обыкновенные дифференциальные уравнения:</p>
+
+    <pre><code>import jax.numpy as jnp
+from jax.experimental.ode import odeint
+
+# Определяем ODE: dy/dt = f(y, t)
+def f(y, t, params):
+    # Нейронная сеть как f
+    return -params[0] * y + params[1] * jnp.sin(t)
+
+# Решаем ODE
+def solve_ode(params, y0, t):
+    return odeint(
+        lambda y, t: f(y, t, params),
+        y0,
+        t
+    )
+
+# Градиенты доступны!
+from jax import grad
+
+def loss(params, y0, t, y_target):
+    y_pred = solve_ode(params, y0, t)
+    return jnp.mean((y_pred - y_target) ** 2)
+
+# Оптимизируем параметры ODE
+grad_loss = grad(loss)
+
+params = jnp.array([1.0, 0.5])
+y0 = jnp.array([1.0])
+t = jnp.linspace(0, 10, 100)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Дифференцируемые структуры данных</h2>
+    <p>Работа с нетривиальными структурами:</p>
+
+    <pre><code># JAX поддерживает pytrees
+import jax
+from jax import grad
+
+# Словарь параметров
+params = {
+    'w1': jnp.array([1.0, 2.0]),
+    'b1': jnp.array([0.5]),
+    'w2': jnp.array([[1.0, 2.0], [3.0, 4.0]])
+}
+
+def model(params, x):
+    h = jnp.dot(x, params['w1']) + params['b1']
+    h = jnp.tanh(h)
+    return jnp.dot(h, params['w2'])
+
+# Градиент по всей структуре
+grad_fn = grad(lambda p, x: jnp.sum(model(p, x)))
+
+x = jnp.array([1.0, 2.0])
+grads = grad_fn(params, x)
+
+# grads имеет ту же структуру что params!
+print(grads['w1'])
+print(grads['b1'])
+print(grads['w2'])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Forward vs Reverse mode</h2>
+    <table>
+      <tr><th>Аспект</th><th>Forward Mode</th><th>Reverse Mode</th></tr>
+      <tr>
+        <td><strong>Направление</strong></td>
+        <td>Входы → Выходы</td>
+        <td>Выходы → Входы</td>
+      </tr>
+      <tr>
+        <td><strong>Сложность</strong></td>
+        <td>O(n × m)</td>
+        <td>O(n + m)</td>
+      </tr>
+      <tr>
+        <td><strong>Эффективно для</strong></td>
+        <td>Мало входов</td>
+        <td>Мало выходов</td>
+      </tr>
+      <tr>
+        <td><strong>Применение</strong></td>
+        <td>Jacobian по столбцам</td>
+        <td>Градиенты (ML)</td>
+      </tr>
+      <tr>
+        <td><strong>Память</strong></td>
+        <td>O(1)</td>
+        <td>O(граф)</td>
+      </tr>
+    </table>
+
+    <pre><code># JAX: выбор режима
+from jax import jacfwd, jacrev
+
+# Forward mode (эффективен если n < m)
+J_fwd = jacfwd(f)
+
+# Reverse mode (эффективен если m < n)
+J_rev = jacrev(f)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Дифференцирование через циклы</h2>
+    <p>JAX может дифференцировать циклы:</p>
+
+    <pre><code>from jax import lax, grad
+
+# Обычный цикл (не дифференцируемый)
+def loop_sum(x, n):
+    total = 0.0
+    for i in range(n):
+        total += x ** i
+    return total
+
+# JAX: дифференцируемый цикл
+def diff_loop_sum(x, n):
+    def body_fn(i, total):
+        return total + x ** i
+    
+    return lax.fori_loop(0, n, body_fn, 0.0)
+
+# Градиент работает!
+grad_fn = grad(diff_loop_sum)
+print(grad_fn(2.0, 5))
+
+# while_loop: условные циклы
+def while_example(x):
+    def cond_fn(val):
+        i, total = val
+        return i < 10
+    
+    def body_fn(val):
+        i, total = val
+        return (i + 1, total + x ** i)
+    
+    _, result = lax.while_loop(
+        cond_fn, 
+        body_fn, 
+        (0, 0.0)
+    )
+    return result</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Дифференцирование через условия</h2>
+    <p>Работа с ветвлениями:</p>
+
+    <pre><code>from jax import lax, grad
+
+# Условный оператор (дифференцируемый)
+def conditional(x):
+    return lax.cond(
+        x > 0,
+        lambda x: x ** 2,      # if x > 0
+        lambda x: -x,          # else
+        x
+    )
+
+# Градиент определен!
+grad_cond = grad(conditional)
+print(grad_cond(2.0))   # 4.0 (производная x²)
+print(grad_cond(-2.0))  # -1.0 (производная -x)
+
+# select: векторизованный выбор
+def select_example(x):
+    return lax.select(
+        x > 0,
+        x ** 2,   # если True
+        -x        # если False
+    )
+
+# Применяется поэлементно
+x = jnp.array([-2.0, -1.0, 0.0, 1.0, 2.0])
+print(select_example(x))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Checkpoint и memory efficiency</h2>
+    <p>Уменьшение использования памяти при backprop:</p>
+
+    <pre><code># PyTorch: gradient checkpointing
+import torch.utils.checkpoint as checkpoint
+
+class CheckpointedModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.layers = nn.ModuleList([
+            nn.Linear(1000, 1000) for _ in range(10)
+        ])
+    
+    def forward(self, x):
+        for layer in self.layers:
+            # Не сохраняем активации
+            x = checkpoint.checkpoint(layer, x)
+        return x
+
+# JAX: jax.checkpoint (remat)
+from jax import checkpoint
+
+@checkpoint
+def expensive_fn(x):
+    # Промежуточные значения не сохраняются
+    for _ in range(100):
+        x = jnp.sin(x) + jnp.cos(x)
+    return x
+
+# Использует O(1) память вместо O(n)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Применения Differentiable Programming</h2>
+    <ul>
+      <li><strong>Глубокое обучение</strong>: нейронные сети любой сложности</li>
+      <li><strong>Физические симуляции</strong>: обучаемые симуляторы</li>
+      <li><strong>Оптимизация</strong>: gradient-based optimization</li>
+      <li><strong>Компьютерная графика</strong>: дифференцируемый рендеринг</li>
+      <li><strong>Robotics</strong>: оптимизация траекторий</li>
+      <li><strong>Научные вычисления</strong>: PDE solving, inverse problems</li>
+      <li><strong>Meta-learning</strong>: MAML, обучение алгоритмов</li>
+      <li><strong>Bayesian inference</strong>: вариационный вывод</li>
+    </ul>
+
+    <blockquote>🚀 Дифференцируемое программирование открывает новые возможности для ML</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. TensorFlow GradientTape</h2>
+    <p>TensorFlow использует GradientTape для AD:</p>
+
+    <pre><code>import tensorflow as tf
+
+# Отслеживание операций
+x = tf.Variable(3.0)
+
+with tf.GradientTape() as tape:
+    y = x ** 2 + 2 * x + 1
+
+# Вычисляем градиент
+dy_dx = tape.gradient(y, x)
+print(dy_dx)  # 8.0 = 2x + 2
+
+# Persistent tape (многократное использование)
+x = tf.Variable([1.0, 2.0, 3.0])
+
+with tf.GradientTape(persistent=True) as tape:
+    y1 = x ** 2
+    y2 = x ** 3
+
+grad_y1 = tape.gradient(y1, x)
+grad_y2 = tape.gradient(y2, x)
+
+del tape  # освобождаем ресурсы</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Performance tips</h2>
+    <p><strong>PyTorch</strong>:</p>
+    <ul>
+      <li>Используйте <code>torch.no_grad()</code> при inference</li>
+      <li>Отключайте gradients для frozen layers</li>
+      <li>Используйте <code>torch.cuda.amp</code> для mixed precision</li>
+      <li>Gradient checkpointing для больших моделей</li>
+    </ul>
+
+    <p><strong>JAX</strong>:</p>
+    <ul>
+      <li>Всегда используйте <code>jit</code> для production</li>
+      <li><code>vmap</code> вместо циклов по batch</li>
+      <li>Избегайте Python control flow в JIT функциях</li>
+      <li>Используйте <code>checkpoint</code> для экономии памяти</li>
+    </ul>
+
+    <pre><code># JAX: оптимизация производительности
+from jax import jit, vmap, grad
+
+# ❌ Медленно
+def slow_fn(params, x_batch):
+    return [model(params, x) for x in x_batch]
+
+# ✅ Быстро
+@jit
+def fast_fn(params, x_batch):
+    return vmap(lambda x: model(params, x))(x_batch)
+
+# Градиент по батчу
+grad_fn = jit(vmap(grad(model), in_axes=(None, 0)))</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>

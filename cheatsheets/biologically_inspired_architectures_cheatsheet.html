@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Биологически вдохновленные архитектуры Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🧠 Биологически вдохновленные архитектуры Cheatsheet</h1>
+  <div class="subtitle">От биологии к искусственным нейросетям • Нейронаука и ML<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Введение</h2>
+    <p><strong>Биологически вдохновленные архитектуры</strong> — нейронные сети, основанные на принципах работы мозга.</p>
+    <ul>
+      <li><strong>Мотивация</strong>: мозг — самая эффективная вычислительная система</li>
+      <li><strong>Цель</strong>: заимствовать принципы для улучшения AI</li>
+      <li><strong>Подходы</strong>: от точных моделей до вдохновленных идей</li>
+      <li><strong>Применение</strong>: новые архитектуры, обучение, эффективность</li>
+    </ul>
+    <blockquote>💡 "Мозг использует 20W энергии, современные модели — киловатты"</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Биологический нейрон vs Искусственный</h2>
+    <table>
+      <tr><th>Аспект</th><th>Биологический</th><th>Искусственный</th></tr>
+      <tr>
+        <td><strong>Сигнал</strong></td>
+        <td>Спайки (импульсы)</td>
+        <td>Непрерывное число</td>
+      </tr>
+      <tr>
+        <td><strong>Время</strong></td>
+        <td>Важно</td>
+        <td>Обычно игнорируется</td>
+      </tr>
+      <tr>
+        <td><strong>Связи</strong></td>
+        <td>Пластичные, изменяемые</td>
+        <td>Фиксированная архитектура</td>
+      </tr>
+      <tr>
+        <td><strong>Энергия</strong></td>
+        <td>Очень эффективный</td>
+        <td>Энергозатратный</td>
+      </tr>
+      <tr>
+        <td><strong>Обучение</strong></td>
+        <td>Локальное, онлайн</td>
+        <td>Глобальное (backprop)</td>
+      </tr>
+      <tr>
+        <td><strong>Асинхронность</strong></td>
+        <td>Да</td>
+        <td>Нет (синхронные слои)</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Spiking Neural Networks (SNN)</h2>
+    <p><strong>SNN</strong> — нейросети с дискретными спайками вместо непрерывных значений.</p>
+    
+    <p><strong>Модель нейрона (LIF - Leaky Integrate-and-Fire)</strong>:</p>
+    <ul>
+      <li>Мембранный потенциал v(t) аккумулирует входы</li>
+      <li>При v(t) > θ генерируется спайк</li>
+      <li>После спайка v(t) сбрасывается</li>
+      <li>"Leaky" — потенциал постепенно уменьшается</li>
+    </ul>
+
+    <pre><code># Упрощенная модель LIF нейрона
+class LIFNeuron:
+    def __init__(self, threshold=1.0, decay=0.9):
+        self.threshold = threshold
+        self.decay = decay
+        self.v = 0.0  # мембранный потенциал
+        
+    def step(self, input_current):
+        # Интеграция входа
+        self.v += input_current
+        
+        # Leaky (утечка)
+        self.v *= self.decay
+        
+        # Генерация спайка
+        if self.v >= self.threshold:
+            spike = 1.0
+            self.v = 0.0  # reset
+        else:
+            spike = 0.0
+            
+        return spike</code></pre>
+
+    <p><strong>Преимущества SNN</strong>:</p>
+    <ul>
+      <li>Энергоэффективность (событийно-ориентированные)</li>
+      <li>Временная динамика (естественная обработка последовательностей)</li>
+      <li>Биологическая правдоподобность</li>
+      <li>Возможность работы на нейроморфном железе</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Spike-Timing-Dependent Plasticity (STDP)</h2>
+    <p><strong>STDP</strong> — биологическое правило обучения: "нейроны которые вместе активируются, связываются".</p>
+
+    <p><strong>Правило</strong>:</p>
+    <ul>
+      <li>Если пре-синаптический спайк перед пост-синаптическим: усиление связи (LTP)</li>
+      <li>Если пре-синаптический спайк после пост-синаптического: ослабление связи (LTD)</li>
+      <li>Зависит от временной разницы Δt</li>
+    </ul>
+
+    <pre><code># Упрощенная реализация STDP
+def stdp_update(pre_spike_time, post_spike_time, 
+                weight, A_plus=0.01, A_minus=0.01,
+                tau_plus=20, tau_minus=20):
+    dt = post_spike_time - pre_spike_time
+    
+    if dt > 0:  # LTP (усиление)
+        dw = A_plus * np.exp(-dt / tau_plus)
+    else:  # LTD (ослабление)
+        dw = -A_minus * np.exp(dt / tau_minus)
+    
+    return weight + dw</code></pre>
+
+    <blockquote>🔬 STDP — один из основных механизмов обучения в мозге</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Attention механизм и мозг</h2>
+    <p>Attention в трансформерах вдохновлен механизмами внимания в мозге:</p>
+
+    <p><strong>Биологическое внимание</strong>:</p>
+    <ul>
+      <li>Фокусировка на важной информации</li>
+      <li>Подавление нерелевантного</li>
+      <li>Топ-даун и боттом-ап процессы</li>
+      <li>Связано с активностью в префронтальной коре</li>
+    </ul>
+
+    <p><strong>Параллели с Attention</strong>:</p>
+    <ul>
+      <li>Query-Key-Value ≈ Поиск релевантных воспоминаний</li>
+      <li>Softmax ≈ Конкуренция между нейронами</li>
+      <li>Multi-head ≈ Разные аспекты внимания</li>
+    </ul>
+
+    <p><strong>Отличия от мозга</strong>:</p>
+    <ul>
+      <li>Мозг использует разреженное внимание</li>
+      <li>Внимание в мозге иерархическое</li>
+      <li>Временная динамика внимания</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Иерархическая обработка (визуальная кора)</h2>
+    <p>Визуальная система мозга обрабатывает информацию иерархически — основа для CNN.</p>
+
+    <p><strong>Уровни визуальной коры</strong>:</p>
+    <ul>
+      <li><strong>V1</strong>: простые признаки (края, ориентация)</li>
+      <li><strong>V2</strong>: комбинации простых признаков</li>
+      <li><strong>V4</strong>: сложные формы, цвет</li>
+      <li><strong>IT</strong>: объекты, лица</li>
+    </ul>
+
+    <p><strong>Соответствие в CNN</strong>:</p>
+    <ul>
+      <li>Ранние слои → V1 (края, текстуры)</li>
+      <li>Средние слои → V2-V4 (части объектов)</li>
+      <li>Поздние слои → IT (целые объекты)</li>
+    </ul>
+
+    <blockquote>🎨 Нейроны в V1 реагируют на края под определенными углами — как фильтры в CNN!</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Рекуррентные связи</h2>
+    <p>В мозге ~80% связей рекуррентные (обратные связи), не только прямые.</p>
+
+    <p><strong>Типы рекуррентности в мозге</strong>:</p>
+    <ul>
+      <li>Локальная: внутри области</li>
+      <li>Межобластная: между областями коры</li>
+      <li>Топ-даун: от высших областей к низшим</li>
+    </ul>
+
+    <p><strong>Функции</strong>:</p>
+    <ul>
+      <li>Контекстная модуляция</li>
+      <li>Предсказания (predictive coding)</li>
+      <li>Рабочая память</li>
+      <li>Усиление сигнала</li>
+    </ul>
+
+    <p><strong>В нейросетях</strong>:</p>
+    <ul>
+      <li>RNN, LSTM — упрощенная рекуррентность</li>
+      <li>ResNet — skip connections (аналог обратных связей)</li>
+      <li>Attention — неявная рекуррентность</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Predictive Coding</h2>
+    <p><strong>Predictive Coding</strong> — теория работы мозга: мозг постоянно предсказывает входы и учится на ошибках предсказаний.</p>
+
+    <p><strong>Принцип</strong>:</p>
+    <ul>
+      <li>Высшие уровни предсказывают активность низших</li>
+      <li>Низшие уровни передают вверх только ошибки предсказания</li>
+      <li>Обучение минимизирует ошибку предсказания</li>
+    </ul>
+
+    <pre><code># Упрощенная модель predictive coding
+class PredictiveCodingLayer:
+    def __init__(self):
+        self.prediction = None
+        self.error = None
+        
+    def forward(self, input_signal, top_down_pred):
+        # Ошибка предсказания
+        self.error = input_signal - top_down_pred
+        
+        # Текущая активность
+        self.prediction = input_signal
+        
+        # Передаем ошибку наверх
+        return self.error
+        
+    def update_weights(self, learning_rate):
+        # Обновление для минимизации ошибки
+        # (упрощенная версия)
+        pass</code></pre>
+
+    <p><strong>Связь с ML</strong>:</p>
+    <ul>
+      <li>Variational Autoencoders (VAE)</li>
+      <li>Generative models</li>
+      <li>Self-supervised learning</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Neurogenesis и структурная пластичность</h2>
+    <p>Мозг может создавать новые нейроны и изменять структуру связей.</p>
+
+    <p><strong>Neurogenesis</strong>:</p>
+    <ul>
+      <li>Рождение новых нейронов (гиппокамп)</li>
+      <li>Происходит в течение всей жизни</li>
+      <li>Важен для обучения и памяти</li>
+    </ul>
+
+    <p><strong>Структурная пластичность</strong>:</p>
+    <ul>
+      <li>Появление новых синапсов</li>
+      <li>Удаление неиспользуемых связей (pruning)</li>
+      <li>Реорганизация связей</li>
+    </ul>
+
+    <p><strong>Аналоги в ML</strong>:</p>
+    <ul>
+      <li><strong>Neural Architecture Search (NAS)</strong>: автоматический поиск архитектуры</li>
+      <li><strong>Network pruning</strong>: удаление неважных связей</li>
+      <li><strong>Progressive networks</strong>: добавление новых модулей</li>
+      <li><strong>Lottery ticket hypothesis</strong>: нахождение эффективных подсетей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Capsule Networks</h2>
+    <p>Вдохновлены обработкой визуальной информации в коре.</p>
+
+    <p><strong>Идея</strong>:</p>
+    <ul>
+      <li>Группы нейронов (капсулы) представляют объекты</li>
+      <li>Вектор активации кодирует свойства (поза, масштаб, и т.д.)</li>
+      <li>Длина вектора = вероятность присутствия</li>
+      <li>Направление вектора = параметры объекта</li>
+    </ul>
+
+    <pre><code># Упрощенная Capsule
+class Capsule(nn.Module):
+    def __init__(self, in_caps, out_caps, 
+                 in_dim, out_dim):
+        super().__init__()
+        self.W = nn.Parameter(
+            torch.randn(out_caps, in_caps, 
+                       out_dim, in_dim)
+        )
+    
+    def squash(self, s):
+        # Нелинейность для векторов
+        norm = torch.norm(s, dim=-1, keepdim=True)
+        return (norm ** 2 / (1 + norm ** 2)) * (s / norm)
+    
+    def forward(self, x):
+        # Dynamic routing (упрощено)
+        u = torch.einsum('...ji,kjiz->...kz', x, self.W)
+        return self.squash(u)</code></pre>
+
+    <p><strong>Преимущества</strong>:</p>
+    <ul>
+      <li>Экви-вариантность к трансформациям</li>
+      <li>Лучше моделируют иерархии объектов</li>
+      <li>Более интерпретируемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Глиальные клетки</h2>
+    <p>Глия составляет ~50% клеток мозга и играет важную роль.</p>
+
+    <p><strong>Функции глии</strong>:</p>
+    <ul>
+      <li>Модуляция синаптической передачи</li>
+      <li>Метаболическая поддержка нейронов</li>
+      <li>Регуляция внеклеточной среды</li>
+      <li>Участие в обучении</li>
+    </ul>
+
+    <p><strong>Аналоги в нейросетях</strong>:</p>
+    <ul>
+      <li><strong>Batch Normalization</strong>: регуляция активаций</li>
+      <li><strong>Neuromodulation layers</strong>: контекстная модуляция</li>
+      <li><strong>Auxiliary networks</strong>: вспомогательные модули</li>
+    </ul>
+
+    <blockquote>🔬 Глия только недавно признана важной для вычислений</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Гомеостатическая пластичность</h2>
+    <p>Механизмы стабилизации активности нейронов.</p>
+
+    <p><strong>Принципы</strong>:</p>
+    <ul>
+      <li>Поддержание целевого уровня активности</li>
+      <li>Scaling синаптических весов</li>
+      <li>Изменение порогов возбуждения</li>
+      <li>Баланс возбуждения/торможения</li>
+    </ul>
+
+    <p><strong>В нейросетях</strong>:</p>
+    <ul>
+      <li><strong>Batch Normalization</strong>: нормализация активаций</li>
+      <li><strong>Layer Normalization</strong>: стабилизация обучения</li>
+      <li><strong>Weight Normalization</strong>: нормализация весов</li>
+      <li><strong>Adaptive learning rates</strong>: адаптация под уровень активности</li>
+    </ul>
+
+    <pre><code># Synaptic scaling (упрощенно)
+def homeostatic_scaling(weights, target_activity,
+                       current_activity, tau=0.01):
+    # Масштабирование весов для достижения 
+    # целевой активности
+    scaling_factor = target_activity / current_activity
+    return weights * (1 + tau * (scaling_factor - 1))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Oscillations и ритмы мозга</h2>
+    <p>Мозг работает с различными ритмами (theta, alpha, beta, gamma).</p>
+
+    <p><strong>Функции oscillations</strong>:</p>
+    <ul>
+      <li>Синхронизация удаленных областей</li>
+      <li>Временное связывание информации</li>
+      <li>Гейтинг информационных потоков</li>
+      <li>Координация различных процессов</li>
+    </ul>
+
+    <p><strong>Применение в ML</strong>:</p>
+    <ul>
+      <li>Temporal binding в последовательностях</li>
+      <li>Циклические learning rate schedules</li>
+      <li>Oscillatory RNNs</li>
+      <li>Phase synchronization в многозадачном обучении</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Working memory (рабочая память)</h2>
+    <p>Временное хранение и манипуляция информацией.</p>
+
+    <p><strong>Свойства</strong>:</p>
+    <ul>
+      <li>Ограниченная емкость (~7±2 элементов)</li>
+      <li>Поддерживается рекуррентной активностью</li>
+      <li>Префронтальная кора</li>
+      <li>Взаимодействие с долговременной памятью</li>
+    </ul>
+
+    <p><strong>В нейросетях</strong>:</p>
+    <ul>
+      <li><strong>LSTM, GRU</strong>: cell state как рабочая память</li>
+      <li><strong>Memory networks</strong>: явная память</li>
+      <li><strong>Transformers</strong>: attention как обращение к памяти</li>
+      <li><strong>Neural Turing Machines</strong>: внешняя память</li>
+    </ul>
+
+    <pre><code># Упрощенная модель working memory
+class WorkingMemoryCell:
+    def __init__(self, capacity=7):
+        self.memory = []
+        self.capacity = capacity
+        
+    def store(self, item, importance):
+        self.memory.append((item, importance))
+        # Ограничение емкости
+        if len(self.memory) > self.capacity:
+            # Удаляем наименее важные
+            self.memory.sort(key=lambda x: x[1])
+            self.memory = self.memory[-self.capacity:]
+    
+    def retrieve(self, query):
+        # Поиск наиболее релевантного
+        scores = [similarity(query, item) 
+                 for item, _ in self.memory]
+        best_idx = np.argmax(scores)
+        return self.memory[best_idx][0]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Sleep и консолидация памяти</h2>
+    <p>Сон критически важен для обучения и памяти.</p>
+
+    <p><strong>Процессы во сне</strong>:</p>
+    <ul>
+      <li>Replay нейронной активности</li>
+      <li>Перенос из гиппокампа в кору</li>
+      <li>Synaptic downscaling</li>
+      <li>Удаление ненужных связей</li>
+    </ul>
+
+    <p><strong>Аналоги в ML</strong>:</p>
+    <ul>
+      <li><strong>Experience replay</strong>: повторное обучение на старых данных</li>
+      <li><strong>Knowledge distillation</strong>: перенос знаний</li>
+      <li><strong>Pruning</strong>: удаление ненужных связей</li>
+      <li><strong>Regularization</strong>: downscaling весов</li>
+    </ul>
+
+    <pre><code># Experience replay (из DQN)
+class ReplayBuffer:
+    def __init__(self, capacity):
+        self.buffer = []
+        self.capacity = capacity
+        
+    def store(self, experience):
+        self.buffer.append(experience)
+        if len(self.buffer) > self.capacity:
+            self.buffer.pop(0)
+    
+    def sample(self, batch_size):
+        # "Replay" во время обучения
+        return random.sample(self.buffer, batch_size)
+    
+# Offline training = "сон"
+for epoch in range(offline_epochs):
+    batch = replay_buffer.sample(batch_size)
+    train_on_batch(model, batch)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Локальное обучение</h2>
+    <p>Backpropagation биологически неправдоподобен — нужны локальные правила.</p>
+
+    <p><strong>Проблемы backprop</strong>:</p>
+    <ul>
+      <li>Требует глобальной информации</li>
+      <li>Симметричные прямые/обратные веса</li>
+      <li>Разделение фаз (forward/backward)</li>
+    </ul>
+
+    <p><strong>Альтернативы</strong>:</p>
+    <ul>
+      <li><strong>Feedback Alignment</strong>: случайные обратные веса</li>
+      <li><strong>Target Propagation</strong>: обучение через целевые значения</li>
+      <li><strong>Contrastive Hebbian Learning</strong>: два прохода с разными условиями</li>
+      <li><strong>Equilibrium Propagation</strong>: физический подход</li>
+    </ul>
+
+    <pre><code># Feedback Alignment (упрощенно)
+class FALayer(nn.Module):
+    def __init__(self, in_features, out_features):
+        super().__init__()
+        self.W_forward = nn.Parameter(
+            torch.randn(out_features, in_features)
+        )
+        # Случайные обратные веса (не обучаются!)
+        self.W_backward = torch.randn(
+            in_features, out_features
+        )
+    
+    def forward(self, x):
+        return torch.matmul(x, self.W_forward.t())
+    
+    def backward_pass(self, grad_output):
+        # Используем случайные веса для обратного прохода
+        return torch.matmul(grad_output, self.W_backward.t())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Будущие направления</h2>
+    <p><strong>Активные области исследований</strong>:</p>
+    <ul>
+      <li><strong>Биологически правдоподобное обучение</strong>: альтернативы backprop</li>
+      <li><strong>Энергоэффективность</strong>: спайковые сети на нейроморфном железе</li>
+      <li><strong>Континуальное обучение</strong>: обучение без забывания</li>
+      <li><strong>Embodied AI</strong>: связь с телом и окружением</li>
+      <li><strong>Consciousness models</strong>: моделирование осознания</li>
+    </ul>
+
+    <blockquote>🚀 Нейронаука и AI взаимно обогащают друг друга</blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
