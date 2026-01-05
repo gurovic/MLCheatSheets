@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Transformers для временных рядов Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔮 Transformers для временных рядов Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <ul>
+      <li><strong>Transformers</strong>: self-attention для TS</li>
+      <li><strong>Attention</strong>: фокус на важных моментах</li>
+      <li><strong>Positional</strong>: информация о времени</li>
+      <li><strong>Forecast</strong>: прогнозирование будущего</li>
+    </ul>
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Длинные зависимости</li>
+      <li>Параллельная обработка</li>
+      <li>Интерпретируемость attention</li>
+      <li>SOTA результаты</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Архитектура для TS</h2>
+    <pre><code>Input Embedding
+    ↓
+Positional Encoding
+    ↓
+Multi-Head Self-Attention
+    ↓
+Feed-Forward Network
+    ↓
+Output Projection</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Temporal Positional Encoding</h2>
+    <pre><code>import torch
+import math
+
+class TemporalEncoding(nn.Module):
+    def __init__(self, d_model, max_len=5000):
+        super().__init__()
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len).unsqueeze(1)
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2) * 
+            -(math.log(10000.0) / d_model)
+        )
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        self.register_buffer('pe', pe)
+    
+    def forward(self, x):
+        return x + self.pe[:x.size(1), :]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Transformer модель</h2>
+    <pre><code>class TimeSeriesTransformer(nn.Module):
+    def __init__(self, input_dim, d_model=128, nhead=8, 
+                 num_layers=3, dim_feedforward=512):
+        super().__init__()
+        self.embedding = nn.Linear(input_dim, d_model)
+        self.pos_encoder = TemporalEncoding(d_model)
+        
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model, nhead, dim_feedforward,
+            dropout=0.1, batch_first=True
+        )
+        self.transformer = nn.TransformerEncoder(
+            encoder_layer, num_layers
+        )
+        self.fc = nn.Linear(d_model, 1)
+    
+    def forward(self, src):
+        src = self.embedding(src)
+        src = self.pos_encoder(src)
+        output = self.transformer(src)
+        output = self.fc(output[:, -1, :])
+        return output</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Attention для TS</h2>
+    <p><strong>Формула:</strong></p>
+    <pre><code>Attention(Q,K,V) = softmax(QK^T/√d_k)V
+
+Q = queries (что ищем)
+K = keys (где искать)
+V = values (что получить)</code></pre>
+    <p><strong>Интерпретация:</strong></p>
+    <ul>
+      <li>Высокий attention → важный момент</li>
+      <li>Низкий attention → игнорируем</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Informer архитектура</h2>
+    <pre><code># Efficient long-sequence forecasting
+from pyts.transformation import ROCKET
+
+class Informer(nn.Module):
+    def __init__(self, enc_in, dec_in, c_out, seq_len):
+        super().__init__()
+        # ProbSparse Self-Attention
+        self.encoder = InformerEncoder(enc_in, seq_len)
+        self.decoder = InformerDecoder(dec_in, c_out)
+    
+    def forward(self, x_enc, x_dec):
+        enc_out = self.encoder(x_enc)
+        dec_out = self.decoder(x_dec, enc_out)
+        return dec_out</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Обучение модели</h2>
+    <pre><code>model = TimeSeriesTransformer(input_dim=1, d_model=64)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+criterion = nn.MSELoss()
+
+for epoch in range(100):
+    model.train()
+    for X_batch, y_batch in train_loader:
+        optimizer.zero_grad()
+        
+        # Forward
+        predictions = model(X_batch)
+        loss = criterion(predictions, y_batch)
+        
+        # Backward
+        loss.backward()
+        optimizer.step()
+    
+    # Validation
+    model.eval()
+    val_loss = evaluate(model, val_loader)
+    print(f'Epoch {epoch}: Loss={loss:.4f}, Val={val_loss:.4f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Популярные модели</h2>
+    <table>
+      <tr><th>Модель</th><th>Год</th><th>Особенности</th></tr>
+      <tr><td><strong>Informer</strong></td><td>2020</td><td>ProbSparse attention</td></tr>
+      <tr><td><strong>Autoformer</strong></td><td>2021</td><td>Auto-correlation</td></tr>
+      <tr><td><strong>FEDformer</strong></td><td>2022</td><td>Frequency enhanced</td></tr>
+      <tr><td><strong>PatchTST</strong></td><td>2023</td><td>Патчи временного ряда</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Примеры применения</h2>
+    <ul>
+      <li><strong>Electricity</strong>: прогноз потребления</li>
+      <li><strong>Traffic</strong>: прогноз трафика</li>
+      <li><strong>Weather</strong>: метеопрогноз</li>
+      <li><strong>Stock</strong>: финансовые рынки</li>
+    </ul>
+    <pre><code># Пример с реальными данными
+from gluonts.dataset.repository import get_dataset
+
+dataset = get_dataset("electricity")
+train_data = dataset.train
+test_data = dataset.test</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Длинные последовательности (>100)</li>
+          <li>Мультивариативные ряды</li>
+          <li>Сложные зависимости</li>
+          <li>Большие датасеты</li>
+          <li>Нужна интерпретируемость</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Малые данные (< 10k)</li>
+          <li>Короткие последовательности</li>
+          <li>Ограничены GPU</li>
+          <li>Простые линейные тренды</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Чек-лист</h2>
+    <ul>
+      <li>[ ] Подготовить данные правильного формата</li>
+      <li>[ ] Выбрать d_model (64-256)</li>
+      <li>[ ] Настроить количество heads (4-8)</li>
+      <li>[ ] Добавить positional encoding</li>
+      <li>[ ] Использовать layer normalization</li>
+      <li>[ ] Применить dropout (0.1)</li>
+      <li>[ ] Warm-up learning rate</li>
+      <li>[ ] Визуализировать attention weights</li>
+      <li>[ ] Сравнить с LSTM/TCN</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Transformer для временных рядов — это как умный аналитик, который смотрит на всю историю одновременно и сам решает, какие моменты важны для прогноза. Модель "обращает внимание" на ключевые события в прошлом».
+    </blockquote>
+  </div>
+
+
+</div>
+
+</body>
+</html>
