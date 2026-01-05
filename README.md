@@ -499,7 +499,7 @@
 ### **22. Нейронаука и биологически правдоподобные модели**
 1. [Биологически вдохновленные архитектуры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/biologically_inspired_architectures_cheatsheet.html)
 1. [Нейроморфные вычисления](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neuromorphic_computing_cheatsheet.html)
-1. Связь нейросетей и мозга
+1. [Связь нейросетей и мозга](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/brain_neural_networks_connection_cheatsheet.html)
 
 ### **23. Креативные приложения**
 1. [Neural style transfer](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_style_transfer_cheatsheet.html)
@@ -517,13 +517,13 @@
 
 ### **25. История и эволюция**
 1. [Хронология глубокого обучения](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/deep_learning_timeline_cheatsheet.html)
-1. Ключевые прорывы
-1. Современные тенденции
-1. Будущее глубокого обучения
+1. [Ключевые прорывы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/deep_learning_key_breakthroughs_cheatsheet.html)
+1. [Современные тенденции](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/modern_trends_deep_learning_cheatsheet.html)
+1. [Будущее глубокого обучения](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/future_deep_learning_cheatsheet.html)
 
 ### **26. Квантовое машинное обучение**
 1. [Квантовые алгоритмы для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantum_algorithms_ml_cheatsheet.html)
-1. Квантовые нейронные сети
+1. [Квантовые нейронные сети](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantum_neural_networks_cheatsheet.html)
 1. Квантовое усиление классических алгоритмов
 
 ### **27. Нейро-символьное ИИ**
@@ -534,24 +534,24 @@
 ## III Разные темы машинного обучения
 
 ### **1. Мета-обучение (Meta-learning) - продвинутые темы**
-1. Model-agnostic meta-learning (MAML)
-1. Metric-based (Siamese networks, Matching networks)
+1. [Model-agnostic meta-learning (MAML)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/maml_meta_learning_cheatsheet.html)
+1. [Metric-based (Siamese networks, Matching networks)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/metric_based_learning_siamese_cheatsheet.html)
 1. Optimization-based meta-learning
 1. Few-shot learning (традиционные подходы)
 1. Meta-features и meta-learning
 
 ### **2. Специализированные прикладные области**
 1. [Биоинформатика и computational biology](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bioinformatics_computational_biology_cheatsheet.html)
-1. Computational chemistry
+1. [Computational chemistry](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/computational_chemistry_ml_cheatsheet.html)
 1. [Астрофизика и космология](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/astrophysics_cosmology_ml_cheatsheet.html)
 1. [Геоинформационные системы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/geoinformation_systems_ml_cheatsheet.html)
 1. Цифровая гуманитаристика
 1. Computational social science
 
 ### **3. Композиционное и структурное обучение**
-1. Grammatical inference
+1. [Grammatical inference](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/grammatical_inference_cheatsheet.html)
 1. Inductive logic programming
-1. Program synthesis
+1. [Program synthesis](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/program_synthesis_ml_cheatsheet.html)
 
 ### **4. Материаловедение и ML**
 1. Материальные информатики
@@ -560,7 +560,7 @@
 
 ### **5. Квантовое машинное обучение**
 1. [Квантовые алгоритмы для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantum_algorithms_ml_cheatsheet.html)
-1. Квантовые нейронные сети
+1. [Квантовые нейронные сети](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantum_neural_networks_cheatsheet.html)
 1. Квантовое усиление классических алгоритмов
 
 ### **6. Нейро-символьное ИИ**

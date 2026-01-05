@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Metric-Based Learning: Siamese и Matching Networks</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📏 Metric-Based Learning: Siamese и Matching Networks</h1>
+  <div class="subtitle">Few-Shot Learning • Metric Learning • Similarity-Based<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы Metric Learning</h2>
+    <p><strong>Идея</strong>: обучить embedding space, где похожие объекты близко, разные — далеко</p>
+    <ul>
+      <li><strong>Классический ML</strong>: учит классифицировать конкретные классы</li>
+      <li><strong>Metric Learning</strong>: учит измерять похожесть</li>
+      <li><strong>Преимущество</strong>: обобщение на новые классы без переобучения</li>
+      <li><strong>Применение</strong>: few-shot learning, face recognition, verification</li>
+    </ul>
+    <p><strong>Формулировка</strong>: d(f(x₁), f(x₂)) должно быть мало для похожих и велико для разных</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Siamese Networks</h2>
+    <p><strong>Архитектура</strong>: две идентичные сети с разделяемыми весами</p>
+    <ul>
+      <li><strong>Input</strong>: пара изображений (x₁, x₂)</li>
+      <li><strong>Encoding</strong>: f(x₁), f(x₂) через одну и ту же сеть</li>
+      <li><strong>Distance</strong>: d = ||f(x₁) - f(x₂)||</li>
+      <li><strong>Output</strong>: similar (1) или different (0)</li>
+    </ul>
+    <p><strong>Contrastive Loss</strong>:</p>
+    <pre><code>L = y * d² + (1-y) * max(margin - d, 0)²
+где y=1 для похожих, y=0 для разных</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Triplet Loss и Triplet Networks</h2>
+    <p><strong>Идея</strong>: anchor, positive, negative</p>
+    <ul>
+      <li><strong>Anchor</strong>: базовый пример</li>
+      <li><strong>Positive</strong>: похожий пример (тот же класс)</li>
+      <li><strong>Negative</strong>: непохожий пример (другой класс)</li>
+    </ul>
+    <p><strong>Triplet Loss</strong>:</p>
+    <pre><code>L = max(d(a,p) - d(a,n) + margin, 0)
+цель: d(a,p) < d(a,n) - margin</code></pre>
+    <p><strong>Hard negative mining</strong>: выбор сложных негативов для эффективного обучения</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Prototypical Networks</h2>
+    <p><strong>Idea</strong>: каждый класс представлен prototype (центроидом)</p>
+    <ul>
+      <li><strong>Support set</strong>: примеры для вычисления prototypes</li>
+      <li><strong>Prototype</strong>: c_k = mean(f(x_i)) для класса k</li>
+      <li><strong>Classification</strong>: ближайший prototype</li>
+    </ul>
+    <p><strong>Distance metric</strong>: обычно Euclidean или cosine</p>
+    <p><strong>Преимущества</strong>:</p>
+    <ul>
+      <li>Простота и эффективность</li>
+      <li>Хорошо работает для few-shot</li>
+      <li>Естественное обобщение k-NN</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Matching Networks</h2>
+    <p><strong>Vinyals et al., 2016</strong></p>
+    <p><strong>Архитектура</strong>:</p>
+    <ul>
+      <li><strong>Embedding</strong>: g(x) для query, f(x) для support</li>
+      <li><strong>Attention</strong>: a(x, x_i) = softmax(cosine(g(x), f(x_i)))</li>
+      <li><strong>Prediction</strong>: взвешенная сумма меток support set</li>
+    </ul>
+    <pre><code>ŷ = Σᵢ a(x, xᵢ) yᵢ</code></pre>
+    <p><strong>Особенности</strong>:</p>
+    <ul>
+      <li>Episodic training: обучение на задачах</li>
+      <li>Full Context Embeddings (FCE): bidirectional LSTM</li>
+      <li>Attention Kernel</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Relation Networks</h2>
+    <p><strong>Обучаемая метрика расстояния</strong></p>
+    <ul>
+      <li><strong>Embedding module</strong>: f(x)</li>
+      <li><strong>Relation module</strong>: g(f(x₁), f(x₂)) → similarity score</li>
+      <li><strong>Обучение end-to-end</strong>: обе части обучаются вместе</li>
+    </ul>
+    <p><strong>Преимущества</strong>:</p>
+    <ul>
+      <li>Гибкая метрика (не фиксированная Euclidean)</li>
+      <li>Лучшее качество на сложных задачах</li>
+      <li>Можно добавить дополнительную информацию</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Практическая реализация (PyTorch)</h2>
+    <pre><code># Siamese Network
+class SiameseNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.encoder = nn.Sequential(
+            nn.Conv2d(1, 64, 10),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(64, 128, 7),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Flatten(),
+            nn.Linear(128*3*3, 128)
+        )
+    
+    def forward(self, x1, x2):
+        h1 = self.encoder(x1)
+        h2 = self.encoder(x2)
+        return torch.norm(h1 - h2, dim=1)
+
+# Contrastive Loss
+def contrastive_loss(d, y, margin=1.0):
+    return torch.mean(
+        y * d**2 + 
+        (1-y) * torch.clamp(margin - d, min=0)**2
+    )</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Face Recognition</h2>
+    <p><strong>Главное применение metric learning</strong></p>
+    <p><strong>FaceNet</strong> (Google, 2015):</p>
+    <ul>
+      <li>Triplet loss для face embeddings</li>
+      <li>128-мерные embeddings</li>
+      <li>Accuracy 99.63% на LFW</li>
+    </ul>
+    <p><strong>ArcFace, CosFace</strong>:</p>
+    <ul>
+      <li>Angular margin для лучшего разделения классов</li>
+      <li>State-of-the-art на face recognition</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Few-Shot Learning Benchmarks</h2>
+    <table>
+      <tr><th>Dataset</th><th>Classes</th><th>Images</th><th>Resolution</th></tr>
+      <tr><td><strong>Omniglot</strong></td><td>1623</td><td>32,460</td><td>28×28</td></tr>
+      <tr><td><strong>Mini-ImageNet</strong></td><td>100</td><td>60,000</td><td>84×84</td></tr>
+      <tr><td><strong>Tiered-ImageNet</strong></td><td>608</td><td>779,165</td><td>84×84</td></tr>
+      <tr><td><strong>CUB-200</strong></td><td>200</td><td>11,788</td><td>84×84</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Сравнение подходов</h2>
+    <table>
+      <tr><th>Метод</th><th>Плюсы</th><th>Минусы</th></tr>
+      <tr><td><strong>Siamese</strong></td><td>Простота, верификация</td><td>Парное сравнение</td></tr>
+      <tr><td><strong>Triplet</strong></td><td>Хорошие embeddings</td><td>Сложный sampling</td></tr>
+      <tr><td><strong>Prototypical</strong></td><td>Эффективность</td><td>Простая метрика</td></tr>
+      <tr><td><strong>Matching</strong></td><td>Attention, гибкость</td><td>Сложнее</td></tr>
+      <tr><td><strong>Relation</strong></td><td>Обучаемая метрика</td><td>Больше параметров</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Data Augmentation для Few-Shot</h2>
+    <ul>
+      <li><strong>Standard augmentations</strong>: flip, crop, rotate, color jitter</li>
+      <li><strong>Mixup</strong>: смешивание примеров</li>
+      <li><strong>Cutout</strong>: маскирование частей изображения</li>
+      <li><strong>MetaAugment</strong>: обучаемые augmentations</li>
+      <li><strong>Hallucination</strong>: генерация синтетических примеров</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Transductive Few-Shot Learning</h2>
+    <p><strong>Использование unlabeled query examples</strong></p>
+    <ul>
+      <li>Semi-supervised подход</li>
+      <li>Label propagation на query set</li>
+      <li>Улучшение протoty пов с query данными</li>
+      <li>Graph-based methods</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Cross-Domain Few-Shot Learning</h2>
+    <p><strong>Transfer между разными доменами</strong></p>
+    <ul>
+      <li><strong>Проблема</strong>: train на ImageNet, test на медицинских изображениях</li>
+      <li><strong>Domain shift</strong>: разные распределения</li>
+      <li><strong>Решения</strong>:
+        <ul>
+          <li>Domain adaptation techniques</li>
+          <li>Meta-learning across domains</li>
+          <li>Self-supervised pre-training</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Применения</h2>
+    <p><strong>Computer Vision</strong>:</p>
+    <ul>
+      <li>Face verification/recognition</li>
+      <li>Person re-identification</li>
+      <li>Object detection с малым числом примеров</li>
+      <li>Medical image analysis</li>
+    </ul>
+    <p><strong>NLP</strong>:</p>
+    <ul>
+      <li>Few-shot text classification</li>
+      <li>Semantic similarity</li>
+      <li>Entity linking</li>
+    </ul>
+    <p><strong>Other</strong>:</p>
+    <ul>
+      <li>Drug discovery</li>
+      <li>Recommendation systems</li>
+      <li>Anomaly detection</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Практические советы</h2>
+    <ul>
+      <li><strong>Embedding size</strong>: 128-512 обычно достаточно</li>
+      <li><strong>Backbone</strong>: ResNet, Conv-4 для few-shot</li>
+      <li><strong>Normalization</strong>: L2 normalize embeddings</li>
+      <li><strong>Distance metric</strong>: начните с Euclidean, попробуйте cosine</li>
+      <li><strong>Hard negative mining</strong>: критично для triplet loss</li>
+      <li><strong>Episodic training</strong>: обязательно для meta-learning</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Выводы</h2>
+    <ul>
+      <li><strong>Metric learning</strong>: обучение similarity вместо классификации</li>
+      <li><strong>Few-shot friendly</strong>: обобщение на новые классы</li>
+      <li><strong>Siamese/Triplet</strong>: классика для embeddings</li>
+      <li><strong>Prototypical/Matching</strong>: специально для few-shot</li>
+      <li><strong>Применения</strong>: face recognition, few-shot learning, verification</li>
+      <li><strong>Активная область исследований</strong>: постоянные улучшения</li>
+    </ul>
+    <blockquote>
+      «Metric learning учит модель понимать "похожесть", а не просто запоминать классы — это ключ к обобщению на новые задачи с малым числом примеров».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

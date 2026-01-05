@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Program Synthesis с ML</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>💻 Program Synthesis с ML</h1>
+  <div class="subtitle">Автоматическая генерация кода • Neural Code Generation • AlphaCode<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Program Synthesis: что это?</h2>
+    <p><strong>Задача</strong>: автоматическая генерация программ из спецификации</p>
+    <ul>
+      <li><strong>Input</strong>: спецификация (примеры, описание, формальная спецификация)</li>
+      <li><strong>Output</strong>: программа, удовлетворяющая спецификации</li>
+      <li><strong>Цель</strong>: автоматизация программирования</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Programming by Example (PBE)</h2>
+    <p><strong>Идея</strong>: генерация программы из input-output примеров</p>
+    <ul>
+      <li><strong>Пример</strong>: "John Smith" → "Smith, J."</li>
+      <li><strong>FlashFill</strong> (Microsoft Excel): PBE для data wrangling</li>
+      <li><strong>Применение</strong>: string manipulation, data extraction</li>
+    </ul>
+    <p><strong>Вызовы</strong>:</p>
+    <ul>
+      <li>Ambiguity: много программ подходят</li>
+      <li>Ranking: какая программа лучше?</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Symbolic Search-Based Synthesis</h2>
+    <p><strong>Enumerative search</strong>:</p>
+    <ul>
+      <li>Перебор программ по возрастанию сложности</li>
+      <li>Проверка на примерах</li>
+      <li>Pruning неподходящих</li>
+    </ul>
+    <p><strong>SMT-based synthesis</strong>:</p>
+    <ul>
+      <li>Формулирование как SAT/SMT задачи</li>
+      <li>Z3, CVC4 solvers</li>
+      <li>Sketch: программа с дырами</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Neural Program Synthesis</h2>
+    <p><strong>Deep Learning подходы</strong>:</p>
+    <ul>
+      <li><strong>Seq2Seq models</strong>:
+        <ul>
+          <li>Input: specification (NL или I/O)</li>
+          <li>Output: code</li>
+          <li>Проблема: синтаксические ошибки</li>
+        </ul>
+      </li>
+      <li><strong>Code Transformers</strong>:
+        <ul>
+          <li>GPT-Codex, StarCoder</li>
+          <li>Pre-training на GitHub</li>
+          <li>Few-shot learning</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Neuro-Symbolic Synthesis</h2>
+    <p><strong>Hybrid approach</strong>: combining neural + symbolic</p>
+    <ul>
+      <li><strong>Neural-guided search</strong>:
+        <ul>
+          <li>Neural model предсказывает следующий шаг</li>
+          <li>Symbolic проверка корректности</li>
+        </ul>
+      </li>
+      <li><strong>Grammar-constrained generation</strong>:
+        <ul>
+          <li>Neural model генерирует в рамках грамматики</li>
+          <li>Гарантия синтаксической корректности</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Domain-Specific Languages (DSL)</h2>
+    <p><strong>Ограничение пространства поиска</strong>:</p>
+    <ul>
+      <li><strong>DSL design</strong>: специализированный язык для задачи</li>
+      <li><strong>Примеры</strong>:
+        <ul>
+          <li>String manipulation DSL (FlashFill)</li>
+          <li>Data wrangling DSL (Wrangler)</li>
+          <li>SQL-like DSL</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. GitHub Copilot и Code Generation</h2>
+    <p><strong>GPT-Codex</strong>:</p>
+    <ul>
+      <li>Fine-tuned GPT-3 на коде GitHub</li>
+      <li>Autocomplete для программирования</li>
+      <li>Понимание комментариев и docstrings</li>
+    </ul>
+    <p><strong>Применение</strong>:</p>
+    <ul>
+      <li>Code completion</li>
+      <li>Function generation из описания</li>
+      <li>Bug fixing</li>
+      <li>Code translation</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. AlphaCode для Competitive Programming</h2>
+    <p><strong>DeepMind, 2022</strong>:</p>
+    <ul>
+      <li>Решение задач программирования</li>
+      <li>Transformer-based model</li>
+      <li>Large-scale sampling + filtering</li>
+      <li>Ranking ~54% участников Codeforces</li>
+    </ul>
+    <p><strong>Процесс</strong>:</p>
+    <ul>
+      <li>Генерация множества кандидатов (100K-1M)</li>
+      <li>Фильтрация через тесты</li>
+      <li>Clustering и ranking</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Inductive Program Synthesis</h2>
+    <p><strong>Обучение из данных</strong>:</p>
+    <ul>
+      <li><strong>RobustFill</strong>: seq2seq для string transformations</li>
+      <li><strong>DreamCoder</strong>: learning library of abstractions</li>
+      <li><strong>LibraryLearning</strong>: discovering reusable primitives</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Formal Verification</h2>
+    <p><strong>Proof synthesis</strong>:</p>
+    <ul>
+      <li><strong>Coq, Isabelle</strong>: proof assistants</li>
+      <li><strong>Neural theorem proving</strong>:
+        <ul>
+          <li>GPT-f (OpenAI)</li>
+          <li>Lean integration</li>
+        </ul>
+      </li>
+      <li><strong>SMT solvers</strong>: Z3, CVC4</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Benchmarks и датасеты</h2>
+    <table>
+      <tr><th>Benchmark</th><th>Описание</th></tr>
+      <tr><td><strong>HumanEval</strong></td><td>164 задачи программирования</td></tr>
+      <tr><td><strong>MBPP</strong></td><td>974 Python задачи</td></tr>
+      <tr><td><strong>APPS</strong></td><td>10K coding problems</td></tr>
+      <tr><td><strong>CodeContests</strong></td><td>Competitive programming</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Инструменты</h2>
+    <ul>
+      <li><strong>GitHub Copilot</strong>: AI pair programmer</li>
+      <li><strong>Tabnine, Codeium</strong>: code completion</li>
+      <li><strong>Replit Ghostwriter</strong>: генерация кода</li>
+      <li><strong>Amazon CodeWhisperer</strong></li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Вызовы</h2>
+    <ul>
+      <li><strong>Correctness</strong>: программа может быть синтаксически верной, но неправильной</li>
+      <li><strong>Ambiguity</strong>: недостаточная спецификация</li>
+      <li><strong>Scalability</strong>: большие программы</li>
+      <li><strong>Generalization</strong>: новые типы задач</li>
+      <li><strong>Security</strong>: уязвимости в генерируемом коде</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Будущее</h2>
+    <ul>
+      <li><strong>AI-assisted programming</strong>: co-pilot для всех</li>
+      <li><strong>Natural language to code</strong>: описание → программа</li>
+      <li><strong>Automatic bug fixing</strong></li>
+      <li><strong>Code optimization</strong></li>
+      <li><strong>Full program generation</strong>: большие проекты</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Выводы</h2>
+    <ul>
+      <li><strong>Program synthesis</strong>: автоматическая генерация кода</li>
+      <li><strong>Подходы</strong>: symbolic search, neural, neuro-symbolic</li>
+      <li><strong>LLM revolution</strong>: Copilot, AlphaCode изменили игру</li>
+      <li><strong>Применения</strong>: code completion, PBE, competitive programming</li>
+      <li><strong>Будущее</strong>: AI-assisted development станет стандартом</li>
+    </ul>
+    <blockquote>
+      «Program synthesis превращает программирование из написания кода в спецификацию желаемого поведения — ИИ берет на себя рутину».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>
