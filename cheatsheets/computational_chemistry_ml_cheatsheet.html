@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Computational Chemistry и ML</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🧪 Computational Chemistry и ML</h1>
+  <div class="subtitle">Машинное обучение в химии • Drug Discovery • Молекулярные свойства<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. ML в вычислительной химии: обзор</h2>
+    <p><strong>Революция</strong>: ML ускоряет химические расчеты в тысячи раз</p>
+    <ul>
+      <li><strong>Традиционные методы</strong>: DFT, молекулярная динамика (часы-дни)</li>
+      <li><strong>ML подход</strong>: предсказание за миллисекунды</li>
+      <li><strong>Применения</strong>: drug discovery, материалы, катализ</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Представление молекул</h2>
+    <p><strong>Способы кодирования</strong>:</p>
+    <ul>
+      <li><strong>SMILES</strong>: текстовое представление (CC(=O)O для уксусной кислоты)</li>
+      <li><strong>Molecular graphs</strong>: атомы = узлы, связи = рёбра</li>
+      <li><strong>3D coordinates</strong>: xyz координаты атомов</li>
+      <li><strong>Fingerprints</strong>: Morgan, MACCS, бинарные векторы</li>
+      <li><strong>Descriptors</strong>: молекулярный вес, logP, TPSA</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Graph Neural Networks для молекул</h2>
+    <p><strong>Архитектуры</strong>:</p>
+    <ul>
+      <li><strong>MPNN</strong> (Message Passing NN): информация между атомами</li>
+      <li><strong>SchNet</strong>: continuous-filter convolutions</li>
+      <li><strong>DimeNet</strong>: directional message passing</li>
+      <li><strong>GemNet</strong>: geometric message passing</li>
+    </ul>
+    <pre><code># Пример MPNN
+for layer in range(num_layers):
+    # Message passing
+    messages = aggregate_neighbors(node_features, edges)
+    # Update
+    node_features = update_function(node_features, messages)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Предсказание свойств молекул</h2>
+    <p><strong>Задачи</strong>:</p>
+    <ul>
+      <li><strong>Solubility</strong>: растворимость в воде</li>
+      <li><strong>Lipophilicity</strong>: logP, проницаемость мембран</li>
+      <li><strong>Toxicity</strong>: LD50, AMES test</li>
+      <li><strong>Binding affinity</strong>: связывание с белком</li>
+      <li><strong>ADMET</strong>: Absorption, Distribution, Metabolism, Excretion, Toxicity</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Квантовая химия и ML</h2>
+    <p><strong>Предсказание энергий</strong>:</p>
+    <ul>
+      <li><strong>Potential Energy Surfaces (PES)</strong></li>
+      <li><strong>Atomization energies</strong></li>
+      <li><strong>Molecular forces</strong></li>
+    </ul>
+    <p><strong>Модели</strong>:</p>
+    <ul>
+      <li><strong>ANI</strong> (Accurate Neural Network Engine for Molecular Energies)</li>
+      <li><strong>SchNet</strong>: rotation-equivariant</li>
+      <li><strong>PhysNet</strong>: physical constraints</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Drug Discovery с ML</h2>
+    <p><strong>Pipeline</strong>:</p>
+    <ul>
+      <li><strong>Virtual screening</strong>: фильтрация больших библиотек</li>
+      <li><strong>De novo design</strong>: генерация новых молекул</li>
+      <li><strong>Lead optimization</strong>: улучшение кандидатов</li>
+      <li><strong>Retrosynthesis</strong>: планирование синтеза</li>
+    </ul>
+    <p><strong>Успехи</strong>:</p>
+    <ul>
+      <li>DSI-poised-Fragment (AstraZeneca)</li>
+      <li>Antibiotics discovery (MIT, 2020)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Генеративные модели молекул</h2>
+    <p><strong>Подходы</strong>:</p>
+    <ul>
+      <li><strong>VAE</strong>: Junction Tree VAE, Grammar VAE</li>
+      <li><strong>GAN</strong>: MolGAN</li>
+      <li><strong>Reinforcement Learning</strong>: REINVENT</li>
+      <li><strong>Flow models</strong>: MoFlow</li>
+      <li><strong>Diffusion</strong>: E(n) Equivariant Diffusion</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. AlphaFold и структура белков</h2>
+    <p><strong>AlphaFold 2 (DeepMind, 2020)</strong>:</p>
+    <ul>
+      <li>Предсказание 3D структуры белка из последовательности</li>
+      <li>Accuracy ~90% (atomic level)</li>
+      <li>Революция в структурной биологии</li>
+    </ul>
+    <p><strong>Архитектура</strong>:</p>
+    <ul>
+      <li>Evoformer: attention + pair representation</li>
+      <li>Structure module: итеративное уточнение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Reaction Prediction</h2>
+    <p><strong>Задача</strong>: предсказать продукты химической реакции</p>
+    <ul>
+      <li><strong>Template-based</strong>: использование известных шаблонов</li>
+      <li><strong>Template-free</strong>: seq2seq модели</li>
+      <li><strong>Graph-based</strong>: изменения в молекулярном графе</li>
+    </ul>
+    <p><strong>Модели</strong>:</p>
+    <ul>
+      <li>Molecular Transformer</li>
+      <li>Graph2Graph</li>
+      <li>LocalRetro</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Молекулярная динамика</h2>
+    <p><strong>ML-accelerated MD</strong>:</p>
+    <ul>
+      <li><strong>Force fields</strong>: обученные на квантовых расчетах</li>
+      <li><strong>Coarse-graining</strong>: упрощение системы</li>
+      <li><strong>Enhanced sampling</strong>: редкие события</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Датасеты и бенчмарки</h2>
+    <table>
+      <tr><th>Dataset</th><th>Размер</th><th>Задача</th></tr>
+      <tr><td><strong>QM9</strong></td><td>134K</td><td>Квантовые свойства</td></tr>
+      <tr><td><strong>ZINC</strong></td><td>250M+</td><td>Drug-like молекулы</td></tr>
+      <tr><td><strong>PubChem</strong></td><td>100M+</td><td>Химические соединения</td></tr>
+      <tr><td><strong>ChEMBL</strong></td><td>2M+</td><td>Bioactivity data</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Инструменты и библиотеки</h2>
+    <ul>
+      <li><strong>RDKit</strong>: хемоинформатика, fingerprints</li>
+      <li><strong>DeepChem</strong>: ML для химии</li>
+      <li><strong>PyTorch Geometric</strong>: GNN для молекул</li>
+      <li><strong>SchNetPack</strong>: neural networks для химии</li>
+      <li><strong>OpenMM</strong>: молекулярная динамика</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Вызовы</h2>
+    <ul>
+      <li><strong>Data scarcity</strong>: мало экспериментальных данных</li>
+      <li><strong>Out-of-distribution</strong>: обобщение на новые химические пространства</li>
+      <li><strong>Interpretability</strong>: понимание предсказаний</li>
+      <li><strong>Физическая правдоподобность</strong>: соблюдение законов физики</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Будущее</h2>
+    <ul>
+      <li><strong>Autonomous labs</strong>: самоуправляемые эксперименты</li>
+      <li><strong>Foundation models</strong>: универсальные модели для химии</li>
+      <li><strong>Quantum + ML</strong>: гибридные подходы</li>
+      <li><strong>Materials design</strong>: новые материалы с нужными свойствами</li>
+    </ul>
+    <blockquote>
+      «ML трансформирует химию из экспериментальной науки в предиктивную, ускоряя открытие новых лекарств и материалов в десятки раз».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

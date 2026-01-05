@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Grammatical Inference</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📝 Grammatical Inference</h1>
+  <div class="subtitle">Обучение формальных грамматик • Structure Learning • Grammar Induction<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Grammatical Inference: введение</h2>
+    <p><strong>Задача</strong>: обучить формальную грамматику из примеров</p>
+    <ul>
+      <li><strong>Input</strong>: строки языка (положительные/отрицательные примеры)</li>
+      <li><strong>Output</strong>: грамматика, генерирующая язык</li>
+      <li><strong>Применение</strong>: NLP, компиляторы, биоинформатика</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы формальных грамматик</h2>
+    <p><strong>Иерархия Хомского</strong>:</p>
+    <ul>
+      <li><strong>Тип 0</strong>: Unrestricted (Turing machines)</li>
+      <li><strong>Тип 1</strong>: Context-sensitive</li>
+      <li><strong>Тип 2</strong>: Context-free (CFG)</li>
+      <li><strong>Тип 3</strong>: Regular (конечные автоматы)</li>
+    </ul>
+    <p><strong>Сложность обучения</strong>: Type 3 проще, Type 0 невозможно</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Regular Language Learning</h2>
+    <p><strong>Алгоритмы</strong>:</p>
+    <ul>
+      <li><strong>RPNI</strong> (Regular Positive and Negative Inference):
+        <ul>
+          <li>Строит prefix tree automaton (PTA)</li>
+          <li>Объединяет состояния для обобщения</li>
+          <li>Полиномиальное время</li>
+        </ul>
+      </li>
+      <li><strong>L* algorithm</strong>:
+        <ul>
+          <li>Активное обучение</li>
+          <li>Запросы к учителю</li>
+          <li>Минимальный DFA</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Context-Free Grammar (CFG) Learning</h2>
+    <p><strong>Проблема</strong>: NP-hard в общем случае</p>
+    <p><strong>Подходы</strong>:</p>
+    <ul>
+      <li><strong>Heuristic methods</strong>: жадные алгоритмы</li>
+      <li><strong>MDL</strong> (Minimum Description Length): баланс сложность/точность</li>
+      <li><strong>Bayesian inference</strong>: вероятностные CFG</li>
+      <li><strong>Genetic algorithms</strong>: эволюционный поиск</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Probabilistic Context-Free Grammars (PCFG)</h2>
+    <p><strong>Идея</strong>: правила с вероятностями</p>
+    <pre><code>S → NP VP  [0.8]
+S → Aux NP VP  [0.2]
+NP → Det N  [0.5]</code></pre>
+    <p><strong>Обучение</strong>:</p>
+    <ul>
+      <li><strong>Inside-Outside algorithm</strong>: аналог EM для CFG</li>
+      <li><strong>Treebank parsing</strong>: supervised learning</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Neural Grammar Induction</h2>
+    <p><strong>Deep Learning подходы</strong>:</p>
+    <ul>
+      <li><strong>Recurrent Neural Network Grammars (RNNG)</strong></li>
+      <li><strong>Neural CFG</strong>: дифференцируемые грамматики</li>
+      <li><strong>Compound PCFG</strong>: unsupervised parsing</li>
+      <li><strong>Syntactic Attention</strong>: неявная грамматика</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Применения в NLP</h2>
+    <p><strong>Синтаксический анализ</strong>:</p>
+    <ul>
+      <li>Unsupervised constituency parsing</li>
+      <li>Dependency parsing</li>
+      <li>Grammar compression</li>
+    </ul>
+    <p><strong>Генерация текста</strong>:</p>
+    <ul>
+      <li>Структурированная генерация</li>
+      <li>Контролируемая генерация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Биоинформатика</h2>
+    <p><strong>RNA secondary structure</strong>:</p>
+    <ul>
+      <li>Предсказание вторичной структуры РНК</li>
+      <li>Stochastic context-free grammars</li>
+    </ul>
+    <p><strong>Protein families</strong>:</p>
+    <ul>
+      <li>Hidden Markov Models</li>
+      <li>Profile HMMs</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Program Synthesis связь</h2>
+    <p><strong>Grammar-guided synthesis</strong>:</p>
+    <ul>
+      <li>DSL (Domain-Specific Language) через грамматику</li>
+      <li>Ограничение пространства поиска</li>
+      <li>Compositional генерация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Инструменты</h2>
+    <ul>
+      <li><strong>NLTK</strong>: CFG parsing в Python</li>
+      <li><strong>Stanford Parser</strong>: PCFG parsing</li>
+      <li><strong>Grammatical Inference Toolbox</strong></li>
+      <li><strong>SEQUITUR</strong>: compression-based grammar</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Теоретические результаты</h2>
+    <p><strong>Learnability</strong>:</p>
+    <ul>
+      <li><strong>Gold's theorem</strong>: невозможность обучения в пределе</li>
+      <li><strong>PAC learning</strong>: для ограниченных классов</li>
+      <li><strong>Structural zeros</strong>: необходимость негативных примеров</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Вызовы</h2>
+    <ul>
+      <li><strong>Ambiguity</strong>: множество грамматик для языка</li>
+      <li><strong>Overfitting</strong>: слишком специфичные правила</li>
+      <li><strong>Scalability</strong>: большие грамматики</li>
+      <li><strong>Negative examples</strong>: часто недоступны</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Выводы</h2>
+    <ul>
+      <li><strong>Grammar induction</strong>: обучение структурных правил</li>
+      <li><strong>Классические методы</strong>: RPNI, L*, Inside-Outside</li>
+      <li><strong>Neural подходы</strong>: дифференцируемые грамматики</li>
+      <li><strong>Применения</strong>: NLP, биоинформатика, program synthesis</li>
+    </ul>
+    <blockquote>
+      «Grammatical inference — это попытка извлечь структурные правила языка из примеров, мост между символьным и статистическим подходами к языку».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>
