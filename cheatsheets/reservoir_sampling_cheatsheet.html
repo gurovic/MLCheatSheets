@@ -37,210 +37,190 @@
 <div class="container">
   <h1>🎲 Reservoir Sampling Cheatsheet</h1>
   <div class="subtitle">Случайное семплирование • Streaming • Алгоритмы<br>📅 Январь 2026</div>
+
   <div class="block">
     <h2>🔷 1. Суть</h2>
     <ul>
-      <li><strong>Адаптивное окно</strong>: изменяемый размер окна для streaming данных</li>
-      <li><strong>Concept drift</strong>: изменение распределения данных во времени</li>
-      <li><strong>Цель</strong>: адаптация модели к изменениям без полного переобучения</li>
-      <li><strong>Trade-off</strong>: скорость адаптации vs стабильность</li>
+      <li><strong>Reservoir sampling</strong>: случайная выборка из потока неизвестного размера</li>
+      <li><strong>Память O(k)</strong>: хранить только k элементов</li>
+      <li><strong>Равномерное распределение</strong>: каждый элемент с вероятностью k/n</li>
+      <li><strong>Одн проход</strong>: не нужно знать размер заранее</li>
+      <li><strong>Применение</strong>: streaming данные, большие файлы, SQL запросы</li>
     </ul>
   </div>
 
   <div class="block">
-    <h2>🔷 2. Типы concept drift</h2>
+    <h2>🔷 2. Базовый алгоритм</h2>
+    <p><strong>Algorithm R (Knuth):</strong></p>
+    <ol>
+      <li>Заполнить reservoir первыми k элементами</li>
+      <li>Для элемента i (i > k): с вероятностью k/i заменить случайный элемент в reservoir</li>
+    </ol>
+    
+    <pre><code>import random
+
+def reservoir_sampling(stream, k):
+    """
+    stream: итератор элементов
+    k: размер выборки
+    """
+    reservoir = []
+    
+    for i, element in enumerate(stream):
+        if i < k:
+            # Заполнить первые k
+            reservoir.append(element)
+        else:
+            # Замена с вероятностью k/i
+            j = random.randint(0, i)
+            if j < k:
+                reservoir[j] = element
+    
+    return reservoir
+
+# Пример использования
+stream = range(1000000)
+sample = reservoir_sampling(stream, k=100)
+print(f"Sampled {len(sample)} elements")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Доказательство корректности</h2>
+    <p><strong>Вероятность для элемента i попасть в выборку:</strong></p>
+    <pre><code>P(i в выборке) = (k/i) * ∏(j=i+1 to n) (1 - 1/j)
+                = (k/i) * (i/n) = k/n</code></pre>
+    
+    <p>Для всех элементов вероятность одинакова: k/n</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Weighted Reservoir Sampling</h2>
+    <p><strong>Выборка с весами:</strong></p>
+    <pre><code>import random
+import math
+
+def weighted_reservoir_sampling(stream, k):
+    """
+    stream: итератор (element, weight)
+    """
+    reservoir = []
+    
+    for element, weight in stream:
+        # Key = random^(1/weight)
+        key = random.random() ** (1/weight)
+        
+        if len(reservoir) < k:
+            reservoir.append((key, element))
+            reservoir.sort(reverse=True)
+        elif key > reservoir[-1][0]:
+            reservoir[-1] = (key, element)
+            reservoir.sort(reverse=True)
+    
+    return [elem for _, elem in reservoir]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Distributed Reservoir Sampling</h2>
+    <p><strong>На нескольких машинах:</strong></p>
+    <ol>
+      <li>Каждая машина делает reservoir sampling локально</li>
+      <li>Объединить все локальные reservoirs</li>
+      <li>Сделать reservoir sampling на объединённых данных</li>
+    </ol>
+    
+    <pre><code># Map phase
+def map_reservoir(partition, k):
+    return reservoir_sampling(partition, k)
+
+# Reduce phase
+reservoirs = [map_reservoir(p, k) for p in partitions]
+combined = [elem for r in reservoirs for elem in r]
+final_sample = reservoir_sampling(combined, k)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Sliding Window Reservoir</h2>
+    <p><strong>С учётом времени/порядка:</strong></p>
+    <pre><code>from collections import deque
+import time
+
+class SlidingWindowReservoir:
+    def __init__(self, k, window_size):
+        self.k = k
+        self.window_size = window_size
+        self.window = deque(maxlen=window_size)
+    
+    def add(self, element):
+        self.window.append(element)
+        
+    def sample(self):
+        if len(self.window) <= self.k:
+            return list(self.window)
+        return random.sample(list(self.window), self.k)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Применения</h2>
     <table>
-      <tr><th>Тип</th><th>Описание</th><th>Пример</th></tr>
-      <tr><td>Sudden</td><td>Резкое изменение</td><td>Смена сезона</td></tr>
-      <tr><td>Gradual</td><td>Постепенный переход</td><td>Тренд</td></tr>
-      <tr><td>Incremental</td><td>Медленное изменение</td><td>Старение</td></tr>
-      <tr><td>Recurring</td><td>Циклическое</td><td>День/ночь</td></tr>
+      <tr><th>Область</th><th>Применение</th></tr>
+      <tr><td>Database</td><td>Random sampling для статистики</td></tr>
+      <tr><td>Networks</td><td>Monitoring пакетов</td></tr>
+      <tr><td>Log analysis</td><td>Выборка событий из логов</td></tr>
+      <tr><td>ML</td><td>Downsampling больших датасетов</td></tr>
+      <tr><td>A/B testing</td><td>Выборка пользователей</td></tr>
     </table>
   </div>
 
   <div class="block">
-    <h2>🔷 3. Методы окон</h2>
+    <h2>🔷 8. Оптимизации</h2>
     <ul>
-      <li><strong>Fixed Window</strong>: постоянный размер</li>
-      <li><strong>Sliding Window</strong>: сдвиг на фиксированный шаг</li>
-      <li><strong>Landmark Window</strong>: от начала потока</li>
-      <li><strong>Damped Window</strong>: экспоненциальное забывание</li>
-      <li><strong>Adaptive Window</strong>: динамический размер</li>
+      <li><strong>Algorithm L</strong>: пропускает элементы, O(k log(n/k))</li>
+      <li><strong>Algorithm Z</strong>: ещё быстрее, O(k(1 + log(n/k)))</li>
+      <li><strong>Priority sampling</strong>: для weighted случая</li>
     </ul>
+    
+    <pre><code># Algorithm L - skip elements
+def reservoir_l(stream, k):
+    reservoir = []
+    w = math.exp(math.log(random.random()) / k)
+    
+    for i, element in enumerate(stream):
+        if i < k:
+            reservoir.append(element)
+        else:
+            # Skip elements
+            skip = math.floor(math.log(random.random()) / math.log(1-w))
+            # Implementation continues...</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 4. ADWIN алгоритм</h2>
-    <p><strong>Reservoir Sampling:</strong></p>
-    <ul>
-      <li>Автоматическое изменение размера окна</li>
-      <li>Обнаружение drift через статистические тесты</li>
-      <li>Удаление старых данных при обнаружении изменений</li>
-    </ul>
-    
-    <pre><code>from river import drift
-
-detector = drift.ADWIN(delta=0.002)
-
-for i, (x, y) in enumerate(stream):
-    # Обновить детектор
-    detector.update(error)
-    
-    # Проверить drift
-    if detector.drift_detected:
-        print(f"Drift detected at {i}")
-        # Сбросить/переобучить модель
-        model = create_new_model()
-    
-    # Обучить модель
-    model.learn_one(x, y)</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>🔷 5. Exponential Weighted Moving Average</h2>
-    <pre><code>EWMA_t = α * x_t + (1-α) * EWMA_{t-1}
-
-α ∈ (0,1) - коэффициент забывания</code></pre>
-    
+    <h2>🔷 9. Variance Estimation</h2>
+    <p><strong>Оценка дисперсии выборки:</strong></p>
     <pre><code>import numpy as np
 
-class EWMADetector:
-    def __init__(self, alpha=0.1, threshold=3):
-        self.alpha = alpha
-        self.threshold = threshold
-        self.mean = None
-        self.std = None
+def reservoir_with_stats(stream, k):
+    reservoir = []
+    n = 0
+    sum_x = 0
+    sum_x2 = 0
     
-    def update(self, value):
-        if self.mean is None:
-            self.mean = value
-            self.std = 0
+    for element in stream:
+        n += 1
+        sum_x += element
+        sum_x2 += element**2
+        
+        if n <= k:
+            reservoir.append(element)
         else:
-            # Обновление
-            delta = value - self.mean
-            self.mean += self.alpha * delta
-            self.std = (1 - self.alpha) * (self.std + self.alpha * delta**2)**0.5
-        
-        # Drift detection
-        if abs(value - self.mean) > self.threshold * self.std:
-            return True  # drift detected
-        return False</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>🔷 6. Page-Hinkley Test</h2>
-    <p><strong>Cumulative sum test:</strong></p>
-    <pre><code>from river import drift
-
-ph = drift.PageHinkley(
-    min_instances=30,
-    delta=0.005,
-    threshold=50,
-    alpha=1-0.0001
-)
-
-for x, y in stream:
-    error = abs(y_pred - y)
-    ph.update(error)
+            j = random.randint(0, n-1)
+            if j < k:
+                reservoir[j] = element
     
-    if ph.drift_detected:
-        print("Drift detected!")
-        # Reset or retrain</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>🔷 7. Sliding Window с размером по качеству</h2>
-    <pre><code>class QualityBasedWindow:
-    def __init__(self, min_size=100, max_size=1000, 
-                 quality_threshold=0.8):
-        self.data = []
-        self.min_size = min_size
-        self.max_size = max_size
-        self.threshold = quality_threshold
+    # Статистики
+    mean = sum_x / n
+    variance = (sum_x2 / n) - mean**2
     
-    def add(self, x, y, pred):
-        self.data.append((x, y, pred))
-        
-        # Compute quality
-        if len(self.data) > self.min_size:
-            recent_acc = self._compute_recent_accuracy()
-            
-            # Shrink window if quality is low
-            if recent_acc < self.threshold:
-                self.data = self.data[-self.min_size:]
-            # Grow if quality is high
-            elif len(self.data) < self.max_size:
-                pass  # Keep growing
-        
-        # Maintain max size
-        if len(self.data) > self.max_size:
-            self.data = self.data[-self.max_size:]
-    
-    def _compute_recent_accuracy(self, n=100):
-        recent = self.data[-n:]
-        correct = sum(y == pred for _, y, pred in recent)
-        return correct / len(recent)</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>🔷 8. Ensemble с разными окнами</h2>
-    <ul>
-      <li>Несколько моделей с разными размерами окон</li>
-      <li>Взвешенное голосование по качеству</li>
-      <li>Покрывает разные типы drift</li>
-    </ul>
-    
-    <pre><code>class MultiWindowEnsemble:
-    def __init__(self, window_sizes=[100, 500, 1000]):
-        self.models = [create_model() for _ in window_sizes]
-        self.windows = [[] for _ in window_sizes]
-        self.window_sizes = window_sizes
-        self.weights = [1.0] * len(window_sizes)
-    
-    def predict(self, x):
-        preds = [m.predict(x) for m in self.models]
-        # Взвешенное голосование
-        weighted = sum(w * p for w, p in zip(self.weights, preds))
-        return weighted / sum(self.weights)
-    
-    def update(self, x, y):
-        for i, (model, window, size) in enumerate(
-            zip(self.models, self.windows, self.window_sizes)):
-            window.append((x, y))
-            if len(window) > size:
-                window.pop(0)
-            
-            # Переобучить на окне
-            model.fit([x for x, y in window], 
-                     [y for x, y in window])
-            
-            # Обновить вес по качеству
-            acc = compute_accuracy(model, window)
-            self.weights[i] = acc</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>🔷 9. Метрики для оценки</h2>
-    <ul>
-      <li><strong>Prequential accuracy</strong>: тестировать перед обучением</li>
-      <li><strong>Kappa statistic</strong>: с учётом дисбаланса</li>
-      <li><strong>Detection delay</strong>: скорость обнаружения drift</li>
-      <li><strong>False alarm rate</strong>: ложные срабатывания</li>
-    </ul>
-    
-    <pre><code># Prequential evaluation
-from river import metrics
-
-metric = metrics.Accuracy()
-
-for x, y in stream:
-    # Predict THEN learn
-    y_pred = model.predict_one(x)
-    metric.update(y, y_pred)
-    model.learn_one(x, y)
-    
-    if i % 100 == 0:
-        print(f"Accuracy: {metric.get()}")</code></pre>
+    return reservoir, mean, variance</code></pre>
   </div>
 
   <div class="block">
@@ -250,52 +230,42 @@ for x, y in stream:
         <h3>✅ Хорошо</h3>
         <ul>
           <li>Streaming данные</li>
-          <li>Concept drift ожидается</li>
-          <li>Нужна онлайн-адаптация</li>
+          <li>Неизвестный размер потока</li>
           <li>Ограниченная память</li>
+          <li>Нужна случайная выборка</li>
+          <li>Один проход по данным</li>
         </ul>
       </div>
       <div class="bad">
         <h3>❌ Плохо</h3>
         <ul>
-          <li>Статичные данные</li>
-          <li>Нет drift</li>
-          <li>Batch обучение возможно</li>
+          <li>Данные в памяти целиком</li>
+          <li>Можно сделать несколько проходов</li>
+          <li>Нужна детерминированность</li>
         </ul>
       </div>
     </div>
   </div>
 
   <div class="block">
-    <h2>🔷 11. Библиотеки</h2>
-    <table>
-      <tr><th>Библиотека</th><th>Язык</th><th>Особенности</th></tr>
-      <tr><td>River</td><td>Python</td><td>Online ML, drift detection</td></tr>
-      <tr><td>scikit-multiflow</td><td>Python</td><td>Streaming ML (deprecated)</td></tr>
-      <tr><td>MOA</td><td>Java</td><td>Massive Online Analysis</td></tr>
-      <tr><td>Spark Streaming</td><td>Scala/Python</td><td>Distributed streaming</td></tr>
-    </table>
-  </div>
-
-  <div class="block">
-    <h2>🔷 12. Чек-лист</h2>
+    <h2>🔷 11. Чек-лист</h2>
     <ul>
-      <li>[ ] Определить тип ожидаемого drift</li>
-      <li>[ ] Выбрать метод обнаружения drift</li>
-      <li>[ ] Настроить параметры чувствительности</li>
-      <li>[ ] Реализовать prequential evaluation</li>
-      <li>[ ] Мониторить false alarm rate</li>
-      <li>[ ] Сравнить с fixed window baseline</li>
-      <li>[ ] Измерить задержку обнаружения</li>
+      <li>[ ] Определить размер выборки k</li>
+      <li>[ ] Выбрать алгоритм (простой, weighted, distributed)</li>
+      <li>[ ] Протестировать равномерность распределения</li>
+      <li>[ ] Проверить memory footprint</li>
+      <li>[ ] Оценить статистические свойства выборки</li>
+      <li>[ ] Рассмотреть sliding window для старых данных</li>
     </ul>
 
     <h3>💡 Объяснение заказчику:</h3>
     <blockquote>
-      «Adaptive windowing — это как подстраивающееся окно просмотра. Когда данные меняются, 
-      мы автоматически забываем старые примеры и фокусируемся на новых. Это позволяет модели 
-      быстро адаптироваться к изменениям без полного переобучения».
+      «Reservoir sampling — это способ получить случайную выборку из потока данных, когда мы не знаем 
+      заранее, сколько всего будет элементов. Представьте, что вы выбираете 100 случайных писем из почты, 
+      которая постоянно пополняется. Алгоритм гарантирует, что каждое письмо имеет равные шансы попасть в выборку».
     </blockquote>
   </div>
+
 </div>
 </body>
 </html>

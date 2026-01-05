@@ -37,265 +37,197 @@
 <div class="container">
   <h1>🌲 Hoeffding Trees Cheatsheet</h1>
   <div class="subtitle">Incremental Decision Trees • VFDT • Streaming<br>📅 Январь 2026</div>
+
   <div class="block">
     <h2>🔷 1. Суть</h2>
     <ul>
-      <li><strong>Адаптивное окно</strong>: изменяемый размер окна для streaming данных</li>
-      <li><strong>Concept drift</strong>: изменение распределения данных во времени</li>
-      <li><strong>Цель</strong>: адаптация модели к изменениям без полного переобучения</li>
-      <li><strong>Trade-off</strong>: скорость адаптации vs стабильность</li>
+      <li><strong>Hoeffding Tree</strong>: инкрементное дерево решений для streaming данных</li>
+      <li><strong>VFDT</strong>: Very Fast Decision Tree</li>
+      <li><strong>Hoeffding Bound</strong>: статистическая граница для выбора атрибута</li>
+      <li><strong>Одноразовый проход</strong>: обрабатывает каждый пример только раз</li>
+      <li><strong>Константная память</strong>: не растёт с размером данных</li>
     </ul>
   </div>
 
   <div class="block">
-    <h2>🔷 2. Типы concept drift</h2>
+    <h2>🔷 2. Hoeffding Bound</h2>
+    <p><strong>Теорема Хёффдинга:</strong></p>
+    <pre><code>ε = √((R²ln(1/δ)) / (2n))
+
+где:
+- R: диапазон значений (max - min)
+- δ: уровень confidence (обычно 0.01)
+- n: число наблюдений
+- ε: граница ошибки</code></pre>
+    
+    <p>С вероятностью 1-δ, истинное среднее отличается от наблюдаемого не более чем на ε.</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Алгоритм VFDT</h2>
+    <ol>
+      <li>Начать с одного листа</li>
+      <li>Для каждого примера (x, y): обновить статистики в листе</li>
+      <li>Если накоплено достаточно примеров: вычислить информационный выигрыш для атрибутов</li>
+      <li>Если лучший атрибут достаточно хорош (по Hoeffding bound): создать разбиение</li>
+      <li>Повторять для новых листьев</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Базовый код</h2>
+    <pre><code>from river import tree
+
+# Hoeffding Tree Classifier
+model = tree.HoeffdingTreeClassifier(
+    grace_period=200,  # мин. примеров перед разбиением
+    delta=0.01,        # confidence level
+    tau=0.05,          # tie threshold
+    leaf_prediction='nb'  # naive bayes в листьях
+)
+
+# Обучение на потоке
+for x, y in stream:
+    model.learn_one(x, y)
+    
+    # Предсказание
+    y_pred = model.predict_one(x)
+
+# Для регрессии
+regressor = tree.HoeffdingTreeRegressor()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Параметры</h2>
     <table>
-      <tr><th>Тип</th><th>Описание</th><th>Пример</th></tr>
-      <tr><td>Sudden</td><td>Резкое изменение</td><td>Смена сезона</td></tr>
-      <tr><td>Gradual</td><td>Постепенный переход</td><td>Тренд</td></tr>
-      <tr><td>Incremental</td><td>Медленное изменение</td><td>Старение</td></tr>
-      <tr><td>Recurring</td><td>Циклическое</td><td>День/ночь</td></tr>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>grace_period</code></td><td>Мин. примеров перед split</td><td>100-500</td></tr>
+      <tr><td><code>delta</code></td><td>Confidence level</td><td>0.001-0.01</td></tr>
+      <tr><td><code>tau</code></td><td>Tie-breaking threshold</td><td>0.01-0.1</td></tr>
+      <tr><td><code>max_depth</code></td><td>Макс. глубина</td><td>None или 10-20</td></tr>
+      <tr><td><code>leaf_prediction</code></td><td>Модель в листьях</td><td>'mc', 'nb', 'nba'</td></tr>
     </table>
   </div>
 
   <div class="block">
-    <h2>🔷 3. Методы окон</h2>
-    <ul>
-      <li><strong>Fixed Window</strong>: постоянный размер</li>
-      <li><strong>Sliding Window</strong>: сдвиг на фиксированный шаг</li>
-      <li><strong>Landmark Window</strong>: от начала потока</li>
-      <li><strong>Damped Window</strong>: экспоненциальное забывание</li>
-      <li><strong>Adaptive Window</strong>: динамический размер</li>
-    </ul>
-  </div>
+    <h2>🔷 6. Adaptive Hoeffding Trees</h2>
+    <p><strong>ADWIN для детекции drift:</strong></p>
+    <pre><code>from river import tree
 
-  <div class="block">
-    <h2>🔷 4. ADWIN алгоритм</h2>
-    <p><strong>Hoeffding Trees:</strong></p>
-    <ul>
-      <li>Автоматическое изменение размера окна</li>
-      <li>Обнаружение drift через статистические тесты</li>
-      <li>Удаление старых данных при обнаружении изменений</li>
-    </ul>
-    
-    <pre><code>from river import drift
-
-detector = drift.ADWIN(delta=0.002)
-
-for i, (x, y) in enumerate(stream):
-    # Обновить детектор
-    detector.update(error)
-    
-    # Проверить drift
-    if detector.drift_detected:
-        print(f"Drift detected at {i}")
-        # Сбросить/переобучить модель
-        model = create_new_model()
-    
-    # Обучить модель
-    model.learn_one(x, y)</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>🔷 5. Exponential Weighted Moving Average</h2>
-    <pre><code>EWMA_t = α * x_t + (1-α) * EWMA_{t-1}
-
-α ∈ (0,1) - коэффициент забывания</code></pre>
-    
-    <pre><code>import numpy as np
-
-class EWMADetector:
-    def __init__(self, alpha=0.1, threshold=3):
-        self.alpha = alpha
-        self.threshold = threshold
-        self.mean = None
-        self.std = None
-    
-    def update(self, value):
-        if self.mean is None:
-            self.mean = value
-            self.std = 0
-        else:
-            # Обновление
-            delta = value - self.mean
-            self.mean += self.alpha * delta
-            self.std = (1 - self.alpha) * (self.std + self.alpha * delta**2)**0.5
-        
-        # Drift detection
-        if abs(value - self.mean) > self.threshold * self.std:
-            return True  # drift detected
-        return False</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>🔷 6. Page-Hinkley Test</h2>
-    <p><strong>Cumulative sum test:</strong></p>
-    <pre><code>from river import drift
-
-ph = drift.PageHinkley(
-    min_instances=30,
-    delta=0.005,
-    threshold=50,
-    alpha=1-0.0001
+# Adaptive Hoeffding Tree
+model = tree.HoeffdingAdaptiveTreeClassifier(
+    grace_period=200,
+    delta=0.01
 )
 
-for x, y in stream:
-    error = abs(y_pred - y)
-    ph.update(error)
+# Автоматически обнаруживает drift
+# и перестраивает поддеревья</code></pre>
     
-    if ph.drift_detected:
-        print("Drift detected!")
-        # Reset or retrain</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>🔷 7. Sliding Window с размером по качеству</h2>
-    <pre><code>class QualityBasedWindow:
-    def __init__(self, min_size=100, max_size=1000, 
-                 quality_threshold=0.8):
-        self.data = []
-        self.min_size = min_size
-        self.max_size = max_size
-        self.threshold = quality_threshold
-    
-    def add(self, x, y, pred):
-        self.data.append((x, y, pred))
-        
-        # Compute quality
-        if len(self.data) > self.min_size:
-            recent_acc = self._compute_recent_accuracy()
-            
-            # Shrink window if quality is low
-            if recent_acc < self.threshold:
-                self.data = self.data[-self.min_size:]
-            # Grow if quality is high
-            elif len(self.data) < self.max_size:
-                pass  # Keep growing
-        
-        # Maintain max size
-        if len(self.data) > self.max_size:
-            self.data = self.data[-self.max_size:]
-    
-    def _compute_recent_accuracy(self, n=100):
-        recent = self.data[-n:]
-        correct = sum(y == pred for _, y, pred in recent)
-        return correct / len(recent)</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>🔷 8. Ensemble с разными окнами</h2>
+    <p><strong>Возможности:</strong></p>
     <ul>
-      <li>Несколько моделей с разными размерами окон</li>
-      <li>Взвешенное голосование по качеству</li>
-      <li>Покрывает разные типы drift</li>
+      <li>Обнаружение изменений в листьях</li>
+      <li>Замена устаревших ветвей</li>
+      <li>Адаптация к concept drift</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Extremely Fast Decision Tree</h2>
+    <p><strong>EFDT улучшения:</strong></p>
+    <ul>
+      <li>Переоценка split решений</li>
+      <li>Удаление плохих split-ов</li>
+      <li>Более агрессивное дерево</li>
     </ul>
     
-    <pre><code>class MultiWindowEnsemble:
-    def __init__(self, window_sizes=[100, 500, 1000]):
-        self.models = [create_model() for _ in window_sizes]
-        self.windows = [[] for _ in window_sizes]
-        self.window_sizes = window_sizes
-        self.weights = [1.0] * len(window_sizes)
-    
-    def predict(self, x):
-        preds = [m.predict(x) for m in self.models]
-        # Взвешенное голосование
-        weighted = sum(w * p for w, p in zip(self.weights, preds))
-        return weighted / sum(self.weights)
-    
-    def update(self, x, y):
-        for i, (model, window, size) in enumerate(
-            zip(self.models, self.windows, self.window_sizes)):
-            window.append((x, y))
-            if len(window) > size:
-                window.pop(0)
-            
-            # Переобучить на окне
-            model.fit([x for x, y in window], 
-                     [y for x, y in window])
-            
-            # Обновить вес по качеству
-            acc = compute_accuracy(model, window)
-            self.weights[i] = acc</code></pre>
+    <pre><code>from river import tree
+
+efdt = tree.ExtremelyFastDecisionTreeClassifier(
+    grace_period=50,  # меньше, чем VFDT
+    min_samples_reevaluate=20
+)</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 9. Метрики для оценки</h2>
+    <h2>🔷 8. Split Criteria</h2>
+    <table>
+      <tr><th>Критерий</th><th>Формула</th><th>Применение</th></tr>
+      <tr><td>Information Gain</td><td>H(S) - Σ|S_v|/|S|·H(S_v)</td><td>Классификация</td></tr>
+      <tr><td>Gini</td><td>1 - Σp_i²</td><td>Классификация</td></tr>
+      <tr><td>Variance Reduction</td><td>Var(S) - Σ|S_v|/|S|·Var(S_v)</td><td>Регрессия</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Memory Management</h2>
     <ul>
-      <li><strong>Prequential accuracy</strong>: тестировать перед обучением</li>
-      <li><strong>Kappa statistic</strong>: с учётом дисбаланса</li>
-      <li><strong>Detection delay</strong>: скорость обнаружения drift</li>
-      <li><strong>False alarm rate</strong>: ложные срабатывания</li>
+      <li><strong>Деактивация листьев</strong>: удалять малоиспользуемые</li>
+      <li><strong>Poor attributes</strong>: не хранить статистики для плохих атрибутов</li>
+      <li><strong>Pre-pruning</strong>: ограничение размера дерева</li>
     </ul>
     
-    <pre><code># Prequential evaluation
-from river import metrics
-
-metric = metrics.Accuracy()
-
-for x, y in stream:
-    # Predict THEN learn
-    y_pred = model.predict_one(x)
-    metric.update(y, y_pred)
-    model.learn_one(x, y)
-    
-    if i % 100 == 0:
-        print(f"Accuracy: {metric.get()}")</code></pre>
+    <pre><code># С ограничением памяти
+model = tree.HoeffdingTreeClassifier(
+    max_size=100,  # макс. MB
+    remove_poor_attrs=True,
+    memory_estimate_period=1000000
+)</code></pre>
   </div>
 
   <div class="block">
-    <h2>🔷 10. Когда использовать</h2>
+    <h2>🔷 10. Применения</h2>
+    <ul>
+      <li><strong>IoT sensors</strong>: классификация в реальном времени</li>
+      <li><strong>Network intrusion detection</strong>: потоковый анализ трафика</li>
+      <li><strong>Financial streams</strong>: предсказание трендов</li>
+      <li><strong>Social media</strong>: анализ постов</li>
+      <li><strong>Log analysis</strong>: классификация событий</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать</h2>
     <div class="good-vs-bad">
       <div class="good">
         <h3>✅ Хорошо</h3>
         <ul>
           <li>Streaming данные</li>
+          <li>Онлайн обучение</li>
           <li>Concept drift ожидается</li>
-          <li>Нужна онлайн-адаптация</li>
           <li>Ограниченная память</li>
+          <li>Нужна интерпретируемость</li>
         </ul>
       </div>
       <div class="bad">
         <h3>❌ Плохо</h3>
         <ul>
-          <li>Статичные данные</li>
-          <li>Нет drift</li>
-          <li>Batch обучение возможно</li>
+          <li>Статичные данные в batch</li>
+          <li>Нужна максимальная точность</li>
+          <li>Сложные нелинейные зависимости</li>
         </ul>
       </div>
     </div>
   </div>
 
   <div class="block">
-    <h2>🔷 11. Библиотеки</h2>
-    <table>
-      <tr><th>Библиотека</th><th>Язык</th><th>Особенности</th></tr>
-      <tr><td>River</td><td>Python</td><td>Online ML, drift detection</td></tr>
-      <tr><td>scikit-multiflow</td><td>Python</td><td>Streaming ML (deprecated)</td></tr>
-      <tr><td>MOA</td><td>Java</td><td>Massive Online Analysis</td></tr>
-      <tr><td>Spark Streaming</td><td>Scala/Python</td><td>Distributed streaming</td></tr>
-    </table>
-  </div>
-
-  <div class="block">
     <h2>🔷 12. Чек-лист</h2>
     <ul>
-      <li>[ ] Определить тип ожидаемого drift</li>
-      <li>[ ] Выбрать метод обнаружения drift</li>
-      <li>[ ] Настроить параметры чувствительности</li>
-      <li>[ ] Реализовать prequential evaluation</li>
-      <li>[ ] Мониторить false alarm rate</li>
-      <li>[ ] Сравнить с fixed window baseline</li>
-      <li>[ ] Измерить задержку обнаружения</li>
+      <li>[ ] Выбрать grace_period и delta</li>
+      <li>[ ] Решить: обычный или Adaptive HT</li>
+      <li>[ ] Настроить leaf_prediction</li>
+      <li>[ ] Мониторить размер дерева</li>
+      <li>[ ] Проверить качество на тесте prequentially</li>
+      <li>[ ] Рассмотреть ensemble (см. следующий cheatsheet)</li>
     </ul>
 
     <h3>💡 Объяснение заказчику:</h3>
     <blockquote>
-      «Adaptive windowing — это как подстраивающееся окно просмотра. Когда данные меняются, 
-      мы автоматически забываем старые примеры и фокусируемся на новых. Это позволяет модели 
-      быстро адаптироваться к изменениям без полного переобучения».
+      «Hoeffding Trees — это деревья решений, которые учатся на ходу из потока данных. Они не требуют 
+      хранить все данные в памяти и могут адаптироваться к изменениям. Статистическая теория Хёффдинга 
+      гарантирует, что решения о разбиении близки к оптимальным даже при ограниченных данных».
     </blockquote>
   </div>
+
 </div>
 </body>
 </html>
