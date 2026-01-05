@@ -185,94 +185,291 @@
   <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
 
   <div class="block">
-    <h2>🔷 1. Основы PyTorch Lightning</h2>
+    <h2>🔷 1. Основы</h2>
     <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
+      <li><strong>Lightning</strong>: структурированный PyTorch</li>
+      <li><strong>Boilerplate</strong>: автоматизация рутины</li>
+      <li><strong>LightningModule</strong>: ядро модели</li>
+      <li><strong>Trainer</strong>: управление обучением</li>
     </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы PyTorch Lightning</h2>
+    <p><strong>Преимущества:</strong></p>
     <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы PyTorch Lightning</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы PyTorch Lightning</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы PyTorch Lightning</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы PyTorch Lightning</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы PyTorch Lightning</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы PyTorch Lightning</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы PyTorch Lightning</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы PyTorch Lightning</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы PyTorch Lightning</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
+      <li>Меньше кода, больше науки</li>
+      <li>Автоматический multi-GPU</li>
+      <li>Встроенный логгинг</li>
+      <li>Воспроизводимость</li>
     </ul>
   </div>
 
+  <div class="block">
+    <h2>🔷 2. LightningModule</h2>
+    <pre><code>import pytorch_lightning as pl
+import torch
+import torch.nn as nn
+
+class MyModel(pl.LightningModule):
+    def __init__(self):
+        super().__init__()
+        self.layer = nn.Linear(28*28, 10)
+    
+    def forward(self, x):
+        return self.layer(x)
+    
+    def training_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self(x)
+        loss = nn.functional.cross_entropy(y_hat, y)
+        self.log('train_loss', loss)
+        return loss
+    
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters(), lr=0.001)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Trainer</h2>
+    <pre><code>from pytorch_lightning import Trainer
+
+# Базовое использование
+trainer = Trainer(
+    max_epochs=10,
+    accelerator='gpu',
+    devices=1,
+    logger=True
+)
+
+model = MyModel()
+trainer.fit(model, train_loader, val_loader)
+
+# Продвинутое
+trainer = Trainer(
+    max_epochs=100,
+    accelerator='gpu',
+    devices=4,  # multi-GPU
+    strategy='ddp',  # distributed
+    precision=16,  # mixed precision
+    gradient_clip_val=0.5,
+    callbacks=[early_stop, checkpoint]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Методы LightningModule</h2>
+    <table>
+      <tr><th>Метод</th><th>Назначение</th></tr>
+      <tr><td><strong>training_step</strong></td><td>Шаг обучения</td></tr>
+      <tr><td><strong>validation_step</strong></td><td>Валидация</td></tr>
+      <tr><td><strong>test_step</strong></td><td>Тестирование</td></tr>
+      <tr><td><strong>predict_step</strong></td><td>Inference</td></tr>
+      <tr><td><strong>configure_optimizers</strong></td><td>Оптимизатор</td></tr>
+      <tr><td><strong>on_train_epoch_end</strong></td><td>Конец эпохи</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Validation и Test</h2>
+    <pre><code>class MyModel(pl.LightningModule):
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self(x)
+        loss = nn.functional.cross_entropy(y_hat, y)
+        acc = (y_hat.argmax(1) == y).float().mean()
+        
+        self.log('val_loss', loss, prog_bar=True)
+        self.log('val_acc', acc, prog_bar=True)
+        return loss
+    
+    def test_step(self, batch, batch_idx):
+        x, y = batch
+        y_hat = self(x)
+        loss = nn.functional.cross_entropy(y_hat, y)
+        acc = (y_hat.argmax(1) == y).float().mean()
+        
+        self.log('test_loss', loss)
+        self.log('test_acc', acc)
+        return loss
+
+# Использование
+trainer.validate(model, val_loader)
+trainer.test(model, test_loader)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Callbacks</h2>
+    <pre><code>from pytorch_lightning.callbacks import (
+    EarlyStopping, 
+    ModelCheckpoint,
+    LearningRateMonitor
+)
+
+# Early stopping
+early_stop = EarlyStopping(
+    monitor='val_loss',
+    patience=3,
+    mode='min'
+)
+
+# Checkpointing
+checkpoint = ModelCheckpoint(
+    dirpath='checkpoints/',
+    filename='{epoch}-{val_loss:.2f}',
+    monitor='val_loss',
+    mode='min',
+    save_top_k=3
+)
+
+# LR monitor
+lr_monitor = LearningRateMonitor(logging_interval='epoch')
+
+trainer = Trainer(
+    callbacks=[early_stop, checkpoint, lr_monitor]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Logging</h2>
+    <pre><code>from pytorch_lightning.loggers import (
+    TensorBoardLogger,
+    WandbLogger
+)
+
+# TensorBoard
+tb_logger = TensorBoardLogger('logs/', name='my_model')
+
+# Weights & Biases
+wandb_logger = WandbLogger(project='my_project')
+
+trainer = Trainer(logger=[tb_logger, wandb_logger])
+
+# В модели
+class MyModel(pl.LightningModule):
+    def training_step(self, batch, batch_idx):
+        # Автоматический logging
+        self.log('train_loss', loss)
+        
+        # Manual logging
+        self.log_dict({
+            'train_loss': loss,
+            'train_acc': acc
+        }, prog_bar=True)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Multi-GPU Training</h2>
+    <pre><code># Data Parallel (DP) - simple but slow
+trainer = Trainer(accelerator='gpu', devices=4, strategy='dp')
+
+# Distributed Data Parallel (DDP) - faster
+trainer = Trainer(accelerator='gpu', devices=4, strategy='ddp')
+
+# DeepSpeed - для очень больших моделей
+trainer = Trainer(
+    accelerator='gpu',
+    devices=4,
+    strategy='deepspeed',
+    precision=16
+)
+
+# Автоматический выбор
+trainer = Trainer(accelerator='auto', devices='auto')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Mixed Precision Training</h2>
+    <pre><code># 16-bit precision
+trainer = Trainer(precision=16)
+
+# bfloat16
+trainer = Trainer(precision='bf16')
+
+# 32-bit (по умолчанию)
+trainer = Trainer(precision=32)
+
+# В модели можно контролировать
+class MyModel(pl.LightningModule):
+    def __init__(self):
+        super().__init__()
+        # Автоматически работает с любой precision
+        self.layer = nn.Linear(100, 10)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. DataModule</h2>
+    <pre><code>class MyDataModule(pl.LightningDataModule):
+    def __init__(self, batch_size=32):
+        super().__init__()
+        self.batch_size = batch_size
+    
+    def prepare_data(self):
+        # Скачать данные (вызывается 1 раз)
+        download_data()
+    
+    def setup(self, stage=None):
+        # Подготовить данные для каждого процесса
+        if stage == 'fit' or stage is None:
+            self.train_data = MyDataset('train')
+            self.val_data = MyDataset('val')
+        if stage == 'test' or stage is None:
+            self.test_data = MyDataset('test')
+    
+    def train_dataloader(self):
+        return DataLoader(self.train_data, batch_size=self.batch_size)
+    
+    def val_dataloader(self):
+        return DataLoader(self.val_data, batch_size=self.batch_size)
+    
+    def test_dataloader(self):
+        return DataLoader(self.test_data, batch_size=self.batch_size)
+
+# Использование
+dm = MyDataModule(batch_size=64)
+trainer.fit(model, datamodule=dm)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Multi-GPU обучение</li>
+          <li>Нужна воспроизводимость</li>
+          <li>Сложные эксперименты</li>
+          <li>Production-ready код</li>
+          <li>Командная разработка</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Простой прототип</li>
+          <li>Нужен полный контроль</li>
+          <li>Обучение PyTorch</li>
+          <li>Кастомные training loops</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Чек-лист</h2>
+    <ul>
+      <li>[ ] Установить: `pip install pytorch-lightning`</li>
+      <li>[ ] Наследовать от LightningModule</li>
+      <li>[ ] Реализовать training_step</li>
+      <li>[ ] Реализовать configure_optimizers</li>
+      <li>[ ] Добавить validation_step</li>
+      <li>[ ] Создать Trainer с нужными параметрами</li>
+      <li>[ ] Использовать callbacks (checkpoint, early stopping)</li>
+      <li>[ ] Настроить logging (TensorBoard/W&B)</li>
+      <li>[ ] Протестировать на CPU перед GPU</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «PyTorch Lightning — это как автопилот для обучения нейросетей: вы говорите ЧТО нужно сделать (модель, данные), а Lightning решает КАК это сделать эффективно (GPU, логирование, чекпоинты)».
+    </blockquote>
+  </div>
 
 </div>
 
