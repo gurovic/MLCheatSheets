@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Нейроморфные вычисления Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔬 Нейроморфные вычисления Cheatsheet</h1>
+  <div class="subtitle">Применение нейросетей в науке • Практические подходы<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основная идея</h2>
+    <p>Нейроморфные вычисления — это вычислительные системы, вдохновлённые архитектурой и принципами работы биологического мозга. Цель: Эффективность, параллелизм, низкое энергопотребление. Spiking Neural Networks (SNN). Event-driven обработка.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Отличия от традиционных</h2>
+    <p>Von Neumann архитектура vs нейроморфная. Традиционные: последовательные, тактовые, разделение памяти/вычислений. Нейроморфные: параллельные, асинхронные, совмещение памяти/вычислений. Энергоэффективность: 1000x-10000x.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Spiking Neural Networks</h2>
+    <p>Нейроны общаются спайками (импульсами). Leaky Integrate-and-Fire (LIF) модель. Spike-timing-dependent plasticity (STDP). Temporal coding — информация в timing спайков.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Нейроморфные чипы</h2>
+    <p>Intel Loihi (2017): 128 cores, 130K neurons. IBM TrueNorth (2014): 1M neurons, 256M synapses. BrainScaleS (Heidelberg). SpiNNaker (Manchester). Akida (BrainChip).</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Обучение SNN</h2>
+    <p>STDP (Spike-Timing-Dependent Plasticity). Surrogate gradient methods. ANN-to-SNN conversion. Direct training через градиенты. Rate coding vs temporal coding.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Применения</h2>
+    <p>Edge computing — IoT устройства. Neuromorphic vision — DVS cameras. Robotics — real-time control. Pattern recognition. Autonomous vehicles.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. DVS cameras</h2>
+    <p>Dynamic Vision Sensor. Асинхронные пиксели. Высокая temporal resolution (μs). Низкое энергопотребление. Хороши для быстрых движений.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Преимущества</h2>
+    <p>Energy efficiency: <1W vs 100W+ GPU. Real-time processing. Fault tolerance. Scalability. Natural для временных данных.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Ограничения</h2>
+    <p>Сложность программирования. Мало готовых фреймворков. Трудности обучения SNN. Ограниченная точность vs DNN. Нехватка инструментов.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Фреймворки</h2>
+    <p>Brian2 (Python). NEST. PyNN. BindsNET. SpikingJelly. Norse. Lava (Intel).</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Будущее направления</h2>
+    <p>Hybrid системы (SNN + DNN). Улучшенные алгоритмы обучения. Более крупные чипы. In-memory computing. Memristors.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Ключевые выводы</h2>
+    <p>Нейроморфные системы обещают революцию в энергоэффективности. Пока нишевое применение. Активная область исследований. Важны для edge AI.</p>
+    
+  </div>
+
+</div>
+
+
+
+<div class="block">
+    <h2>🔷 13. Практический пример SNN</h2>
+    <pre><code># Spiking Neural Network с BindsNET
+import torch
+from bindsnet.network import Network
+from bindsnet.network.nodes import Input, LIFNodes
+from bindsnet.network.topology import Connection
+
+# Создание сети
+network = Network()
+
+# Слои
+input_layer = Input(n=784)  # 28x28 MNIST
+hidden_layer = LIFNodes(n=100)
+output_layer = LIFNodes(n=10)
+
+network.add_layer(input_layer, name="input")
+network.add_layer(hidden_layer, name="hidden")
+network.add_layer(output_layer, name="output")
+
+# Связи
+network.add_connection(
+    Connection(input_layer, hidden_layer),
+    source="input", target="hidden"
+)
+network.add_connection(
+    Connection(hidden_layer, output_layer),
+    source="hidden", target="output"
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Benchmarks и датасеты</h2>
+    <ul>
+      <li><strong>N-MNIST</strong>: Neuromorphic MNIST</li>
+      <li><strong>DVS Gesture</strong>: 11 hand gestures</li>
+      <li><strong>SHD/SSC</strong>: Spike Heidelberg Digits</li>
+      <li><strong>N-Caltech101</strong>: Event-based objects</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Перспективы</h2>
+    <ul>
+      <li><strong>Edge AI</strong>: Локальная обработка на IoT</li>
+      <li><strong>Robotics</strong>: Real-time motor control</li>
+      <li><strong>Brain-computer interface</strong>: Нейропротезы</li>
+      <li><strong>Autonomous systems</strong>: Энергоэффективное зрение</li>
+    </ul>
+
+
+
+<!-- removed extra div -->
+</body>
+</html>
+
+</div>
+
+</body>
+</html>

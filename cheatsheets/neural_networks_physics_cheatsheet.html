@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Нейросети в физике Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔬 Нейросети в физике Cheatsheet</h1>
+  <div class="subtitle">Применение нейросетей в науке • Практические подходы<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Обзор</h2>
+    <p>ML революционизирует физику. От анализа данных до теоретических предсказаний. Physics-informed neural networks (PINN). Symbolic regression. Автоматизация экспериментов.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Решение PDE</h2>
+    <p>Physics-Informed Neural Networks. Вместо численных методов — нейросеть. Loss = data loss + physics loss. Уравнения в теле функции потерь.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Квантовая механика</h2>
+    <p>Решение уравнения Шрёдингера. Variational quantum eigensolver. Моделирование квантовых систем. Neural network wavefunctions.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Астрофизика</h2>
+    <p>Classification галактик. Gravitational lensing detection. Exoplanet detection. N-body simulations. Dark matter searches.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Физика частиц</h2>
+    <p>Jet tagging в LHC. Event classification. Trigger systems. Detector simulation. Anomaly detection.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Климат и погода</h2>
+    <p>Weather forecasting (GraphCast, FourCastNet). Climate modeling. Extreme events prediction. Downscaling моделей.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Физика материалов</h2>
+    <p>Crystal structure prediction. Property prediction. Molecular dynamics. Material discovery.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Fluid dynamics</h2>
+    <p>Turbulence modeling. Flow prediction. CFD ускорение. Супер-resolution симуляций.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Symbolic regression</h2>
+    <p>AI Feynman. PySR. Discovering физических законов. Interpretable формулы. Dimensionality analysis.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Graph Neural Networks</h2>
+    <p>Molecular modeling (SchNet, DimeNet). Particle interactions. Many-body systems. Симметрии и инвариантности.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Challenges</h2>
+    <p>Физическая интерпретируемость. Extrapolation за пределы данных. Conservation laws. Causality.</p>
+    
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Ключевые выводы</h2>
+    <p>ML ускоряет физические вычисления на порядки. PINN решают PDE без сеток. Открытие новых законов. Но нужна физическая interpretability.</p>
+    
+  </div>
+
+</div>
+
+
+
+<div class="block">
+    <h2>🔷 13. PINN пример</h2>
+    <pre><code># Physics-Informed Neural Network
+import torch
+import torch.nn as nn
+
+class PINN(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(2, 50), nn.Tanh(),
+            nn.Linear(50, 50), nn.Tanh(),
+            nn.Linear(50, 1)
+        )
+    
+    def forward(self, x, t):
+        u = self.net(torch.cat([x, t], 1))
+        return u
+
+# Loss = data_loss + physics_loss
+def physics_loss(model, x, t):
+    u = model(x, t)
+    u_t = torch.autograd.grad(u, t, create_graph=True)[0]
+    u_x = torch.autograd.grad(u, x, create_graph=True)[0]
+    u_xx = torch.autograd.grad(u_x, x, create_graph=True)[0]
+    
+    # Heat equation: u_t = u_xx
+    pde_residual = u_t - u_xx
+    return torch.mean(pde_residual**2)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Датасеты и инструменты</h2>
+    <ul>
+      <li><strong>Dark Machines</strong>: LHC anomaly detection</li>
+      <li><strong>Galaxy Zoo</strong>: Классификация галактик</li>
+      <li><strong>Climate Data Store</strong>: ERA5 reanalysis</li>
+      <li><strong>Materials Project</strong>: DFT calculations</li>
+      <li><strong>QM9</strong>: Quantum chemistry properties</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Успешные проекты</h2>
+    <ul>
+      <li><strong>AlphaFold</strong>: Protein folding (биофизика)</li>
+      <li><strong>GraphCast</strong>: Weather forecasting (DeepMind)</li>
+      <li><strong>PDE-Net</strong>: Discovering PDEs from data</li>
+      <li><strong>SchNet</strong>: Molecular energies и forces</li>
+      <li><strong>AI Feynman</strong>: Symbolic regression</li>
+    </ul>
+
+
+
+<!-- removed extra div -->
+</body>
+</html>
+
+</div>
+
+</body>
+</html>

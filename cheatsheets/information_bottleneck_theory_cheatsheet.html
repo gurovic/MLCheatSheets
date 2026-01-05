@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Information Bottleneck Theory Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔍 Information Bottleneck Theory Cheatsheet</h1>
+  <div class="subtitle">Информационно-теоретический взгляд на глубокое обучение<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основная идея</h2>
+    <p><strong>Information Bottleneck (IB):</strong> Оптимальное сжатие информации X в представление T, сохраняя релевантность для Y.</p>
+    <pre><code>Цель: найти T, который:
+1. Максимизирует I(T; Y) - информацию о цели
+2. Минимизирует I(T; X) - сжатие входа
+
+L_IB = I(T; Y) - β·I(T; X)
+
+где β - tradeoff parameter</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Информационная диаграмма</h2>
+    <p><strong>Markov chain:</strong> X → T → Ŷ</p>
+    <ul>
+      <li><strong>X</strong>: Входные данные</li>
+      <li><strong>T</strong>: Скрытое представление (hidden layer)</li>
+      <li><strong>Y</strong>: Целевая переменная</li>
+      <li><strong>I(T;Y)</strong>: Предсказательная сила</li>
+      <li><strong>I(T;X)</strong>: Сложность представления</li>
+    </ul>
+    <blockquote>
+      Хорошая нейросеть находится на оптимальной кривой IB: минимум информации о X, максимум о Y
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Фазы обучения (Tishby, 2017)</h2>
+    <table>
+      <tr><th>Фаза</th><th>Что происходит</th><th>I(T;X)</th><th>I(T;Y)</th></tr>
+      <tr><td><strong>1. Fitting</strong></td><td>Запоминание данных</td><td>↑ Растёт</td><td>↑ Растёт</td></tr>
+      <tr><td><strong>2. Compression</strong></td><td>Сжатие, забывание лишнего</td><td>↓ Падает</td><td>→ Стабильно</td></tr>
+    </table>
+    <p><strong>Инсайт:</strong> Генерализация = compression фаза!</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Information Plane</h2>
+    <p><strong>Визуализация процесса обучения:</strong></p>
+    <pre><code>I(T;Y)  ▲
+        |     / (оптимальная IB кривая)
+        |    /
+        |   /•  ← модель двигается сюда
+        |  / •
+        | /  •
+        |/___•______________________
+                              I(T;X)</code></pre>
+    <ul>
+      <li>Ось X: I(T;X) - сколько информации о входе</li>
+      <li>Ось Y: I(T;Y) - сколько информации о выходе</li>
+      <li>Траектория: Обучение движется по плоскости</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Вычисление взаимной информации</h2>
+    <pre><code>import numpy as np
+from sklearn.feature_selection import mutual_info_regression
+
+# Mutual information
+def compute_MI(X, Y, bins=10):
+    """I(X;Y) = H(X) + H(Y) - H(X,Y)"""
+    # Дискретизация для непрерывных данных
+    pxy, _, _ = np.histogram2d(X, Y, bins=bins)
+    pxy = pxy / np.sum(pxy)
+    
+    px = np.sum(pxy, axis=1)
+    py = np.sum(pxy, axis=0)
+    
+    # Энтропии
+    H_X = -np.sum(px * np.log2(px + 1e-10))
+    H_Y = -np.sum(py * np.log2(py + 1e-10))
+    H_XY = -np.sum(pxy * np.log2(pxy + 1e-10))
+    
+    MI = H_X + H_Y - H_XY
+    return MI
+
+# Для нейросетей: MI между активациями
+def track_information_plane(model, data_loader):
+    activations = get_layer_activations(model, data_loader)
+    X, Y = data_loader.dataset.tensors
+    
+    for layer_idx, T in enumerate(activations):
+        I_TX = compute_MI(T, X)
+        I_TY = compute_MI(T, Y)
+        print(f"Layer {layer_idx}: I(T;X)={I_TX:.3f}, I(T;Y)={I_TY:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Связь с регуляризацией</h2>
+    <p><strong>IB как регуляризатор:</strong></p>
+    <pre><code>Variational IB:
+L = -I(T;Y) + β·I(T;X)
+  ≈ -E[log p(y|T)] + β·KL(p(T|x) || p(T))
+
+где β контролирует сжатие</code></pre>
+    <ul>
+      <li><strong>β → 0</strong>: Нет сжатия (переобучение)</li>
+      <li><strong>β оптимальное</strong>: Баланс</li>
+      <li><strong>β → ∞</strong>: Максимальное сжатие (недообучение)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Критика теории</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Что работает</h3>
+        <ul>
+          <li>Красивая концептуальная модель</li>
+          <li>Объясняет compression phase</li>
+          <li>Связь с оптимальным кодированием</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Проблемы</h3>
+        <ul>
+          <li>Работает для tanh, не для ReLU</li>
+          <li>Зависит от binning</li>
+          <li>Compression фаза не всегда есть</li>
+          <li>Противоречивые эмпирические результаты</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Современные работы</h2>
+    <ul>
+      <li><strong>Saxe et al. (2019)</strong>: IB не работает для ReLU, только для saturating activations</li>
+      <li><strong>Goldfeld et al. (2020)</strong>: Compression для дискретных данных</li>
+      <li><strong>Shwartz-Ziv & LeCun (2020)</strong>: Compression зависит от активации</li>
+      <li><strong>Achille & Soatto (2018)</strong>: Effective information как мера</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Практическое применение</h2>
+    <table>
+      <tr><th>Метод</th><th>Связь с IB</th></tr>
+      <tr><td><strong>Dropout</strong></td><td>Добавляет шум → увеличивает I(T;X)</td></tr>
+      <tr><td><strong>Weight decay</strong></td><td>Уменьшает capacity → сжатие</td></tr>
+      <tr><td><strong>VAE</strong></td><td>Явная IB цель через KL</td></tr>
+      <tr><td><strong>Contrastive learning</strong></td><td>Максимизация I(T_1;T_2)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Variational IB</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class VariationalIBLayer(nn.Module):
+    def __init__(self, input_dim, latent_dim, beta=0.1):
+        super().__init__()
+        self.beta = beta
+        self.encoder = nn.Linear(input_dim, latent_dim * 2)
+        
+    def forward(self, x):
+        # Параметризация распределения
+        params = self.encoder(x)
+        mu, logvar = torch.chunk(params, 2, dim=-1)
+        
+        # Reparameterization trick
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        z = mu + eps * std
+        
+        # KL divergence (compression term)
+        kl = -0.5 * torch.sum(1 + logvar - mu**2 - logvar.exp())
+        
+        return z, self.beta * kl
+
+# Использование
+class IBNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.ib_layer = VariationalIBLayer(784, 128, beta=0.001)
+        self.classifier = nn.Linear(128, 10)
+        
+    def forward(self, x):
+        z, kl_loss = self.ib_layer(x)
+        logits = self.classifier(z)
+        return logits, kl_loss</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Deep Variational IB</h2>
+    <p><strong>Расширение на глубокие сети:</strong></p>
+    <ul>
+      <li><strong>Каждый слой</strong>: Своя IB цель</li>
+      <li><strong>Последовательное сжатие</strong>: X → T₁ → T₂ → ... → Y</li>
+      <li><strong>Total loss</strong>: Σ[-I(T_i;Y) + β_i·I(T_i;T_{i-1})]</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Связь с другими теориями</h2>
+    <ul>
+      <li><strong>Rate-Distortion Theory</strong>: IB = rate-distortion для предсказания</li>
+      <li><strong>Minimal Sufficient Statistics</strong>: IB ищет MSS для Y</li>
+      <li><strong>PAC-Bayes</strong>: KL term появляется в обеих теориях</li>
+      <li><strong>Compression bounds</strong>: Лучшее сжатие → лучшая генерализация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Измерение в практике</h2>
+    <pre><code># Отслеживание information plane
+import matplotlib.pyplot as plt
+
+def visualize_information_plane(model, train_loader, epochs=100):
+    I_XT_history = []
+    I_TY_history = []
+    
+    for epoch in range(epochs):
+        # Получить активации
+        activations, labels = get_activations(model, train_loader)
+        
+        # Вычислить MI
+        I_XT = estimate_mutual_information(train_loader.dataset.data, activations)
+        I_TY = estimate_mutual_information(activations, labels)
+        
+        I_XT_history.append(I_XT)
+        I_TY_history.append(I_TY)
+        
+        train_one_epoch(model, train_loader)
+    
+    # Визуализация
+    plt.plot(I_XT_history, I_TY_history, 'o-')
+    plt.xlabel('I(X;T)')
+    plt.ylabel('I(T;Y)')
+    plt.title('Information Plane Trajectory')
+    plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Ключевые выводы</h2>
+    <ul>
+      <li>[ ] IB предлагает <strong>информационный взгляд</strong> на обучение</li>
+      <li>[ ] Compression phase <strong>спорна</strong> эмпирически</li>
+      <li>[ ] Работает для <strong>tanh</strong>, не всегда для ReLU</li>
+      <li>[ ] Полезна для <strong>VAE и контрастного обучения</strong></li>
+      <li>[ ] Связывает обучение с <strong>теорией информации</strong></li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Information Bottleneck — это идея, что нейросеть должна сжать входные данные до самого необходимого для решения задачи. Как хороший конспект лекции: выкинуть всё лишнее, оставить только важное. Теория красивая, но на практике работает не всегда».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

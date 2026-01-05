@@ -482,23 +482,23 @@
 1. [FastAI](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fastai_cheatsheet.html)
 
 ### **20. Теория глубокого обучения**
-1. Теорема универсальной аппроксимации
-1. Теория обобщения для нейросетей
+1. [Теорема универсальной аппроксимации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/universal_approximation_theorem_cheatsheet.html)
+1. [Теория обобщения для нейросетей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/generalization_theory_neural_networks_cheatsheet.html)
 1. Динамика обучения нейросетей
-1. Neural tangent kernel
-1. Information bottleneck theory
+1. [Neural tangent kernel](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_tangent_kernel_cheatsheet.html)
+1. [Information bottleneck theory](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/information_bottleneck_theory_cheatsheet.html)
 
 ### **21. Специальные архитектуры**
 1. [Capsule networks](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/capsule_networks_cheatsheet.html)
 1. [Spiking neural networks](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/spiking_neural_networks_cheatsheet.html)
-1. Neural ODEs
+1. [Neural ODEs](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_odes_cheatsheet.html)
 1. Differentiable programming
-1. Memory networks
+1. [Memory networks](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/memory_networks_cheatsheet.html)
 1. [Hypernetworks](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hypernetworks_cheatsheet.html)
 
 ### **22. Нейронаука и биологически правдоподобные модели**
 1. Биологически вдохновленные архитектуры
-1. Нейроморфные вычисления
+1. [Нейроморфные вычисления](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neuromorphic_computing_cheatsheet.html)
 1. Связь нейросетей и мозга
 
 ### **23. Креативные приложения**
@@ -509,9 +509,9 @@
 1. [Генерация видео](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/video_generation_cheatsheet.html)
 
 ### **24. Научные применения**
-1. Нейросети в физике
-1. Нейросети в химии
-1. Нейросети в биологии
+1. [Нейросети в физике](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_networks_physics_cheatsheet.html)
+1. [Нейросети в химии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_networks_chemistry_cheatsheet.html)
+1. [Нейросети в биологии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_networks_biology_cheatsheet.html)
 1. [Нейросети в медицине](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_networks_medicine_cheatsheet.html)
 1. Нейросети в астрономии
 

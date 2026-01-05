@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Нейросети в биологии Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🧬 Нейросети в биологии Cheatsheet</h1>
+  <div class="subtitle">От геномики до медицинской диагностики<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Геномика и секвенирование</h2>
+    <ul>
+      <li><strong>Variant calling</strong>: CNN для детекции мутаций (DeepVariant)</li>
+      <li><strong>Gene expression</strong>: Предсказание экспрессии генов (Basenji)</li>
+      <li><strong>Enhancers</strong>: Поиск регуляторных элементов (DeepSEA)</li>
+      <li><strong>CRISPR</strong>: Off-target prediction для gene editing</li>
+      <li><strong>RNA splicing</strong>: Alternative splicing sites (SpliceAI)</li>
+    </ul>
+    <blockquote>DeepVariant от Google достиг точности >99.9% в calling SNPs</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Protein Structure Prediction</h2>
+    <p><strong>AlphaFold2 революция (2020):</strong></p>
+    <ul>
+      <li><strong>Точность</strong>: GDT >90 (атомная точность)</li>
+      <li><strong>Скорость</strong>: Минуты вместо лет</li>
+      <li><strong>База данных</strong>: 200M+ структур предсказано</li>
+      <li><strong>Архитектура</strong>: Evoformer + Structure module</li>
+      <li><strong>Применение</strong>: Drug discovery, protein design</li>
+    </ul>
+    <p><strong>RoseTTAFold</strong>: Альтернатива от U.Washington, 3-track network</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Drug Discovery</h2>
+    <table>
+      <tr><th>Задача</th><th>Модель</th></tr>
+      <tr><td>Binding affinity</td><td>DeepDTA, GraphDTA</td></tr>
+      <tr><td>Virtual screening</td><td>GNN для молекул</td></tr>
+      <tr><td>ADMET prediction</td><td>MoleculeNet models</td></tr>
+      <tr><td>Docking</td><td>EquiBind, DiffDock</td></tr>
+    </table>
+    <p><strong>Успехи</strong>: Insilico Medicine открыла drug candidates с AI</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Medical Imaging</h2>
+    <ul>
+      <li><strong>Chest X-ray</strong>: Pneumonia, COVID-19 detection (>95% accuracy)</li>
+      <li><strong>CT/MRI</strong>: Tumor segmentation (U-Net, nnU-Net)</li>
+      <li><strong>Pathology</strong>: Cancer detection в whole-slide images</li>
+      <li><strong>Retinal</strong>: Diabetic retinopathy (FDA approved)</li>
+      <li><strong>Ultrasound</strong>: Real-time guidance</li>
+    </ul>
+    <pre><code># U-Net для segmentation
+model = UNet(in_channels=1, out_channels=2)
+pred = model(ct_scan)
+tumor_mask = pred.argmax(dim=1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Single-Cell Genomics</h2>
+    <p><strong>Анализ single-cell RNA-seq:</strong></p>
+    <ul>
+      <li><strong>Cell type classification</strong>: Автоматическая аннотация</li>
+      <li><strong>Trajectory inference</strong>: Cell differentiation paths</li>
+      <li><strong>Batch correction</strong>: scVI, scGAN</li>
+      <li><strong>Data integration</strong>: Multi-omics (Seurat, Harmony)</li>
+      <li><strong>Spatial transcriptomics</strong>: Spatial patterns</li>
+    </ul>
+    <blockquote>scVI использует VAE для probabilistic representation клеток</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Microscopy Image Analysis</h2>
+    <pre><code># CellPose для segmentation
+from cellpose import models
+model = models.Cellpose(model_type='cyto')
+masks, flows, styles = model.eval(
+    images, 
+    diameter=30, 
+    channels=[0,0]
+)
+
+# Tracking во времени
+from trackpy import link
+trajectories = link(detected_cells, search_range=5)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. RNA Structure и Function</h2>
+    <ul>
+      <li><strong>Secondary structure</strong>: RNA fold prediction</li>
+      <li><strong>RNA-protein binding</strong>: RNAcompete, GraphProt</li>
+      <li><strong>Modification sites</strong>: m6A, pseudouridine</li>
+      <li><strong>ncRNA function</strong>: miRNA target prediction</li>
+      <li><strong>Ribosome profiling</strong>: Translation efficiency</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Metagenomics</h2>
+    <table>
+      <tr><th>Задача</th><th>Инструмент</th></tr>
+      <tr><td>Taxonomic classification</td><td>Kraken2, DeepMicrobes</td></tr>
+      <tr><td>Gene prediction</td><td>Prodigal, MetaGene</td></tr>
+      <tr><td>Functional annotation</td><td>eggNOG, KEGG</td></tr>
+      <tr><td>Binning</td><td>MetaBAT2, CONCOCT</td></tr>
+    </table>
+    <p><strong>Микробиом</strong>: Связь с болезнями (диабет, IBD, etc.)</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Phylogenetics и Evolution</h2>
+    <ul>
+      <li><strong>Tree inference</strong>: ML phylogenies (IQ-TREE, RAxML)</li>
+      <li><strong>Species identification</strong>: DNA barcoding</li>
+      <li><strong>Ancestral reconstruction</strong>: Evolutionary history</li>
+      <li><strong>Selection detection</strong>: dN/dS analysis</li>
+      <li><strong>Recombination</strong>: Breakpoint detection</li>
+    </ul>
+    <blockquote>IQ-TREE использует ML для построения филогенетических деревьев</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Systems Biology</h2>
+    <pre><code># Gene regulatory network inference
+import scanpy as sc
+sc.tl.rank_genes_groups(adata, 'leiden', method='wilcoxon')
+
+# Pathway enrichment
+from gseapy import enrichr
+enr = enrichr(gene_list=['TP53', 'BRCA1'], 
+              gene_sets='KEGG_2021_Human')
+
+# Network analysis
+import networkx as nx
+G = nx.from_pandas_edgelist(interactions)
+centrality = nx.betweenness_centrality(G)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Challenges в биомедицине</h2>
+    <ul>
+      <li><strong>Interpretability</strong>: FDA требует объяснимости для медицинских AI</li>
+      <li><strong>Small datasets</strong>: Медицинские данные дорогие и редкие</li>
+      <li><strong>Batch effects</strong>: Различия между лабораториями/приборами</li>
+      <li><strong>Domain shift</strong>: Модель обучена на одной популяции</li>
+      <li><strong>Privacy</strong>: HIPAA, GDPR requirements</li>
+      <li><strong>Validation</strong>: Клинические trials необходимы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Ключевые инсайты</h2>
+    <ul>
+      <li>[ ] <strong>AlphaFold2</strong> решила 50-летнюю проблему protein folding</li>
+      <li>[ ] ML трансформирует <strong>drug discovery</strong> (годы → месяцы)</li>
+      <li>[ ] Medical imaging AI уже <strong>FDA-approved</strong></li>
+      <li>[ ] Single-cell genomics открывает <strong>новый уровень</strong> детализации</li>
+      <li>[ ] Персонализированная медицина через <strong>genomic prediction</strong></li>
+    </ul>
+
+    <blockquote>
+      «В биологии AI уже не "будущее", а настоящее: от диагностики диабетической ретинопатии до открытия структуры белков»
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
