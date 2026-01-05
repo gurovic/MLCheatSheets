@@ -282,10 +282,14 @@ class GeneticAlgorithm:
             
             # Кроссовер и мутация
             offspring = []
-            for i in range(0, self.pop_size, 2):
+            for i in range(0, self.pop_size - 1, 2):
                 child1, child2 = self.crossover(parents[i], parents[i+1])
                 offspring.append(self.mutate(child1))
                 offspring.append(self.mutate(child2))
+            
+            # Если pop_size нечетный, добавить последнюю особь
+            if self.pop_size % 2 == 1:
+                offspring.append(self.mutate(parents[-1].copy()))
             
             population = np.array(offspring)
             
