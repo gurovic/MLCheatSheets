@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Shape Constraints Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📘 Monotonic Constraints Cheatsheet</h1>
+  <div class="subtitle">Ограничения на форму функции в ML • Интерпретируемые модели<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть формости</h2>
+    <p><strong>Monotonic constraint</strong> — ограничение, что увеличение признака должно только увеличивать (или уменьшать) предсказание</p>
+    <ul>
+      <li><strong>Возрастающая формость</strong>: если x1 > x2, то f(x1) ≥ f(x2)</li>
+      <li><strong>Убывающая формость</strong>: если x1 > x2, то f(x1) ≤ f(x2)</li>
+    </ul>
+    <blockquote>
+      Монотонность делает модель интерпретируемой и соответствующей domain knowledge
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Зачем нужна формость</h2>
+    <table>
+      <tr><th>Задача</th><th>Монотонный признак</th></tr>
+      <tr><td>Кредитный скоринг</td><td>Доход↑ → Вероятность одобрения↑</td></tr>
+      <tr><td>Медицина</td><td>Возраст↑ → Риск болезни↑</td></tr>
+      <tr><td>Ценообразование</td><td>Площадь↑ → Цена дома↑</td></tr>
+      <tr><td>Маркетинг</td><td>Число покупок↑ → Лояльность↑</td></tr>
+    </table>
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Интерпретируемость для бизнеса</li>
+      <li>Соответствие реальности</li>
+      <li>Защита от странных артефактов</li>
+      <li>Юридические требования</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Градиентный бустинг с формостью</h2>
+    <pre><code># XGBoost
+import xgboost as xgb
+
+# 1 = возрастающая, -1 = убывающая, 0 = нет ограничений
+monotone_constraints = {
+    'income': 1,      # доход↑ → скор↑
+    'age': 1,         # возраст↑ → скор↑
+    'debt': -1,       # долг↑ → скор↓
+    'education': 0    # нет ограничения
+}
+
+model = xgb.XGBClassifier(
+    monotone_constraints=monotone_constraints,
+    n_estimators=100
+)
+model.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. LightGBM с формостью</h2>
+    <pre><code>import lightgbm as lgb
+
+# Вектор constraints (по порядку признаков)
+# 1 = возрастающая, -1 = убывающая, 0 = нет
+monotone_constraints = [1, 1, -1, 0]
+
+params = {
+    'objective': 'binary',
+    'monotone_constraints': monotone_constraints,
+    'monotone_constraints_method': 'advanced'  # или 'basic'
+}
+
+train_data = lgb.Dataset(X_train, y_train)
+model = lgb.train(params, train_data, num_boost_round=100)</code></pre>
+    <p><strong>Methods:</strong></p>
+    <ul>
+      <li><code>basic</code>: простая проверка формости</li>
+      <li><code>advanced</code>: более строгое соблюдение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. CatBoost с формостью</h2>
+    <pre><code>from catboost import CatBoostClassifier
+
+# Словарь constraints
+monotone_constraints = {
+    0: 1,   # feature 0: возрастающая
+    1: 1,   # feature 1: возрастающая
+    2: -1,  # feature 2: убывающая
+}
+
+model = CatBoostClassifier(
+    iterations=100,
+    monotone_constraints=monotone_constraints,
+    verbose=False
+)
+model.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Нейронные сети с формостью</h2>
+    <p><strong>Подход 1: Положительные веса</strong></p>
+    <pre><code>import torch
+import torch.nn as nn
+
+class MonotonicNN(nn.Module):
+    def __init__(self, input_dim):
+        super().__init__()
+        self.fc1 = nn.Linear(input_dim, 32)
+        self.fc2 = nn.Linear(32, 1)
+    
+    def forward(self, x):
+        # Обеспечиваем положительные веса
+        with torch.no_grad():
+            self.fc1.weight.clamp_(min=0)
+            self.fc2.weight.clamp_(min=0)
+        
+        h = torch.relu(self.fc1(x))
+        return self.fc2(h)</code></pre>
+    <p><strong>Подход 2: Monotonic activation</strong></p>
+    <ul>
+      <li>Использовать только формые активации (ReLU, sigmoid)</li>
+      <li>Не использовать tanh (не форма)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Проверка формости</h2>
+    <pre><code>import numpy as np
+
+def check_monotonicity(model, X, feature_idx, 
+                       direction='increasing'):
+    """Проверяет формость по признаку"""
+    violations = 0
+    
+    for i in range(len(X)):
+        x = X[i].copy()
+        original_value = x[feature_idx]
+        original_pred = model.predict([x])[0]
+        
+        # Увеличиваем признак
+        x[feature_idx] = original_value * 1.1
+        new_pred = model.predict([x])[0]
+        
+        if direction == 'increasing':
+            if new_pred < original_pred:
+                violations += 1
+        else:  # decreasing
+            if new_pred > original_pred:
+                violations += 1
+    
+    return violations / len(X)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Isotonic Regression</h2>
+    <p><strong>Метод для формой регрессии:</strong></p>
+    <pre><code>from sklearn.isotonic import IsotonicRegression
+
+# Монотонная регрессия
+iso_reg = IsotonicRegression(increasing=True)
+iso_reg.fit(X_train.ravel(), y_train)
+
+# Предсказание
+y_pred = iso_reg.predict(X_test.ravel())</code></pre>
+    <p><strong>Применение:</strong></p>
+    <ul>
+      <li>Калибровка вероятностей</li>
+      <li>Post-processing для формости</li>
+      <li>Univariate формые модели</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Partial Dependence для проверки</h2>
+    <pre><code>from sklearn.inspection import partial_dependence
+import matplotlib.pyplot as plt
+
+# Partial dependence для признака
+pdp_result = partial_dependence(
+    model, X_train, features=[feature_idx]
+)
+
+# Визуализация
+plt.plot(pdp_result['values'][0], 
+         pdp_result['average'][0])
+plt.xlabel(f'Feature {feature_idx}')
+plt.ylabel('Partial dependence')
+plt.title('Monotonicity check')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Монотонность в линейных моделях</h2>
+    <pre><code>from sklearn.linear_model import Ridge
+from scipy.optimize import minimize
+
+def monotonic_linear_regression(X, y, 
+                                 monotone_features):
+    """Linear regression с формыми constraints"""
+    def objective(w):
+        pred = X @ w
+        return np.mean((pred - y)**2)
+    
+    # Constraints: веса формых признаков >= 0
+    constraints = [
+        {'type': 'ineq', 'fun': lambda w: w[i]}
+        for i in monotone_features
+    ]
+    
+    result = minimize(
+        objective, 
+        x0=np.zeros(X.shape[1]),
+        constraints=constraints
+    )
+    return result.x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Монотонность и интерпретируемость</h2>
+    <ul>
+      <li><strong>GAM</strong> (Generalized Additive Models): формые сплайны</li>
+      <li><strong>Shape constraints</strong>: выпуклость + формость</li>
+      <li><strong>Piecewise linear</strong>: формые кусочно-линейные функции</li>
+    </ul>
+    <pre><code># Monotonic GAM с pygam
+from pygam import LinearGAM, s
+
+gam = LinearGAM(s(0, constraints='monotonic_inc') + 
+                s(1, constraints='monotonic_dec') + 
+                s(2))
+gam.fit(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Trade-offs</h2>
+    <table>
+      <tr><th>Аспект</th><th>Без constraints</th><th>С формостью</th></tr>
+      <tr><td>Точность</td><td>✅ Выше</td><td>❌ Ниже</td></tr>
+      <tr><td>Интерпретируемость</td><td>❌ Хуже</td><td>✅ Лучше</td></tr>
+      <tr><td>Доверие</td><td>❌ Ниже</td><td>✅ Выше</td></tr>
+      <tr><td>Переобучение</td><td>❌ Больше</td><td>✅ Меньше</td></tr>
+      <tr><td>Обобщение</td><td>❌ Хуже</td><td>✅ Лучше</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Типичные ошибки</h2>
+    <ul>
+      <li>❌ <strong>Неправильное направление</strong> формости (↑ вместо ↓)</li>
+      <li>❌ <strong>Слишком много constraints</strong> → модель не может обучиться</li>
+      <li>❌ <strong>Не проверять constraints на test</strong></li>
+      <li>❌ <strong>Забыть нормализовать</strong> перед формостью</li>
+      <li>✅ <strong>Консультироваться с экспертами</strong> для выбора формых признаков</li>
+      <li>✅ <strong>Визуализировать partial dependence</strong></li>
+      <li>✅ <strong>Измерять violations</strong> на валидации</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Монотонность нужна:</h3>
+        <ul>
+          <li>Есть чёткое domain knowledge</li>
+          <li>Критична интерпретируемость</li>
+          <li>Регулируемые отрасли (банки, медицина)</li>
+          <li>Нужно доверие пользователей</li>
+          <li>Защита от артефактов данных</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не нужна если:</h3>
+        <ul>
+          <li>Нет чётких знаний о направлении</li>
+          <li>Максимальная точность критична</li>
+          <li>Отношения сложные и нелинейные</li>
+          <li>Внутренние модели (не для клиентов)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить формые признаки с экспертами</li>
+      <li>[ ] Выбрать направление формости для каждого</li>
+      <li>[ ] Обучить baseline без constraints</li>
+      <li>[ ] Добавить monotone constraints в модель</li>
+      <li>[ ] Проверить соблюдение constraints (check_monotonicity)</li>
+      <li>[ ] Визуализировать partial dependence</li>
+      <li>[ ] Измерить снижение точности</li>
+      <li>[ ] Валидировать формость на test set</li>
+    </ul>
+    <blockquote>
+      <strong>Совет:</strong> Начинайте с малого числа критичных формых constraints, постепенно добавляйте больше.
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulated Annealing Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📘 Simulated Annealing Cheatsheet</h1>
+  <div class="subtitle">Optimization without gradients • ES, CMA-ES<br>📅 5 января 2026</div>
+
+
+  <div class="block">
+    <h2>🔷 1. Суть Simulated Annealing • Метод отжига</h2>
+    <p><strong>Simulated Annealing (ES)</strong> — методы оптимизации, вдохновлённые эволюцией</p>
+    <ul>
+      <li><strong>Идея</strong>: популяция решений эволюционирует к оптимуму</li>
+      <li><strong>Не требует градиентов</strong>: только значения функции</li>
+      <li><strong>Стохастический поиск</strong>: использует случайность</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый (μ,λ)-ES</h2>
+    <pre><code>import numpy as np
+
+def evolution_strategy(f, x0, sigma=0.1, 
+                       mu=10, lam=50, generations=100):
+    """(μ,λ)-ES: mu parents, lambda offspring"""
+    population = [x0 + np.random.randn(*x0.shape) * sigma 
+                  for _ in range(mu)]
+    
+    for gen in range(generations):
+        # Generate offspring
+        offspring = []
+        for _ in range(lam):
+            parent = population[np.random.randint(mu)]
+            child = parent + np.random.randn(*x0.shape) * sigma
+            offspring.append((child, f(child)))
+        
+        # Select best mu
+        offspring.sort(key=lambda x: x[1])
+        population = [x[0] for x in offspring[:mu]]
+    
+    return population[0]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. CMA-ES (Covariance Matrix Adaptation)</h2>
+    <pre><code>import cma
+
+# Самый популярный ES алгоритм
+es = cma.CMAEvolutionStrategy(
+    x0=np.zeros(10),  # starting point
+    sigma0=0.5         # initial standard deviation
+)
+
+while not es.stop():
+    solutions = es.ask()
+    es.tell(solutions, [f(x) for x in solutions])
+    es.disp()
+
+best_solution = es.result.xbest
+print(f"Best: {best_solution}, f={es.result.fbest}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Natural Simulated Annealing • Метод отжига</h2>
+    <pre><code># NES: используют natural gradient
+def nes(f, x0, sigma=0.1, lr=0.01, n_samples=100):
+    mu = x0
+    for iteration in range(1000):
+        # Sample from distribution
+        samples = [mu + np.random.randn(*x0.shape) * sigma 
+                   for _ in range(n_samples)]
+        
+        # Evaluate
+        rewards = [f(x) for x in samples]
+        
+        # Update parameters
+        grad_mu = np.mean([
+            (x - mu) * r for x, r in zip(samples, rewards)
+        ], axis=0)
+        mu = mu + lr * grad_mu
+    
+    return mu</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. ES для Deep Learning</h2>
+    <pre><code>import torch
+
+def es_train_neural_network(model, env, n_generations=100):
+    """ES для обучения нейросети в RL"""
+    population_size = 50
+    sigma = 0.1
+    
+    for gen in range(n_generations):
+        # Generate perturbed weights
+        population = []
+        for _ in range(population_size):
+            noise = {name: torch.randn_like(param) * sigma
+                     for name, param in model.named_parameters()}
+            population.append(noise)
+        
+        # Evaluate each
+        rewards = []
+        for noise in population:
+            # Apply noise to model
+            with torch.no_grad():
+                for name, param in model.named_parameters():
+                    param.add_(noise[name])
+            
+            reward = evaluate(model, env)
+            rewards.append(reward)
+            
+            # Remove noise
+            with torch.no_grad():
+                for name, param in model.named_parameters():
+                    param.sub_(noise[name])
+        
+        # Update weights
+        rewards = np.array(rewards)
+        rewards = (rewards - rewards.mean()) / (rewards.std() + 1e-8)
+        
+        for name, param in model.named_parameters():
+            grad = sum([r * noise[name] for r, noise 
+                        in zip(rewards, population)])
+            param.data.add_(grad, alpha=0.01)
+    
+    return model</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. ES vs Gradient Descent</h2>
+    <table>
+      <tr><th>Критерий</th><th>Gradient Descent</th><th>ES</th></tr>
+      <tr><td>Градиенты</td><td>✅ Нужны</td><td>❌ Не нужны</td></tr>
+      <tr><td>Скорость</td><td>✅ Быстрее</td><td>❌ Медленнее</td></tr>
+      <tr><td>Параллелизм</td><td>❌ Сложнее</td><td>✅ Легко</td></tr>
+      <tr><td>Локальные минимумы</td><td>❌ Застревает</td><td>✅ Лучше</td></tr>
+      <tr><td>Дискретность</td><td>❌ Проблема</td><td>✅ OK</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Применения ES</h2>
+    <ul>
+      <li><strong>Reinforcement Learning</strong>: альтернатива policy gradient</li>
+      <li><strong>Гиперпараметры</strong>: оптимизация hyperparameters</li>
+      <li><strong>Чёрный ящик</strong>: когда градиенты недоступны</li>
+      <li><strong>Adversarial examples</strong>: генерация атак</li>
+      <li><strong>Neural Architecture Search</strong>: поиск архитектур</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. OpenAI ES для RL</h2>
+    <pre><code># Знаменитая статья OpenAI 2017
+# ES конкурирует с A3C на Atari
+
+def openai_es(policy, env, n_workers=100):
+    for iteration in range(n_iterations):
+        # Generate perturbations
+        seeds = [np.random.randint(0, 2**32) 
+                 for _ in range(n_workers)]
+        
+        # Parallel evaluation
+        results = parallel_evaluate(policy, seeds, env)
+        
+        # Aggregate gradients
+        grad = compute_gradient(results, seeds)
+        
+        # Update policy
+        policy.update(grad)
+    
+    return policy</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Параметры ES</h2>
+    <table>
+      <tr><th>Параметр</th><th>Значение</th><th>Описание</th></tr>
+      <tr><td>population_size</td><td>10-1000</td><td>Размер популяции</td></tr>
+      <tr><td>sigma</td><td>0.01-1.0</td><td>Стандартное отклонение</td></tr>
+      <tr><td>learning_rate</td><td>0.001-0.1</td><td>Шаг обновления</td></tr>
+      <tr><td>elitism</td><td>1-10%</td><td>Сколько лучших сохранить</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Типичные ошибки</h2>
+    <ul>
+      <li>❌ Слишком маленькая популяция</li>
+      <li>❌ Неправильный sigma (слишком большой/малый)</li>
+      <li>✅ Нормализовать rewards</li>
+      <li>✅ Использовать параллелизацию</li>
+      <li>✅ Попробовать CMA-ES для сложных задач</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить fitness function</li>
+      <li>[ ] Выбрать алгоритм (basic ES, CMA-ES, NES)</li>
+      <li>[ ] Настроить population size и sigma</li>
+      <li>[ ] Реализовать параллельное evaluation</li>
+      <li>[ ] Мониторить convergence</li>
+      <li>[ ] Сравнить с gradient-based методами</li>
+    </ul>
+  </div>
+
+
+</div>
+
+</body>
+</html>
