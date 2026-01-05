@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Capsule Networks Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}
+    @media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}
+    .container{column-count:3;column-gap:20px;max-width:100%}
+    .block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+    h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}
+    .subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}
+    h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}
+    p,ul,ol{font-size:0.92em;margin:0.6em 0}
+    ul,ol{padding-left:18px}
+    li{margin-bottom:4px}
+    code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}
+    pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}
+    pre code{padding:0;background:none;white-space:pre-wrap}
+    strong{color:#1a5fb4}
+  </style>
+</head>
+<body>
+  <h1>Capsule Networks (CapsNets)</h1>
+  <div class="subtitle">Нейросети с векторными выходами для лучшего представления иерархий</div>
+  <div class="container">
+    <div class="block">
+      <h2>1. Мотивация</h2>
+      <p><strong>Проблемы CNN:</strong></p>
+      <ul>
+        <li><strong>Pooling теряет информацию</strong>: где именно находится feature</li>
+        <li><strong>Нет понимания части-целое</strong>: не моделирует иерархические отношения</li>
+        <li><strong>View-point variation</strong>: плохо работает при изменении ракурса</li>
+        <li><strong>Adversarial vulnerability</strong>: легко обмануть</li>
+      </ul>
+      <p><strong>Идея Hinton:</strong> использовать группы нейронов (capsules) для представления объектов и их свойств</p>
+      <p><strong>Capsule:</strong> вектор активаций, где длина = вероятность существования entity, направление = properties (поза, освещение и т.д.)</p>
+    </div>
+
+    <div class="block">
+      <h2>2. Capsule — базовая единица</h2>
+      <p><strong>Определение:</strong> капсула = группа нейронов, выход которых — вектор активаций</p>
+      <p><strong>Компоненты вектора:</strong></p>
+      <ul>
+        <li><strong>Length (||v||)</strong>: вероятность существования entity [0,1]</li>
+        <li><strong>Direction</strong>: instantiation parameters (позиция, ориентация, размер и т.д.)</li>
+      </ul>
+      <p><strong>Squashing function:</strong> нелинейность для нормализации длины</p>
+      <pre><code>v_j = (||s_j||² / (1 + ||s_j||²)) · (s_j / ||s_j||)
+
+где s_j — взвешенная сумма входов</code></pre>
+      <p><strong>Свойства:</strong> короткие векторы → 0, длинные → 1, направление сохраняется</p>
+    </div>
+
+    <div class="block">
+      <h2>3. Dynamic Routing</h2>
+      <p><strong>Проблема:</strong> как капсулы нижнего уровня посылают выход капсулам верхнего?</p>
+      <p><strong>Routing by agreement:</strong> итеративный процесс определения coupling coefficients</p>
+      <p><strong>Алгоритм routing:</strong></p>
+      <pre><code>Для каждой капсулы i на уровне l:
+  Вычислить prediction vectors:
+    û_j|i = W_ij · u_i
+  
+  Инициализировать b_ij = 0
+  
+  Для r итераций routing:
+    c_ij = softmax(b_ij)  # coupling coeffs
+    s_j = Σ_i c_ij û_j|i   # взвеш. сумма
+    v_j = squash(s_j)      # выход капсулы
+    b_ij += û_j|i · v_j    # обновить routing</code></pre>
+      <p><strong>Интуиция:</strong> если u_i "согласен" с v_j (большое скалярное произведение), увеличить c_ij</p>
+    </div>
+
+    <div class="block">
+      <h2>4. Архитектура CapsNet</h2>
+      <p><strong>Слои (оригинальная CapsNet для MNIST):</strong></p>
+      <ol>
+        <li><strong>Conv1</strong>: обычная свёртка 9×9, 256 каналов, ReLU</li>
+        <li><strong>PrimaryCaps</strong>: 32 channels × 8D capsules = 256 capsules</li>
+        <li><strong>DigitCaps</strong>: 10 классов × 16D capsules = 10 capsules</li>
+        <li><strong>Reconstruction</strong>: декодер для регуляризации</li>
+      </ol>
+      <p><strong>PrimaryCaps:</strong> применить convolution для создания векторных выходов</p>
+      <p><strong>DigitCaps:</strong> routing между PrimaryCaps и DigitCaps для классификации</p>
+    </div>
+
+    <div class="block">
+      <h2>5. Loss функция</h2>
+      <p><strong>Margin loss для классификации:</strong></p>
+      <pre><code>L_k = T_k · max(0, m⁺ - ||v_k||)² + 
+      λ · (1-T_k) · max(0, ||v_k|| - m⁻)²
+
+где:
+- T_k = 1 если класс k присутствует
+- m⁺ = 0.9, m⁻ = 0.1 (пороги)
+- λ = 0.5 (down-weighting)</code></pre>
+      <p><strong>Цель:</strong> длина капсулы класса k должна быть близка к 1 если k присутствует, к 0 иначе</p>
+      <p><strong>Reconstruction loss:</strong> дополнительная регуляризация через decoder</p>
+      <pre><code>L_recon = ||image - reconstruction||²</code></pre>
+      <p><strong>Total loss:</strong> L = L_margin + α·L_recon, где α = 0.0005</p>
+    </div>
+
+    <div class="block">
+      <h2>6. Decoder для регуляризации</h2>
+      <p><strong>Цель:</strong> заставить капсулы выучить значимые representations</p>
+      <p><strong>Архитектура:</strong></p>
+      <ul>
+        <li>Вход: 16D вектор правильного класса</li>
+        <li>Fully connected: 512 → 1024 → 784 (28×28)</li>
+        <li>Выход: реконструкция входного изображения</li>
+      </ul>
+      <p><strong>Обучение:</strong> минимизировать MSE между исходным и реконструированным изображением</p>
+      <p><strong>Эффект:</strong> капсулы учатся кодировать позицию, размер, ориентацию — информацию, необходимую для реконструкции</p>
+    </div>
+
+    <div class="block">
+      <h2>7. Преимущества CapsNets</h2>
+      <p><strong>Equivariance к трансформациям:</strong> если объект повернуть, изменяется направление вектора, не вероятность</p>
+      <p><strong>View-point invariance:</strong> лучше работает при изменении ракурса</p>
+      <p><strong>Part-whole relationships:</strong> иерархическое представление</p>
+      <p><strong>Меньше параметров:</strong> по сравнению с глубокими CNN для аналогичной задачи</p>
+      <p><strong>Лучше на sparse data:</strong> эффективнее учится на малых датасетах</p>
+      <p><strong>Robustness:</strong> более устойчив к adversarial attacks</p>
+    </div>
+
+    <div class="block">
+      <h2>8. Недостатки и ограничения</h2>
+      <p><strong>Вычислительная сложность:</strong> routing требует многократных forward passes</p>
+      <p><strong>Медленное обучение:</strong> значительно медленнее CNN</p>
+      <p><strong>Не работает на сложных датасетах:</strong> MNIST, smallNORB OK; ImageNet, COCO — плохо</p>
+      <p><strong>Routing нестабилен:</strong> может требовать тщательной инициализации</p>
+      <p><strong>Ограниченные ресурсы:</strong> высокие требования к памяти</p>
+      <p><strong>Мало исследований:</strong> относительно новая технология, мало best practices</p>
+    </div>
+
+    <div class="block">
+      <h2>9. Реализация на PyTorch</h2>
+      <pre><code>import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class PrimaryCapsule(nn.Module):
+    def __init__(self, in_channels, out_channels,
+                 dim_caps, kernel_size, stride):
+        super().__init__()
+        self.dim_caps = dim_caps
+        self.conv = nn.Conv2d(
+            in_channels, 
+            out_channels * dim_caps,
+            kernel_size=kernel_size,
+            stride=stride
+        )
+    
+    def forward(self, x):
+        # x: [batch, in_channels, H, W]
+        out = self.conv(x)
+        batch, _, H, W = out.shape
+        # Reshape to [batch, num_caps, dim_caps, H, W]
+        out = out.view(
+            batch, -1, self.dim_caps, H, W
+        )
+        # Squash
+        return self.squash(out.view(batch, -1, self.dim_caps))
+    
+    def squash(self, s):
+        s_norm = torch.norm(s, dim=2, keepdim=True)
+        s_norm_sq = s_norm ** 2
+        v = (s_norm_sq / (1 + s_norm_sq)) * (s / s_norm)
+        return v
+
+class DigitCapsule(nn.Module):
+    def __init__(self, in_caps, out_caps, 
+                 in_dim, out_dim, num_routing=3):
+        super().__init__()
+        self.in_caps = in_caps
+        self.out_caps = out_caps
+        self.num_routing = num_routing
+        
+        # Transformation matrix
+        self.W = nn.Parameter(
+            torch.randn(out_caps, in_caps, 
+                       out_dim, in_dim)
+        )
+    
+    def forward(self, u):
+        # u: [batch, in_caps, in_dim]
+        batch = u.size(0)
+        
+        # Compute û_j|i predictions
+        u_hat = torch.einsum('bnid,oind->bnoi', 
+                            u, self.W)
+        
+        # Initialize routing logits
+        b = torch.zeros(batch, self.in_caps, 
+                       self.out_caps, 1).to(u.device)
+        
+        # Routing iterations
+        for iteration in range(self.num_routing):
+            c = F.softmax(b, dim=2)  # coupling coefficients
+            s = torch.sum(c * u_hat, dim=1)  # weighted sum
+            v = self.squash(s)  # squash
+            
+            if iteration < self.num_routing - 1:
+                # Update routing logits
+                b = b + torch.sum(
+                    u_hat * v.unsqueeze(1), 
+                    dim=-1, keepdim=True
+                )
+        
+        return v
+    
+    def squash(self, s):
+        s_norm = torch.norm(s, dim=2, keepdim=True)
+        s_norm_sq = s_norm ** 2
+        v = (s_norm_sq / (1 + s_norm_sq)) * (s / s_norm)
+        return v</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>10. Варианты и улучшения</h2>
+      <p><strong>EM Routing:</strong> использовать EM algorithm вместо dynamic routing</p>
+      <p><strong>Self-attention routing:</strong> attention mechanism для routing</p>
+      <p><strong>Inverted Dot-Product Attention Routing:</strong> более эффективный routing</p>
+      <p><strong>Matrix Capsules:</strong> представлять капсулы матрицами вместо векторов</p>
+      <p><strong>Stacked Capsules:</strong> несколько capsule слоёв для глубоких сетей</p>
+      <p><strong>Efficient CapsNets:</strong> оптимизации для снижения вычислительной сложности</p>
+    </div>
+
+    <div class="block">
+      <h2>11. Применения</h2>
+      <p><strong>Image Classification:</strong> MNIST, CIFAR-10, smallNORB</p>
+      <p><strong>Object Detection:</strong> локализация и классификация объектов</p>
+      <p><strong>Segmentation:</strong> сегментация с понижением spatial info loss</p>
+      <p><strong>Medical Imaging:</strong> анализ медицинских изображений</p>
+      <p><strong>NLP:</strong> text classification, sentiment analysis</p>
+      <p><strong>Video Analysis:</strong> action recognition, video segmentation</p>
+      <p><strong>3D Vision:</strong> point cloud classification</p>
+    </div>
+
+    <div class="block">
+      <h2>12. Best Practices</h2>
+      <p><strong>Начинать с простых датасетов:</strong> MNIST или Fashion-MNIST для прототипирования</p>
+      <p><strong>Настройка routing:</strong></p>
+      <ul>
+        <li>Начать с 3 routing iterations</li>
+        <li>Больше итераций не всегда лучше</li>
+        <li>Экспериментировать с инициализацией b</li>
+      </ul>
+      <p><strong>Learning rate:</strong> меньшие LR (0.001-0.0001), использовать decay</p>
+      <p><strong>Regularization:</strong> decoder помогает, но α нужно тщательно подбирать</p>
+      <p><strong>Когда использовать:</strong></p>
+      <ul>
+        <li>Задачи с иерархическими структурами</li>
+        <li>Малые датасеты</li>
+        <li>Когда важна интерпретируемость</li>
+      </ul>
+      <p><strong>Когда не использовать:</strong> большие сложные датасеты, real-time inference</p>
+    </div>
+  </div>
+</body>
+</html>

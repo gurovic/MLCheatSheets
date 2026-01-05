@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Neural Style Transfer Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}
+    @media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}
+    .container{column-count:3;column-gap:20px;max-width:100%}
+    .block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+    h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}
+    .subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}
+    h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}
+    p,ul,ol{font-size:0.92em;margin:0.6em 0}
+    ul,ol{padding-left:18px}
+    li{margin-bottom:4px}
+    code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}
+    pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}
+    pre code{padding:0;background:none;white-space:pre-wrap}
+    strong{color:#1a5fb4}
+  </style>
+</head>
+<body>
+  <h1>Neural Style Transfer (Перенос стиля)</h1>
+  <div class="subtitle">Художественное применение CNN для переноса стилей изображений</div>
+  <div class="container">
+    <div class="block">
+      <h2>1. Основная идея</h2>
+      <p><strong>Neural Style Transfer (NST)</strong> — техника применения художественного стиля одного изображения к содержимому другого с использованием глубоких нейронных сетей</p>
+      <p><strong>Входные данные:</strong></p>
+      <ul>
+        <li><strong>Content image</strong>: изображение с целевым содержимым</li>
+        <li><strong>Style image</strong>: изображение с желаемым стилем</li>
+        <li><strong>Output</strong>: синтезированное изображение, комбинирующее content + style</li>
+      </ul>
+      <p><strong>Ключевая идея:</strong> использовать feature representations pre-trained CNN (обычно VGG) для измерения content и style</p>
+    </div>
+
+    <div class="block">
+      <h2>2. Архитектура Gatys et al.</h2>
+      <p><strong>Классический метод (2015):</strong> оптимизация изображения для минимизации content + style loss</p>
+      <p><strong>Loss функция:</strong></p>
+      <pre><code>L_total = α·L_content + β·L_style
+где α, β — веса для баланса</code></pre>
+      <p><strong>Процесс:</strong></p>
+      <ol>
+        <li>Инициализировать output (обычно из content или шум)</li>
+        <li>Пропустить через VGG, извлечь features</li>
+        <li>Вычислить content loss и style loss</li>
+        <li>Backprop и обновить пиксели output</li>
+        <li>Повторять до сходимости</li>
+      </ol>
+      <p><strong>Pre-trained VGG:</strong> обычно VGG-16 или VGG-19, обученная на ImageNet</p>
+    </div>
+
+    <div class="block">
+      <h2>3. Content Loss</h2>
+      <p><strong>Цель:</strong> сохранить содержимое content image</p>
+      <p><strong>Определение:</strong> squared error между feature maps</p>
+      <pre><code>L_content = ||F^l(output) - F^l(content)||²
+
+где F^l — features на слое l</code></pre>
+      <p><strong>Выбор слоя:</strong> обычно средние слои (conv4_2 в VGG19)</p>
+      <ul>
+        <li><strong>Ранние слои</strong>: мелкие детали, текстуры</li>
+        <li><strong>Средние слои</strong>: структура объектов</li>
+        <li><strong>Поздние слои</strong>: семантическое содержание</li>
+      </ul>
+      <p><strong>Интуиция:</strong> если feature maps похожи, изображения имеют похожее содержание</p>
+    </div>
+
+    <div class="block">
+      <h2>4. Style Loss</h2>
+      <p><strong>Цель:</strong> воспроизвести стиль style image</p>
+      <p><strong>Gram Matrix:</strong> мера корреляций между feature maps</p>
+      <pre><code>G^l_{ij} = Σ_k F^l_{ik} · F^l_{jk}
+
+где F^l — features (C×H×W)</code></pre>
+      <p><strong>Style Loss:</strong></p>
+      <pre><code>L_style = Σ_l w_l · ||G^l(output) - G^l(style)||²
+
+где w_l — веса слоёв</code></pre>
+      <p><strong>Multiple layers:</strong> используют несколько слоёв (conv1_1, conv2_1, conv3_1, conv4_1, conv5_1)</p>
+      <p><strong>Интуиция:</strong> Gram matrix захватывает статистику текстур независимо от spatial layout</p>
+    </div>
+
+    <div class="block">
+      <h2>5. Оптимизация</h2>
+      <p><strong>Метод:</strong> gradient descent в пространстве пикселей</p>
+      <pre><code>output = content.clone()  # или random noise
+
+optimizer = torch.optim.LBFGS([output])
+
+for iteration in range(num_steps):
+    def closure():
+        # Compute losses
+        content_loss = compute_content_loss()
+        style_loss = compute_style_loss()
+        total_loss = α*content_loss + β*style_loss
+        
+        # Backward
+        optimizer.zero_grad()
+        total_loss.backward()
+        return total_loss
+    
+    optimizer.step(closure)</code></pre>
+      <p><strong>Оптимизаторы:</strong> L-BFGS лучше, но медленнее; Adam быстрее</p>
+    </div>
+
+    <div class="block">
+      <h2>6. Fast Neural Style Transfer</h2>
+      <p><strong>Проблема Gatys:</strong> медленно (минуты на изображение)</p>
+      <p><strong>Решение (Johnson et al.):</strong> обучить feed-forward network для трансформации</p>
+      <p><strong>Архитектура:</strong></p>
+      <ul>
+        <li><strong>Image Transform Net</strong>: encoder-decoder с residual blocks</li>
+        <li><strong>Loss Network</strong>: VGG для вычисления loss</li>
+      </ul>
+      <p><strong>Обучение:</strong></p>
+      <pre><code>1. Пропустить content через Transform Net → output
+2. Вычислить loss через VGG
+3. Backprop через Transform Net
+4. Обновить веса Transform Net</code></pre>
+      <p><strong>Inference:</strong> один forward pass через Transform Net (~реальное время)</p>
+    </div>
+
+    <div class="block">
+      <h2>7. Arbitrary Style Transfer</h2>
+      <p><strong>Ограничение Fast NST:</strong> одна сеть на один стиль</p>
+      <p><strong>AdaIN (Adaptive Instance Normalization):</strong> universal style transfer</p>
+      <pre><code>AdaIN(content_features, style_features) = 
+    σ(style) * normalize(content) + μ(style)
+    
+где μ, σ — mean и std feature maps</code></pre>
+      <p><strong>Архитектура:</strong></p>
+      <ul>
+        <li>Encoder: VGG до relu4_1</li>
+        <li>AdaIN: выравнивание статистик</li>
+        <li>Decoder: зеркало encoder</li>
+      </ul>
+      <p><strong>Преимущество:</strong> работает с любым стилем, никакого переобучения</p>
+    </div>
+
+    <div class="block">
+      <h2>8. Варианты и расширения</h2>
+      <p><strong>Multi-style Transfer:</strong> комбинирование нескольких стилей</p>
+      <p><strong>Video Style Transfer:</strong> с temporal consistency</p>
+      <ul>
+        <li>Optical flow для согласованности кадров</li>
+        <li>Temporal loss между последовательными кадрами</li>
+      </ul>
+      <p><strong>Semantic Style Transfer:</strong> применять стиль к определённым объектам</p>
+      <p><strong>Photo-realistic Style Transfer:</strong> сохранение фотореализма</p>
+      <ul>
+        <li>Photorealism regularization</li>
+        <li>Semantic segmentation для контроля</li>
+      </ul>
+      <p><strong>3D Style Transfer:</strong> для 3D моделей и point clouds</p>
+    </div>
+
+    <div class="block">
+      <h2>9. Реализация с PyTorch</h2>
+      <pre><code>import torch
+import torch.nn as nn
+import torchvision.models as models
+
+class StyleTransfer:
+    def __init__(self):
+        # Load VGG
+        vgg = models.vgg19(pretrained=True).features
+        self.vgg = vgg.eval()
+        
+        # Freeze parameters
+        for param in self.vgg.parameters():
+            param.requires_grad = False
+    
+    def get_features(self, image, layers):
+        features = {}
+        x = image
+        for name, layer in self.vgg._modules.items():
+            x = layer(x)
+            if name in layers:
+                features[name] = x
+        return features
+    
+    def gram_matrix(self, tensor):
+        b, c, h, w = tensor.size()
+        features = tensor.view(b*c, h*w)
+        G = torch.mm(features, features.t())
+        return G.div(b*c*h*w)
+    
+    def transfer(self, content, style, 
+                 num_steps=300, α=1, β=1e6):
+        # Initialize output
+        output = content.clone().requires_grad_(True)
+        optimizer = torch.optim.LBFGS([output])
+        
+        # Extract features
+        content_features = self.get_features(
+            content, ['21'])  # conv4_2
+        style_features = self.get_features(
+            style, ['0','5','10','19','28'])
+        
+        # Compute style grams
+        style_grams = {
+            layer: self.gram_matrix(style_features[layer])
+            for layer in style_features
+        }
+        
+        for step in range(num_steps):
+            def closure():
+                optimizer.zero_grad()
+                
+                output_features = self.get_features(
+                    output, ['21'])
+                content_loss = torch.mean(
+                    (output_features['21'] - 
+                     content_features['21'])**2
+                )
+                
+                style_loss = 0
+                output_features_style = self.get_features(
+                    output, style_grams.keys())
+                for layer in style_grams:
+                    output_gram = self.gram_matrix(
+                        output_features_style[layer])
+                    style_loss += torch.mean(
+                        (output_gram - style_grams[layer])**2
+                    )
+                
+                total_loss = α*content_loss + β*style_loss
+                total_loss.backward()
+                return total_loss
+            
+            optimizer.step(closure)
+        
+        return output.detach()</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>10. Параметры и настройка</h2>
+      <p><strong>Веса α и β:</strong></p>
+      <ul>
+        <li><strong>α/β = 1e-3</strong>: сильный стиль, мало content</li>
+        <li><strong>α/β = 1e-4</strong>: баланс</li>
+        <li><strong>α/β = 1e-5</strong>: сильный content, мало style</li>
+      </ul>
+      <p><strong>Content слои:</strong> conv4_2 стандартный выбор</p>
+      <p><strong>Style слои:</strong> несколько слоёв (conv1_1 до conv5_1) для разных масштабов</p>
+      <p><strong>Инициализация:</strong></p>
+      <ul>
+        <li>Content image: быстрее сходится</li>
+        <li>Random noise: более творческие результаты</li>
+      </ul>
+      <p><strong>Размер изображения:</strong> 512-1024px баланс качества и скорости</p>
+    </div>
+
+    <div class="block">
+      <h2>11. Применения</h2>
+      <p><strong>Художественные:</strong></p>
+      <ul>
+        <li>Создание artwork</li>
+        <li>Фото-фильтры (Prisma app)</li>
+        <li>Кинопроизводство</li>
+      </ul>
+      <p><strong>Коммерческие:</strong></p>
+      <ul>
+        <li>Design tools</li>
+        <li>Fashion design</li>
+        <li>Game assets</li>
+      </ul>
+      <p><strong>Исследовательские:</strong></p>
+      <ul>
+        <li>Понимание CNN representations</li>
+        <li>Texture synthesis</li>
+        <li>Domain adaptation</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>12. Best Practices</h2>
+      <p><strong>Preprocessing:</strong></p>
+      <ul>
+        <li>Нормализация по ImageNet statistics</li>
+        <li>Resize к разумному размеру</li>
+        <li>Центрирование</li>
+      </ul>
+      <p><strong>Качество результата:</strong></p>
+      <ul>
+        <li>Экспериментировать с α/β ratio</li>
+        <li>Пробовать разные content/style слои</li>
+        <li>Варьировать инициализацию</li>
+      </ul>
+      <p><strong>Производительность:</strong></p>
+      <ul>
+        <li>Использовать Fast NST для продакшена</li>
+        <li>GPU необходим для real-time</li>
+        <li>Batch processing для множества изображений</li>
+      </ul>
+      <p><strong>Ограничения:</strong> работает лучше для художественных стилей, чем фотореалистичных</p>
+    </div>
+  </div>
+</body>
+</html>

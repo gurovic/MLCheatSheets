@@ -276,7 +276,7 @@
 1. [Canonical Correlation Analysis (CCA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/canonical_correlation_analysis_cheatsheet.html)
 1. [Kernel CCA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/kernel_cca_cheatsheet.html)
 1. [Multi-view learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multi_view_learning_cheatsheet.html)
-1. Co-training
+1. [Co-training](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cotraining_semi_supervised_cheatsheet.html)
 
 ### **30. Обучение с ограничениями**
 1. [Constrained optimization в ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/constrained_optimization_ml_cheatsheet.html)
@@ -289,15 +289,15 @@
 1. [Эволюционные стратегии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/evolutionary_strategies_cheatsheet.html)
 1. [Swarm intelligence (PSO, ant colony)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/swarm_intelligence_cheatsheet.html)
 1. [Simulated annealing](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/simulated_annealing_cheatsheet.html)
-1. Tabu search
+1. [Tabu search](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tabu_search_cheatsheet.html)
 
 ### **32. Обучение с подкреплением (классическое RL)**
 1. [Reinforcement Learning Basics (RL основы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/reinforcement_learning_basics_cheatsheet.html)
 1. Классическое RL (табличное, без нейросетей)
-1. Многорукие бандиты (Multi-armed bandits)
-1. Марковские процессы принятия решений
-1. Динамическое программирование
-1. Монте-Карло методы
+1. [Многорукие бандиты (Multi-armed bandits)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multi_armed_bandits_cheatsheet.html)
+1. [Марковские процессы принятия решений](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/markov_decision_processes_cheatsheet.html)
+1. [Динамическое программирование](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dynamic_programming_rl_cheatsheet.html)
+1. [Монте-Карло методы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/monte_carlo_methods_cheatsheet.html)
 1. Временная разница (TD-learning)
 1. [Q-learning и SARSA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/q_learning_sarsa_cheatsheet.html)
 1. Функции приближения (линейные, ядерные)
@@ -449,7 +449,7 @@
 
 ### **16. Нейросети для табличных данных**
 1. MLP для табличных данных
-1. TabNet
+1. [TabNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tabnet_cheatsheet.html)
 1. Neural Oblivious Decision Ensembles
 1. AutoML для нейросетей
 1. Сравнение с классическими методами
@@ -460,7 +460,7 @@
 1. Adversarial training
 1. Bias в нейросетях
 1. Fairness в ML
-1. Federated learning
+1. [Federated learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/federated_learning_cheatsheet.html)
 1. [Differential privacy](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/differential_privacy_cheatsheet.html)
 
 ### **18. Производство и MLOps**
@@ -489,7 +489,7 @@
 1. Information bottleneck theory
 
 ### **21. Специальные архитектуры**
-1. Capsule networks
+1. [Capsule networks](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/capsule_networks_cheatsheet.html)
 1. Spiking neural networks
 1. Neural ODEs
 1. Differentiable programming
@@ -502,7 +502,7 @@
 1. Связь нейросетей и мозга
 
 ### **23. Креативные приложения**
-1. Neural style transfer
+1. [Neural style transfer](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_style_transfer_cheatsheet.html)
 1. Image-to-image translation
 1. Text-to-image generation
 1. Музыкальные нейросети

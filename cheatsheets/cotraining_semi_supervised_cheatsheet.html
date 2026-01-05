@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Co-training Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}
+    @media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}
+    .container{column-count:3;column-gap:20px;max-width:100%}
+    .block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+    h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}
+    .subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}
+    h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}
+    p,ul,ol{font-size:0.92em;margin:0.6em 0}
+    ul,ol{padding-left:18px}
+    li{margin-bottom:4px}
+    code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}
+    pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}
+    pre code{padding:0;background:none;white-space:pre-wrap}
+    strong{color:#1a5fb4}
+  </style>
+</head>
+<body>
+  <h1>Co-training (Со-обучение)</h1>
+  <div class="subtitle">Semi-supervised learning с multiple views</div>
+  <div class="container">
+    <div class="block">
+      <h2>1. Основная идея</h2>
+      <p><strong>Co-training</strong> — метод полуконтролируемого обучения, использующий два различных "взгляда" (views) на данные для взаимного обучения классификаторов</p>
+      <p><strong>Предположения:</strong></p>
+      <ul>
+        <li><strong>Sufficiency</strong>: каждый view достаточен для классификации</li>
+        <li><strong>Independence</strong>: views условно независимы при классе</li>
+        <li><strong>Compatibility</strong>: предсказания согласуются на неразмеченных данных</li>
+      </ul>
+      <p><strong>Пример:</strong> классификация веб-страниц по содержимому текста (view 1) и гиперссылкам (view 2)</p>
+    </div>
+
+    <div class="block">
+      <h2>2. Алгоритм Co-training</h2>
+      <pre><code>Вход: L (labeled), U (unlabeled)
+Инициализация: обучить h1, h2 на L
+
+Повторять:
+  1. h1 предсказывает метки для U
+     Выбрать k самых уверенных примеров
+     Добавить в L1
+  
+  2. h2 предсказывает метки для U
+     Выбрать k самых уверенных примеров
+     Добавить в L2
+  
+  3. Переобучить h1 на L ∪ L2
+     Переобучить h2 на L ∪ L1
+  
+  4. Удалить L1, L2 из U
+
+Пока не сойдётся или U пусто</code></pre>
+      <p><strong>k</strong> — гиперпараметр числа добавляемых примеров (обычно 1-10)</p>
+    </div>
+
+    <div class="block">
+      <h2>3. Multi-view данные</h2>
+      <p><strong>Естественные views:</strong></p>
+      <ul>
+        <li><strong>Текст + изображения</strong>: статьи с фото</li>
+        <li><strong>Audio + video</strong>: видеозаписи</li>
+        <li><strong>Текст + ссылки</strong>: веб-страницы</li>
+        <li><strong>Контент + метаданные</strong>: документы</li>
+      </ul>
+      <p><strong>Искусственные views:</strong> если естественных нет, можно создать</p>
+      <ul>
+        <li>Разделить признаки случайно</li>
+        <li>Использовать разные типы признаков</li>
+        <li>Разные архитектуры моделей</li>
+        <li>Разные preprocessing</li>
+      </ul>
+      <p><strong>Требование:</strong> views должны предоставлять дополнительную информацию друг другу</p>
+    </div>
+
+    <div class="block">
+      <h2>4. Теоретические гарантии</h2>
+      <p><strong>PAC-learning bounds:</strong> при выполнении условий sufficiency и independence, co-training сходится к оптимальному классификатору</p>
+      <p><strong>Ключевое свойство:</strong> даже если один view делает ошибку, другой может её исправить</p>
+      <p><strong>Error reduction:</strong></p>
+      <pre><code>ε(h1, h2) ≤ ε(h1) · ε(h2) / (1 - ε(h1) - ε(h2))</code></pre>
+      <p><strong>Условия успеха:</strong></p>
+      <ul>
+        <li>Views действительно независимы</li>
+        <li>Каждый view информативен</li>
+        <li>Достаточно labeled данных для начала</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>5. Выбор confident примеров</h2>
+      <p><strong>Стратегии выбора:</strong></p>
+      <ul>
+        <li><strong>Максимальная вероятность</strong>: max P(y|x)</li>
+        <li><strong>Margin</strong>: P(y1|x) - P(y2|x) (разница топ-2)</li>
+        <li><strong>Entropy</strong>: низкая энтропия предсказания</li>
+        <li><strong>Agreement</strong>: оба view согласны</li>
+      </ul>
+      <p><strong>Балансировка классов:</strong> выбирать равное число примеров из каждого класса для избежания class imbalance</p>
+      <p><strong>Пороги confidence:</strong> использовать адаптивные пороги вместо фиксированного k</p>
+    </div>
+
+    <div class="block">
+      <h2>6. Варианты Co-training</h2>
+      <p><strong>Democratic Co-learning:</strong> несколько (>2) learners голосуют</p>
+      <p><strong>Co-EM:</strong> использует EM-алгоритм вместо жёсткой маркировки</p>
+      <pre><code>E-step: вычислить P(y|x) для каждого view
+M-step: обновить параметры, взвешивая по P(y|x)</code></pre>
+      <p><strong>Tri-training:</strong> три классификатора, два обучают третий</p>
+      <p><strong>Multi-view learning:</strong> обобщение на >2 views</p>
+      <p><strong>Self-training</strong> — специальный случай с одним view</p>
+    </div>
+
+    <div class="block">
+      <h2>7. Применения в ML</h2>
+      <p><strong>NLP:</strong></p>
+      <ul>
+        <li>Классификация текстов (content + metadata)</li>
+        <li>Named Entity Recognition</li>
+        <li>Sentiment analysis (текст разных частей документа)</li>
+      </ul>
+      <p><strong>Computer Vision:</strong></p>
+      <ul>
+        <li>Классификация изображений (разные модальности)</li>
+        <li>Object detection (appearance + context)</li>
+        <li>Video analysis (spatial + temporal views)</li>
+      </ul>
+      <p><strong>Web Mining:</strong></p>
+      <ul>
+        <li>Классификация веб-страниц</li>
+        <li>Email classification</li>
+        <li>Social network analysis</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>8. Реализация на Python</h2>
+      <pre><code>import numpy as np
+from sklearn.naive_bayes import MultinomialNB
+
+class CoTraining:
+    def __init__(self, clf1, clf2, k=10):
+        self.clf1 = clf1
+        self.clf2 = clf2
+        self.k = k
+    
+    def fit(self, X1_labeled, X2_labeled, y_labeled,
+            X1_unlabeled, X2_unlabeled, n_iter=100):
+        
+        for iteration in range(n_iter):
+            # Обучить classifiers
+            self.clf1.fit(X1_labeled, y_labeled)
+            self.clf2.fit(X2_labeled, y_labeled)
+            
+            # Предсказать для unlabeled
+            proba1 = self.clf1.predict_proba(X1_unlabeled)
+            proba2 = self.clf2.predict_proba(X2_unlabeled)
+            
+            # Выбрать самые уверенные
+            conf1 = np.max(proba1, axis=1)
+            conf2 = np.max(proba2, axis=1)
+            
+            # Топ-k от каждого classifier
+            idx1 = np.argsort(conf1)[-self.k:]
+            idx2 = np.argsort(conf2)[-self.k:]
+            
+            # Добавить в labeled
+            X1_labeled = np.vstack([X1_labeled, X1_unlabeled[idx2]])
+            X2_labeled = np.vstack([X2_labeled, X2_unlabeled[idx1]])
+            
+            y1_new = self.clf1.predict(X1_unlabeled[idx2])
+            y2_new = self.clf2.predict(X2_unlabeled[idx1])
+            
+            y_labeled = np.concatenate([y_labeled, y2_new, y1_new])
+            
+            # Удалить из unlabeled
+            mask = np.ones(len(X1_unlabeled), dtype=bool)
+            mask[np.concatenate([idx1, idx2])] = False
+            X1_unlabeled = X1_unlabeled[mask]
+            X2_unlabeled = X2_unlabeled[mask]
+            
+            if len(X1_unlabeled) == 0:
+                break
+        
+        return self</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>9. Проблемы и решения</h2>
+      <p><strong>Error propagation:</strong> неправильно размеченные примеры ухудшают качество</p>
+      <p><strong>Решения:</strong></p>
+      <ul>
+        <li>Строгие пороги confidence</li>
+        <li>Validation set для мониторинга</li>
+        <li>Периодическое удаление шумных меток</li>
+      </ul>
+      <p><strong>View agreement:</strong> если views слишком похожи, co-training неэффективен</p>
+      <p><strong>Решение:</strong> проверять независимость views, использовать regularization для их разделения</p>
+      <p><strong>Class imbalance:</strong> один класс может доминировать в confident примерах</p>
+      <p><strong>Решение:</strong> балансировка при выборе примеров</p>
+    </div>
+
+    <div class="block">
+      <h2>10. Сравнение с другими методами</h2>
+      <p><strong>Self-training:</strong> один view, может усиливать ошибки</p>
+      <p><strong>Co-training:</strong> два views, взаимная коррекция ошибок</p>
+      <p><strong>Label propagation:</strong> использует graph structure, не требует views</p>
+      <p><strong>Semi-supervised SVM:</strong> прямая оптимизация на unlabeled</p>
+      <p><strong>Когда использовать co-training:</strong></p>
+      <ul>
+        <li>Есть естественные multiple views</li>
+        <li>Views условно независимы</li>
+        <li>Мало labeled, много unlabeled данных</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>11. Deep Co-training</h2>
+      <p><strong>Идея:</strong> использовать нейронные сети в качестве views</p>
+      <p><strong>Подходы:</strong></p>
+      <ul>
+        <li><strong>Разные архитектуры</strong>: CNN + RNN</li>
+        <li><strong>Разные слои</strong>: early layers + late layers</li>
+        <li><strong>Разные модальности</strong>: vision + text</li>
+        <li><strong>Adversarial training</strong>: генерация diverse views</li>
+      </ul>
+      <p><strong>Deep Co-training алгоритм:</strong></p>
+      <pre><code>1. Обучить две нейросети на labeled
+2. Для unlabeled batch:
+   - Получить предсказания обеих сетей
+   - Выбрать согласованные high-confidence
+   - Обучить каждую сеть на примерах другой
+3. Повторять</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>12. Best Practices</h2>
+      <p><strong>Начальное обучение:</strong> убедиться, что оба view-specific классификатора работают разумно на labeled данных</p>
+      <p><strong>Размер k:</strong></p>
+      <ul>
+        <li>Малый k (1-5): консервативный, меньше ошибок</li>
+        <li>Большой k (>10): быстрее использует unlabeled, но рискованнее</li>
+      </ul>
+      <p><strong>Мониторинг:</strong></p>
+      <ul>
+        <li>Отслеживать agreement между views</li>
+        <li>Validation accuracy обоих классификаторов</li>
+        <li>Распределение confidence scores</li>
+      </ul>
+      <p><strong>Остановка:</strong> когда agreement падает или нет confident примеров</p>
+    </div>
+  </div>
+</body>
+</html>
