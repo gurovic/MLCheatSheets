@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Модельные реестры Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, '''Segoe UI''', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: '''Consolas''', '''Courier New''', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88em; margin: 6px 0; }
+    th, td { padding: 6px 8px; text-align: left; border: 1px solid #e0e7ff; }
+    th { background-color: #1a5fb4; color: white; font-weight: 700; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📚 Модельные реестры Cheatsheet</h1>
+  <div class="subtitle">Model Registries • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы модельных реестров</h2>
+    <p><strong>Model Registry</strong>: централизованное хранилище для управления ML моделями</p>
+    <ul>
+      <li><strong>Версионирование</strong>: отслеживание версий моделей</li>
+      <li><strong>Метаданные</strong>: метрики, параметры, артефакты</li>
+      <li><strong>Жизненный цикл</strong>: staging, production, archived</li>
+      <li><strong>Lineage</strong>: отслеживание происхождения</li>
+      <li><strong>Collaboration</strong>: совместная работа команды</li>
+    </ul>
+    <blockquote>💡 Model Registry - центральная часть MLOps инфраструктуры</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. MLflow Model Registry</h2>
+    <pre><code>import mlflow
+from mlflow.tracking import MlflowClient
+
+# Логирование модели
+with mlflow.start_run() as run:
+    mlflow.sklearn.log_model(
+        model,
+        "model",
+        registered_model_name="my_model"
+    )
+
+# Работа с Registry
+client = MlflowClient()
+
+# Создание нового registered model
+client.create_registered_model(
+    "my_model",
+    tags={"task": "classification"},
+    description="My classification model"
+)
+
+# Переход между стадиями
+client.transition_model_version_stage(
+    name="my_model",
+    version=1,
+    stage="Production"
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Версионирование моделей</h2>
+    <pre><code># Регистрация новой версии
+result = mlflow.register_model(
+    model_uri=f"runs:/{run_id}/model",
+    name="my_model"
+)
+
+# Получение latest version
+latest_version = client.get_latest_versions(
+    "my_model",
+    stages=["Production"]
+)[0]
+
+# Загрузка модели по версии
+model = mlflow.pyfunc.load_model(
+    f"models:/my_model/{latest_version.version}"
+)
+
+# Загрузка модели по stage
+model = mlflow.pyfunc.load_model(
+    "models:/my_model/Production"
+)
+
+# Описание версии
+client.update_model_version(
+    name="my_model",
+    version=1,
+    description="Best model from experiment X"
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Жизненный цикл модели</h2>
+    <table>
+      <tr><th>Stage</th><th>Описание</th><th>Использование</th></tr>
+      <tr><td>None</td><td>Только зарегистрирована</td><td>Начальное состояние</td></tr>
+      <tr><td>Staging</td><td>Тестирование</td><td>Pre-production tests</td></tr>
+      <tr><td>Production</td><td>В продакшене</td><td>Активное использование</td></tr>
+      <tr><td>Archived</td><td>Архивирована</td><td>Устаревшие модели</td></tr>
+    </table>
+    <pre><code># Переход между стадиями
+client.transition_model_version_stage(
+    name="my_model",
+    version=2,
+    stage="Staging",
+    archive_existing_versions=False
+)
+
+# Архивирование старой версии
+client.transition_model_version_stage(
+    name="my_model",
+    version=1,
+    stage="Archived"
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Метаданные и теги</h2>
+    <pre><code># Добавление тегов к модели
+client.set_registered_model_tag(
+    "my_model",
+    "task",
+    "classification"
+)
+
+# Добавление тегов к версии
+client.set_model_version_tag(
+    "my_model",
+    version="1",
+    key="validation_accuracy",
+    value="0.95"
+)
+
+# Поиск моделей по тегам
+models = client.search_registered_models(
+    filter_string="tags.task = '''classification'''"
+)
+
+# Удаление тега
+client.delete_registered_model_tag(
+    "my_model",
+    "old_tag"
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Model Registry в других инструментах</h2>
+    <p><strong>W&B Model Registry</strong>:</p>
+    <pre><code>import wandb
+
+# Логирование модели
+run = wandb.init(project="my-project")
+wandb.log_model(
+    path="./model.pkl",
+    name="my-model",
+    aliases=["latest", "production"]
+)
+
+# Загрузка модели
+artifact = wandb.use_artifact(
+    "my-model:production",
+    type="model"
+)
+model_path = artifact.download()</code></pre>
+    <p><strong>Neptune.ai</strong>:</p>
+    <pre><code>import neptune
+
+run = neptune.init_run()
+run["model"].upload("model.pkl")
+run["model/signature"].upload_files("signature.json")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Автоматизация workflow</h2>
+    <pre><code># Автоматическое продвижение модели
+def promote_best_model(experiment_id, metric="accuracy"):
+    runs = mlflow.search_runs(
+        experiment_ids=[experiment_id],
+        order_by=[f"metrics.{metric} DESC"],
+        max_results=1
+    )
+    
+    best_run_id = runs.iloc[0].run_id
+    model_uri = f"runs:/{best_run_id}/model"
+    
+    # Регистрация
+    result = mlflow.register_model(
+        model_uri,
+        "my_model"
+    )
+    
+    # Продвижение в Production
+    client.transition_model_version_stage(
+        "my_model",
+        result.version,
+        "Production",
+        archive_existing_versions=True
+    )
+    
+    return result.version
+
+# Использование
+new_version = promote_best_model("exp123", "f1_score")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Webhooks и уведомления</h2>
+    <pre><code># MLflow webhooks для событий
+{
+  "model_name": "my_model",
+  "events": [
+    "MODEL_VERSION_CREATED",
+    "MODEL_VERSION_TRANSITIONED_STAGE",
+    "REGISTERED_MODEL_CREATED"
+  ],
+  "http_url_spec": {
+    "url": "https://my-service.com/webhook"
+  }
+}
+
+# Обработчик webhook
+from flask import Flask, request
+
+app = Flask(__name__)
+
+@app.route("/webhook", methods=["POST"])
+def handle_webhook():
+    event = request.json
+    
+    if event["event"] == "MODEL_VERSION_TRANSITIONED_STAGE":
+        if event["to_stage"] == "Production":
+            # Триггер deployment
+            deploy_model(event["model_name"], event["version"])
+    
+    return {"status": "ok"}</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Best Practices</h2>
+    <ul>
+      <li>✅ <strong>Семантическое версионирование</strong>: major.minor.patch</li>
+      <li>✅ <strong>Описания</strong>: документируйте каждую версию</li>
+      <li>✅ <strong>Теги</strong>: используйте для поиска и фильтрации</li>
+      <li>✅ <strong>Автоматизация</strong>: CI/CD для регистрации</li>
+      <li>✅ <strong>Approval process</strong>: перед продакшеном</li>
+      <li>✅ <strong>Rollback plan</strong>: возможность отката</li>
+      <li>✅ <strong>Мониторинг</strong>: отслеживайте performance</li>
+      <li>✅ <strong>Архивирование</strong>: старые неиспользуемые модели</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Интеграция с deployment</h2>
+    <pre><code># Deployment с MLflow
+import mlflow.sagemaker as mfs
+
+# Deploy to SageMaker
+mfs.deploy(
+    app_name="my-model",
+    model_uri="models:/my_model/Production",
+    region_name="us-east-1",
+    mode="create"
+)
+
+# Deploy to Azure ML
+from azureml.core import Workspace, Model
+
+ws = Workspace.from_config()
+model = Model.register(
+    workspace=ws,
+    model_name="my_model",
+    model_path="model.pkl"
+)
+
+# Deploy to Kubernetes
+from mlflow.deployments import get_deploy_client
+
+client = get_deploy_client("kubernetes")
+client.create_deployment(
+    name="my-model",
+    model_uri="models:/my_model/Production"
+)</code></pre>
+  </div>
+
+</div>
+</body>
+</html>

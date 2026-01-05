@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Feature Stores Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88em; margin: 6px 0; }
+    th, td { padding: 6px 8px; text-align: left; border: 1px solid #e0e7ff; }
+    th { background-color: #1a5fb4; color: white; font-weight: 700; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🗄️ Feature Stores Cheatsheet</h1>
+  <div class="subtitle">Feature Stores for ML • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы Feature Stores</h2>
+<p><strong>Feature Store</strong>: централизованное хранилище для ML признаков</p>
+<ul>
+  <li><strong>Offline store</strong>: для обучения (batch)</li>
+  <li><strong>Online store</strong>: для инференса (real-time)</li>
+  <li><strong>Feature registry</strong>: метаданные признаков</li>
+  <li><strong>Time travel</strong>: исторические значения</li>
+  <li><strong>Consistency</strong>: одинаковые фичи в training и serving</li>
+</ul>
+<blockquote>💡 Feature Store решает проблему training-serving skew</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Feast Framework</h2>
+<pre><code>from feast import FeatureStore, Entity, Feature, FeatureView
+from feast.types import Float32, Int64
+from datetime import timedelta
+
+# Определение entity
+driver = Entity(
+    name="driver_id",
+    value_type=ValueType.INT64,
+    description="Driver identifier"
+)
+
+# Feature view
+driver_stats = FeatureView(
+    name="driver_hourly_stats",
+    entities=["driver_id"],
+    ttl=timedelta(hours=1),
+    schema=[
+        Feature(name="conv_rate", dtype=Float32),
+        Feature(name="acc_rate", dtype=Float32),
+    ],
+    source=batch_source
+)
+
+# Инициализация store
+store = FeatureStore(repo_path=".")
+
+# Получение online features
+features = store.get_online_features(
+    features=[
+        "driver_hourly_stats:conv_rate",
+        "driver_hourly_stats:acc_rate",
+    ],
+    entity_rows=[{"driver_id": 1001}]
+).to_dict()
+
+# Получение historical features
+training_df = store.get_historical_features(
+    entity_df=entity_df,
+    features=[
+        "driver_hourly_stats:conv_rate",
+        "driver_hourly_stats:acc_rate",
+    ]
+).to_df()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Feature Transformations</h2>
+<pre><code># On-demand features
+from feast import on_demand_feature_view
+
+@on_demand_feature_view(
+    sources=["driver_hourly_stats"],
+    schema=[
+        Feature(name="conv_rate_plus_acc", dtype=Float32),
+    ],
+)
+def conv_rate_plus_acc(features_df):
+    df = pd.DataFrame()
+    df["conv_rate_plus_acc"] = (
+        features_df["conv_rate"] + features_df["acc_rate"]
+    )
+    return df
+
+# Stream features (Kafka)
+from feast import StreamFeatureView
+
+stream_view = StreamFeatureView(
+    name="driver_streaming_stats",
+    entities=["driver_id"],
+    ttl=timedelta(minutes=5),
+    schema=[Feature(name="current_speed", dtype=Float32)],
+    source=kafka_source
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Tecton Feature Platform</h2>
+<pre><code>from tecton import Entity, BatchFeatureView, batch_feature_view
+from datetime import timedelta
+
+@entity
+class User:
+    user_id = String(primary=True)
+
+@batch_feature_view(
+    sources=[user_events],
+    entities=[User],
+    mode="pandas",
+    online=True,
+    offline=True,
+    feature_start_time=datetime(2020, 1, 1),
+    batch_schedule=timedelta(hours=1),
+    ttl=timedelta(days=1),
+)
+def user_transaction_counts(user_events):
+    return user_events.groupby("user_id").count()
+
+# Получение features
+from tecton import get_workspace
+
+ws = get_workspace("prod")
+features = ws.get_online_features(
+    feature_service="fraud_detection",
+    join_keys={"user_id": "user_123"}
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. AWS SageMaker Feature Store</h2>
+<pre><code>import sagemaker
+from sagemaker.feature_store.feature_group import FeatureGroup
+
+feature_group = FeatureGroup(
+    name="driver-features",
+    sagemaker_session=sagemaker_session
+)
+
+# Создание feature group
+feature_group.create(
+    s3_uri=f"s3://{bucket}/feature-store",
+    record_identifier_name="driver_id",
+    event_time_feature_name="event_time",
+    role_arn=role,
+    enable_online_store=True
+)
+
+# Ingestion
+feature_group.ingest(
+    data_frame=driver_df,
+    max_workers=3,
+    wait=True
+)
+
+# Online query
+record = feature_group.get_record(
+    record_identifier_value_as_string="driver_1001"
+)
+
+# Offline query (Athena)
+query = feature_group.athena_query()
+query.run(
+    query_string="""
+        SELECT * FROM "driver-features"
+        WHERE driver_id = 'driver_1001'
+    """,
+    output_location=f"s3://{bucket}/query-results"
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Feature Versioning</h2>
+<pre><code># Feast versioning
+driver_stats_v2 = FeatureView(
+    name="driver_hourly_stats_v2",
+    entities=["driver_id"],
+    ttl=timedelta(hours=2),
+    schema=[
+        Feature(name="conv_rate", dtype=Float32),
+        Feature(name="acc_rate", dtype=Float32),
+        Feature(name="new_metric", dtype=Float32),  # New!
+    ],
+    source=batch_source_v2
+)
+
+# Использование версий
+features_v1 = store.get_online_features(
+    features=["driver_hourly_stats:conv_rate"],
+    entity_rows=[{"driver_id": 1001}]
+)
+
+features_v2 = store.get_online_features(
+    features=["driver_hourly_stats_v2:conv_rate"],
+    entity_rows=[{"driver_id": 1001}]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Feature Monitoring</h2>
+<pre><code># Отслеживание drift
+from evidently import ColumnDriftMetric
+from evidently.report import Report
+
+# Сравнение тренировочных и production features
+report = Report(metrics=[
+    ColumnDriftMetric(column_name="conv_rate"),
+    ColumnDriftMetric(column_name="acc_rate"),
+])
+
+report.run(
+    reference_data=training_features,
+    current_data=production_features
+)
+
+# Alerting
+if report.as_dict()["metrics"][0]["result"]["drift_detected"]:
+    send_alert("Feature drift detected in conv_rate")
+
+# Feast monitoring
+from feast import FeatureStore
+
+store = FeatureStore(repo_path=".")
+
+# Get feature statistics
+stats = store.get_feature_statistics(
+    feature_view_name="driver_hourly_stats",
+    start_date=datetime(2024, 1, 1),
+    end_date=datetime(2024, 1, 31)
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Feature Discovery</h2>
+<pre><code># Feast feature registry
+feature_views = store.list_feature_views()
+
+for fv in feature_views:
+    print(f"Name: {fv.name}")
+    print(f"Entities: {fv.entities}")
+    print(f"Features: {[f.name for f in fv.features]}")
+
+# Поиск по тегам
+from feast import FeatureView
+
+driver_stats = FeatureView(
+    name="driver_hourly_stats",
+    tags={"team": "drivers", "version": "v2"},
+    # ... rest of config
+)
+
+# Search features
+relevant_features = search_features(
+    tags={"team": "drivers"},
+    contains="rate"
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Best Practices</h2>
+<ul>
+  <li>✅ <strong>Унификация</strong>: одни признаки для train и serve</li>
+  <li>✅ <strong>Документация</strong>: описывайте каждый признак</li>
+  <li>✅ <strong>Версионирование</strong>: отслеживайте изменения</li>
+  <li>✅ <strong>Monitoring</strong>: следите за drift</li>
+  <li>✅ <strong>Lineage</strong>: отслеживайте происхождение</li>
+  <li>✅ <strong>Тестирование</strong>: валидируйте признаки</li>
+  <li>✅ <strong>Performance</strong>: оптимизируйте online serving</li>
+  <li>✅ <strong>Ownership</strong>: назначайте владельцев фичам</li>
+</ul>
+<blockquote>💡 Feature Store - ключевой компонент scalable ML infrastructure</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применение</h2>
+<ul>
+  <li>🎯 <strong>Recommendation systems</strong>: user и item features</li>
+  <li>🎯 <strong>Fraud detection</strong>: transaction features</li>
+  <li>🎯 <strong>Ad tech</strong>: user behavior features</li>
+  <li>🎯 <strong>Search ranking</strong>: query и document features</li>
+  <li>�� <strong>Risk models</strong>: financial features</li>
+  <li>🎯 <strong>Personalization</strong>: user preference features</li>
+</ul>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Графические модели Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88em; margin: 6px 0; }
+    th, td { padding: 6px 8px; text-align: left; border: 1px solid #e0e7ff; }
+    th { background-color: #1a5fb4; color: white; font-weight: 700; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🕸️ Графические модели Cheatsheet</h1>
+  <div class="subtitle">Graphical Models • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы графических моделей</h2>
+    <p><strong>Графические модели</strong>: представление вероятностных зависимостей через графы</p>
+    <ul>
+      <li><strong>Узлы (nodes)</strong>: случайные величины</li>
+      <li><strong>Ребра (edges)</strong>: вероятностные зависимости</li>
+      <li><strong>Типы</strong>: направленные (Bayesian networks) и ненаправленные (Markov networks)</li>
+      <li><strong>Преимущества</strong>: интуитивная визуализация, модульность, эффективный вывод</li>
+      <li><strong>Факторизация</strong>: разложение совместного распределения</li>
+    </ul>
+    <blockquote>💡 Графические модели - мощный инструмент для моделирования сложных вероятностных зависимостей</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Байесовские сети</h2>
+    <p><strong>Directed Acyclic Graph (DAG)</strong>: P(X₁, ..., Xₙ) = ∏ᵢ P(Xᵢ | Parents(Xᵢ))</p>
+    <pre><code>from pgmpy.models import BayesianNetwork
+from pgmpy.factors.discrete import TabularCPD
+
+# Создание структуры
+model = BayesianNetwork([
+    ('Rain', 'Sprinkler'),
+    ('Rain', 'Grass_Wet'),
+    ('Sprinkler', 'Grass_Wet')
+])
+
+# CPD для Rain
+cpd_rain = TabularCPD(
+    variable='Rain',
+    variable_card=2,
+    values=[[0.8], [0.2]]
+)
+
+# CPD для Sprinkler | Rain
+cpd_sprinkler = TabularCPD(
+    variable='Sprinkler',
+    variable_card=2,
+    values=[[0.6, 0.99], [0.4, 0.01]],
+    evidence=['Rain'],
+    evidence_card=[2]
+)
+
+model.add_cpds(cpd_rain, cpd_sprinkler)
+model.check_model()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Марковские сети</h2>
+    <p><strong>Undirected graphical models</strong>: P(X) = (1/Z) ∏_c ψ_c(X_c)</p>
+    <pre><code>from pgmpy.models import MarkovNetwork
+from pgmpy.factors.discrete import DiscreteFactor
+
+# Создание сети
+model = MarkovNetwork([
+    ('A', 'B'), ('B', 'C'), ('A', 'C')
+])
+
+# Потенциальные функции
+factor_ab = DiscreteFactor(
+    variables=['A', 'B'],
+    cardinality=[2, 2],
+    values=[1.0, 2.0, 2.0, 1.0]
+)
+
+model.add_factors(factor_ab)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Условная независимость</h2>
+    <table>
+      <tr><th>Структура</th><th>Независимость</th><th>Название</th></tr>
+      <tr><td>A → B → C</td><td>A ⊥ C | B</td><td>Chain</td></tr>
+      <tr><td>A ← B → C</td><td>A ⊥ C | B</td><td>Fork</td></tr>
+      <tr><td>A → B ← C</td><td>A ⊥ C (без B)</td><td>Collider</td></tr>
+    </table>
+    <p><strong>D-separation</strong>: проверка условной независимости в DAG</p>
+    <pre><code>from pgmpy.base import DAG
+
+dag = DAG([('A', 'B'), ('B', 'C')])
+is_dsep = dag.is_dconnected('A', 'C', observed=['B'])
+print(f"A d-separated from C given B: {not is_dsep}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Алгоритмы вывода</h2>
+    <pre><code>from pgmpy.inference import VariableElimination
+
+# Variable Elimination
+infer = VariableElimination(model)
+
+# Маргинальная вероятность
+result = infer.query(variables=['Grass_Wet'])
+
+# Условная вероятность
+result = infer.query(
+    variables=['Grass_Wet'],
+    evidence={'Rain': 1}
+)
+
+# MAP inference
+result = infer.map_query(
+    variables=['Sprinkler'],
+    evidence={'Grass_Wet': 1}
+)
+
+# Belief Propagation
+from pgmpy.inference import BeliefPropagation
+
+bp = BeliefPropagation(model)
+bp.calibrate()
+result = bp.query(variables=['Grass_Wet'])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Hidden Markov Models</h2>
+    <pre><code>from hmmlearn import hmm
+
+# Discrete HMM
+model = hmm.MultinomialHMM(n_components=3)
+
+# Параметры
+model.startprob_ = np.array([0.6, 0.3, 0.1])
+model.transmat_ = np.array([
+    [0.7, 0.2, 0.1],
+    [0.1, 0.8, 0.1],
+    [0.1, 0.1, 0.8]
+])
+model.emissionprob_ = np.array([
+    [0.7, 0.3],
+    [0.4, 0.6],
+    [0.1, 0.9]
+])
+
+# Генерация последовательности
+X, Z = model.sample(100)
+
+# Обучение
+model.fit(X)
+
+# Декодирование (Viterbi)
+log_prob, states = model.decode(X)
+
+# Forward-backward
+posteriors = model.predict_proba(X)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Conditional Random Fields</h2>
+    <pre><code>import sklearn_crfsuite
+
+def word2features(sent, i):
+    word = sent[i][0]
+    return {
+        'bias': 1.0,
+        'word.lower()': word.lower(),
+        'word[-3:]': word[-3:],
+        'word.isupper()': word.isupper(),
+        'word.istitle()': word.istitle(),
+    }
+
+# Training CRF
+crf = sklearn_crfsuite.CRF(
+    algorithm='lbfgs',
+    c1=0.1,
+    c2=0.1,
+    max_iterations=100
+)
+
+X_train = [
+    [word2features(s, i) for i in range(len(s))]
+    for s in train_sents
+]
+y_train = [[label for _, label in s] for s in train_sents]
+
+crf.fit(X_train, y_train)
+y_pred = crf.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Factor Graphs</h2>
+    <p><strong>Factor graphs</strong>: унифицированное представление</p>
+    <ul>
+      <li><strong>Variable nodes</strong>: случайные величины (круги)</li>
+      <li><strong>Factor nodes</strong>: функции (квадраты)</li>
+      <li><strong>Sum-Product algorithm</strong>: общий алгоритм вывода</li>
+    </ul>
+    <pre><code># P(x₁,x₂,x₃) = f_A(x₁,x₂) · f_B(x₂,x₃)
+
+class FactorGraph:
+    def __init__(self):
+        self.variables = {}
+        self.factors = {}
+    
+    def add_variable(self, name, cardinality):
+        self.variables[name] = {
+            'card': cardinality,
+            'neighbors': []
+        }
+    
+    def add_factor(self, name, variables, values):
+        self.factors[name] = {
+            'vars': variables,
+            'values': np.array(values)
+        }</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Структурное обучение</h2>
+    <pre><code>from pgmpy.estimators import HillClimbSearch, BicScore
+
+# Hill climbing с BIC score
+hc = HillClimbSearch(data)
+best_model = hc.estimate(
+    scoring_method=BicScore(data)
+)
+
+# Constraint-based (PC algorithm)
+from pgmpy.estimators import PC
+
+pc = PC(data)
+model = pc.estimate(
+    variant='stable',
+    ci_test='chi_square',
+    significance_level=0.05
+)
+
+# Обучение параметров
+from pgmpy.estimators import MaximumLikelihoodEstimator
+
+bn = BayesianNetwork(best_model.edges())
+bn.fit(data, estimator=MaximumLikelihoodEstimator)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Dynamic Bayesian Networks</h2>
+    <pre><code>from pgmpy.models import DynamicBayesianNetwork as DBN
+
+# 2-Time-Slice BN
+dbn = DBN()
+
+# Intra-slice edges
+dbn.add_edges_from([('X_0', 'Y_0')])
+
+# Inter-slice edges
+dbn.add_edges_from([
+    (('X', 0), ('X', 1)),  # X_{t-1} → X_t
+    (('Y', 0), ('Y', 1)),  # Y_{t-1} → Y_t
+    (('X', 1), ('Y', 1'))  # X_t → Y_t
+])
+
+# Inference
+from pgmpy.inference import DBNInference
+
+dbn_infer = DBNInference(dbn)
+result = dbn_infer.forward_inference(['X'])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Лучшие практики</h2>
+    <ul>
+      <li>✅ <strong>Выбор структуры</strong>: используйте domain knowledge</li>
+      <li>✅ <strong>Conditional independence</strong>: упрощает модель</li>
+      <li>✅ <strong>Валидация</strong>: проверяйте d-separation</li>
+      <li>✅ <strong>Сложность вывода</strong>: зависит от tree-width</li>
+      <li>✅ <strong>Approximate inference</strong>: для сложных моделей</li>
+      <li>✅ <strong>Библиотеки</strong>: pgmpy (Python), bnlearn (R)</li>
+      <li>✅ <strong>Визуализация</strong>: помогает понять зависимости</li>
+    </ul>
+    <blockquote>💡 Графические модели полезны когда важна интерпретируемость</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Применение</h2>
+    <ul>
+      <li>🎯 <strong>Медицина</strong>: диагностические системы</li>
+      <li>🎯 <strong>NLP</strong>: POS tagging, NER, parsing</li>
+      <li>🎯 <strong>Computer vision</strong>: segmentation</li>
+      <li>🎯 <strong>Биоинформатика</strong>: gene networks</li>
+      <li>🎯 <strong>Recommendation</strong>: user modeling</li>
+      <li>🎯 <strong>Speech recognition</strong>: HMM для фонем</li>
+      <li>🎯 <strong>Robotics</strong>: SLAM</li>
+      <li>🎯 <strong>Finance</strong>: risk modeling</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>

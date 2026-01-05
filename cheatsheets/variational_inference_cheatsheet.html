@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Вариационный вывод Cheatsheet</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.88em; margin: 6px 0; }
+    th, td { padding: 6px 8px; text-align: left; border: 1px solid #e0e7ff; }
+    th { background-color: #1a5fb4; color: white; font-weight: 700; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>�� Вариационный вывод Cheatsheet</h1>
+  <div class="subtitle">Variational Inference • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы вариационного вывода</h2>
+    <p><strong>Variational Inference (VI)</strong>: приближённый байесовский вывод через оптимизацию</p>
+    <ul>
+      <li><strong>Цель</strong>: найти q(z) ≈ p(z|x) через оптимизацию</li>
+      <li><strong>Вместо</strong> сэмплирования (MCMC) используем оптимизацию</li>
+      <li><strong>Быстрее</strong> чем MCMC, но менее точно</li>
+      <li><strong>Масштабируемость</strong>: подходит для больших данных</li>
+      <li><strong>Детерминизм</strong>: воспроизводимые результаты</li>
+    </ul>
+    <blockquote>💡 VI превращает задачу вывода в задачу оптимизации</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. ELBO и KL-дивергенция</h2>
+    <pre><code><strong>Evidence Lower Bound (ELBO):</strong>
+
+log p(x) ≥ ELBO = 𝔼_q[log p(x,z)] - 𝔼_q[log q(z)]
+           = 𝔼_q[log p(x,z) - log q(z)]
+
+<strong>KL-дивергенция:</strong>
+KL(q(z) || p(z|x)) = 𝔼_q[log q(z) - log p(z|x)]
+                    = -ELBO + log p(x)
+
+<strong>Задача оптимизации:</strong>
+max ELBO(q) ⟺ min KL(q(z) || p(z|x))
+     q              q
+
+<strong>Декомпозиция ELBO:</strong>
+ELBO = 𝔼_q[log p(x|z)] - KL(q(z) || p(z))
+       ↑                   ↑
+   reconstruction      regularization</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Mean-field вариационное семейство</h2>
+    <p><strong>Полная факторизация</strong>:</p>
+    <pre><code>q(z) = ∏ᵢ q_i(z_i)
+
+# Пример для Gaussian
+q(z) = ∏ᵢ 𝒩(z_i | μ_i, σ_i²)
+
+# В PyTorch
+import torch
+import torch.nn as nn
+
+class MeanFieldGaussian(nn.Module):
+    def __init__(self, dim):
+        super().__init__()
+        self.mu = nn.Parameter(torch.zeros(dim))
+        self.log_sigma = nn.Parameter(torch.zeros(dim))
+    
+    def sample(self, n_samples=1):
+        eps = torch.randn(n_samples, self.mu.shape[0])
+        sigma = torch.exp(self.log_sigma)
+        return self.mu + sigma * eps
+    
+    def log_prob(self, z):
+        sigma = torch.exp(self.log_sigma)
+        log_prob = -0.5 * torch.sum(
+            (z - self.mu)**2 / sigma**2 + 
+            2 * self.log_sigma + 
+            torch.log(torch.tensor(2 * 3.14159))
+        , dim=-1)
+        return log_prob</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Координатный подъем (CAVI)</h2>
+    <pre><code># Coordinate Ascent Variational Inference
+import numpy as np
+
+def cavi_gaussian_mixture(X, K, max_iter=100):
+    """CAVI для Gaussian Mixture Model"""
+    N, D = X.shape
+    
+    # Инициализация
+    r = np.random.dirichlet(np.ones(K), N)  # responsibilities
+    mu = X[np.random.choice(N, K)]
+    
+    for iteration in range(max_iter):
+        # E-step: обновить q(z)
+        for n in range(N):
+            for k in range(K):
+                r[n, k] = np.exp(
+                    -0.5 * np.sum((X[n] - mu[k])**2)
+                )
+            r[n] /= np.sum(r[n])
+        
+        # M-step: обновить q(μ)
+        for k in range(K):
+            mu[k] = np.sum(r[:, k:k+1] * X, axis=0)
+            mu[k] /= np.sum(r[:, k])
+        
+        # Вычислить ELBO
+        elbo = compute_elbo(X, mu, r)
+        
+        if iteration % 10 == 0:
+            print(f"Iteration {iteration}, ELBO: {elbo:.3f}")
+    
+    return mu, r
+
+def compute_elbo(X, mu, r):
+    N, K = r.shape
+    elbo = 0
+    for n in range(N):
+        for k in range(K):
+            if r[n, k] > 0:
+                elbo += r[n, k] * (
+                    -0.5 * np.sum((X[n] - mu[k])**2)
+                    - r[n, k] * np.log(r[n, k])
+                )
+    return elbo</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Stochastic Variational Inference</h2>
+    <pre><code>import torch
+import torch.optim as optim
+
+class StochasticVI:
+    def __init__(self, model, q_dist, lr=0.01):
+        self.model = model
+        self.q = q_dist
+        self.optimizer = optim.Adam(q.parameters(), lr=lr)
+    
+    def elbo_estimate(self, x, n_samples=1):
+        """Оценка ELBO через MC"""
+        z = self.q.sample(n_samples)  # [n_samples, dim_z]
+        
+        # Log likelihood
+        log_p_x_z = self.model.log_likelihood(x, z)
+        
+        # Log prior
+        log_p_z = self.model.log_prior(z)
+        
+        # Log variational
+        log_q_z = self.q.log_prob(z)
+        
+        # ELBO = E[log p(x,z) - log q(z)]
+        elbo = torch.mean(
+            log_p_x_z + log_p_z - log_q_z
+        )
+        
+        return elbo
+    
+    def step(self, x, n_samples=1):
+        self.optimizer.zero_grad()
+        
+        # Compute ELBO
+        elbo = self.elbo_estimate(x, n_samples)
+        
+        # Maximize ELBO = minimize -ELBO
+        loss = -elbo
+        loss.backward()
+        
+        self.optimizer.step()
+        
+        return elbo.item()
+
+# Использование
+svi = StochasticVI(model, q_dist, lr=0.01)
+for epoch in range(1000):
+    elbo = svi.step(x_batch, n_samples=10)
+    if epoch % 100 == 0:
+        print(f"Epoch {epoch}, ELBO: {elbo:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Reparametrization trick</h2>
+    <pre><code>import torch
+
+class ReparameterizedGaussian:
+    """
+    Трюк репараметризации для градиентов через случайность
+    z = μ + σ * ε, где ε ~ N(0,1)
+    """
+    def __init__(self, mu, log_sigma):
+        self.mu = mu
+        self.log_sigma = log_sigma
+    
+    def sample(self, n_samples=1):
+        eps = torch.randn(n_samples, *self.mu.shape)
+        sigma = torch.exp(self.log_sigma)
+        z = self.mu + sigma * eps
+        return z
+    
+    def log_prob(self, z):
+        sigma = torch.exp(self.log_sigma)
+        log_prob = -0.5 * (
+            ((z - self.mu) / sigma) ** 2 +
+            2 * self.log_sigma +
+            torch.log(torch.tensor(2 * 3.14159))
+        )
+        return torch.sum(log_prob, dim=-1)
+
+# VAE encoder
+class Encoder(nn.Module):
+    def __init__(self, input_dim, latent_dim):
+        super().__init__()
+        self.fc1 = nn.Linear(input_dim, 256)
+        self.fc_mu = nn.Linear(256, latent_dim)
+        self.fc_log_sigma = nn.Linear(256, latent_dim)
+    
+    def forward(self, x):
+        h = torch.relu(self.fc1(x))
+        mu = self.fc_mu(h)
+        log_sigma = self.fc_log_sigma(h)
+        return mu, log_sigma
+    
+    def encode(self, x):
+        mu, log_sigma = self.forward(x)
+        q = ReparameterizedGaussian(mu, log_sigma)
+        return q</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Variational Autoencoder (VAE)</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class VAE(nn.Module):
+    def __init__(self, input_dim, latent_dim):
+        super().__init__()
+        
+        # Encoder: q(z|x)
+        self.encoder = nn.Sequential(
+            nn.Linear(input_dim, 400),
+            nn.ReLU(),
+            nn.Linear(400, 2 * latent_dim)  # μ and log σ
+        )
+        
+        # Decoder: p(x|z)
+        self.decoder = nn.Sequential(
+            nn.Linear(latent_dim, 400),
+            nn.ReLU(),
+            nn.Linear(400, input_dim),
+            nn.Sigmoid()
+        )
+        
+        self.latent_dim = latent_dim
+    
+    def encode(self, x):
+        h = self.encoder(x)
+        mu = h[:, :self.latent_dim]
+        log_sigma = h[:, self.latent_dim:]
+        return mu, log_sigma
+    
+    def reparameterize(self, mu, log_sigma):
+        std = torch.exp(0.5 * log_sigma)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+    
+    def decode(self, z):
+        return self.decoder(z)
+    
+    def forward(self, x):
+        mu, log_sigma = self.encode(x)
+        z = self.reparameterize(mu, log_sigma)
+        return self.decode(z), mu, log_sigma
+    
+    def loss_function(self, x, x_recon, mu, log_sigma):
+        # Reconstruction loss
+        recon_loss = nn.functional.binary_cross_entropy(
+            x_recon, x, reduction='sum'
+        )
+        
+        # KL divergence: KL(q(z|x) || p(z))
+        # где p(z) = N(0, I)
+        kl_loss = -0.5 * torch.sum(
+            1 + log_sigma - mu.pow(2) - log_sigma.exp()
+        )
+        
+        return recon_loss + kl_loss
+
+# Training
+vae = VAE(input_dim=784, latent_dim=20)
+optimizer = torch.optim.Adam(vae.parameters(), lr=1e-3)
+
+for epoch in range(num_epochs):
+    for batch in dataloader:
+        x = batch.view(-1, 784)
+        
+        # Forward
+        x_recon, mu, log_sigma = vae(x)
+        loss = vae.loss_function(x, x_recon, mu, log_sigma)
+        
+        # Backward
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Amortized Inference</h2>
+    <p><strong>Амортизированный вывод</strong>: использование нейросети для q(z|x)</p>
+    <ul>
+      <li><strong>Вместо</strong>: оптимизации q для каждого x отдельно</li>
+      <li><strong>Обучаем</strong>: inference network φ: x → (μ, σ)</li>
+      <li><strong>Преимущества</strong>: быстрый вывод для новых x</li>
+      <li><strong>Применение</strong>: VAE, normalizing flows</li>
+    </ul>
+    <pre><code># Без амортизации (медленно)
+for x in dataset:
+    q_x = optimize_q_for_x(x)  # O(iterations)
+    z = q_x.sample()
+
+# С амортизацией (быстро)
+inference_net = train_inference_network(dataset)  # Once
+for x in dataset:
+    z = inference_net(x).sample()  # O(1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Black Box Variational Inference</h2>
+    <pre><code>import torch
+
+def bbvi_gradient_estimate(model, q, x, n_samples=10):
+    """
+    Black box variational inference с score function estimator
+    ∇φ ELBO = 𝔼_q[∇φ log q(z) (log p(x,z) - log q(z))]
+    """
+    z_samples = q.sample(n_samples)
+    
+    # Log joint
+    log_p_xz = model.log_joint(x, z_samples)
+    
+    # Log variational
+    log_q_z = q.log_prob(z_samples)
+    
+    # f(z) = log p(x,z) - log q(z)
+    f_z = log_p_xz - log_q_z
+    
+    # Score function: ∇φ log q(z; φ)
+    log_q_z.backward(torch.ones_like(log_q_z), retain_graph=True)
+    score = [p.grad.clone() for p in q.parameters()]
+    
+    # Gradient estimate
+    gradients = []
+    for param, sc in zip(q.parameters(), score):
+        grad = torch.mean(f_z.unsqueeze(-1) * sc, dim=0)
+        gradients.append(grad)
+    
+    return gradients
+
+# С control variates для variance reduction
+class BBVIWithBaseline:
+    def __init__(self, model, q, lr=0.01):
+        self.model = model
+        self.q = q
+        self.optimizer = torch.optim.Adam(q.parameters(), lr=lr)
+        self.baseline = 0.0  # Moving average
+        self.baseline_decay = 0.9
+    
+    def step(self, x, n_samples=10):
+        z = self.q.sample(n_samples)
+        
+        log_p_xz = self.model.log_joint(x, z)
+        log_q_z = self.q.log_prob(z)
+        
+        f_z = log_p_xz - log_q_z
+        
+        # Update baseline (moving average)
+        self.baseline = (
+            self.baseline_decay * self.baseline +
+            (1 - self.baseline_decay) * torch.mean(f_z).item()
+        )
+        
+        # Centered reward
+        f_centered = f_z - self.baseline
+        
+        # Policy gradient with baseline
+        loss = -torch.mean(f_centered * log_q_z)
+        
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+        
+        return torch.mean(f_z).item()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Сравнение методов вывода</h2>
+    <table>
+      <tr><th>Метод</th><th>Скорость</th><th>Точность</th><th>Масштабируемость</th></tr>
+      <tr><td>MCMC</td><td>⭐</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐</td></tr>
+      <tr><td>Mean-field VI</td><td>⭐⭐⭐⭐⭐</td><td>⭐⭐</td><td>⭐⭐⭐⭐⭐</td></tr>
+      <tr><td>Stochastic VI</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐</td><td>⭐⭐⭐⭐⭐</td></tr>
+      <tr><td>BBVI</td><td>⭐⭐⭐</td><td>⭐⭐⭐</td><td>⭐⭐⭐⭐</td></tr>
+      <tr><td>Normalizing Flows</td><td>⭐⭐⭐</td><td>⭐⭐⭐⭐</td><td>⭐⭐⭐</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Продвинутые техники</h2>
+    <ul>
+      <li><strong>Importance Weighted VAE</strong>: улучшенная оценка ELBO</li>
+      <li><strong>β-VAE</strong>: контроль disentanglement через β·KL</li>
+      <li><strong>Normalizing flows</strong>: более выразительный q(z)</li>
+      <li><strong>Hierarchical VI</strong>: многоуровневые latent variables</li>
+      <li><strong>Structured VI</strong>: не mean-field, сохраняем зависимости</li>
+      <li><strong>Stein VI</strong>: использование Stein's identity</li>
+    </ul>
+    <pre><code># β-VAE
+def beta_vae_loss(x, x_recon, mu, log_sigma, beta=4.0):
+    recon = F.binary_cross_entropy(x_recon, x, reduction='sum')
+    kl = -0.5 * torch.sum(1 + log_sigma - mu.pow(2) - log_sigma.exp())
+    return recon + beta * kl
+
+# Importance Weighted VAE
+def iwae_loss(x, encoder, decoder, k=50):
+    mu, log_sigma = encoder(x)
+    
+    # Sample k latent codes
+    z = reparameterize(mu, log_sigma, k)
+    
+    log_p_x_z = decoder.log_prob(x, z)
+    log_p_z = prior.log_prob(z)
+    log_q_z_x = gaussian_log_prob(z, mu, log_sigma)
+    
+    # Importance weights
+    log_w = log_p_x_z + log_p_z - log_q_z_x
+    
+    # IWAE bound
+    return -torch.logsumexp(log_w, dim=0) + np.log(k)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Практические советы</h2>
+    <ul>
+      <li>✅ <strong>Начинайте с mean-field</strong>: простота важна</li>
+      <li>✅ <strong>Мониторинг ELBO</strong>: должен расти</li>
+      <li>✅ <strong>Reparametrization trick</strong>: когда возможно</li>
+      <li>✅ <strong>Warm-up для KL</strong>: β от 0 до 1</li>
+      <li>✅ <strong>Batch normalization</strong>: стабилизирует обучение</li>
+      <li>✅ <strong>Learning rate</strong>: начните с 1e-3 - 1e-4</li>
+      <li>✅ <strong>Проверка оверфита</strong>: train vs valid ELBO</li>
+      <li>✅ <strong>Visualization</strong>: следите за latent space</li>
+    </ul>
+    <blockquote>💡 VI - это approximation, не exact inference. Всегда проверяйте качество приближения!</blockquote>
+  </div>
+
+</div>
+</body>
+</html>

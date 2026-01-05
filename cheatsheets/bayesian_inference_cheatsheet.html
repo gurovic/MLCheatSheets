@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Байесовский вывод Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 6px 0;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border: 1px solid #e0e7ff;
+    }
+
+    th {
+      background-color: #1a5fb4;
+      color: white;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔮 Байесовский вывод Cheatsheet</h1>
+  <div class="subtitle">Bayesian Inference • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы байесовского вывода</h2>
+    <p><strong>Байесовский вывод</strong>: обновление вероятностных представлений на основе наблюдений</p>
+    <ul>
+      <li><strong>Теорема Байеса</strong>: P(θ|D) = P(D|θ) × P(θ) / P(D)</li>
+      <li><strong>Prior</strong> P(θ): априорное распределение до наблюдений</li>
+      <li><strong>Likelihood</strong> P(D|θ): правдоподобие данных при параметрах</li>
+      <li><strong>Posterior</strong> P(θ|D): апостериорное распределение после наблюдений</li>
+      <li><strong>Evidence</strong> P(D): нормировочная константа</li>
+    </ul>
+    <blockquote>
+      💡 Байесовский вывод предоставляет полное распределение параметров, а не точечную оценку
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Формула Байеса</h2>
+    <pre><code><strong>Теорема Байеса:</strong>
+
+P(θ|D) = P(D|θ) × P(θ) / P(D)
+
+где:
+- θ (theta) - параметры модели
+- D - наблюдаемые данные
+- P(θ) - априорное распределение
+- P(D|θ) - функция правдоподобия
+- P(θ|D) - апостериорное распределение
+- P(D) = ∫ P(D|θ) P(θ) dθ - evidence
+
+<strong>Упрощенная форма:</strong>
+Posterior ∝ Likelihood × Prior</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Выбор априорного распределения</h2>
+    <table>
+      <tr><th>Тип</th><th>Когда использовать</th><th>Пример</th></tr>
+      <tr><td>Uninformative</td><td>Нет знаний</td><td>Uniform, Jeffreys</td></tr>
+      <tr><td>Weakly informative</td><td>Общие знания</td><td>Normal(0, 10)</td></tr>
+      <tr><td>Informative</td><td>Сильные знания</td><td>Normal(μ_expert, σ²)</td></tr>
+      <tr><td>Conjugate</td><td>Аналитическое решение</td><td>Beta для Bernoulli</td></tr>
+      <tr><td>Hierarchical</td><td>Групповые данные</td><td>Multi-level priors</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Сопряженные распределения</h2>
+    <table>
+      <tr><th>Likelihood</th><th>Conjugate Prior</th><th>Posterior</th></tr>
+      <tr><td>Bernoulli</td><td>Beta(α, β)</td><td>Beta(α+k, β+n-k)</td></tr>
+      <tr><td>Binomial</td><td>Beta(α, β)</td><td>Beta(α+k, β+n-k)</td></tr>
+      <tr><td>Multinomial</td><td>Dirichlet(α)</td><td>Dirichlet(α+counts)</td></tr>
+      <tr><td>Poisson</td><td>Gamma(α, β)</td><td>Gamma(α+Σx, β+n)</td></tr>
+      <tr><td>Normal (μ)</td><td>Normal(μ₀, σ₀²)</td><td>Normal(μ_new, σ_new²)</td></tr>
+      <tr><td>Normal (σ²)</td><td>Inverse-Gamma</td><td>Inverse-Gamma</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Байесовская линейная регрессия</h2>
+    <pre><code>import numpy as np
+from scipy import stats
+
+class BayesianLinearRegression:
+    def __init__(self, alpha=1.0, beta=1.0):
+        """
+        alpha: точность prior на веса (1/σ²)
+        beta: точность noise (1/σ²_noise)
+        """
+        self.alpha = alpha
+        self.beta = beta
+        self.m_N = None  # Posterior mean
+        self.S_N = None  # Posterior covariance
+    
+    def fit(self, X, y):
+        N, M = X.shape
+        
+        # Prior: w ~ N(0, α⁻¹I)
+        S_0 = (1/self.alpha) * np.eye(M)
+        m_0 = np.zeros(M)
+        
+        # Posterior: w ~ N(m_N, S_N)
+        S_N_inv = self.alpha * np.eye(M) + self.beta * X.T @ X
+        self.S_N = np.linalg.inv(S_N_inv)
+        self.m_N = self.beta * self.S_N @ X.T @ y
+        
+        return self
+    
+    def predict(self, X, return_std=False):
+        # Предсказание: y ~ N(m_N^T x, σ²)
+        y_pred = X @ self.m_N
+        
+        if return_std:
+            # Uncertainty: σ² = 1/β + x^T S_N x
+            y_var = 1/self.beta + np.sum(X @ self.S_N * X, axis=1)
+            y_std = np.sqrt(y_var)
+            return y_pred, y_std
+        
+        return y_pred
+    
+    def sample_weights(self, n_samples=100):
+        """Сэмплирование весов из posterior"""
+        return np.random.multivariate_normal(
+            self.m_N, self.S_N, size=n_samples
+        )
+
+# Использование
+model = BayesianLinearRegression(alpha=1.0, beta=25.0)
+model.fit(X_train, y_train)
+y_pred, y_std = model.predict(X_test, return_std=True)
+
+# Confidence intervals
+y_lower = y_pred - 1.96 * y_std
+y_upper = y_pred + 1.96 * y_std</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Байесовская классификация</h2>
+    <pre><code>import numpy as np
+from scipy import stats
+
+class BayesianLogisticRegression:
+    """Байесовская логистическая регрессия с Laplace approximation"""
+    
+    def __init__(self, alpha=1.0, max_iter=100):
+        self.alpha = alpha  # Prior precision
+        self.max_iter = max_iter
+        self.w_map = None  # MAP estimate
+        self.H_inv = None  # Inverse Hessian
+    
+    def sigmoid(self, z):
+        return 1 / (1 + np.exp(-z))
+    
+    def fit(self, X, y):
+        N, M = X.shape
+        
+        # Initialize weights
+        w = np.zeros(M)
+        
+        # Newton-Raphson optimization for MAP
+        for _ in range(self.max_iter):
+            # Predictions
+            pred = self.sigmoid(X @ w)
+            
+            # Gradient
+            grad = X.T @ (pred - y) + self.alpha * w
+            
+            # Hessian
+            R = np.diag(pred * (1 - pred))
+            H = X.T @ R @ X + self.alpha * np.eye(M)
+            
+            # Update
+            w = w - np.linalg.solve(H, grad)
+        
+        self.w_map = w
+        self.H_inv = np.linalg.inv(H)
+        
+        return self
+    
+    def predict_proba(self, X):
+        # MAP prediction
+        z = X @ self.w_map
+        p = self.sigmoid(z)
+        
+        # Uncertainty (approximate)
+        var = np.sum(X @ self.H_inv * X, axis=1)
+        
+        return p, var
+    
+    def predict(self, X, threshold=0.5):
+        p, _ = self.predict_proba(X)
+        return (p >= threshold).astype(int)
+
+# Использование
+model = BayesianLogisticRegression(alpha=1.0)
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+y_proba, uncertainty = model.predict_proba(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Bayesian Model Selection</h2>
+    <pre><code>import numpy as np
+from scipy import stats
+
+def bayesian_model_comparison(models, X, y):
+    """
+    Сравнение моделей через Bayes Factor
+    """
+    log_evidences = []
+    
+    for model in models:
+        # Вычисление log evidence (marginal likelihood)
+        # P(D|M) = ∫ P(D|θ,M) P(θ|M) dθ
+        
+        # Laplace approximation
+        model.fit(X, y)
+        
+        # Log likelihood at MAP
+        if hasattr(model, 'log_likelihood'):
+            log_like = model.log_likelihood(X, y)
+        else:
+            # Approximate for sklearn models
+            y_pred = model.predict(X)
+            log_like = -0.5 * np.sum((y - y_pred)**2)
+        
+        # Penalty for complexity (BIC approximation)
+        n_params = len(model.w_map) if hasattr(model, 'w_map') else X.shape[1]
+        n_samples = len(y)
+        log_evidence = log_like - 0.5 * n_params * np.log(n_samples)
+        
+        log_evidences.append(log_evidence)
+    
+    # Bayes Factors
+    log_evidences = np.array(log_evidences)
+    bayes_factors = np.exp(log_evidences - log_evidences[0])
+    
+    # Posterior probabilities
+    posterior_probs = bayes_factors / np.sum(bayes_factors)
+    
+    return {
+        'log_evidences': log_evidences,
+        'bayes_factors': bayes_factors,
+        'posterior_probs': posterior_probs
+    }
+
+# Использование
+results = bayesian_model_comparison([model1, model2, model3], X, y)
+print(f"Posterior probabilities: {results['posterior_probs']}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Bayesian A/B Testing</h2>
+    <pre><code>import numpy as np
+from scipy import stats
+
+def bayesian_ab_test(conversions_A, trials_A, 
+                     conversions_B, trials_B,
+                     prior_alpha=1, prior_beta=1):
+    """
+    Байесовское A/B тестирование с Beta-Binomial моделью
+    """
+    # Posterior distributions
+    posterior_A = stats.beta(
+        prior_alpha + conversions_A,
+        prior_beta + trials_A - conversions_A
+    )
+    posterior_B = stats.beta(
+        prior_alpha + conversions_B,
+        prior_beta + trials_B - conversions_B
+    )
+    
+    # Monte Carlo для P(B > A)
+    samples_A = posterior_A.rvs(size=10000)
+    samples_B = posterior_B.rvs(size=10000)
+    
+    prob_B_better = np.mean(samples_B > samples_A)
+    
+    # Expected loss
+    expected_loss_A = np.mean(np.maximum(samples_B - samples_A, 0))
+    expected_loss_B = np.mean(np.maximum(samples_A - samples_B, 0))
+    
+    # Posterior means and credible intervals
+    mean_A = posterior_A.mean()
+    mean_B = posterior_B.mean()
+    ci_A = posterior_A.interval(0.95)
+    ci_B = posterior_B.interval(0.95)
+    
+    return {
+        'prob_B_better': prob_B_better,
+        'expected_loss_A': expected_loss_A,
+        'expected_loss_B': expected_loss_B,
+        'mean_A': mean_A,
+        'mean_B': mean_B,
+        'ci_A': ci_A,
+        'ci_B': ci_B
+    }
+
+# Пример
+results = bayesian_ab_test(
+    conversions_A=100, trials_A=1000,
+    conversions_B=120, trials_B=1000
+)
+
+print(f"P(B > A) = {results['prob_B_better']:.3f}")
+print(f"Expected loss if choose A: {results['expected_loss_A']:.4f}")
+print(f"Expected loss if choose B: {results['expected_loss_B']:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Преимущества и недостатки</h2>
+    <p><strong>Преимущества</strong>:</p>
+    <ul>
+      <li>✅ Полная неопределенность (uncertainty quantification)</li>
+      <li>✅ Естественная регуляризация через prior</li>
+      <li>✅ Работает с малыми данными</li>
+      <li>✅ Incorporates prior knowledge</li>
+      <li>✅ Последовательное обновление</li>
+      <li>✅ Автоматический model selection</li>
+    </ul>
+    <p><strong>Недостатки</strong>:</p>
+    <ul>
+      <li>❌ Вычислительно затратно</li>
+      <li>❌ Требует выбора prior</li>
+      <li>❌ Сложная интерпретация</li>
+      <li>❌ Может быть чувствителен к prior</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Библиотеки для байесовского вывода</h2>
+    <pre><code># PyMC3
+import pymc3 as pm
+
+with pm.Model() as model:
+    # Priors
+    alpha = pm.Normal('alpha', mu=0, sd=10)
+    beta = pm.Normal('beta', mu=0, sd=10, shape=X.shape[1])
+    sigma = pm.HalfNormal('sigma', sd=1)
+    
+    # Linear model
+    mu = alpha + pm.math.dot(X, beta)
+    
+    # Likelihood
+    y_obs = pm.Normal('y_obs', mu=mu, sd=sigma, observed=y)
+    
+    # Inference
+    trace = pm.sample(2000, tune=1000)
+
+# Arviz для анализа
+import arviz as az
+az.plot_trace(trace)
+az.summary(trace)
+
+# Stan через PyStan
+import pystan
+
+stan_code = """
+data {
+    int<lower=0> N;
+    vector[N] x;
+    vector[N] y;
+}
+parameters {
+    real alpha;
+    real beta;
+    real<lower=0> sigma;
+}
+model {
+    y ~ normal(alpha + beta * x, sigma);
+}
+"""
+
+sm = pystan.StanModel(model_code=stan_code)
+fit = sm.sampling(data={'N': len(y), 'x': X, 'y': y})</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Лучшие практики</h2>
+    <ul>
+      <li><strong>Выбор prior</strong>: начните с weakly informative priors</li>
+      <li><strong>Prior predictive checks</strong>: симулируйте данные из prior</li>
+      <li><strong>Posterior predictive checks</strong>: проверяйте согласованность</li>
+      <li><strong>Sensitivity analysis</strong>: тестируйте разные priors</li>
+      <li><strong>Convergence diagnostics</strong>: R-hat, effective sample size</li>
+      <li><strong>Визуализация</strong>: используйте trace plots, posterior plots</li>
+      <li><strong>Документация</strong>: описывайте выбор priors</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Применение</h2>
+    <p><strong>Когда использовать байесовский вывод</strong>:</p>
+    <ul>
+      <li>🎯 Малое количество данных</li>
+      <li>🎯 Нужна оценка неопределенности</li>
+      <li>🎯 Есть prior knowledge</li>
+      <li>🎯 Последовательное обновление данных</li>
+      <li>🎯 A/B тестирование с малыми выборками</li>
+      <li>🎯 Иерархические модели</li>
+      <li>🎯 Robustness к outliers</li>
+      <li>🎯 Causal inference</li>
+    </ul>
+    <blockquote>
+      💡 Байесовский подход особенно ценен когда неопределенность критична для принятия решений
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

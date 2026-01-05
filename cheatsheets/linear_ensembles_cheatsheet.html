@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Ансамбли линейных моделей Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 6px 0;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border: 1px solid #e0e7ff;
+    }
+
+    th {
+      background-color: #1a5fb4;
+      color: white;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 Ансамбли линейных моделей Cheatsheet</h1>
+  <div class="subtitle">Linear Model Ensembles • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы ансамблей линейных моделей</h2>
+    <p><strong>Ансамбли линейных моделей</strong>: комбинирование нескольких линейных моделей для улучшения предсказаний</p>
+    <ul>
+      <li><strong>Преимущества</strong>: интерпретируемость + улучшенная точность</li>
+      <li><strong>Быстрое обучение</strong>: линейные модели обучаются быстрее деревьев</li>
+      <li><strong>Низкая дисперсия</strong>: стабильные предсказания</li>
+      <li><strong>Работа с разреженными данными</strong>: эффективны для текстов и категорий</li>
+      <li><strong>Масштабируемость</strong>: хорошо работают с большими данными</li>
+    </ul>
+    <blockquote>
+      💡 Ансамбли линейных моделей комбинируют простоту с мощностью ансамблирования
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы ансамблей линейных моделей</h2>
+    <p><strong>Основные подходы</strong>:</p>
+    <ul>
+      <li><strong>Bagging линейных моделей</strong>: обучение на bootstrap выборках</li>
+      <li><strong>Feature-based ensembles</strong>: разные наборы признаков</li>
+      <li><strong>Regularization ensembles</strong>: разные типы регуляризации (L1, L2, ElasticNet)</li>
+      <li><strong>Meta-ensembles</strong>: стекинг линейных моделей</li>
+      <li><strong>Weighted averaging</strong>: взвешенное усреднение предсказаний</li>
+      <li><strong>Voting classifiers</strong>: голосование линейных классификаторов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Bagging линейных моделей</h2>
+    <pre><code>from sklearn.ensemble import BaggingRegressor, BaggingClassifier
+from sklearn.linear_model import Ridge, LogisticRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, accuracy_score
+
+# Регрессия с bagging
+bagging_reg = BaggingRegressor(
+    base_estimator=Ridge(alpha=1.0),
+    n_estimators=10,
+    max_samples=0.8,  # 80% данных
+    max_features=0.8,  # 80% признаков
+    bootstrap=True,
+    bootstrap_features=False,
+    n_jobs=-1,
+    random_state=42
+)
+
+bagging_reg.fit(X_train, y_train)
+y_pred = bagging_reg.predict(X_test)
+rmse = mean_squared_error(y_test, y_pred, squared=False)
+
+# Классификация с bagging
+bagging_clf = BaggingClassifier(
+    base_estimator=LogisticRegression(max_iter=1000),
+    n_estimators=10,
+    max_samples=0.8,
+    random_state=42
+)
+
+bagging_clf.fit(X_train, y_train)
+y_pred = bagging_clf.predict(X_test)
+acc = accuracy_score(y_test, y_pred)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Feature-based ансамбли</h2>
+    <pre><code>import numpy as np
+from sklearn.linear_model import LinearRegression
+
+class FeatureSubsetEnsemble:
+    def __init__(self, n_models=5, feature_fraction=0.7):
+        self.n_models = n_models
+        self.feature_fraction = feature_fraction
+        self.models = []
+        self.feature_indices = []
+    
+    def fit(self, X, y):
+        n_features = X.shape[1]
+        n_select = int(n_features * self.feature_fraction)
+        
+        for i in range(self.n_models):
+            # Случайный выбор признаков
+            indices = np.random.choice(
+                n_features, n_select, replace=False
+            )
+            self.feature_indices.append(indices)
+            
+            # Обучение модели
+            model = LinearRegression()
+            model.fit(X[:, indices], y)
+            self.models.append(model)
+        
+        return self
+    
+    def predict(self, X):
+        predictions = []
+        for model, indices in zip(self.models, self.feature_indices):
+            pred = model.predict(X[:, indices])
+            predictions.append(pred)
+        
+        # Усреднение предсказаний
+        return np.mean(predictions, axis=0)
+
+# Использование
+ensemble = FeatureSubsetEnsemble(n_models=10, feature_fraction=0.7)
+ensemble.fit(X_train, y_train)
+y_pred = ensemble.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Регуляризационный ансамбль</h2>
+    <pre><code>from sklearn.linear_model import Ridge, Lasso, ElasticNet
+from sklearn.ensemble import VotingRegressor
+
+# Создание моделей с разной регуляризацией
+ridge_weak = Ridge(alpha=0.1)
+ridge_strong = Ridge(alpha=10.0)
+lasso = Lasso(alpha=1.0, max_iter=5000)
+elasticnet = ElasticNet(alpha=1.0, l1_ratio=0.5, max_iter=5000)
+
+# Ансамбль с voting
+voting_reg = VotingRegressor(
+    estimators=[
+        ('ridge_weak', ridge_weak),
+        ('ridge_strong', ridge_strong),
+        ('lasso', lasso),
+        ('elasticnet', elasticnet)
+    ],
+    weights=[1, 1, 1, 1]  # Равные веса
+)
+
+voting_reg.fit(X_train, y_train)
+y_pred = voting_reg.predict(X_test)
+
+# Для классификации
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import VotingClassifier
+
+voting_clf = VotingClassifier(
+    estimators=[
+        ('lr_l1', LogisticRegression(penalty='l1', solver='saga')),
+        ('lr_l2', LogisticRegression(penalty='l2')),
+        ('lr_elasticnet', LogisticRegression(
+            penalty='elasticnet', solver='saga', l1_ratio=0.5
+        ))
+    ],
+    voting='soft'  # 'hard' или 'soft'
+)
+
+voting_clf.fit(X_train, y_train)
+y_pred = voting_clf.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Стекинг линейных моделей</h2>
+    <pre><code>from sklearn.ensemble import StackingRegressor, StackingClassifier
+from sklearn.linear_model import (
+    Ridge, Lasso, ElasticNet, LogisticRegression
+)
+
+# Регрессия со стекингом
+base_estimators = [
+    ('ridge', Ridge(alpha=1.0)),
+    ('lasso', Lasso(alpha=1.0, max_iter=5000)),
+    ('elasticnet', ElasticNet(alpha=1.0, l1_ratio=0.5))
+]
+
+stacking_reg = StackingRegressor(
+    estimators=base_estimators,
+    final_estimator=Ridge(alpha=1.0),
+    cv=5
+)
+
+stacking_reg.fit(X_train, y_train)
+y_pred = stacking_reg.predict(X_test)
+
+# Классификация со стекингом
+base_classifiers = [
+    ('lr_l1', LogisticRegression(penalty='l1', solver='saga')),
+    ('lr_l2', LogisticRegression(penalty='l2')),
+    ('lr_elasticnet', LogisticRegression(
+        penalty='elasticnet', solver='saga', l1_ratio=0.5
+    ))
+]
+
+stacking_clf = StackingClassifier(
+    estimators=base_classifiers,
+    final_estimator=LogisticRegression(),
+    cv=5,
+    stack_method='predict_proba'
+)
+
+stacking_clf.fit(X_train, y_train)
+y_pred = stacking_clf.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Взвешенное усреднение</h2>
+    <pre><code>import numpy as np
+from sklearn.model_selection import cross_val_score
+
+# Обучение нескольких моделей
+models = [
+    Ridge(alpha=0.1),
+    Ridge(alpha=1.0),
+    Lasso(alpha=1.0, max_iter=5000),
+    ElasticNet(alpha=1.0, l1_ratio=0.5, max_iter=5000)
+]
+
+# Вычисление весов на основе CV
+weights = []
+for model in models:
+    scores = cross_val_score(
+        model, X_train, y_train, 
+        cv=5, scoring='neg_mean_squared_error'
+    )
+    weight = np.mean(scores)
+    weights.append(weight)
+
+# Нормализация весов
+weights = np.array(weights)
+weights = np.exp(weights) / np.sum(np.exp(weights))
+
+# Обучение всех моделей
+trained_models = []
+for model in models:
+    model.fit(X_train, y_train)
+    trained_models.append(model)
+
+# Взвешенное предсказание
+def weighted_predict(models, weights, X):
+    predictions = np.array([m.predict(X) for m in models])
+    return np.average(predictions, axis=0, weights=weights)
+
+y_pred = weighted_predict(trained_models, weights, X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Ансамбль с разными признаками</h2>
+    <pre><code>from sklearn.preprocessing import PolynomialFeatures
+from sklearn.pipeline import Pipeline
+
+# Модель 1: линейные признаки
+model1 = Ridge(alpha=1.0)
+
+# Модель 2: полиномиальные признаки
+model2 = Pipeline([
+    ('poly', PolynomialFeatures(degree=2, include_bias=False)),
+    ('ridge', Ridge(alpha=1.0))
+])
+
+# Модель 3: взаимодействия
+from sklearn.preprocessing import StandardScaler
+model3 = Pipeline([
+    ('scaler', StandardScaler()),
+    ('ridge', Ridge(alpha=1.0))
+])
+
+# Ансамбль
+voting = VotingRegressor(
+    estimators=[
+        ('linear', model1),
+        ('poly', model2),
+        ('scaled', model3)
+    ]
+)
+
+voting.fit(X_train, y_train)
+y_pred = voting.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Параметры и настройка</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>n_estimators</code></td><td>Число моделей в ансамбле</td><td>5-20 для линейных моделей</td></tr>
+      <tr><td><code>max_samples</code></td><td>Доля данных для bagging</td><td>0.7-0.9</td></tr>
+      <tr><td><code>max_features</code></td><td>Доля признаков</td><td>0.5-0.8</td></tr>
+      <tr><td><code>weights</code></td><td>Веса моделей в voting</td><td>Оптимизировать через CV</td></tr>
+      <tr><td><code>voting</code></td><td>'hard' или 'soft'</td><td>'soft' для вероятностей</td></tr>
+      <tr><td><code>cv</code></td><td>Кросс-валидация для стекинга</td><td>5-10 фолдов</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Преимущества и недостатки</h2>
+    <p><strong>Преимущества</strong>:</p>
+    <ul>
+      <li>✅ Сохраняется интерпретируемость</li>
+      <li>✅ Быстрое обучение и предсказание</li>
+      <li>✅ Низкое потребление памяти</li>
+      <li>✅ Хорошо работают с разреженными данными</li>
+      <li>✅ Устойчивость к выбросам (с регуляризацией)</li>
+    </ul>
+    <p><strong>Недостатки</strong>:</p>
+    <ul>
+      <li>❌ Ограниченная способность моделировать нелинейности</li>
+      <li>❌ Требуется feature engineering</li>
+      <li>❌ Меньшая точность чем у tree-based моделей</li>
+      <li>❌ Чувствительность к масштабу признаков</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Лучшие практики</h2>
+    <ul>
+      <li><strong>Нормализация</strong>: всегда нормализуйте признаки</li>
+      <li><strong>Разнообразие</strong>: используйте разные типы регуляризации</li>
+      <li><strong>Feature engineering</strong>: создавайте информативные признаки</li>
+      <li><strong>Валидация</strong>: используйте кросс-валидацию для подбора весов</li>
+      <li><strong>Мониторинг</strong>: следите за корреляцией между моделями</li>
+      <li><strong>Оптимизация</strong>: начните с малого числа моделей (5-10)</li>
+      <li><strong>Баланс</strong>: компромисс между сложностью и производительностью</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Применение</h2>
+    <p><strong>Когда использовать</strong>:</p>
+    <ul>
+      <li>🎯 <strong>Высокоразмерные данные</strong>: текст, категории</li>
+      <li>🎯 <strong>Требуется интерпретируемость</strong>: регуляторные требования</li>
+      <li>🎯 <strong>Ограниченные ресурсы</strong>: малая память, быстрые предсказания</li>
+      <li>🎯 <strong>Онлайн обучение</strong>: инкрементальное обновление</li>
+      <li>🎯 <strong>Разреженные данные</strong>: много нулей в матрице признаков</li>
+      <li>🎯 <strong>Большие данные</strong>: миллионы примеров</li>
+    </ul>
+    <blockquote>
+      💡 Ансамбли линейных моделей - отличный выбор для production систем требующих скорости и интерпретируемости
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

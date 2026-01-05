@@ -129,8 +129,8 @@
 1. [Advanced Model Ensembling](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/advanced_ensembling_cheatsheet.html)
 1. Блендинг (Blending)
 1. Ансамбли деревьев
-1. Ансамбли линейных моделей
-1. Диверсификация ансамблей
+1. [Ансамбли линейных моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/linear_ensembles_cheatsheet.html)
+1. [Диверсификация ансамблей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ensemble_diversification_cheatsheet.html)
 
 ### **12. Статистические методы**
 1. [Статистические методы для ML (Bootstrap, тесты)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/statistical_methods_cheatsheet.html)
@@ -139,13 +139,13 @@
 1. [Дисперсионный анализ (ANOVA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/anova_cheatsheet.html)
 1. [Bootstrap](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bootstrap_methods_cheatsheet.html)
 1. [Статистическая проверка гипотез](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hypothesis_testing_cheatsheet.html)
-1. Байесовский вывод
+1. [Байесовский вывод](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bayesian_inference_cheatsheet.html)
 1. [Скрытые марковские модели (HMM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hmm_cheatsheet.html)
 1. [Гауссовские процессы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gaussian_processes_cheatsheet.html)
-1. Вариационный вывод
+1. [Вариационный вывод](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/variational_inference_cheatsheet.html)
 1. [Марковские цепи Монте-Карло (MCMC) и Байесовский вывод](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mcmc_bayesian_inference_cheatsheet.html)
 1. Expectation-Maximization (EM)
-1. Графические модели
+1. [Графические модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/graphical_models_cheatsheet.html)
 1. Наивный Байес (как байесовский метод)
 
 ### **13. Проектирование признаков (Feature Engineering)**
@@ -177,9 +177,9 @@
 1. [Пайплайны ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ml_pipelines_cheatsheet.html)
 1. [MLOps Best Practices](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mlops_best_practices_cheatsheet.html)
 1. [Мониторинг моделей и A/B тестирование](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_monitoring_ab_testing_cheatsheet.html)
-1. Модельные реестры
-1. Feature stores
-1. CI/CD для ML
+1. [Модельные реестры](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_registries_cheatsheet.html)
+1. [Feature stores](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_stores_cheatsheet.html)
+1. [CI/CD для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cicd_ml_cheatsheet.html)
 
 ### **17. Специальные алгоритмы**
 1. [Метод главных компонент (PCA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pca_method_cheatsheet.html)
@@ -202,8 +202,8 @@
 1. [Регуляризация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/regularization_cheatsheet.html)
 1. [Байесовский подход](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bayesian_approach_cheatsheet.html)
 1. [Теория информации в ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/information_theory_ml_cheatsheet.html)
-1. Линейная алгебра и оптимизация
-1. Теория графов для ML
+1. [Линейная алгебра и оптимизация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/linear_algebra_optimization_cheatsheet.html)
+1. [Теория графов для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/graph_theory_ml_cheatsheet.html)
 1. Теория решений
 
 ### **20. Инструменты и библиотеки**
