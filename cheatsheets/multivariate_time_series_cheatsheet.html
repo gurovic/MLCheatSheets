@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Многомерные временные ряды Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 Многомерные временные ряды Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Определение</strong>: несколько взаимосвязанных временных рядов</li>
+      <li><strong>Формат</strong>: матрица (время × переменные)</li>
+      <li><strong>Зависимости</strong>: между переменными и во времени</li>
+      <li><strong>Примеры</strong>: метео-данные, финансы, IoT</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Отличия от одномерных</h2>
+    <table>
+      <tr><th>Аспект</th><th>Одномерные</th><th>Многомерные</th></tr>
+      <tr><td>Переменных</td><td>1</td><td>2+</td></tr>
+      <tr><td>Зависимости</td><td>Только временные</td><td>Временные + кросс-переменные</td></tr>
+      <tr><td>Сложность</td><td>Низкая</td><td>Высокая</td></tr>
+      <tr><td>Интерпретация</td><td>Простая</td><td>Сложная</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. VAR (Vector Autoregression)</h2>
+    <p><strong>Модель:</strong></p>
+    <pre><code>y_t = c + A₁y_{t-1} + A₂y_{t-2} + ... + Aₚy_{t-p} + ε_t
+
+где:
+y_t ∈ ℝⁿ — вектор переменных в момент t
+Aᵢ ∈ ℝⁿˣⁿ — матрицы коэффициентов
+p — порядок модели (лаги)</code></pre>
+
+    <p><strong>Применение:</strong> экономические ряды, макропоказатели</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. VAR в Python</h2>
+    <pre><code>from statsmodels.tsa.api import VAR
+import pandas as pd
+
+# Данные: DataFrame с временными рядами
+data = pd.DataFrame({
+    'temp': temperature_series,
+    'humidity': humidity_series,
+    'pressure': pressure_series
+})
+
+# Модель VAR
+model = VAR(data)
+results = model.fit(maxlags=5)
+
+# Прогноз на 10 шагов вперёд
+forecast = results.forecast(data.values[-5:], steps=10)
+print(forecast)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Granger Causality</h2>
+    <p><strong>Вопрос:</strong> помогает ли X предсказать Y?</p>
+    <ul>
+      <li><strong>Тест</strong>: проверяем улучшение прогноза</li>
+      <li><strong>H₀</strong>: X не Granger-причина для Y</li>
+      <li><strong>Не эквивалентно причинности!</strong></li>
+    </ul>
+
+    <pre><code>from statsmodels.tsa.stattools import grangercausalitytests
+
+# Тест для пары рядов
+result = grangercausalitytests(data[['y', 'x']], maxlag=5)
+
+# p-value < 0.05 → X Granger-причина для Y</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. LSTM для многомерных рядов</h2>
+    <pre><code>import torch.nn as nn
+
+class MultivariateLSTM(nn.Module):
+    def __init__(self, num_features, hidden_size, num_layers):
+        super().__init__()
+        self.lstm = nn.LSTM(
+            input_size=num_features,
+            hidden_size=hidden_size,
+            num_layers=num_layers,
+            batch_first=True
+        )
+        self.fc = nn.Linear(hidden_size, num_features)
+    
+    def forward(self, x):
+        # x: (batch, seq_len, num_features)
+        lstm_out, _ = self.lstm(x)
+        # Предсказываем следующий шаг
+        pred = self.fc(lstm_out[:, -1, :])
+        return pred  # (batch, num_features)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Temporal Convolutional Networks (TCN)</h2>
+    <p><strong>Преимущества над RNN:</strong></p>
+    <ul>
+      <li>Параллелизация</li>
+      <li>Stable gradients</li>
+      <li>Гибкое receptive field</li>
+    </ul>
+
+    <pre><code>from tcn import TemporalConvNet
+
+class TCNForecaster(nn.Module):
+    def __init__(self, num_inputs, num_channels, output_size):
+        super().__init__()
+        self.tcn = TemporalConvNet(
+            num_inputs, 
+            num_channels, 
+            kernel_size=3
+        )
+        self.linear = nn.Linear(num_channels[-1], output_size)
+    
+    def forward(self, x):
+        # x: (batch, seq_len, features)
+        x = x.transpose(1, 2)  # (batch, features, seq_len)
+        y = self.tcn(x)
+        return self.linear(y[:, :, -1])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Transformer для временных рядов</h2>
+    <p><strong>Идея:</strong> self-attention видит всю историю</p>
+    <ul>
+      <li><strong>Плюсы</strong>: long-range dependencies</li>
+      <li><strong>Минусы</strong>: квадратичная сложность</li>
+    </ul>
+
+    <pre><code>class TimeSeriesTransformer(nn.Module):
+    def __init__(self, d_model, nhead, num_layers, num_features):
+        super().__init__()
+        self.input_proj = nn.Linear(num_features, d_model)
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model, nhead
+        )
+        self.transformer = nn.TransformerEncoder(
+            encoder_layer, num_layers
+        )
+        self.output_proj = nn.Linear(d_model, num_features)
+    
+    def forward(self, x):
+        # x: (batch, seq_len, features)
+        x = self.input_proj(x)
+        x = x.transpose(0, 1)  # (seq_len, batch, d_model)
+        x = self.transformer(x)
+        x = x[-1]  # Последний временной шаг
+        return self.output_proj(x)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Методы нормализации</h2>
+    <table>
+      <tr><th>Метод</th><th>Формула</th><th>Когда использовать</th></tr>
+      <tr><td><strong>Min-Max</strong></td><td>(x - min)/(max - min)</td><td>Ограниченный диапазон</td></tr>
+      <tr><td><strong>Z-score</strong></td><td>(x - μ)/σ</td><td>Нормальное распределение</td></tr>
+      <tr><td><strong>Log</strong></td><td>log(x)</td><td>Экспоненциальный рост</td></tr>
+      <tr><td><strong>Differencing</strong></td><td>x_t - x_{t-1}</td><td>Тренды</td></tr>
+    </table>
+
+    <p><strong>Важно:</strong> нормализовать каждую переменную отдельно!</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Dynamic Time Warping (DTW)</h2>
+    <p><strong>Задача:</strong> измерить сходство временных рядов с разной скоростью</p>
+    <pre><code>from dtaidistance import dtw
+
+# Сравнение двух рядов
+distance = dtw.distance(series1, series2)
+
+# DTW матрица для многомерных
+from dtaidistance import dtw_ndim
+
+distance = dtw_ndim.distance(
+    multivariate_series1, 
+    multivariate_series2
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Коинтеграция</h2>
+    <p><strong>Определение:</strong> два нестационарных ряда, но их линейная комбинация стационарна</p>
+    <ul>
+      <li><strong>Пример</strong>: цены акций в одной отрасли</li>
+      <li><strong>Тест</strong>: Engle-Granger, Johansen</li>
+    </ul>
+
+    <pre><code>from statsmodels.tsa.vector_ar.vecm import coint_johansen
+
+# Johansen тест
+result = coint_johansen(data, det_order=0, k_ar_diff=1)
+
+# Число коинтеграционных отношений
+print(result.lr1)  # Trace statistic
+print(result.cvt)  # Critical values</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Feature Engineering</h2>
+    <ul>
+      <li><strong>Лаги</strong>: X_{t-1}, X_{t-2}, ...</li>
+      <li><strong>Rolling statistics</strong>: mean, std, min, max</li>
+      <li><strong>Дифференцирование</strong>: ΔX_t = X_t - X_{t-1}</li>
+      <li><strong>Fourier признаки</strong>: выделение периодичности</li>
+      <li><strong>Cross-variable interaction</strong>: X₁ * X₂</li>
+    </ul>
+
+    <pre><code># Пример: создание признаков
+df['temp_lag1'] = df['temp'].shift(1)
+df['temp_rolling_mean'] = df['temp'].rolling(window=7).mean()
+df['temp_humidity'] = df['temp'] * df['humidity']</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Evaluation Metrics</h2>
+    <p><strong>Для каждой переменной:</strong></p>
+    <ul>
+      <li><strong>MAE</strong>: среднее абсолютное отклонение</li>
+      <li><strong>RMSE</strong>: корень из средней квадратичной ошибки</li>
+      <li><strong>MAPE</strong>: процентная ошибка</li>
+    </ul>
+
+    <p><strong>Агрегированная метрика:</strong></p>
+    <pre><code>overall_mae = np.mean([
+    mae_var1, mae_var2, ..., mae_varN
+])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Переменные взаимосвязаны</li>
+          <li>Нужен совместный прогноз</li>
+          <li>Есть кросс-зависимости</li>
+          <li>Системный анализ</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Переменные независимы</li>
+          <li>Малый объем данных</li>
+          <li>Разные частоты измерений</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <ul>
+      <li>[ ] Проверить стационарность каждого ряда</li>
+      <li>[ ] Нормализовать данные</li>
+      <li>[ ] Проверить Granger causality</li>
+      <li>[ ] Выбрать модель (VAR, LSTM, Transformer)</li>
+      <li>[ ] Определить порядок лагов</li>
+      <li>[ ] Разделить на train/val/test</li>
+      <li>[ ] Обучить и валидировать</li>
+      <li>[ ] Оценить для каждой переменной</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Многомерные временные ряды — это как погода: температура, влажность, давление меняются вместе и влияют друг на друга. Модель учитывает эти связи для более точного прогноза».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

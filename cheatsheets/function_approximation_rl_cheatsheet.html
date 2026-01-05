@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Функции приближения в RL Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🤖 Функции приближения в RL Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Проблема табличных методов</strong>: не масштабируются на большие пространства состояний</li>
+      <li><strong>Решение</strong>: аппроксимация функций значений параметрическими моделями</li>
+      <li><strong>Цель</strong>: обобщение на невиденные состояния</li>
+      <li><strong>Популярные методы</strong>: линейные, ядерные, нейросетевые</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Зачем нужны функции приближения</h2>
+    <ul>
+      <li><strong>Непрерывные пространства</strong>: бесконечное число состояний</li>
+      <li><strong>Большие дискретные пространства</strong>: миллионы состояний (шахматы, Го)</li>
+      <li><strong>Обобщение</strong>: похожие состояния → похожие значения</li>
+      <li><strong>Эффективность памяти</strong>: вместо таблицы — параметры модели</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Линейная аппроксимация</h2>
+    <p><strong>Формула:</strong></p>
+    <pre><code>V̂(s, w) = w₁φ₁(s) + w₂φ₂(s) + ... + wₙφₙ(s)
+         = wᵀφ(s)
+
+где:
+w = вектор параметров
+φ(s) = вектор признаков состояния s</code></pre>
+
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Простота реализации</li>
+      <li>Гарантии сходимости</li>
+      <li>Быстрое обучение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Признаки (Features)</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Пример</th></tr>
+      <tr><td><strong>Полиномиальные</strong></td><td>Степени переменных</td><td>x, x², x³</td></tr>
+      <tr><td><strong>Fourier</strong></td><td>Периодические функции</td><td>sin(πx), cos(2πx)</td></tr>
+      <tr><td><strong>Tile coding</strong></td><td>Бинарные признаки</td><td>Сетка тайлов</td></tr>
+      <tr><td><strong>Radial Basis</strong></td><td>Гауссианы</td><td>exp(-||x-c||²)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Градиентное обучение</h2>
+    <p><strong>Обновление весов:</strong></p>
+    <pre><code>w ← w + α[R + γV̂(s', w) - V̂(s, w)]∇V̂(s, w)
+
+где:
+α = learning rate
+R = reward
+γ = discount factor
+∇V̂(s, w) = градиент по параметрам</code></pre>
+
+    <p><strong>Для линейной аппроксимации:</strong></p>
+    <pre><code>∇V̂(s, w) = φ(s)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Ядерные методы</h2>
+    <p><strong>Идея:</strong> использовать ядра для измерения сходства состояний</p>
+    <ul>
+      <li><strong>RBF ядро</strong>: k(s, s') = exp(-||s-s'||²/2σ²)</li>
+      <li><strong>Полиномиальное</strong>: k(s, s') = (sᵀs' + c)ᵈ</li>
+      <li><strong>Преимущество</strong>: работают в высокомерных пространствах</li>
+    </ul>
+
+    <p><strong>LSTD (Least-Squares TD):</strong></p>
+    <pre><code>w = (ΦᵀΦ)⁻¹ΦᵀR
+
+где Φ — матрица признаков</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Tile Coding</h2>
+    <p><strong>Суть:</strong> разбить пространство на перекрывающиеся сетки</p>
+    <ul>
+      <li><strong>Создание</strong>: несколько сеток со смещением</li>
+      <li><strong>Активация</strong>: бинарные признаки (1 если внутри тайла)</li>
+      <li><strong>Обобщение</strong>: контролируется размером тайлов</li>
+      <li><strong>Разрешение</strong>: контролируется числом сеток</li>
+    </ul>
+
+    <pre><code># Python пример
+import numpy as np
+
+def tile_coding(state, num_tilings=8, tiles_per_dim=8):
+    features = np.zeros(num_tilings * tiles_per_dim**2)
+    for i in range(num_tilings):
+        offset = i / num_tilings
+        idx = int((state + offset) * tiles_per_dim)
+        features[i * tiles_per_dim + idx] = 1
+    return features</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Нейросетевая аппроксимация</h2>
+    <p><strong>Deep Q-Network (DQN) пример:</strong></p>
+    <pre><code>import torch
+import torch.nn as nn
+
+class QNetwork(nn.Module):
+    def __init__(self, state_dim, action_dim):
+        super().__init__()
+        self.fc1 = nn.Linear(state_dim, 128)
+        self.fc2 = nn.Linear(128, 128)
+        self.fc3 = nn.Linear(128, action_dim)
+    
+    def forward(self, state):
+        x = torch.relu(self.fc1(state))
+        x = torch.relu(self.fc2(x))
+        return self.fc3(x)
+
+# Использование
+q_net = QNetwork(state_dim=4, action_dim=2)
+q_values = q_net(state_tensor)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Нестабильность</td><td>Target network, experience replay</td></tr>
+      <tr><td>Катастрофическое забывание</td><td>Replay buffer</td></tr>
+      <tr><td>Переоценка значений</td><td>Double Q-learning</td></tr>
+      <tr><td>Медленная сходимость</td><td>Batch normalization</td></tr>
+      <tr><td>Exploration</td><td>ε-greedy, Boltzmann</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Скорость</th><th>Точность</th><th>Сложность</th></tr>
+      <tr><td><strong>Линейный</strong></td><td>Быстро</td><td>Средняя</td><td>Низкая</td></tr>
+      <tr><td><strong>Tile Coding</strong></td><td>Быстро</td><td>Хорошая</td><td>Средняя</td></tr>
+      <tr><td><strong>RBF</strong></td><td>Средне</td><td>Хорошая</td><td>Средняя</td></tr>
+      <tr><td><strong>Нейросеть</strong></td><td>Медленно</td><td>Отличная</td><td>Высокая</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Гиперпараметры</h2>
+    <ul>
+      <li><strong>Learning rate (α)</strong>: 0.001 - 0.1</li>
+      <li><strong>Discount factor (γ)</strong>: 0.9 - 0.99</li>
+      <li><strong>Число признаков</strong>: зависит от задачи</li>
+      <li><strong>Batch size</strong>: 32-256 (для нейросетей)</li>
+      <li><strong>Target update freq</strong>: каждые 1000-10000 шагов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Большие пространства состояний</li>
+          <li>Непрерывные состояния</li>
+          <li>Нужно обобщение</li>
+          <li>Ограничена память</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Маленькие дискретные пространства</li>
+          <li>Нужны гарантии оптимальности</li>
+          <li>Нет вычислительных ресурсов</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать тип аппроксимации (линейная, ядерная, нейросеть)</li>
+      <li>[ ] Создать подходящие признаки для состояний</li>
+      <li>[ ] Настроить learning rate</li>
+      <li>[ ] Использовать нормализацию признаков</li>
+      <li>[ ] Добавить regularization при необходимости</li>
+      <li>[ ] Мониторить TD error</li>
+      <li>[ ] Использовать target network для стабильности</li>
+      <li>[ ] Тестировать на простых задачах сначала</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Функция приближения в RL — это как научиться оценивать ситуации по опыту. Вместо того, чтобы запоминать каждую ситуацию отдельно, агент учится распознавать паттерны и применять знания из похожих ситуаций».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

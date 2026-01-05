@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Neural Oblivious Decision Ensembles Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🤖 Neural Oblivious Decision Ensembles Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Идея</strong>: дифференцируемые decision trees</li>
+      <li><strong>Архитектура</strong>: soft decision trees</li>
+      <li><strong>Преимущество</strong>: интерпретируемость + мощность NN</li>
+      <li><strong>Применение</strong>: табличные данные</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Oblivious Decision Trees</h2>
+    <ul>
+      <li>Все узлы на уровне используют один признак</li>
+      <li>Симметричная структура</li>
+      <li>Быстрое inference</li>
+      <li>Меньше overfitting</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Soft Splits</h2>
+    <ul>
+      <li>Вместо hard splits: sigmoid</li>
+      <li>Дифференцируемые</li>
+      <li>Обучаются backpropagation</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Архитектура NODE</h2>
+    <ul>
+      <li>Вход → Feature transforms</li>
+      <li>Multiple oblivious trees</li>
+      <li>Ensemble outputs</li>
+      <li>Learnable splits</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Обучение</h2>
+    <ul>
+      <li>End-to-end gradient descent</li>
+      <li>Joint optimization</li>
+      <li>Regularization for sparsity</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. vs XGBoost</h2>
+    <ul>
+      <li>NODE: дифференцируем</li>
+      <li>XGBoost: более зрелый</li>
+      <li>NODE: лучше с градиентами</li>
+      <li>Ensemble обоих - best</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Гиперпараметры</h2>
+    <ul>
+      <li>Depth: 4-8</li>
+      <li>Num trees: 1024-2048</li>
+      <li>Learning rate: 0.001</li>
+      <li>Choice function: entmax</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Implementation</h2>
+    <ul>
+      <li>torch-based</li>
+      <li>Custom layers</li>
+      <li>Attention mechanism</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Интерпретация</h2>
+    <ul>
+      <li>Feature importance</li>
+      <li>Tree visualization</li>
+      <li>Decision paths</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <ul>
+      <li>Табличные данные</li>
+      <li>Нужна интерпретируемость</li>
+      <li>Хотите end-to-end обучение</li>
+      <li>Комбинировать с NN</li>
+    </ul>
+  </div>
+
+
+  <div class="block">
+    <h2>🔷 11. Математика soft splits</h2>
+    <p>Как работают дифференцируемые splits</p>
+    <ul>
+      <li>Sigmoid вместо hard threshold</li>
+      <li>P(left) = σ(α(x - threshold))</li>
+      <li>Обе ветви получают вклад</li>
+      <li>α контролирует жесткость</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Feature selection</h2>
+    <p>Выбор признаков в NODE</p>
+    <ul>
+      <li>Learnable attention на признаки</li>
+      <li>Sparse gates</li>
+      <li>Автоматически отбрасывает нерелевантные</li>
+      <li>Интерпретируемость</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Обучение end-to-end</h2>
+    <p>Процесс обучения NODE</p>
+    <ul>
+      <li>Инициализация: случайные splits</li>
+      <li>Forward pass через все деревья</li>
+      <li>Backpropagation градиентов</li>
+      <li>Update splits и leaf values</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Применения</h2>
+    <p>Где использовать NODE</p>
+    <ul>
+      <li>Кредитный скоринг: интерпретируемость важна</li>
+      <li>Медицина: нужны объяснения</li>
+      <li>Fraud detection: табличные данные</li>
+      <li>Любые табличные задачи</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Код пример</h2>
+    <p>Использование NODE</p>
+    <ul>
+    </ul>
+    <pre><code>from node import NODE
+
+model = NODE(
+    input_dim=X.shape[1],
+    num_trees=1024,
+    depth=6,
+    choice_function='entmax15'
+)
+
+model.fit(X_train, y_train,
+          eval_set=(X_val, y_val))
+
+preds = model.predict(X_test)</code></pre>
+    <ul>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <p>Практические шаги</p>
+    <ul>
+      <li>[ ] Подготовить табличные данные</li>
+      <li>[ ] Попробовать XGBoost/LightGBM baseline</li>
+      <li>[ ] Обучить NODE модель</li>
+      <li>[ ] Настроить depth и num_trees</li>
+      <li>[ ] Визуализировать деревья</li>
+      <li>[ ] Анализировать feature importance</li>
+      <li>[ ] Сравнить с baseline</li>
+      <li>[ ] Рассмотреть ensemble</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

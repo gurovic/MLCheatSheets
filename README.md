@@ -300,10 +300,10 @@
 1. [Монте-Карло методы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/monte_carlo_methods_cheatsheet.html)
 1. [Временная разница (TD-learning)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/td_learning_cheatsheet.html)
 1. [Q-learning и SARSA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/q_learning_sarsa_cheatsheet.html)
-1. Функции приближения (линейные, ядерные)
+1. [Функции приближения (линейные, ядерные)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/function_approximation_rl_cheatsheet.html)
 1. [Иерархическое RL](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hierarchical_rl_detailed_cheatsheet.html)
 1. Многозадачное RL
-1. Инверсное RL
+1. [Инверсное RL](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/inverse_rl_cheatsheet.html)
 
 ## II Глубокое обучение
 
@@ -437,21 +437,21 @@
 1. [Graph Convolutional Networks (GCN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gcn_cheatsheet.html)
 1. [Graph Attention Networks (GAT)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gat_cheatsheet.html)
 1. [Message Passing Networks](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/message_passing_networks_cheatsheet.html)
-1. Применения GNN
+1. [Применения GNN](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gnn_applications_cheatsheet.html)
 
 ### **15. Временные ряды и прогнозирование**
 1. [RNN/LSTM для временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rnn_lstm_time_series_cheatsheet.html)
 1. [CNN для временных рядов (TCN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_time_series_tcn_cheatsheet.html)
 1. [Transformers для временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transformers_time_series_cheatsheet.html)
-1. Многомерные временные ряды
-1. Аномалии во временных рядах
-1. Прогнозирование спроса и трафика
+1. [Многомерные временные ряды](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multivariate_time_series_cheatsheet.html)
+1. [Аномалии во временных рядах](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_anomalies_cheatsheet.html)
+1. [Прогнозирование спроса и трафика](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/demand_traffic_forecasting_cheatsheet.html)
 
 ### **16. Нейросети для табличных данных**
-1. MLP для табличных данных
+1. [MLP для табличных данных](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mlp_tabular_data_cheatsheet.html)
 1. [TabNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tabnet_cheatsheet.html)
-1. Neural Oblivious Decision Ensembles
-1. AutoML для нейросетей
+1. [Neural Oblivious Decision Ensembles](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/node_ensemble_cheatsheet.html)
+1. [AutoML для нейросетей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/automl_neural_networks_cheatsheet.html)
 1. Сравнение с классическими методами
 
 ### **17. Этичные аспекты и безопасность**
@@ -490,7 +490,7 @@
 
 ### **21. Специальные архитектуры**
 1. [Capsule networks](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/capsule_networks_cheatsheet.html)
-1. Spiking neural networks
+1. [Spiking neural networks](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/spiking_neural_networks_cheatsheet.html)
 1. Neural ODEs
 1. Differentiable programming
 1. Memory networks
