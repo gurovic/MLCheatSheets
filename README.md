@@ -452,23 +452,23 @@
 1. [TabNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tabnet_cheatsheet.html)
 1. [Neural Oblivious Decision Ensembles](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/node_ensemble_cheatsheet.html)
 1. [AutoML для нейросетей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/automl_neural_networks_cheatsheet.html)
-1. Сравнение с классическими методами
+1. [Сравнение с классическими методами](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/comparison_neural_classical_cheatsheet.html)
 
 ### **17. Этичные аспекты и безопасность**
 1. Adversarial attacks
-1. Defensive distillation
+1. [Defensive distillation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/defensive_distillation_cheatsheet.html)
 1. [Adversarial training](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adversarial_training_cheatsheet.html)
-1. Bias в нейросетях
+1. [Bias в нейросетях](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bias_neural_networks_cheatsheet.html)
 1. Fairness в ML
 1. [Federated learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/federated_learning_cheatsheet.html)
 1. [Differential privacy](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/differential_privacy_cheatsheet.html)
 
 ### **18. Производство и MLOps**
-1. Model Deployment
+1. [Model Deployment](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_deployment_cheatsheet.html)
 1. Сериализация нейросетей
-1. ONNX формат
-1. TensorFlow Serving
-1. TorchServe
+1. [ONNX формат](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/onnx_format_cheatsheet.html)
+1. [TensorFlow Serving](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tensorflow_serving_cheatsheet.html)
+1. [TorchServe](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/torchserve_cheatsheet.html)
 1. Мониторинг моделей
 1. CI/CD для ML
 1. Feature stores
@@ -479,7 +479,7 @@
 1. [JAX и Flax](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/jax_flax_cheatsheet.html)
 1. [Hugging Face Transformers](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hugging_face_transformers_cheatsheet.html)
 1. [PyTorch Lightning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pytorch_lightning_cheatsheet.html)
-1. FastAI
+1. [FastAI](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fastai_cheatsheet.html)
 
 ### **20. Теория глубокого обучения**
 1. Теорема универсальной аппроксимации
@@ -504,7 +504,7 @@
 ### **23. Креативные приложения**
 1. [Neural style transfer](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_style_transfer_cheatsheet.html)
 1. [Image-to-image translation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/image_to_image_translation_cheatsheet.html)
-1. Text-to-image generation
+1. [Text-to-image generation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/text_to_image_generation_cheatsheet.html)
 1. Музыкальные нейросети
 1. Генерация видео
 
@@ -512,7 +512,7 @@
 1. Нейросети в физике
 1. Нейросети в химии
 1. Нейросети в биологии
-1. Нейросети в медицине
+1. [Нейросети в медицине](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_networks_medicine_cheatsheet.html)
 1. Нейросети в астрономии
 
 ### **25. История и эволюция**
