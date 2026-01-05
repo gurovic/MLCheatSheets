@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>CNN для временных рядов (TCN) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🌊 CNN для временных рядов (TCN) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+
+  <div class="block">
+    <h2>🔷 1. Суть TCN</h2>
+    <ul>
+      <li><strong>TCN</strong>: Temporal Convolutional Networks</li>
+      <li><strong>1D Conv</strong>: свертки по временной оси</li>
+      <li><strong>Dilated</strong>: расширенные свертки</li>
+      <li><strong>Causal</strong>: только прошлое</li>
+    </ul>
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Параллельная обработка</li>
+      <li>Длинные зависимости</li>
+      <li>Быстрее RNN</li>
+      <li>Стабильное обучение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Архитектура</h2>
+    <pre><code>Input → [Dilated Conv] → [Residual] → Output
+
+Dilation rates: 1, 2, 4, 8, 16...
+Receptive field = 2^n * kernel_size</code></pre>
+    <p><strong>Пример:</strong></p>
+    <pre><code>Kernel=3, Dilations=[1,2,4,8]
+Receptive field = 31 timesteps</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. PyTorch реализация</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class TCNBlock(nn.Module):
+    def __init__(self, in_channels, out_channels, kernel_size, dilation):
+        super().__init__()
+        self.conv = nn.Conv1d(
+            in_channels, out_channels,
+            kernel_size, padding='same',
+            dilation=dilation
+        )
+        self.bn = nn.BatchNorm1d(out_channels)
+        self.relu = nn.ReLU()
+        self.dropout = nn.Dropout(0.2)
+    
+    def forward(self, x):
+        out = self.conv(x)
+        out = self.bn(out)
+        out = self.relu(out)
+        out = self.dropout(out)
+        return out
+
+class TCN(nn.Module):
+    def __init__(self, input_size, hidden_size, num_layers):
+        super().__init__()
+        layers = []
+        for i in range(num_layers):
+            dilation = 2 ** i
+            layers.append(TCNBlock(
+                input_size if i == 0 else hidden_size,
+                hidden_size, kernel_size=3, dilation=dilation
+            ))
+        self.network = nn.Sequential(*layers)
+        self.fc = nn.Linear(hidden_size, 1)
+    
+    def forward(self, x):
+        out = self.network(x)
+        out = out[:, :, -1]  # last timestep
+        return self.fc(out)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Dilated Convolutions</h2>
+    <p><strong>Формула:</strong></p>
+    <pre><code>output[t] = Σ weight[k] * input[t - k*dilation]
+
+Dilation=1: обычная свертка
+Dilation=2: пропускаем каждый второй
+Dilation=4: пропускаем каждый четвертый</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Causal Padding</h2>
+    <pre><code># Только прошлое, не будущее
+padding = (kernel_size - 1) * dilation
+
+conv = nn.Conv1d(in_ch, out_ch, kernel_size,
+                 padding=padding, dilation=dilation)
+
+# Обрезать будущее
+def causal_forward(x):
+    out = conv(x)
+    return out[:, :, :-padding]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Residual Connections</h2>
+    <pre><code>class ResidualTCN(nn.Module):
+    def __init__(self, channels):
+        super().__init__()
+        self.tcn = TCNBlock(channels, channels)
+        self.residual = nn.Conv1d(channels, channels, 1)
+    
+    def forward(self, x):
+        out = self.tcn(x)
+        residual = self.residual(x)
+        return out + residual</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Обучение TCN</h2>
+    <pre><code>model = TCN(input_size=1, hidden_size=64, num_layers=4)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+criterion = nn.MSELoss()
+
+for epoch in range(100):
+    for X_batch, y_batch in dataloader:
+        # X: (batch, channels, seq_len)
+        X_batch = X_batch.transpose(1, 2)
+        
+        outputs = model(X_batch)
+        loss = criterion(outputs, y_batch)
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. TCN vs RNN</h2>
+    <table>
+      <tr><th>Критерий</th><th>TCN</th><th>RNN/LSTM</th></tr>
+      <tr><td><strong>Скорость</strong></td><td>Быстрее</td><td>Медленнее</td></tr>
+      <tr><td><strong>Параллелизм</strong></td><td>Да</td><td>Нет</td></tr>
+      <tr><td><strong>Память</strong></td><td>Больше</td><td>Меньше</td></tr>
+      <tr><td><strong>Gradient flow</strong></td><td>Стабильный</td><td>Проблемы</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Примеры применения</h2>
+    <ul>
+      <li><strong>Финансы</strong>: прогноз цен акций</li>
+      <li><strong>Энергетика</strong>: прогноз нагрузки</li>
+      <li><strong>Погода</strong>: прогноз температуры</li>
+      <li><strong>Аномалии</strong>: детекция в сенсорах</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Длинные последовательности</li>
+          <li>Нужна скорость inference</li>
+          <li>Много вычислительных ресурсов</li>
+          <li>Стабильное обучение важно</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Ограничена память GPU</li>
+          <li>Очень короткие последовательности</li>
+          <li>Нужна малая латентность</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Чек-лист</h2>
+    <ul>
+      <li>[ ] Подготовить данные в формате (batch, channels, seq_len)</li>
+      <li>[ ] Выбрать количество слоев (4-8)</li>
+      <li>[ ] Настроить dilation rates</li>
+      <li>[ ] Добавить residual connections</li>
+      <li>[ ] Использовать Dropout (0.1-0.2)</li>
+      <li>[ ] Применить causal padding</li>
+      <li>[ ] Сравнить с LSTM baseline</li>
+      <li>[ ] Визуализировать receptive field</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «TCN — это как смотреть на временной ряд через увеличительное стекло с разным увеличением одновременно: близкие точки видим детально, дальние — общий тренд. И всё это быстрее, чем RNN».
+    </blockquote>
+  </div>
+
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>RNN/LSTM для временных рядов Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📈 RNN/LSTM для временных рядов Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <ul>
+      <li><strong>RNN</strong>: Recurrent Neural Networks</li>
+      <li><strong>Sequence</strong>: обработка последовательностей</li>
+      <li><strong>Memory</strong>: скрытое состояние</li>
+      <li><strong>Временные ряды</strong>: цены, температура, продажи</li>
+    </ul>
+    <p><strong>Преимущества для TS:</strong></p>
+    <ul>
+      <li>Автоматическое извлечение признаков</li>
+      <li>Работа с переменной длиной</li>
+      <li>Нелинейные зависимости</li>
+      <li>Мультивариативные ряды</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. RNN vs LSTM vs GRU</h2>
+    <table>
+      <tr><th>Модель</th><th>Параметры</th><th>Скорость</th><th>Память</th></tr>
+      <tr><td><strong>Simple RNN</strong></td><td>Мало</td><td>Быстро</td><td>Короткая</td></tr>
+      <tr><td><strong>LSTM</strong></td><td>Много</td><td>Медленно</td><td>Длинная</td></tr>
+      <tr><td><strong>GRU</strong></td><td>Средне</td><td>Средне</td><td>Средняя</td></tr>
+    </table>
+    <p><strong>Выбор:</strong></p>
+    <ul>
+      <li>Short sequences (< 50): Simple RNN</li>
+      <li>Long dependencies: LSTM</li>
+      <li>Ограничены ресурсы: GRU</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Подготовка данных</h2>
+    <pre><code>import numpy as np
+import pandas as pd
+from sklearn.preprocessing import MinMaxScaler
+
+# Загрузка данных
+df = pd.read_csv('data.csv', parse_dates=['date'])
+values = df['value'].values
+
+# Нормализация
+scaler = MinMaxScaler(feature_range=(0, 1))
+scaled = scaler.fit_transform(values.reshape(-1, 1))
+
+# Создание sequences
+def create_sequences(data, seq_length):
+    X, y = [], []
+    for i in range(len(data) - seq_length):
+        X.append(data[i:i+seq_length])
+        y.append(data[i+seq_length])
+    return np.array(X), np.array(y)
+
+seq_length = 10
+X, y = create_sequences(scaled, seq_length)
+
+# Train/test split
+split = int(0.8 * len(X))
+X_train, X_test = X[:split], X[split:]
+y_train, y_test = y[:split], y[split:]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. LSTM модель в PyTorch</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class LSTMModel(nn.Module):
+    def __init__(self, input_size=1, hidden_size=50, num_layers=2):
+        super().__init__()
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        
+        self.lstm = nn.LSTM(
+            input_size, 
+            hidden_size, 
+            num_layers, 
+            batch_first=True,
+            dropout=0.2
+        )
+        self.fc = nn.Linear(hidden_size, 1)
+    
+    def forward(self, x):
+        # x shape: (batch, seq_len, features)
+        h0 = torch.zeros(self.num_layers, x.size(0), 
+                        self.hidden_size).to(x.device)
+        c0 = torch.zeros(self.num_layers, x.size(0), 
+                        self.hidden_size).to(x.device)
+        
+        out, _ = self.lstm(x, (h0, c0))
+        out = self.fc(out[:, -1, :])
+        return out
+
+model = LSTMModel(input_size=1, hidden_size=50, num_layers=2)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Обучение модели</h2>
+    <pre><code>criterion = nn.MSELoss()
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+
+num_epochs = 100
+batch_size = 32
+
+for epoch in range(num_epochs):
+    model.train()
+    for i in range(0, len(X_train), batch_size):
+        batch_X = torch.FloatTensor(X_train[i:i+batch_size])
+        batch_y = torch.FloatTensor(y_train[i:i+batch_size])
+        
+        # Forward pass
+        outputs = model(batch_X)
+        loss = criterion(outputs, batch_y)
+        
+        # Backward pass
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    
+    if (epoch+1) % 10 == 0:
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Прогнозирование</h2>
+    <pre><code># Одношаговый прогноз
+model.eval()
+with torch.no_grad():
+    test_inputs = torch.FloatTensor(X_test)
+    predictions = model(test_inputs)
+    predictions = scaler.inverse_transform(predictions.numpy())
+
+# Многошаговый прогноз (рекурсивный)
+def forecast_recursive(model, last_sequence, steps):
+    forecasts = []
+    current_seq = last_sequence.copy()
+    
+    for _ in range(steps):
+        # Прогноз
+        with torch.no_grad():
+            x = torch.FloatTensor(current_seq).unsqueeze(0)
+            pred = model(x).item()
+        
+        forecasts.append(pred)
+        
+        # Обновление последовательности
+        current_seq = np.append(current_seq[1:], [[pred]], axis=0)
+    
+    return scaler.inverse_transform(np.array(forecasts).reshape(-1, 1))
+
+# Прогноз на 30 шагов вперед
+last_seq = X_test[-1]
+forecast = forecast_recursive(model, last_seq, steps=30)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Keras/TensorFlow альтернатива</h2>
+    <pre><code>from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense, Dropout
+
+model = Sequential([
+    LSTM(50, return_sequences=True, input_shape=(seq_length, 1)),
+    Dropout(0.2),
+    LSTM(50, return_sequences=False),
+    Dropout(0.2),
+    Dense(25),
+    Dense(1)
+])
+
+model.compile(optimizer='adam', loss='mse', metrics=['mae'])
+
+history = model.fit(
+    X_train, y_train,
+    epochs=100,
+    batch_size=32,
+    validation_split=0.1,
+    verbose=1
+)
+
+# Прогноз
+predictions = model.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Архитектурные паттерны</h2>
+    <p><strong>Stacked LSTM:</strong></p>
+    <pre><code>model = Sequential([
+    LSTM(64, return_sequences=True),
+    LSTM(32, return_sequences=True),
+    LSTM(16, return_sequences=False),
+    Dense(1)
+])</code></pre>
+
+    <p><strong>Bidirectional LSTM:</strong></p>
+    <pre><code>from tensorflow.keras.layers import Bidirectional
+
+model = Sequential([
+    Bidirectional(LSTM(50, return_sequences=True)),
+    Bidirectional(LSTM(50)),
+    Dense(1)
+])</code></pre>
+
+    <p><strong>Attention LSTM:</strong></p>
+    <pre><code>from tensorflow.keras.layers import Attention
+
+lstm_out = LSTM(50, return_sequences=True)(inputs)
+attention_out = Attention()([lstm_out, lstm_out])
+output = Dense(1)(attention_out)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Мультивариативные ряды</h2>
+    <pre><code># Несколько признаков
+df = pd.read_csv('multivariate.csv')
+features = ['price', 'volume', 'volatility']
+values = df[features].values
+
+scaler = MinMaxScaler()
+scaled = scaler.fit_transform(values)
+
+# X shape: (samples, seq_length, num_features)
+X, y = create_sequences(scaled, seq_length=10)
+
+model = Sequential([
+    LSTM(50, return_sequences=True, input_shape=(10, 3)),
+    LSTM(50),
+    Dense(1)  # предсказываем только price
+])
+
+model.compile(optimizer='adam', loss='mse')
+model.fit(X_train, y_train, epochs=100)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Нелинейные временные ряды</li>
+          <li>Длинные зависимости (> 50 шагов)</li>
+          <li>Мультивариативные ряды</li>
+          <li>Большие данные (> 10k точек)</li>
+          <li>Сложные паттерны</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Малый датасет (< 1000)</li>
+          <li>Простые линейные тренды</li>
+          <li>Нужна интерпретируемость</li>
+          <li>Ограничены вычисления</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Чек-лист</h2>
+    <ul>
+      <li>[ ] Нормализовать данные (MinMaxScaler)</li>
+      <li>[ ] Создать sequences правильной длины</li>
+      <li>[ ] Train/val/test split по времени</li>
+      <li>[ ] Выбрать LSTM или GRU</li>
+      <li>[ ] Добавить Dropout (0.2-0.3)</li>
+      <li>[ ] Настроить hidden_size (32-128)</li>
+      <li>[ ] Использовать Adam optimizer</li>
+      <li>[ ] Мониторить validation loss</li>
+      <li>[ ] Визуализировать прогнозы</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «LSTM для временных рядов — это как опытный трейдер, который помнит историю цен и паттерны, чтобы предсказать будущие значения. В отличие от простых моделей, LSTM "видит" сложные зависимости во времени».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Иерархическое RL Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🏗️ Иерархическое RL Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы HRL</h2>
+    <ul>
+      <li><strong>HRL</strong>: Hierarchical RL — иерархия агентов</li>
+      <li><strong>Абстракция</strong>: разбиение задачи на подзадачи</li>
+      <li><strong>Options</strong>: временно расширенные действия</li>
+      <li><strong>Skills</strong>: переиспользуемые навыки</li>
+    </ul>
+    <p><strong>Зачем нужно:</strong></p>
+    <ul>
+      <li>Разреженные награды (sparse rewards)</li>
+      <li>Долгосрочное планирование</li>
+      <li>Transfer learning между задачами</li>
+      <li>Масштабируемость</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Options Framework</h2>
+    <p><strong>Option = (π, β, I):</strong></p>
+    <pre><code>π - policy (что делать)
+β - termination condition (когда остановиться)
+I - initiation set (где можно начать)
+
+Пример: "Открыть дверь"
+π: двигаться к двери, взять ручку, повернуть
+β: дверь открыта
+I: рядом с дверью</code></pre>
+
+    <p><strong>Реализация:</strong></p>
+    <pre><code>class Option:
+    def __init__(self, policy, beta, initiation):
+        self.policy = policy
+        self.beta = beta  # termination function
+        self.initiation = initiation
+    
+    def can_start(self, state):
+        return self.initiation(state)
+    
+    def should_terminate(self, state):
+        return self.beta(state)
+    
+    def execute(self, env, state):
+        while not self.should_terminate(state):
+            action = self.policy(state)
+            state, reward, done = env.step(action)
+            if done:
+                break
+        return state, reward</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Уровни иерархии</h2>
+    <table>
+      <tr><th>Уровень</th><th>Горизонт</th><th>Действия</th></tr>
+      <tr><td><strong>High-level</strong></td><td>Долгий</td><td>Подцели, options</td></tr>
+      <tr><td><strong>Mid-level</strong></td><td>Средний</td><td>Skills, макро-действия</td></tr>
+      <tr><td><strong>Low-level</strong></td><td>Короткий</td><td>Примитивные действия</td></tr>
+    </table>
+
+    <p><strong>Пример - робот-уборщик:</strong></p>
+    <pre><code>High: "Убрать квартиру"
+  ↓
+Mid: "Убрать кухню", "Убрать спальню"
+  ↓
+Low: "Вперёд", "Назад", "Пылесосить"</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. MAXQ Decomposition</h2>
+    <p><strong>Идея:</strong> декомпозиция Q-функции</p>
+    <pre><code>Q(s,a) = V(s,a) + C(s,a)
+
+V(s,a) - completion value
+C(s,a) - cumulative reward
+
+# Иерархия задач
+Task: RootTask
+  Subtask1: Navigation
+    Primitive: Move
+  Subtask2: Pickup
+    Primitive: Grasp</code></pre>
+
+    <p><strong>Псевдокод:</strong></p>
+    <pre><code>def MAXQ(state, task):
+    if task.is_primitive():
+        return execute_primitive(state, task)
+    
+    # Выбрать подзадачу
+    subtask = argmax([Q(state, task, s) for s in task.subtasks])
+    
+    # Рекурсивно выполнить
+    next_state, reward = MAXQ(state, subtask)
+    
+    # Обновить Q-значения
+    update_Q(state, task, subtask, reward)
+    
+    return next_state, reward</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Feudal RL</h2>
+    <p><strong>Manager-Worker архитектура:</strong></p>
+    <pre><code>class FeudalRL:
+    def __init__(self):
+        self.manager = ManagerPolicy()
+        self.worker = WorkerPolicy()
+    
+    def act(self, state):
+        # Manager выбирает подцель
+        goal = self.manager.select_goal(state)
+        
+        # Worker выполняет действия для достижения подцели
+        action = self.worker.act(state, goal)
+        
+        return action
+    
+    def train_step(self, transition):
+        # Intrinsic reward для worker
+        worker_reward = self.intrinsic_reward(
+            transition.state, 
+            transition.next_state, 
+            goal
+        )
+        
+        # Обновление worker
+        self.worker.update(worker_reward)
+        
+        # Обновление manager
+        self.manager.update(transition.reward)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. HAM (Hierarchical Abstract Machines)</h2>
+    <p><strong>State machines для иерархии:</strong></p>
+    <pre><code>class HAM:
+    def __init__(self):
+        self.machines = {
+            'Root': RootMachine(),
+            'Navigate': NavigateMachine(),
+            'PickUp': PickUpMachine()
+        }
+    
+    def execute(self, env, state):
+        machine = self.machines['Root']
+        
+        while True:
+            if machine.is_choice_state():
+                # Выбор действия через Q-learning
+                action = self.select_action(machine, state)
+            elif machine.is_call_state():
+                # Вызов под-машины
+                machine = machine.call_submachine()
+            elif machine.is_action_state():
+                # Примитивное действие
+                state = machine.execute_action(env, state)
+            
+            if machine.is_stop_state():
+                break</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Intrinsic Motivation</h2>
+    <p><strong>Reward shaping для HRL:</strong></p>
+    <pre><code># Curiosity-driven
+def curiosity_reward(state, next_state, goal):
+    # Reward за приближение к подцели
+    dist_before = distance(state, goal)
+    dist_after = distance(next_state, goal)
+    return dist_before - dist_after
+
+# Empowerment
+def empowerment_reward(state):
+    # Reward за увеличение контроля над средой
+    return mutual_information(action, next_state)
+
+# Count-based
+def exploration_bonus(state):
+    visit_count[state] += 1
+    return 1.0 / sqrt(visit_count[state])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Skill Discovery</h2>
+    <p><strong>Автоматическое обучение навыков:</strong></p>
+    <pre><code># DIAYN (Diversity Is All You Need)
+class DIAYN:
+    def __init__(self, num_skills):
+        self.skills = num_skills
+        self.discriminator = SkillDiscriminator()
+    
+    def intrinsic_reward(self, state, skill):
+        # Reward за различимость навыка
+        prob = self.discriminator.predict(state, skill)
+        return log(prob) - log(1.0 / self.num_skills)
+    
+    def train_skill(self, skill_id):
+        for episode in range(num_episodes):
+            state = env.reset()
+            while not done:
+                action = policy(state, skill_id)
+                next_state, _, done = env.step(action)
+                
+                # Intrinsic reward
+                reward = self.intrinsic_reward(next_state, skill_id)
+                policy.update(reward)
+                
+                state = next_state</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Примеры применения</h2>
+    <ul>
+      <li><strong>Робототехника</strong>: манипуляция объектами</li>
+      <li><strong>Навигация</strong>: многокомнатная навигация</li>
+      <li><strong>Игры</strong>: StarCraft, Minecraft</li>
+      <li><strong>Dialogue systems</strong>: диалоговые агенты</li>
+    </ul>
+
+    <p><strong>MuJoCo пример:</strong></p>
+    <pre><code>import gym
+
+# High-level policy
+class HighLevelPolicy:
+    def select_skill(self, state):
+        return self.policy(state)  # skill_id
+
+# Low-level policy
+class LowLevelPolicy:
+    def act(self, state, skill):
+        return self.skill_policies[skill](state)
+
+# Обучение
+env = gym.make('Ant-v2')
+high_policy = HighLevelPolicy()
+low_policy = LowLevelPolicy()
+
+state = env.reset()
+skill = high_policy.select_skill(state)
+for t in range(10):  # skill horizon
+    action = low_policy.act(state, skill)
+    state, reward, done = env.step(action)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Разреженные награды</li>
+          <li>Долгосрочное планирование</li>
+          <li>Композиционные задачи</li>
+          <li>Transfer learning нужен</li>
+          <li>Человеко-подобное поведение</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Простые задачи</li>
+          <li>Плотные награды</li>
+          <li>Короткий горизонт</li>
+          <li>Нет явной структуры задачи</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить уровни иерархии</li>
+      <li>[ ] Выбрать framework (Options, MAXQ, HAM)</li>
+      <li>[ ] Спроектировать options/skills</li>
+      <li>[ ] Реализовать high-level policy</li>
+      <li>[ ] Реализовать low-level policies</li>
+      <li>[ ] Добавить intrinsic rewards</li>
+      <li>[ ] Обучить каждый уровень отдельно</li>
+      <li>[ ] Протестировать на простой задаче (4 rooms)</li>
+      <li>[ ] Визуализировать learned hierarchy</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Иерархическое RL — это как управление компанией: CEO ставит высокоуровневые цели (увеличить продажи), менеджеры разрабатывают планы (запустить рекламу), а сотрудники выполняют конкретные действия (написать пост в соцсети)».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Временная разница (TD-learning) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⏱️ Временная разница (TD-learning) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть TD-learning</h2>
+    <ul>
+      <li><strong>TD</strong>: Temporal Difference — разница во времени</li>
+      <li><strong>Комбинация</strong>: MC + Dynamic Programming</li>
+      <li><strong>Bootstrapping</strong>: обновление на основе оценок</li>
+      <li><strong>Online</strong>: обучение после каждого шага</li>
+    </ul>
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Не нужно ждать конца эпизода</li>
+      <li>Работает в непрерывных задачах</li>
+      <li>Меньшая дисперсия чем MC</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. TD(0) — основа</h2>
+    <p><strong>Формула обновления:</strong></p>
+    <pre><code>V(s_t) ← V(s_t) + α[R_{t+1} + γV(s_{t+1}) - V(s_t)]
+
+где:
+α - learning rate
+γ - discount factor
+TD error = R_{t+1} + γV(s_{t+1}) - V(s_t)</code></pre>
+
+    <p><strong>Алгоритм:</strong></p>
+    <pre><code>def td0_learning(env, episodes=1000, alpha=0.1, gamma=0.9):
+    V = defaultdict(float)
+    
+    for episode in range(episodes):
+        state = env.reset()
+        
+        while True:
+            action = policy(state)
+            next_state, reward, done = env.step(action)
+            
+            # TD(0) update
+            td_error = reward + gamma * V[next_state] - V[state]
+            V[state] += alpha * td_error
+            
+            if done:
+                break
+            state = next_state
+    
+    return V</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. MC vs TD сравнение</h2>
+    <table>
+      <tr><th>Критерий</th><th>Monte Carlo</th><th>TD-learning</th></tr>
+      <tr><td><strong>Обновление</strong></td><td>Конец эпизода</td><td>Каждый шаг</td></tr>
+      <tr><td><strong>Bias</strong></td><td>Нет</td><td>Есть</td></tr>
+      <tr><td><strong>Variance</strong></td><td>Высокая</td><td>Низкая</td></tr>
+      <tr><td><strong>Сходимость</strong></td><td>Медленная</td><td>Быстрая</td></tr>
+      <tr><td><strong>Episodic</strong></td><td>Требуется</td><td>Не требуется</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. TD(λ) — обобщение</h2>
+    <p><strong>Eligibility Traces:</strong></p>
+    <pre><code>e(s) ← γλe(s) + 1  # если s посещено
+e(s) ← γλe(s)      # иначе
+
+V(s) ← V(s) + α * δ_t * e(s)
+
+где:
+λ ∈ [0,1] - trace decay parameter
+δ_t - TD error
+e(s) - eligibility trace</code></pre>
+
+    <p><strong>Реализация:</strong></p>
+    <pre><code>def td_lambda(env, episodes, alpha=0.1, gamma=0.9, lambda_=0.9):
+    V = defaultdict(float)
+    
+    for episode in range(episodes):
+        e = defaultdict(float)  # eligibility traces
+        state = env.reset()
+        
+        while True:
+            action = policy(state)
+            next_state, reward, done = env.step(action)
+            
+            delta = reward + gamma * V[next_state] - V[state]
+            e[state] += 1
+            
+            # Update all states
+            for s in e.keys():
+                V[s] += alpha * delta * e[s]
+                e[s] *= gamma * lambda_
+            
+            if done:
+                break
+            state = next_state
+    
+    return V</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. n-step TD</h2>
+    <p><strong>n-step return:</strong></p>
+    <pre><code>G_t^(n) = R_{t+1} + γR_{t+2} + ... + γ^{n-1}R_{t+n} + γ^n V(s_{t+n})
+
+V(s_t) ← V(s_t) + α[G_t^(n) - V(s_t)]</code></pre>
+
+    <p><strong>Реализация:</strong></p>
+    <pre><code>def n_step_td(env, n=3, alpha=0.1, gamma=0.9):
+    V = defaultdict(float)
+    
+    for episode in range(episodes):
+        states = []
+        rewards = []
+        state = env.reset()
+        
+        while True:
+            states.append(state)
+            action = policy(state)
+            next_state, reward, done = env.step(action)
+            rewards.append(reward)
+            
+            # Update after n steps
+            if len(states) >= n:
+                G = sum([gamma**i * rewards[i] 
+                        for i in range(n)])
+                G += gamma**n * V[next_state]
+                
+                s_update = states[0]
+                V[s_update] += alpha * (G - V[s_update])
+                
+                states.pop(0)
+                rewards.pop(0)
+            
+            if done:
+                break
+            state = next_state
+    
+    return V</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. TD Error интуиция</h2>
+    <pre><code>TD Error = δ_t = R_{t+1} + γV(s_{t+1}) - V(s_t)
+           = [Target] - [Prediction]</code></pre>
+
+    <p><strong>Значения:</strong></p>
+    <ul>
+      <li><strong>δ > 0</strong>: недооценили V(s), увеличить</li>
+      <li><strong>δ < 0</strong>: переоценили V(s), уменьшить</li>
+      <li><strong>δ = 0</strong>: правильная оценка</li>
+    </ul>
+
+    <p><strong>Пример:</strong></p>
+    <pre><code># Состояние s: V(s) = 10
+# Получили reward = 5
+# Следующее состояние s': V(s') = 8
+# γ = 0.9
+
+δ = 5 + 0.9 * 8 - 10 = 2.2
+
+# V(s) слишком мало, увеличиваем!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Параметры настройки</h2>
+    <p><strong>Learning rate (α):</strong></p>
+    <ul>
+      <li><strong>0.01-0.1</strong>: медленное обучение</li>
+      <li><strong>0.1-0.3</strong>: стандартное</li>
+      <li><strong>0.3-0.5</strong>: быстрое, но нестабильное</li>
+    </ul>
+
+    <p><strong>Discount factor (γ):</strong></p>
+    <ul>
+      <li><strong>0.9</strong>: близкие награды важнее</li>
+      <li><strong>0.95-0.99</strong>: долгосрочное планирование</li>
+      <li><strong>0.999</strong>: очень долгосрочное</li>
+    </ul>
+
+    <p><strong>Lambda (λ):</strong></p>
+    <ul>
+      <li><strong>λ = 0</strong>: TD(0)</li>
+      <li><strong>λ = 0.5-0.9</strong>: компромисс</li>
+      <li><strong>λ = 1</strong>: Monte Carlo</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Eligibility Traces</h2>
+    <p><strong>Идея:</strong> отслеживать "заслуги" состояний</p>
+    <pre><code># Forward view (теоретическое)
+V(s) ← V(s) + α[G_t^λ - V(s)]
+
+# Backward view (практическое)
+e(s) ← γλe(s) + 1
+V(s) ← V(s) + α * δ_t * e(s)</code></pre>
+
+    <p><strong>Типы:</strong></p>
+    <ul>
+      <li><strong>Accumulating</strong>: e(s) += 1</li>
+      <li><strong>Replacing</strong>: e(s) = 1</li>
+      <li><strong>Dutch</strong>: e(s) = (1-α)e(s) + 1</li>
+    </ul>
+
+    <p><strong>Визуализация:</strong></p>
+    <pre><code>t=0: s1 → s2 → s3 → s4 (reward=10)
+                         ↑
+                    TD error здесь
+
+Eligibility:
+e(s1) = 0.729 → обновить на 72.9% от TD error
+e(s2) = 0.81  → обновить на 81% от TD error
+e(s3) = 0.9   → обновить на 90% от TD error
+e(s4) = 1.0   → обновить на 100% от TD error</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Практические советы</h2>
+    <ul>
+      <li><strong>Начните с TD(0)</strong>: проще понять и отладить</li>
+      <li><strong>Уменьшайте α</strong>: α = α₀/(1 + episode/1000)</li>
+      <li><strong>Используйте λ=0.9</strong>: хороший баланс</li>
+      <li><strong>Мониторьте TD error</strong>: должен уменьшаться</li>
+      <li><strong>Визуализируйте V(s)</strong>: проверка обучения</li>
+      <li><strong>Сравните с MC</strong>: baseline для проверки</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Нужно онлайн обучение</li>
+          <li>Непрерывные задачи без эпизодов</li>
+          <li>Быстрая сходимость важна</li>
+          <li>Стохастическая среда</li>
+          <li>Малая дисперсия критична</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Нужны гарантии несмещённости</li>
+          <li>Очень простая детерминированная среда</li>
+          <li>Достаточно одного эпизода для оценки</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Чек-лист</h2>
+    <ul>
+      <li>[ ] Инициализировать V(s) = 0</li>
+      <li>[ ] Выбрать α = 0.1 для начала</li>
+      <li>[ ] Установить γ = 0.9-0.99</li>
+      <li>[ ] Для TD(λ) выбрать λ = 0.9</li>
+      <li>[ ] Реализовать TD error подсчёт</li>
+      <li>[ ] Добавить eligibility traces для ускорения</li>
+      <li>[ ] Протестировать на GridWorld</li>
+      <li>[ ] Сравнить с Monte Carlo</li>
+      <li>[ ] Визуализировать learned values</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «TD-learning — это как учиться на своих ошибках сразу, не дожидаясь конца игры. Представьте, что вы играете в шахматы и после каждого хода сразу оцениваете, насколько он был хорош или плох, основываясь на новой позиции».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

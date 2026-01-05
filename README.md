@@ -293,15 +293,15 @@
 
 ### **32. Обучение с подкреплением (классическое RL)**
 1. [Reinforcement Learning Basics (RL основы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/reinforcement_learning_basics_cheatsheet.html)
-1. Классическое RL (табличное, без нейросетей)
+1. [Классическое RL (табличное, без нейросетей)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/classical_rl_tabular_cheatsheet.html)
 1. [Многорукие бандиты (Multi-armed bandits)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multi_armed_bandits_cheatsheet.html)
 1. [Марковские процессы принятия решений](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/markov_decision_processes_cheatsheet.html)
 1. [Динамическое программирование](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dynamic_programming_rl_cheatsheet.html)
 1. [Монте-Карло методы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/monte_carlo_methods_cheatsheet.html)
-1. Временная разница (TD-learning)
+1. [Временная разница (TD-learning)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/td_learning_cheatsheet.html)
 1. [Q-learning и SARSA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/q_learning_sarsa_cheatsheet.html)
 1. Функции приближения (линейные, ядерные)
-1. Иерархическое RL
+1. [Иерархическое RL](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hierarchical_rl_detailed_cheatsheet.html)
 1. Многозадачное RL
 1. Инверсное RL
 
@@ -440,9 +440,9 @@
 1. Применения GNN
 
 ### **15. Временные ряды и прогнозирование**
-1. RNN/LSTM для временных рядов
-1. CNN для временных рядов (TCN)
-1. Transformers для временных рядов
+1. [RNN/LSTM для временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rnn_lstm_time_series_cheatsheet.html)
+1. [CNN для временных рядов (TCN)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_time_series_tcn_cheatsheet.html)
+1. [Transformers для временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/transformers_time_series_cheatsheet.html)
 1. Многомерные временные ряды
 1. Аномалии во временных рядах
 1. Прогнозирование спроса и трафика
@@ -457,7 +457,7 @@
 ### **17. Этичные аспекты и безопасность**
 1. Adversarial attacks
 1. Defensive distillation
-1. Adversarial training
+1. [Adversarial training](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adversarial_training_cheatsheet.html)
 1. Bias в нейросетях
 1. Fairness в ML
 1. [Federated learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/federated_learning_cheatsheet.html)
@@ -476,9 +476,9 @@
 ### **19. Фреймворки и библиотеки**
 1. [PyTorch полный гайд](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pytorch_full_guide_cheatsheet.html)
 1. [TensorFlow/Keras полный гайд](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tensorflow_keras_full_guide_cheatsheet.html)
-1. JAX и Flax
+1. [JAX и Flax](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/jax_flax_cheatsheet.html)
 1. [Hugging Face Transformers](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hugging_face_transformers_cheatsheet.html)
-1. PyTorch Lightning
+1. [PyTorch Lightning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pytorch_lightning_cheatsheet.html)
 1. FastAI
 
 ### **20. Теория глубокого обучения**
@@ -503,7 +503,7 @@
 
 ### **23. Креативные приложения**
 1. [Neural style transfer](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_style_transfer_cheatsheet.html)
-1. Image-to-image translation
+1. [Image-to-image translation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/image_to_image_translation_cheatsheet.html)
 1. Text-to-image generation
 1. Музыкальные нейросети
 1. Генерация видео

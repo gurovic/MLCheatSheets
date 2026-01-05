@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Классическое RL (табличное) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎮 Классическое RL (табличное, без нейросетей) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <ul>
+      <li><strong>RL</strong>: агент учится действовать в среде</li>
+      <li><strong>Табличное</strong>: Q-таблица для хранения значений</li>
+      <li><strong>Discrete</strong>: конечные состояния и действия</li>
+      <li><strong>Model-free</strong>: не требует модели среды</li>
+    </ul>
+    <p><strong>Основные компоненты:</strong></p>
+    <ul>
+      <li>States (S): состояния среды</li>
+      <li>Actions (A): возможные действия</li>
+      <li>Rewards (R): вознаграждения</li>
+      <li>Policy (π): стратегия агента</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Формализация</h2>
+    <p><strong>Markov Decision Process (MDP):</strong></p>
+    <pre><code>MDP = (S, A, P, R, γ)
+
+S - множество состояний
+A - множество действий
+P(s'|s,a) - вероятность перехода
+R(s,a) - функция вознаграждения
+γ - коэффициент дисконтирования (0 < γ < 1)</code></pre>
+
+    <p><strong>Value Function:</strong></p>
+    <pre><code>V(s) = E[Σ γ^t * R_t | s_0 = s]
+
+Q(s,a) = E[Σ γ^t * R_t | s_0 = s, a_0 = a]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Value Iteration</h2>
+    <p>Алгоритм для нахождения оптимальной value function:</p>
+    <pre><code>import numpy as np
+
+# Инициализация
+V = np.zeros(n_states)
+
+for iteration in range(max_iterations):
+    V_new = np.zeros(n_states)
+    
+    for s in range(n_states):
+        # Максимум по действиям
+        q_values = []
+        for a in range(n_actions):
+            q = reward[s,a] + gamma * sum(
+                transition_prob[s,a,s_next] * V[s_next]
+                for s_next in range(n_states)
+            )
+            q_values.append(q)
+        V_new[s] = max(q_values)
+    
+    if np.max(np.abs(V - V_new)) < threshold:
+        break
+    V = V_new</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Policy Iteration</h2>
+    <p>Алгоритм итерации по стратегиям:</p>
+    <pre><code># 1. Policy Evaluation
+def policy_eval(policy, V, gamma=0.9):
+    while True:
+        delta = 0
+        for s in range(n_states):
+            v = V[s]
+            a = policy[s]
+            V[s] = reward[s,a] + gamma * sum(
+                transition_prob[s,a,s_next] * V[s_next]
+                for s_next in range(n_states)
+            )
+            delta = max(delta, abs(v - V[s]))
+        if delta < threshold:
+            break
+    return V
+
+# 2. Policy Improvement
+def policy_improve(V, gamma=0.9):
+    policy_stable = True
+    for s in range(n_states):
+        old_action = policy[s]
+        # Жадная стратегия
+        q_values = [reward[s,a] + gamma * sum(
+            transition_prob[s,a,s_next] * V[s_next]
+            for s_next in range(n_states)
+        ) for a in range(n_actions)]
+        policy[s] = np.argmax(q_values)
+        if old_action != policy[s]:
+            policy_stable = False
+    return policy, policy_stable</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Табличные методы</h2>
+    <table>
+      <tr><th>Метод</th><th>Требует модели</th><th>On/Off-policy</th></tr>
+      <tr><td><strong>Value Iteration</strong></td><td>Да</td><td>-</td></tr>
+      <tr><td><strong>Policy Iteration</strong></td><td>Да</td><td>-</td></tr>
+      <tr><td><strong>Q-Learning</strong></td><td>Нет</td><td>Off-policy</td></tr>
+      <tr><td><strong>SARSA</strong></td><td>Нет</td><td>On-policy</td></tr>
+      <tr><td><strong>Monte Carlo</strong></td><td>Нет</td><td>Both</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. GridWorld пример</h2>
+    <pre><code>import numpy as np
+
+class GridWorld:
+    def __init__(self, size=5):
+        self.size = size
+        self.state = (0, 0)
+        self.goal = (size-1, size-1)
+        
+    def reset(self):
+        self.state = (0, 0)
+        return self.state
+    
+    def step(self, action):
+        # actions: 0=up, 1=right, 2=down, 3=left
+        x, y = self.state
+        if action == 0 and x > 0:
+            x -= 1
+        elif action == 1 and y < self.size-1:
+            y += 1
+        elif action == 2 and x < self.size-1:
+            x += 1
+        elif action == 3 and y > 0:
+            y -= 1
+        
+        self.state = (x, y)
+        reward = 1.0 if self.state == self.goal else -0.1
+        done = (self.state == self.goal)
+        
+        return self.state, reward, done</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Exploration vs Exploitation</h2>
+    <p><strong>ε-greedy:</strong></p>
+    <pre><code>def epsilon_greedy(Q, state, epsilon=0.1):
+    if np.random.random() < epsilon:
+        # Exploration: случайное действие
+        return np.random.randint(n_actions)
+    else:
+        # Exploitation: лучшее действие
+        return np.argmax(Q[state, :])</code></pre>
+
+    <p><strong>Softmax (Boltzmann):</strong></p>
+    <pre><code>def softmax_policy(Q, state, temperature=1.0):
+    q_values = Q[state, :]
+    exp_q = np.exp(q_values / temperature)
+    probs = exp_q / np.sum(exp_q)
+    return np.random.choice(n_actions, p=probs)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Примеры применения</h2>
+    <ul>
+      <li><strong>GridWorld</strong>: навигация робота</li>
+      <li><strong>Tic-Tac-Toe</strong>: простые игры</li>
+      <li><strong>Frozen Lake</strong>: стохастическая среда</li>
+      <li><strong>Taxi</strong>: дискретные задачи</li>
+      <li><strong>Cliff Walking</strong>: on/off-policy сравнение</li>
+    </ul>
+    
+    <p><strong>OpenAI Gym пример:</strong></p>
+    <pre><code>import gym
+
+env = gym.make('FrozenLake-v1')
+n_states = env.observation_space.n
+n_actions = env.action_space.n
+
+Q = np.zeros((n_states, n_actions))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Ограничения табличных методов</h2>
+    <ul>
+      <li><strong>Curse of dimensionality</strong>: размер таблицы растёт экспоненциально</li>
+      <li><strong>Discrete только</strong>: не работает с непрерывными состояниями</li>
+      <li><strong>Медленная сходимость</strong>: требует много итераций</li>
+      <li><strong>Память</strong>: большие таблицы Q-значений</li>
+      <li><strong>Generalization</strong>: нет обобщения между похожими состояниями</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Малое количество состояний (< 10^6)</li>
+          <li>Дискретные действия и состояния</li>
+          <li>Простые задачи (игры, навигация)</li>
+          <li>Нужна теоретическая гарантия сходимости</li>
+          <li>Обучение новичков RL</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Большое пространство состояний</li>
+          <li>Непрерывные состояния/действия</li>
+          <li>Сложные задачи (Atari, робототехника)</li>
+          <li>Нужна быстрая адаптация</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Чек-лист</h2>
+    <ul>
+      <li>[ ] Дискретное пространство состояний и действий</li>
+      <li>[ ] Инициализировать Q-таблицу нулями или случайно</li>
+      <li>[ ] Выбрать правильный γ (0.9-0.99)</li>
+      <li>[ ] Настроить exploration (ε = 0.1-0.3)</li>
+      <li>[ ] Уменьшать ε со временем (decay)</li>
+      <li>[ ] Проверить сходимость алгоритма</li>
+      <li>[ ] Визуализировать learned policy</li>
+      <li>[ ] Тестировать на простых средах (GridWorld)</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Табличное RL — это как шпаргалка с ответами: агент запоминает, что делать в каждой ситуации. Это работает отлично для простых задач, но не подходит для сложных, где ситуаций слишком много».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
