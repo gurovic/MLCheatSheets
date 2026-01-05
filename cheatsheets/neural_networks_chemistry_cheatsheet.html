@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Нейросети в химии Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔬 Нейросети в химии Cheatsheet</h1>
+  <div class="subtitle">Применение нейросетей в науке • Практические подходы<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Обзор применений</h2>
+    <p>Предсказание свойств молекул. Drug discovery. Reaction prediction. Retrosynthesis. Molecular generation.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Молекулярные представления</h2>
+    <p>SMILES strings. Graph representations. 3D coordinates. Fingerprints (ECFP). Multiple levels.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Graph Neural Networks</h2>
+    <p>Message passing для молекул. SchNet (continuous filters). DimeNet (directional). SE(3)-equivariant networks.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Property prediction</h2>
+    <p>Solubility, toxicity, binding affinity. QSAR models. Transfer learning от больших датасетов. MoleculeNet benchmark.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Drug discovery</h2>
+    <p>Virtual screening миллионов молекул. Hit-to-lead optimization. ADMET prediction. AlphaFold для структуры белков.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Reaction prediction</h2>
+    <p>Forward prediction: reactants → products. Retrosynthesis: product → reactants. Reaction conditions. Template-free models.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Molecular generation</h2>
+    <p>VAE для молекул. GAN для SMILES. Diffusion models. Constrained generation. Property optimization.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Retrosynthesis</h2>
+    <p>Breaking bonds обратно. Multi-step synthesis planning. Retro* алгоритм. MCTS + neural network.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Pretrained models</h2>
+    <p>ChemBERTa. MolBERT. Grover. Self-supervised learning. Transfer learning.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Quantum chemistry</h2>
+    <p>DFT calculations ускорение. Energy prediction. Force fields. SchNet, DimeNet++.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Challenges</h2>
+    <p>Синтезируемость молекул. Chemical validity. Data scarcity. Extrapolation. Interpretability.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Ключевые выводы</h2>
+    <p>ML ускоряет drug discovery на годы. GNN лучше традиционных дескрипторов. AlphaFold революция в структурной биологии. Но нужна экспериментальная валидация.</p>
+    <ul>
+      <li><strong>Ключевой момент 1</strong>: Детальное описание</li>
+      <li><strong>Ключевой момент 2</strong>: Практические примеры</li>
+      <li><strong>Ключевой момент 3</strong>: Современное состояние</li>
+      <li><strong>Ключевой момент 4</strong>: Открытые проблемы</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
