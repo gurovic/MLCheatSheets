@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Хронология глубокого обучения Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📅 Хронология глубокого обучения Cheatsheet</h1>
+  <div class="subtitle">История и ключевые вехи развития Deep Learning • От перцептрона до LLM<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Эра перцептронов (1940-1969)</h2>
+    <p><strong>Начало искусственных нейронных сетей</strong></p><ul><li>1943: McCulloch-Pitts нейрон</li><li>1958: Розенблатт создает перцептрон</li><li>1969: Минский и Пейперт - ограничения перцептрона</li><li>Первая зима AI (1970-е)</li></ul><blockquote>💡 "Перцептрон - это первый шаг к мыслящим машинам" - Розенблатт</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Backpropagation и вторая попытка (1970-1986)</h2>
+    <p><strong>Математическое обоснование обучения</strong></p><ul><li>1974: Werbos - backpropagation (PhD thesis)</li><li>1982: Hopfield networks</li><li>1986: Rumelhart, Hinton, Williams - популяризация backprop</li><li>Начало второй волны интереса к нейросетям</li></ul><pre><code># Идея backpropagation
+# Градиенты распространяются назад:
+# δL/δw = (δL/δy) × (δy/δw)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Прорыв в обработке данных (1989-1998)</h2>
+    <p><strong>LeNet и первые практические успехи</strong></p><ul><li>1989: LeCun - сверточные сети для распознавания цифр</li><li>1997: LSTM (Hochreiter & Schmidhuber)</li><li>1998: LeNet-5 - чтение чеков в банках</li><li>Градиентное затухание все еще проблема</li></ul><blockquote>🎯 LeNet-5 обрабатывала миллионы чеков ежедневно</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Вторая зима AI и другие подходы (1995-2005)</h2>
+    <p><strong>Доминирование SVM и Random Forest</strong></p><ul><li>SVM превосходят нейросети на большинстве задач</li><li>Проблемы обучения глубоких сетей</li><li>Развитие kernel methods</li><li>Нейросети теряют популярность</li></ul><p><strong>Почему нейросети не работали?</strong></p><ul><li>Недостаточно данных</li><li>Недостаточно вычислительной мощности</li><li>Плохая инициализация весов</li><li>Gradient vanishing</li></ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Deep Learning Renaissance (2006-2012)</h2>
+    <p><strong>Возрождение через unsupervised pretraining</strong></p><ul><li>2006: Hinton - Deep Belief Networks (DBN)</li><li>2006: Greedy layer-wise pretraining</li><li>2009: Введение термина "Deep Learning"</li><li>2010: ReLU activation (Nair & Hinton)</li><li>2012: AlexNet выигрывает ImageNet</li></ul><pre><code># ReLU - простота и эффективность
+def relu(x):
+    return max(0, x)</code></pre><blockquote>🚀 AlexNet снизил ошибку ImageNet с 26% до 15%!</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. ImageNet эра (2012-2015)</h2>
+    <p><strong>Революция в computer vision</strong></p><ul><li>2012: AlexNet (Krizhevsky et al.) - прорыв</li><li>2013: ZFNet улучшает AlexNet</li><li>2014: VGGNet (очень глубокие сети)</li><li>2014: GoogLeNet (Inception modules)</li><li>2015: ResNet (skip connections) - 152 слоя!</li><li>2015: Batch Normalization</li></ul><p><strong>Ключевые инновации</strong>:</p><ul><li>GPU ускорение (CUDA)</li><li>Dropout regularization</li><li>Data augmentation</li><li>Transfer learning</li></ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. RNN и последовательности (2014-2017)</h2>
+    <p><strong>От изображений к языку</strong></p><ul><li>2014: Seq2seq (Sutskever et al.)</li><li>2014: Attention mechanism (Bahdanau et al.)</li><li>2015: Neural Machine Translation</li><li>2016: Google Neural Machine Translation</li><li>2016: WaveNet (синтез речи)</li></ul><pre><code># Attention idea
+context = sum(alpha_i * h_i)
+where alpha_i = softmax(score(query, key_i))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Transformers революция (2017-2020)</h2>
+    <p><strong>"Attention is All You Need"</strong></p><ul><li>2017: Transformer (Vaswani et al.)</li><li>2018: BERT (Google) - bidirectional encoding</li><li>2018: GPT-1 (OpenAI) - autoregressive generation</li><li>2019: GPT-2 (1.5B parameters)</li><li>2019: ALBERT, RoBERTa, XLNet</li><li>2020: GPT-3 (175B parameters)</li></ul><blockquote>🔥 Transformers вытеснили RNN практически везде</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Large Language Models (2020-2023)</h2>
+    <p><strong>Эра гигантских моделей</strong></p><ul><li>2020: GPT-3 - few-shot learning</li><li>2021: DALL-E - text-to-image</li><li>2022: ChatGPT - диалоговый AI</li><li>2022: Stable Diffusion - открытая генерация</li><li>2023: GPT-4 - мультимодальность</li><li>2023: LLaMA, Falcon - open-source LLM</li></ul><p><strong>Scaling laws</strong>:</p><ul><li>Больше данных = лучше качество</li><li>Больше параметров = лучше качество</li><li>Emergence of abilities при scale-up</li></ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Современность и будущее (2023+)</h2>
+    <p><strong>Текущие тренды</strong></p><ul><li>Эффективность: mixture of experts, sparse models</li><li>Мультимодальность: GPT-4V, Gemini</li><li>Alignment: RLHF, constitutional AI</li><li>Open source движение: LLaMA, Mistral</li><li>Edge AI: квантизация, дистилляция</li></ul><p><strong>Будущие направления</strong>:</p><ul><li>AGI research</li><li>Embodied AI</li><li>Neuromorphic computing</li><li>Квантовое ML</li><li>Биологически правдоподобные сети</li></ul><blockquote>🚀 "Мы только в начале пути" - Yann LeCun</blockquote>
+  </div>
+
+
+</div>
+
+</body>
+</html>
