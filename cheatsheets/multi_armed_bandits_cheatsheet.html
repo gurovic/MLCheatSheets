@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Multi-Armed Bandits Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    strong {
+      color: #1a5fb4;
+    }
+  </style>
+</head>
+<body>
+  <h1>Многорукие бандиты (Multi-Armed Bandits)</h1>
+  <div class="subtitle">Задача оптимального исследования и использования</div>
+
+  <div class="container">
+
+    <div class="block">
+      <h2>1. Постановка задачи</h2>
+      <p><strong>Проблема:</strong> есть K "рук" (действий), каждая даёт случайное вознаграждение. Нужно максимизировать суммарное вознаграждение за T шагов.</p>
+      <p><strong>Компоненты:</strong></p>
+      <ul>
+        <li><strong>K arms</strong>: набор возможных действий</li>
+        <li><strong>Rewards</strong>: r_t ~ P(r|a_t) для действия a_t</li>
+        <li><strong>Goal</strong>: max Σ r_t за T шагов</li>
+        <li><strong>Unknowns</strong>: распределения наград неизвестны</li>
+      </ul>
+      <p><strong>Exploration vs Exploitation:</strong></p>
+      <ul>
+        <li><strong>Exploration</strong>: пробовать новые руки, чтобы узнать их качество</li>
+        <li><strong>Exploitation</strong>: использовать лучшую известную руку</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>2. Ключевые метрики</h2>
+      <p><strong>Regret (сожаление):</strong> разница между оптимальной и полученной наградой</p>
+      <pre><code>R(T) = T·μ* - Σ r_t
+где μ* — ожидаемая награда лучшей руки</code></pre>
+      <p><strong>Типы regret:</strong></p>
+      <ul>
+        <li><strong>Cumulative regret</strong>: суммарный за все шаги</li>
+        <li><strong>Simple regret</strong>: на последнем шаге</li>
+      </ul>
+      <p><strong>Оптимальность:</strong></p>
+      <ul>
+        <li><strong>Sublinear</strong>: R(T) = o(T) — хороший алгоритм</li>
+        <li><strong>Logarithmic</strong>: R(T) = O(log T) — оптимальный</li>
+      </ul>
+      <p><strong>Value функции:</strong></p>
+      <pre><code>Q(a) = E[r|a]  # истинное значение
+Q̂_t(a) = оценка на шаге t</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>3. ε-Greedy алгоритм</h2>
+      <p><strong>Идея:</strong> с вероятностью ε исследовать, иначе использовать лучшую руку</p>
+      <pre><code>if random() < ε:
+    a_t = random_arm()  # explore
+else:
+    a_t = argmax_a Q̂_t(a)  # exploit</code></pre>
+      <p><strong>Параметры:</strong></p>
+      <ul>
+        <li><strong>ε = 0.1</strong>: стандартное значение</li>
+        <li><strong>ε = 0.01</strong>: больше эксплуатации</li>
+        <li><strong>Decaying ε</strong>: ε_t = 1/t для сходимости</li>
+      </ul>
+      <p><strong>Плюсы:</strong> простота, понятность</p>
+      <p><strong>Минусы:</strong> равномерное исследование всех рук, не учитывает неопределённость</p>
+    </div>
+
+    <div class="block">
+      <h2>4. Upper Confidence Bound (UCB)</h2>
+      <p><strong>Принцип оптимизма:</strong> выбирать руку с максимальной верхней границей уверенности</p>
+      <pre><code>UCB_t(a) = Q̂_t(a) + c·√(ln(t) / N_t(a))
+
+где:
+- Q̂_t(a): средняя награда
+- N_t(a): число выборов руки a
+- c: параметр исследования (обычно √2)</code></pre>
+      <p><strong>Компоненты:</strong></p>
+      <ul>
+        <li><strong>Эксплуатация</strong>: Q̂_t(a) — текущая оценка</li>
+        <li><strong>Исследование</strong>: √(ln(t)/N_t(a)) — бонус за неопределённость</li>
+      </ul>
+      <p><strong>Свойства:</strong></p>
+      <ul>
+        <li>Regret O(√(KT log T))</li>
+        <li>Оптимальный для stochastic bandits</li>
+        <li>Детерминированный выбор</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>5. Thompson Sampling</h2>
+      <p><strong>Байесовский подход:</strong> поддерживать распределение вероятностей для каждой руки</p>
+      <p><strong>Алгоритм (для Bernoulli rewards):</strong></p>
+      <pre><code>for each arm a:
+    θ_a ~ Beta(α_a, β_a)  # sample
+a_t = argmax_a θ_a  # выбрать руку
+
+# После наблюдения r_t:
+if r_t == 1:
+    α_{a_t} += 1
+else:
+    β_{a_t} += 1</code></pre>
+      <p><strong>Для Gaussian rewards:</strong></p>
+      <pre><code>θ_a ~ N(μ_a, σ²_a)
+# Обновление через байесовский вывод</code></pre>
+      <p><strong>Преимущества:</strong></p>
+      <ul>
+        <li>Естественный баланс exploration/exploitation</li>
+        <li>Оптимальный asymptotic regret</li>
+        <li>Легко обобщается</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>6. Contextual Bandits</h2>
+      <p><strong>Расширение:</strong> награда зависит от контекста (признаков) x_t</p>
+      <p><strong>Постановка:</strong></p>
+      <pre><code>На каждом шаге t:
+1. Наблюдаем контекст x_t
+2. Выбираем действие a_t
+3. Получаем награду r_t ~ P(r|x_t, a_t)</code></pre>
+      <p><strong>LinUCB алгоритм:</strong></p>
+      <ul>
+        <li>Предполагаем линейную модель: E[r|x,a] = x^T θ_a</li>
+        <li>Используем ridge regression для оценки θ_a</li>
+        <li>Добавляем UCB бонус на основе неопределённости</li>
+      </ul>
+      <pre><code>UCB_t(a) = x_t^T θ̂_a + α·√(x_t^T A_a^{-1} x_t)
+где A_a = X_a^T X_a + λI</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>7. Adversarial Bandits</h2>
+      <p><strong>Предположение:</strong> награды выбираются противником, могут меняться произвольно</p>
+      <p><strong>EXP3 алгоритм (Exponential-weight algorithm):</strong></p>
+      <pre><code>Веса: w_t(a) = exp(η·Ĝ_t(a))
+Вероятности: p_t(a) = (1-γ)·w_t(a)/Σw + γ/K
+
+где Ĝ_t(a) — накопленные оценки наград</code></pre>
+      <p><strong>Importance sampling:</strong></p>
+      <pre><code>Ĝ_{t+1}(a) = Ĝ_t(a) + r_t·I(a_t=a)/p_t(a)</code></pre>
+      <p><strong>Гарантии:</strong></p>
+      <ul>
+        <li>Regret O(√(KT log K))</li>
+        <li>Работает против любого противника</li>
+        <li>No-regret learning</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>8. Restless Bandits</h2>
+      <p><strong>Нестационарность:</strong> распределения наград меняются со временем</p>
+      <p><strong>Подходы:</strong></p>
+      <ul>
+        <li><strong>Sliding window</strong>: использовать только недавние наблюдения</li>
+        <li><strong>Discounted UCB</strong>: экспоненциальное забывание</li>
+        <li><strong>Change detection</strong>: детектировать изменения и перезапускать</li>
+      </ul>
+      <p><strong>Discounted UCB:</strong></p>
+      <pre><code>Q̂_t(a) = Σ_{τ:a_τ=a} γ^{t-τ} r_τ / Σ_{τ:a_τ=a} γ^{t-τ}
+
+где γ ∈ (0,1) — фактор забывания</code></pre>
+      <p><strong>Sliding Window UCB:</strong></p>
+      <pre><code># Использовать только последние W наблюдений
+UCB_t(a) = Q̂_t^W(a) + c·√(ln(W)/N_t^W(a))</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>9. Применения в ML</h2>
+      <p><strong>A/B тестирование:</strong> онлайн оптимизация вариантов веб-страниц, рекламы</p>
+      <p><strong>Рекомендательные системы:</strong></p>
+      <ul>
+        <li>Контентные: выбор статей, видео</li>
+        <li>Contextual: персонализация по пользователю</li>
+        <li>Cold-start problem: быстрое обучение на новых айтемах</li>
+      </ul>
+      <p><strong>Hyperparameter optimization:</strong> адаптивный выбор конфигураций в процессе обучения</p>
+      <p><strong>Reinforcement Learning:</strong></p>
+      <ul>
+        <li>Exploration strategies в RL</li>
+        <li>Action selection в Q-learning</li>
+        <li>Option discovery</li>
+      </ul>
+      <p><strong>Online advertising:</strong> выбор рекламы для показа в реальном времени</p>
+    </div>
+
+    <div class="block">
+      <h2>10. Реализация на Python</h2>
+      <pre><code>import numpy as np
+
+class UCBBandit:
+    def __init__(self, n_arms, c=2.0):
+        self.n_arms = n_arms
+        self.c = c
+        self.counts = np.zeros(n_arms)
+        self.values = np.zeros(n_arms)
+        self.t = 0
+    
+    def select_arm(self):
+        self.t += 1
+        
+        # Инициализация: попробовать каждую руку
+        if self.t <= self.n_arms:
+            return self.t - 1
+        
+        # UCB выбор
+        ucb_values = self.values + \
+            self.c * np.sqrt(
+                np.log(self.t) / self.counts
+            )
+        return np.argmax(ucb_values)
+    
+    def update(self, arm, reward):
+        self.counts[arm] += 1
+        n = self.counts[arm]
+        # Инкрементное среднее
+        self.values[arm] += \
+            (reward - self.values[arm]) / n
+
+# Использование
+bandit = UCBBandit(n_arms=5)
+for t in range(1000):
+    arm = bandit.select_arm()
+    reward = get_reward(arm)  # внешняя функция
+    bandit.update(arm, reward)</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>11. Thompson Sampling код</h2>
+      <pre><code>class ThompsonSampling:
+    def __init__(self, n_arms):
+        self.n_arms = n_arms
+        # Beta(α, β) параметры
+        self.alpha = np.ones(n_arms)
+        self.beta = np.ones(n_arms)
+    
+    def select_arm(self):
+        # Сэмплировать из Beta распределений
+        samples = np.random.beta(
+            self.alpha, self.beta
+        )
+        return np.argmax(samples)
+    
+    def update(self, arm, reward):
+        # Bernoulli rewards (0 или 1)
+        if reward > 0:
+            self.alpha[arm] += 1
+        else:
+            self.beta[arm] += 1
+
+# Для Gaussian rewards
+class ThompsonGaussian:
+    def __init__(self, n_arms, σ²=1.0):
+        self.n_arms = n_arms
+        self.σ² = σ²
+        self.μ = np.zeros(n_arms)
+        self.τ = np.ones(n_arms)  # precision
+    
+    def select_arm(self):
+        samples = np.random.normal(
+            self.μ, 1/np.sqrt(self.τ)
+        )
+        return np.argmax(samples)
+    
+    def update(self, arm, reward):
+        # Bayesian update для Gaussian
+        self.τ[arm] += 1/self.σ²
+        self.μ[arm] = (
+            self.μ[arm] + reward/self.σ²
+        ) / self.τ[arm]</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>12. Best Practices</h2>
+      <p><strong>Выбор алгоритма:</strong></p>
+      <ul>
+        <li><strong>UCB</strong>: детерминированный, теоретические гарантии</li>
+        <li><strong>Thompson</strong>: более эффективен на практике, легко расширяется</li>
+        <li><strong>ε-greedy</strong>: простейший базовый вариант</li>
+      </ul>
+      <p><strong>Настройка параметров:</strong></p>
+      <ul>
+        <li>UCB c: начать с √2, увеличить для больше exploration</li>
+        <li>ε-greedy: использовать decaying ε_t = min(1, c/t)</li>
+        <li>Thompson: выбор prior согласно доменным знаниям</li>
+      </ul>
+      <p><strong>Оценка качества:</strong></p>
+      <ul>
+        <li>Отслеживать cumulative regret</li>
+        <li>Сравнивать с оптимальной рукой (если известна)</li>
+        <li>Измерять частоту выбора оптимальной руки</li>
+      </ul>
+      <p><strong>Нестационарность:</strong> если среда меняется, использовать discounting или sliding window</p>
+    </div>
+
+  </div>
+</body>
+</html>

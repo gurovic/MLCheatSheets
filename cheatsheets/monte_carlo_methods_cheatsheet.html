@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Монте-Карло методы в RL Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px;}}
+    @media print {body {background: white; padding: 0;} @page {size: A4 landscape; margin: 10mm;}}
+    .container {column-count: 3; column-gap: 20px; max-width: 100%;}
+    .block {break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+    h1 {font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all;}
+    .subtitle {text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all;}
+    h2 {font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff;}
+    p, ul, ol {font-size: 0.92em; margin: 0.6em 0;}
+    ul, ol {padding-left: 18px;}
+    li {margin-bottom: 4px;}
+    code {font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em;}
+    pre {background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0;}
+    pre code {padding: 0; background: none; white-space: pre-wrap;}
+    strong {color: #1a5fb4;}
+  </style>
+</head>
+<body>
+  <h1>Монте-Карло методы в Reinforcement Learning</h1>
+  <div class="subtitle">Model-free обучение по полным эпизодам</div>
+  <div class="container">
+    <div class="block">
+      <h2>1. Основная идея</h2>
+      <p><strong>Monte Carlo (MC) методы</strong> — обучение value функций и оптимальных стратегий из опыта взаимодействия без модели среды</p>
+      <p><strong>Ключевые особенности:</strong></p>
+      <ul>
+        <li><strong>Model-free</strong>: не требует знания P и R</li>
+        <li><strong>Эпизодический</strong>: обучение по полным эпизодам</li>
+        <li><strong>Sample-based</strong>: оценка через усреднение образцов</li>
+      </ul>
+      <p><strong>Принцип:</strong> оценивать V(s) и Q(s,a) как среднее наблюдаемых returns</p>
+      <pre><code>Return: G_t = r_{t+1} + γr_{t+2} + γ²r_{t+3} + ...</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>2. MC Prediction</h2>
+      <p><strong>Задача:</strong> оценить V^π(s) для данной π</p>
+      <p><strong>First-Visit MC:</strong></p>
+      <pre><code>Для каждого эпизода:
+  Для каждого состояния s в эпизоде:
+    Если первое посещение s:
+      G ← return после первого s
+      V(s) ← среднее всех G для s</code></pre>
+      <p><strong>Every-Visit MC:</strong> усреднять по всем посещениям s в эпизоде</p>
+      <p><strong>Инкрементное обновление:</strong></p>
+      <pre><code>V(s) ← V(s) + α[G - V(s)]
+где α — learning rate</code></pre>
+      <p><strong>Сходимость:</strong> V(s) → V^π(s) при числе визитов → ∞</p>
+    </div>
+
+    <div class="block">
+      <h2>3. MC Control</h2>
+      <p><strong>Цель:</strong> найти оптимальную стратегию π*</p>
+      <p><strong>Проблема:</strong> для policy improvement нужны Q-values, не V</p>
+      <p><strong>Решение:</strong> оценивать Q^π(s,a) напрямую</p>
+      <pre><code>Q^π(s,a) = E_π[G_t | s_t=s, a_t=a]</code></pre>
+      <p><strong>Алгоритм MC Control:</strong></p>
+      <ol>
+        <li>Инициализировать Q, π</li>
+        <li>Генерировать эпизод по π</li>
+        <li>Для каждой пары (s,a) в эпизоде:
+          <ul><li>Обновить Q(s,a) по наблюдённому return</li></ul>
+        </li>
+        <li>Улучшить π: π(s) ← argmax_a Q(s,a)</li>
+        <li>Повторить</li>
+      </ol>
+    </div>
+
+    <div class="block">
+      <h2>4. Exploration Problem</h2>
+      <p><strong>Проблема:</strong> жадная стратегия может никогда не посетить все (s,a) пары</p>
+      <p><strong>Решения:</strong></p>
+      <ul>
+        <li><strong>Exploring Starts</strong>: каждый эпизод начинать со случайной (s,a)</li>
+        <li><strong>ε-greedy policies</strong>: с вероятностью ε выбирать случайное действие</li>
+        <li><strong>ε-soft</strong>: π(a|s) ≥ ε/|A| для всех a</li>
+      </ul>
+      <p><strong>ε-greedy MC Control:</strong></p>
+      <pre><code>π(a|s) = {
+  1 - ε + ε/|A|  если a = argmax Q(s,a')
+  ε/|A|          иначе
+}</code></pre>
+      <p><strong>Exploring Starts</strong> гарантирует посещение всех пар, но непрактично</p>
+    </div>
+
+    <div class="block">
+      <h2>5. On-Policy vs Off-Policy</h2>
+      <p><strong>On-Policy:</strong> оценивать и улучшать ту же стратегию, по которой собираем данные</p>
+      <ul>
+        <li>Пример: ε-greedy MC Control</li>
+        <li>Проще, но менее гибко</li>
+      </ul>
+      <p><strong>Off-Policy:</strong> оценивать целевую π, но действовать по behavior μ</p>
+      <ul>
+        <li><strong>Target policy π</strong>: то, что хотим выучить (часто жадная)</li>
+        <li><strong>Behavior policy μ</strong>: то, по чему действуем (exploratory)</li>
+        <li>Позволяет учиться из опыта других агентов</li>
+      </ul>
+      <p><strong>Требование:</strong> coverage - μ(a|s) > 0 когда π(a|s) > 0</p>
+    </div>
+
+    <div class="block">
+      <h2>6. Importance Sampling</h2>
+      <p><strong>Проблема:</strong> off-policy returns имеют неверное распределение</p>
+      <p><strong>Решение:</strong> корректировать веса траекторий</p>
+      <p><strong>Importance sampling ratio:</strong></p>
+      <pre><code>ρ_{t:T-1} = ∏_{k=t}^{T-1} π(a_k|s_k) / μ(a_k|s_k)</code></pre>
+      <p><strong>Ordinary importance sampling:</strong></p>
+      <pre><code>V(s) = Σ ρ_{t:T-1} G_t / |episodes with s|</code></pre>
+      <p><strong>Weighted importance sampling:</strong></p>
+      <pre><code>V(s) = Σ ρ_{t:T-1} G_t / Σ ρ_{t:T-1}</code></pre>
+      <p><strong>Weighted</strong> имеет меньшую дисперсию и предпочтителен</p>
+    </div>
+
+    <div class="block">
+      <h2>7. Off-Policy MC Control</h2>
+      <pre><code>Инициализировать Q, π (жадная)
+Поведенческая μ (ε-soft)
+
+Для каждого эпизода (по μ):
+  Генерировать s_0, a_0, ..., s_T
+  G ← 0, W ← 1
+  
+  Для t = T-1, ..., 0:
+    G ← γG + r_{t+1}
+    Q(s_t,a_t) += W[G - Q(s_t,a_t)]
+    π(s_t) ← argmax_a Q(s_t,a)
+    
+    Если a_t ≠ π(s_t): прервать цикл
+    W ← W / μ(a_t|s_t)</code></pre>
+      <p><strong>Incremental implementation</strong> более эффективен по памяти</p>
+    </div>
+
+    <div class="block">
+      <h2>8. Реализация First-Visit MC</h2>
+      <pre><code>import numpy as np
+
+class MonteCarloAgent:
+    def __init__(self, n_states, n_actions, γ=0.99, α=0.01):
+        self.Q = np.zeros((n_states, n_actions))
+        self.γ = γ
+        self.α = α
+    
+    def select_action(self, state, ε=0.1):
+        """ε-greedy action selection"""
+        if np.random.random() < ε:
+            return np.random.randint(self.Q.shape[1])
+        return np.argmax(self.Q[state])
+    
+    def update(self, episode):
+        """First-visit MC update"""
+        G = 0
+        visited = set()
+        
+        # Backward pass через эпизод
+        for s, a, r in reversed(episode):
+            G = r + self.γ * G
+            
+            if (s, a) not in visited:
+                visited.add((s, a))
+                # Incremental update
+                self.Q[s,a] += self.α * (G - self.Q[s,a])</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>9. Преимущества и недостатки</h2>
+      <p><strong>Преимущества MC:</strong></p>
+      <ul>
+        <li>Не требует модели среды</li>
+        <li>Может учиться из симуляций или реального опыта</li>
+        <li>Прост в реализации</li>
+        <li>Несмещённая оценка (unbiased)</li>
+        <li>Хорош для эпизодических задач</li>
+      </ul>
+      <p><strong>Недостатки:</strong></p>
+      <ul>
+        <li>Требует завершения эпизодов (не для continuing tasks)</li>
+        <li>Высокая дисперсия оценок</li>
+        <li>Медленная сходимость</li>
+        <li>Неэффективное использование данных</li>
+      </ul>
+      <p><strong>MC vs DP:</strong> MC не требует модели, но менее эффективен по данным</p>
+    </div>
+
+    <div class="block">
+      <h2>10. Variance Reduction</h2>
+      <p><strong>Проблема:</strong> returns имеют высокую дисперсию</p>
+      <p><strong>Baseline subtraction:</strong></p>
+      <pre><code>Q(s,a) += α[(G - b(s)) - (Q(s,a) - b(s))]
+где b(s) — baseline (например, V(s))</code></pre>
+      <p><strong>Control variates:</strong> использовать коррелированную переменную с известным средним</p>
+      <p><strong>Stratified sampling:</strong> разбить пространство на страты</p>
+      <p><strong>Importance sampling:</strong> weighted IS имеет меньшую дисперсию</p>
+    </div>
+
+    <div class="block">
+      <h2>11. Применения MC</h2>
+      <p><strong>Games:</strong></p>
+      <ul>
+        <li>AlphaGo использует MC Tree Search</li>
+        <li>Оценка позиций через rollouts</li>
+        <li>Blackjack, покер</li>
+      </ul>
+      <p><strong>Симуляция:</strong></p>
+      <ul>
+        <li>Оценка сложных систем</li>
+        <li>Финансовое моделирование</li>
+        <li>Физические процессы</li>
+      </ul>
+      <p><strong>Off-policy learning:</strong></p>
+      <ul>
+        <li>Обучение из логов</li>
+        <li>Batch RL</li>
+        <li>Безопасное обучение</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>12. Практические советы</h2>
+      <p><strong>Настройка параметров:</strong></p>
+      <ul>
+        <li><strong>α</strong>: начать с 0.01-0.1, уменьшать со временем</li>
+        <li><strong>ε</strong>: начать с 0.1-0.3, decay к 0.01</li>
+        <li><strong>γ</strong>: обычно 0.95-0.99</li>
+      </ul>
+      <p><strong>Ускорение обучения:</strong></p>
+      <ul>
+        <li>Использовать every-visit вместо first-visit</li>
+        <li>Incremental updates вместо batch</li>
+        <li>Parallel rollouts</li>
+      </ul>
+      <p><strong>Когда использовать MC:</strong></p>
+      <ul>
+        <li>Эпизодические задачи</li>
+        <li>Модель недоступна</li>
+        <li>Нужна простота</li>
+      </ul>
+      <p><strong>Альтернативы:</strong> Temporal Difference (TD) для continuing tasks и меньшей дисперсии</p>
+    </div>
+  </div>
+</body>
+</html>

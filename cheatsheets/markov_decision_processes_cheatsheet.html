@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Марковские процессы принятия решений Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    strong {
+      color: #1a5fb4;
+    }
+  </style>
+</head>
+<body>
+  <h1>Марковские процессы принятия решений (MDP)</h1>
+  <div class="subtitle">Markov Decision Processes — математическая основа Reinforcement Learning</div>
+
+  <div class="container">
+
+    <div class="block">
+      <h2>1. Определение MDP</h2>
+      <p><strong>MDP</strong> — это кортеж (S, A, P, R, γ):</p>
+      <ul>
+        <li><strong>S</strong>: множество состояний</li>
+        <li><strong>A</strong>: множество действий</li>
+        <li><strong>P</strong>: функция перехода P(s'|s,a)</li>
+        <li><strong>R</strong>: функция награды R(s,a,s')</li>
+        <li><strong>γ</strong>: фактор дисконтирования [0,1]</li>
+      </ul>
+      <p><strong>Марковское свойство:</strong> будущее зависит только от текущего состояния</p>
+      <pre><code>P(s_{t+1}|s_t, a_t, ..., s_0, a_0) = P(s_{t+1}|s_t, a_t)</code></pre>
+      <p><strong>Цель:</strong> найти оптимальную стратегию π*(s) для максимизации суммарной награды</p>
+    </div>
+
+    <div class="block">
+      <h2>2. Стратегия (Policy)</h2>
+      <p><strong>Policy π</strong>: отображение состояний в действия</p>
+      <p><strong>Типы стратегий:</strong></p>
+      <ul>
+        <li><strong>Детерминированная</strong>: π: S → A</li>
+        <li><strong>Стохастическая</strong>: π(a|s) — вероятность действия a в состоянии s</li>
+        <li><strong>Стационарная</strong>: не зависит от времени</li>
+        <li><strong>Нестационарная</strong>: π_t(s) зависит от t</li>
+      </ul>
+      <p><strong>Траектория (эпизод):</strong></p>
+      <pre><code>τ = (s_0, a_0, r_1, s_1, a_1, r_2, ..., s_T)
+генерируется следованием π</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>3. Value функции</h2>
+      <p><strong>State-value функция V^π(s):</strong> ожидаемая награда из состояния s при следовании π</p>
+      <pre><code>V^π(s) = E_π[Σ_{t=0}^∞ γ^t r_{t+1} | s_0=s]</code></pre>
+      <p><strong>Action-value функция Q^π(s,a):</strong> ожидаемая награда при выборе a в s, затем π</p>
+      <pre><code>Q^π(s,a) = E_π[Σ_{t=0}^∞ γ^t r_{t+1} | s_0=s, a_0=a]</code></pre>
+      <p><strong>Связь:</strong></p>
+      <pre><code>V^π(s) = Σ_a π(a|s) Q^π(s,a)
+Q^π(s,a) = R(s,a) + γ Σ_{s'} P(s'|s,a) V^π(s')</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>4. Уравнение Беллмана</h2>
+      <p><strong>Bellman Expectation Equation для V^π:</strong></p>
+      <pre><code>V^π(s) = Σ_a π(a|s) [R(s,a) + γ Σ_{s'} P(s'|s,a) V^π(s')]</code></pre>
+      <p><strong>Для Q^π:</strong></p>
+      <pre><code>Q^π(s,a) = R(s,a) + γ Σ_{s'} P(s'|s,a) Σ_{a'} π(a'|s') Q^π(s',a')</code></pre>
+      <p><strong>Векторная форма:</strong></p>
+      <pre><code>V^π = R^π + γ P^π V^π
+V^π = (I - γ P^π)^{-1} R^π</code></pre>
+      <p>где P^π — матрица переходов под π, R^π — вектор наград</p>
+    </div>
+
+    <div class="block">
+      <h2>5. Оптимальность</h2>
+      <p><strong>Оптимальная value функция:</strong></p>
+      <pre><code>V*(s) = max_π V^π(s)
+Q*(s,a) = max_π Q^π(s,a)</code></pre>
+      <p><strong>Bellman Optimality Equation:</strong></p>
+      <pre><code>V*(s) = max_a [R(s,a) + γ Σ_{s'} P(s'|s,a) V*(s')]
+
+Q*(s,a) = R(s,a) + γ Σ_{s'} P(s'|s,a) max_{a'} Q*(s',a')</code></pre>
+      <p><strong>Оптимальная стратегия:</strong></p>
+      <pre><code>π*(s) = argmax_a Q*(s,a)</code></pre>
+      <p>Если известна V* или Q*, оптимальная π* находится жадно</p>
+    </div>
+
+    <div class="block">
+      <h2>6. Фактор дисконтирования γ</h2>
+      <p><strong>Роль γ:</strong> определяет важность будущих наград относительно текущих</p>
+      <p><strong>Значения:</strong></p>
+      <ul>
+        <li><strong>γ = 0</strong>: только немедленная награда (близорукий)</li>
+        <li><strong>γ → 1</strong>: равное значение всех будущих наград</li>
+        <li><strong>γ = 1</strong>: undiscounted (только для эпизодических задач)</li>
+        <li><strong>Типичное</strong>: γ ∈ [0.9, 0.99]</li>
+      </ul>
+      <p><strong>Свойства:</strong></p>
+      <ul>
+        <li>Обеспечивает сходимость для бесконечного горизонта</li>
+        <li>Моделирует неопределённость будущего</li>
+        <li>Влияет на баланс exploration/exploitation</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>7. Типы MDP</h2>
+      <p><strong>Episodic (эпизодические):</strong></p>
+      <ul>
+        <li>Конечная длительность эпизодов</li>
+        <li>Есть терминальные состояния</li>
+        <li>Пример: игры с конечным числом ходов</li>
+      </ul>
+      <p><strong>Continuing (продолжающиеся):</strong></p>
+      <ul>
+        <li>Бесконечный горизонт</li>
+        <li>Нет терминальных состояний</li>
+        <li>Требуется дисконтирование γ < 1</li>
+      </ul>
+      <p><strong>Finite vs Infinite:</strong></p>
+      <ul>
+        <li><strong>Finite</strong>: |S|, |A| конечны (табличный случай)</li>
+        <li><strong>Infinite</strong>: непрерывные пространства (требуют аппроксимации)</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>8. Частично наблюдаемые MDP (POMDP)</h2>
+      <p><strong>POMDP</strong> = (S, A, P, R, γ, Ω, O):</p>
+      <ul>
+        <li><strong>Ω</strong>: множество наблюдений</li>
+        <li><strong>O</strong>: функция наблюдений O(o|s',a)</li>
+      </ul>
+      <p><strong>Отличие от MDP:</strong> агент не знает точное состояние, только получает наблюдения</p>
+      <p><strong>Belief state:</strong> распределение вероятностей по состояниям</p>
+      <pre><code>b(s) = P(s_t = s | o_1,...,o_t, a_1,...,a_{t-1})</code></pre>
+      <p><strong>Решение:</strong> стратегия зависит от belief: π(b)</p>
+      <p><strong>Примеры:</strong> робототехника с зашумлёнными сенсорами, финансовые рынки</p>
+    </div>
+
+    <div class="block">
+      <h2>9. Методы решения</h2>
+      <p><strong>Model-based (с моделью):</strong></p>
+      <ul>
+        <li><strong>Dynamic Programming</strong>: Value Iteration, Policy Iteration</li>
+        <li>Требует знания P и R</li>
+        <li>Точное решение для небольших MDP</li>
+      </ul>
+      <p><strong>Model-free (без модели):</strong></p>
+      <ul>
+        <li><strong>Monte Carlo</strong>: обучение по полным эпизодам</li>
+        <li><strong>Temporal Difference</strong>: Q-learning, SARSA</li>
+        <li>Не требует знания динамики</li>
+        <li>Обучение по опыту</li>
+      </ul>
+      <p><strong>Аппроксимация:</strong></p>
+      <ul>
+        <li>Линейная: V(s) ≈ w^T φ(s)</li>
+        <li>Нейросети: Deep Q-Networks, Actor-Critic</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>10. Примеры MDP</h2>
+      <p><strong>GridWorld:</strong></p>
+      <ul>
+        <li>S: позиции на сетке</li>
+        <li>A: {↑, ↓, ←, →}</li>
+        <li>P: детерминированные или стохастические переходы</li>
+        <li>R: +1 в цели, -1 в препятствиях, 0 иначе</li>
+      </ul>
+      <p><strong>Управление запасами:</strong></p>
+      <ul>
+        <li>S: текущий уровень запасов</li>
+        <li>A: сколько заказать</li>
+        <li>R: прибыль от продаж минус затраты хранения</li>
+      </ul>
+      <p><strong>Игры:</strong></p>
+      <ul>
+        <li>S: конфигурация доски</li>
+        <li>A: легальные ходы</li>
+        <li>R: +1 за победу, -1 за поражение, 0 за ничью</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>11. Реализация на Python</h2>
+      <pre><code>import numpy as np
+
+class MDP:
+    def __init__(self, n_states, n_actions, γ=0.9):
+        self.n_states = n_states
+        self.n_actions = n_actions
+        self.γ = γ
+        
+        # P[s, a, s'] = P(s'|s,a)
+        self.P = np.zeros((n_states, n_actions, n_states))
+        
+        # R[s, a] = E[r|s,a]
+        self.R = np.zeros((n_states, n_actions))
+    
+    def set_transition(self, s, a, s_next, prob):
+        """Установить вероятность перехода"""
+        self.P[s, a, s_next] = prob
+    
+    def set_reward(self, s, a, reward):
+        """Установить награду"""
+        self.R[s, a] = reward
+    
+    def bellman_backup(self, V, s, a):
+        """Bellman backup для Q-value"""
+        expected_future = np.sum(
+            self.P[s, a, :] * V
+        )
+        return self.R[s, a] + self.γ * expected_future
+    
+    def optimal_value(self, V, s):
+        """Оптимальное значение V*(s)"""
+        q_values = [
+            self.bellman_backup(V, s, a)
+            for a in range(self.n_actions)
+        ]
+        return max(q_values)
+    
+    def optimal_policy(self, V):
+        """Извлечь оптимальную стратегию из V*"""
+        π = np.zeros(self.n_states, dtype=int)
+        for s in range(self.n_states):
+            q_values = [
+                self.bellman_backup(V, s, a)
+                for a in range(self.n_actions)
+            ]
+            π[s] = np.argmax(q_values)
+        return π</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>12. Свойства и теоремы</h2>
+      <p><strong>Существование оптимальной стратегии:</strong> для любого конечного MDP существует хотя бы одна детерминированная стационарная оптимальная стратегия</p>
+      <p><strong>Уникальность V*:</strong> оптимальная value функция единственна</p>
+      <p><strong>Policy Improvement Theorem:</strong> жадная стратегия относительно V^π не хуже π</p>
+      <p><strong>Принцип контракции:</strong> Bellman operator — сжимающее отображение</p>
+      <pre><code>||T(V) - T(V')||_∞ ≤ γ ||V - V'||_∞</code></pre>
+      <p><strong>Следствие:</strong> итеративное применение T сходится к V*</p>
+      <p><strong>Связь с RL:</strong> MDP — математическая модель, RL — методы решения MDP через взаимодействие</p>
+    </div>
+
+  </div>
+</body>
+</html>
