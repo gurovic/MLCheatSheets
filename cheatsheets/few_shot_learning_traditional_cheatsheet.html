@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Few-shot learning (традиционные подходы) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Few-shot learning (традиционные подходы) Cheatsheet</h1>
+  <div class="subtitle">Малообразцовое обучение • Metric learning • Прототипы<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основные концепции</h2>
+
+    <ul>
+      <li><strong>Few-shot learning</strong>: обучение на малом числе примеров</li>
+      <li><strong>N-way K-shot</strong>: N классов, K примеров на класс</li>
+      <li><strong>Support set</strong>: примеры для обучения</li>
+      <li><strong>Query set</strong>: примеры для тестирования</li>
+    </ul>
+    <blockquote>
+      Задача: научиться классифицировать новые классы, имея всего несколько примеров.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы подходов</h2>
+
+    <table>
+      <tr><th>Подход</th><th>Идея</th><th>Примеры</th></tr>
+      <tr><td>Metric-based</td><td>Обучение метрики близости</td><td>Siamese, Prototypical</td></tr>
+      <tr><td>Model-based</td><td>Модели с памятью</td><td>Memory-augmented NN</td></tr>
+      <tr><td>Optimization-based</td><td>Быстрая адаптация</td><td>MAML</td></tr>
+      <tr><td>Generation-based</td><td>Генерация данных</td><td>Data augmentation</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Siamese Networks</h2>
+
+    <pre><code>import torch.nn as nn
+
+class SiameseNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.encoder = nn.Sequential(
+            nn.Conv2d(1, 64, 3),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(64, 128, 3),
+            nn.ReLU(),
+            nn.Flatten(),
+            nn.Linear(128*5*5, 256)
+        )
+    
+    def forward(self, x1, x2):
+        emb1 = self.encoder(x1)
+        emb2 = self.encoder(x2)
+        return emb1, emb2
+
+# Contrastive loss
+def contrastive_loss(emb1, emb2, label, margin=1.0):
+    dist = F.pairwise_distance(emb1, emb2)
+    loss = (1-label) * dist**2 + label * torch.clamp(margin-dist, min=0)**2
+    return loss.mean()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Prototypical Networks</h2>
+
+    <ul>
+      <li><strong>Идея</strong>: представить каждый класс прототипом (центром)</li>
+      <li><strong>Прототип</strong>: среднее эмбеддингов support set</li>
+      <li><strong>Классификация</strong>: ближайший прототип</li>
+    </ul>
+    <pre><code># Prototypical Networks
+def compute_prototypes(support_embeddings, support_labels, n_way):
+    prototypes = []
+    for class_id in range(n_way):
+        mask = support_labels == class_id
+        class_embeddings = support_embeddings[mask]
+        prototype = class_embeddings.mean(dim=0)
+        prototypes.append(prototype)
+    return torch.stack(prototypes)
+
+def classify_query(query_embedding, prototypes):
+    distances = torch.cdist(query_embedding, prototypes)
+    predictions = distances.argmin(dim=1)
+    return predictions</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Matching Networks</h2>
+
+    <ul>
+      <li><strong>Attention mechanism</strong>: взвешенное голосование</li>
+      <li><strong>Bidirectional LSTM</strong>: кодирование последовательности</li>
+      <li><strong>Full Context Embeddings</strong>: учет всех примеров</li>
+    </ul>
+    <pre><code># Matching Networks
+def attention_kernel(query, support):
+    # Cosine similarity
+    similarities = F.cosine_similarity(
+        query.unsqueeze(1), 
+        support.unsqueeze(0), 
+        dim=2
+    )
+    attention = F.softmax(similarities, dim=1)
+    return attention
+
+def predict(query_emb, support_emb, support_labels):
+    attention = attention_kernel(query_emb, support_emb)
+    # Weighted voting
+    predictions = torch.matmul(attention, support_labels)
+    return predictions</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Relation Networks</h2>
+
+    <pre><code># Relation Networks: обучаемая метрика
+class RelationModule(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.relation = nn.Sequential(
+            nn.Conv2d(128, 64, 3),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            nn.Conv2d(64, 64, 3),
+            nn.ReLU(),
+            nn.Flatten(),
+            nn.Linear(64*2*2, 8),
+            nn.ReLU(),
+            nn.Linear(8, 1),
+            nn.Sigmoid()
+        )
+    
+    def forward(self, query_features, support_features):
+        # Concatenate features
+        combined = torch.cat([query_features, support_features], dim=1)
+        relation_score = self.relation(combined)
+        return relation_score</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Meta-features</h2>
+
+    <ul>
+      <li><strong>Task-level features</strong>: характеристики задачи</li>
+      <li><strong>Instance-level features</strong>: признаки примеров</li>
+      <li><strong>Meta-knowledge</strong>: знания о распределении задач</li>
+    </ul>
+    <table>
+      <tr><th>Тип</th><th>Примеры</th></tr>
+      <tr><td>Статистические</td><td>Среднее, дисперсия, корреляции</td></tr>
+      <tr><td>Геометрические</td><td>Расстояния между классами</td></tr>
+      <tr><td>Топологические</td><td>Плотность, связность</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Data Augmentation для FSL</h2>
+
+    <pre><code># Augmentation для увеличения support set
+from torchvision import transforms
+
+augmentation = transforms.Compose([
+    transforms.RandomRotation(20),
+    transforms.RandomHorizontalFlip(),
+    transforms.ColorJitter(0.2, 0.2, 0.2),
+    transforms.RandomResizedCrop(84, scale=(0.8, 1.0))
+])
+
+def augment_support_set(support_images, k_aug=5):
+    augmented = []
+    for img in support_images:
+        for _ in range(k_aug):
+            aug_img = augmentation(img)
+            augmented.append(aug_img)
+    return augmented</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Трансдуктивное обучение</h2>
+
+    <ul>
+      <li><strong>Идея</strong>: использовать query set для улучшения предсказаний</li>
+      <li><strong>Label propagation</strong>: распространение меток</li>
+      <li><strong>Transductive Fine-Tuning</strong>: адаптация на query</li>
+    </ul>
+    <pre><code># Transductive inference
+def transductive_inference(support_emb, query_emb, support_labels, iterations=5):
+    # Начальные прототипы
+    prototypes = compute_prototypes(support_emb, support_labels)
+    
+    for _ in range(iterations):
+        # Псевдо-метки для query
+        query_predictions = classify(query_emb, prototypes)
+        
+        # Обновление прототипов с учетом query
+        all_embeddings = torch.cat([support_emb, query_emb])
+        all_labels = torch.cat([support_labels, query_predictions])
+        prototypes = compute_prototypes(all_embeddings, all_labels)
+    
+    return query_predictions</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Benchmarks и датасеты</h2>
+
+    <table>
+      <tr><th>Датасет</th><th>Задача</th><th>Сложность</th></tr>
+      <tr><td>Omniglot</td><td>Рукописные символы</td><td>Легкая</td></tr>
+      <tr><td>miniImageNet</td><td>Изображения объектов</td><td>Средняя</td></tr>
+      <tr><td>tieredImageNet</td><td>Иерархия классов</td><td>Средняя</td></tr>
+      <tr><td>CIFAR-FS</td><td>Few-shot CIFAR</td><td>Средняя</td></tr>
+      <tr><td>Meta-Dataset</td><td>Мета-обучение</td><td>Высокая</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Оценка качества</h2>
+
+    <pre><code># Evaluation protocol
+def evaluate_few_shot(model, test_tasks, n_way=5, k_shot=1):
+    accuracies = []
+    
+    for task in test_tasks:
+        # Sample N-way K-shot task
+        support, query = task.sample(n_way, k_shot)
+        
+        # Get predictions
+        predictions = model.predict(support, query)
+        
+        # Compute accuracy
+        acc = (predictions == query_labels).float().mean()
+        accuracies.append(acc)
+    
+    mean_acc = torch.tensor(accuracies).mean()
+    conf_interval = 1.96 * torch.tensor(accuracies).std() / sqrt(len(accuracies))
+    
+    return mean_acc, conf_interval
+
+# Типичный результат: 95.2% ± 0.3% на Omniglot 5-way 1-shot</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Практические советы</h2>
+
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>Рекомендации</h3>
+        <ul>
+          <li>Предобучение на большом датасете</li>
+          <li>Эмбеддинги размером 64-256</li>
+          <li>Data augmentation важен</li>
+          <li>Episodic training эффективен</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>Проблемы</h3>
+        <ul>
+          <li>Overfitting на малых данных</li>
+          <li>Domain shift между задачами</li>
+          <li>Вычислительная сложность</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+</body>
+</html>

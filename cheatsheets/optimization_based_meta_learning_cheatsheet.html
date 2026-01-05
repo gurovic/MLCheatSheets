@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Optimization-based Meta-learning Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Optimization-based Meta-learning Cheatsheet</h1>
+  <div class="subtitle">MAML • Reptile • Градиентное мета-обучение • Few-shot learning<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основные концепции</h2>
+    <ul>
+      <li><strong>Meta-learning</strong>: обучение тому, как обучаться</li>
+      <li><strong>Optimization-based</strong>: оптимизация процесса оптимизации</li>
+      <li><strong>Task distribution</strong>: набор различных задач для обучения</li>
+      <li><strong>Inner/Outer loop</strong>: адаптация к задаче / обновление мета-параметров</li>
+    </ul>
+    <blockquote>
+      Цель: найти начальные веса, которые быстро адаптируются к новым задачам за несколько шагов градиентного спуска.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. MAML (Model-Agnostic Meta-Learning)</h2>
+    <p><strong>Алгоритм</strong>:</p>
+    <ol>
+      <li>Инициализировать мета-параметры θ</li>
+      <li>Для каждой задачи τᵢ:
+        <ul>
+          <li>Скопировать θ → θ'ᵢ</li>
+          <li>Сделать K шагов градиента на support set</li>
+          <li>Оценить на query set</li>
+        </ul>
+      </li>
+      <li>Обновить θ используя градиенты по всем задачам</li>
+    </ol>
+    <pre><code>import torch
+import torch.nn as nn
+
+def maml_train(model, tasks, alpha=0.01, beta=0.001):
+    meta_params = list(model.parameters())
+    
+    for epoch in range(num_epochs):
+        meta_loss = 0
+        for task in tasks:
+            # Inner loop: адаптация к задаче
+            adapted_params = adapt_to_task(
+                model, task.support, alpha, K=5
+            )
+            # Outer loop: оценка на query set
+            loss = evaluate(model, adapted_params, task.query)
+            meta_loss += loss
+        
+        # Мета-обновление
+        meta_loss.backward()
+        optimizer.step()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Внутренний и внешний циклы</h2>
+    <table>
+      <tr><th>Цикл</th><th>Цель</th><th>Данные</th><th>Learning rate</th></tr>
+      <tr><td>Inner</td><td>Адаптация к задаче</td><td>Support set</td><td>α (высокий)</td></tr>
+      <tr><td>Outer</td><td>Мета-обучение</td><td>Query set</td><td>β (низкий)</td></tr>
+    </table>
+    <pre><code># Внутренний цикл (адаптация)
+def adapt_to_task(model, support_data, lr, K):
+    adapted_model = copy.deepcopy(model)
+    for k in range(K):
+        loss = compute_loss(adapted_model, support_data)
+        grads = torch.autograd.grad(loss, adapted_model.parameters())
+        # Обновление параметров
+        adapted_params = [p - lr * g for p, g in zip(adapted_model.parameters(), grads)]
+    return adapted_params
+
+# Внешний цикл (мета-обучение)
+def meta_update(model, tasks, meta_lr):
+    meta_grads = []
+    for task in tasks:
+        adapted_params = adapt_to_task(model, task.support)
+        query_loss = evaluate(adapted_params, task.query)
+        grads = torch.autograd.grad(query_loss, model.parameters())
+        meta_grads.append(grads)
+    
+    # Усреднение градиентов по задачам
+    avg_grads = average_gradients(meta_grads)
+    update_parameters(model, avg_grads, meta_lr)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Варианты MAML</h2>
+    <ul>
+      <li><strong>First-order MAML (FOMAML)</strong>:
+        <ul>
+          <li>Игнорирует вторые производные</li>
+          <li>Быстрее и меньше памяти</li>
+          <li>Немного хуже качество</li>
+        </ul>
+      </li>
+      <li><strong>MAML++</strong>:
+        <ul>
+          <li>Multi-step loss optimization</li>
+          <li>Автоматическая learning rate per-layer</li>
+          <li>Улучшенная стабильность</li>
+        </ul>
+      </li>
+      <li><strong>Meta-SGD</strong>:
+        <ul>
+          <li>Обучение learning rate</li>
+          <li>Адаптивные шаги градиента</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Reptile</h2>
+    <p><strong>Упрощенная версия MAML</strong>:</p>
+    <pre><code>def reptile_train(model, tasks, epsilon=0.1, K=10):
+    """
+    Reptile: более простая альтернатива MAML
+    """
+    for epoch in range(num_epochs):
+        # Выбор случайной задачи
+        task = sample_task(tasks)
+        
+        # Копия исходных параметров
+        initial_params = copy_parameters(model)
+        
+        # K шагов SGD на задаче
+        for k in range(K):
+            batch = task.sample_batch()
+            loss = compute_loss(model, batch)
+            loss.backward()
+            optimizer.step()
+        
+        # Мета-обновление: двигаемся к адаптированным параметрам
+        adapted_params = model.parameters()
+        for p_init, p_adapt in zip(initial_params, adapted_params):
+            p_init.data += epsilon * (p_adapt.data - p_init.data)</code></pre>
+    <blockquote>
+      Reptile проще MAML: не требует вторых производных, но работает примерно так же.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Сравнение подходов</h2>
+    <table>
+      <tr><th>Метод</th><th>Сложность</th><th>Память</th><th>Качество</th></tr>
+      <tr><td>MAML</td><td>Высокая (2-й порядок)</td><td>Большая</td><td>Отличное</td></tr>
+      <tr><td>FOMAML</td><td>Средняя (1-й порядок)</td><td>Средняя</td><td>Хорошее</td></tr>
+      <tr><td>Reptile</td><td>Низкая</td><td>Малая</td><td>Хорошее</td></tr>
+      <tr><td>MAML++</td><td>Высокая</td><td>Большая</td><td>Лучшее</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Task Construction</h2>
+    <pre><code>class FewShotTask:
+    def __init__(self, n_way, k_shot, q_query):
+        """
+        n_way: количество классов
+        k_shot: примеров на класс в support
+        q_query: примеров на класс в query
+        """
+        self.n_way = n_way
+        self.k_shot = k_shot
+        self.q_query = q_query
+    
+    def sample(self, dataset):
+        # Выбираем n_way классов
+        classes = random.sample(dataset.classes, self.n_way)
+        
+        # Support set: k_shot примеров каждого класса
+        support = []
+        query = []
+        for cls in classes:
+            samples = dataset.get_samples(cls)
+            support.extend(samples[:self.k_shot])
+            query.extend(samples[self.k_shot:self.k_shot+self.q_query])
+        
+        return support, query
+
+# Пример: 5-way 1-shot задача
+task = FewShotTask(n_way=5, k_shot=1, q_query=15)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Применение к few-shot learning</h2>
+    <ul>
+      <li><strong>5-way 1-shot</strong>: 5 классов, 1 пример на класс</li>
+      <li><strong>5-way 5-shot</strong>: 5 классов, 5 примеров на класс</li>
+      <li><strong>Episode training</strong>: каждый эпизод = новая задача</li>
+    </ul>
+    <pre><code># Few-shot classification с MAML
+def few_shot_classify(model, support, query):
+    # Адаптация на support set
+    adapted_model = maml_adapt(model, support, steps=5)
+    
+    # Предсказание на query set
+    predictions = adapted_model(query)
+    return predictions
+
+# Оценка
+accuracy = evaluate_few_shot(
+    model, 
+    test_tasks, 
+    n_way=5, 
+    k_shot=1
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Implicit MAML (iMAML)</h2>
+    <ul>
+      <li><strong>Проблема</strong>: MAML требует раскрутки градиентов через все K шагов</li>
+      <li><strong>Решение</strong>: неявное дифференцирование</li>
+      <li><strong>Преимущества</strong>:
+        <ul>
+          <li>Константная память относительно K</li>
+          <li>Больше шагов адаптации без роста памяти</li>
+        </ul>
+      </li>
+    </ul>
+    <pre><code># iMAML использует implicit function theorem
+# для вычисления градиентов без раскрутки
+def imaml_meta_gradient(meta_params, task):
+    # Решаем inner optimization до сходимости
+    adapted_params = solve_inner_opt(meta_params, task.support)
+    
+    # Вычисляем градиент неявно
+    meta_grad = implicit_gradient(
+        adapted_params,
+        meta_params,
+        task.query
+    )
+    return meta_grad</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Автоматический learning rate</h2>
+    <pre><code># Meta-SGD: обучаемый learning rate
+class MetaSGD(nn.Module):
+    def __init__(self, model):
+        super().__init__()
+        self.model = model
+        # Learning rate как параметр
+        self.alphas = nn.ParameterDict({
+            name: nn.Parameter(torch.ones_like(p) * 0.01)
+            for name, p in model.named_parameters()
+        })
+    
+    def adapt(self, support_data):
+        for step in range(K):
+            loss = compute_loss(self.model, support_data)
+            grads = torch.autograd.grad(loss, self.model.parameters())
+            
+            # Адаптация с обучаемыми learning rates
+            for (name, param), grad, alpha in zip(
+                self.model.named_parameters(), 
+                grads, 
+                self.alphas.values()
+            ):
+                param.data -= alpha * grad</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Практические советы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>Рекомендации</h3>
+        <ul>
+          <li>Используйте FOMAML для начала (проще)</li>
+          <li>Inner LR обычно 0.01-0.1</li>
+          <li>Meta LR обычно 0.001</li>
+          <li>5-10 inner steps достаточно</li>
+          <li>Batch normalization требует особого внимания</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>Проблемы</h3>
+        <ul>
+          <li>Высокие требования к памяти</li>
+          <li>Нестабильность обучения</li>
+          <li>Чувствительность к гиперпараметрам</li>
+          <li>Долгое время обучения</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Применения</h2>
+    <ul>
+      <li><strong>Few-shot classification</strong>: Omniglot, miniImageNet</li>
+      <li><strong>Few-shot regression</strong>: sin/cos функции</li>
+      <li><strong>Reinforcement Learning</strong>: быстрая адаптация агента</li>
+      <li><strong>Neural Architecture Search</strong>: поиск архитектур</li>
+      <li><strong>Personalization</strong>: адаптация к пользователю</li>
+    </ul>
+    <pre><code># Пример: MAML для RL
+def maml_rl(agent, envs, alpha=0.01):
+    for epoch in range(num_epochs):
+        for env in envs:
+            # Адаптация агента к окружению
+            adapted_agent = agent.clone()
+            for step in range(K):
+                trajectory = collect_trajectory(adapted_agent, env)
+                policy_loss = compute_policy_loss(trajectory)
+                adapted_agent.update(policy_loss, lr=alpha)
+            
+            # Мета-обновление
+            meta_loss = evaluate_agent(adapted_agent, env)
+            agent.meta_update(meta_loss)</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>

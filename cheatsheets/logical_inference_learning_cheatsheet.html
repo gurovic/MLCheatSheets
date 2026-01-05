@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Логический вывод с обучением Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🧠 Логический вывод с обучением Cheatsheet</h1>
+  <div class="subtitle">Нейро-символьный AI • Дифференцируемая логика • Обучаемые правила<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основные концепции</h2>
+    <ul>
+      <li><strong>Символьный AI</strong>: работа с логическими правилами и знаниями</li>
+      <li><strong>Нейронные сети</strong>: обучение на данных через градиентный спуск</li>
+      <li><strong>Нейро-символьное обучение</strong>: объединение логики и обучения</li>
+      <li><strong>Дифференцируемая логика</strong>: логические операции с градиентами</li>
+    </ul>
+    <blockquote>
+      Комбинация символьного вывода и статистического обучения позволяет системам рассуждать и учиться одновременно.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы систем</h2>
+    <table>
+      <tr><th>Подход</th><th>Описание</th><th>Примеры</th></tr>
+      <tr><td>Logic Tensor Networks</td><td>Логика на основе тензоров</td><td>LTN</td></tr>
+      <tr><td>Neural Logic</td><td>Нейронные реализации логики</td><td>∂ILP, NLM</td></tr>
+      <tr><td>Probabilistic Logic</td><td>Вероятностный вывод</td><td>ProbLog, PSL</td></tr>
+      <tr><td>Differentiable ILP</td><td>Индуктивное программирование</td><td>∂ILP</td></tr>
+      <tr><td>Semantic Loss</td><td>Логика в функции потерь</td><td>SL, Logic RL</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Logic Tensor Networks (LTN)</h2>
+    <pre><code>import ltn
+
+# Определение предикатов
+Predicate_friend = ltn.Predicate(
+    model=torch.nn.Sequential(
+        torch.nn.Linear(256, 128),
+        torch.nn.ReLU(),
+        torch.nn.Linear(128, 1),
+        torch.nn.Sigmoid()
+    )
+)
+
+# Логические формулы
+# ∀x,y: Friend(x,y) → Friend(y,x)
+formula = ltn.Quantifier(
+    ltn.Implies(
+        Predicate_friend([x, y]),
+        Predicate_friend([y, x])
+    ),
+    quantifier="forall"
+)
+
+# Обучение через минимизацию нарушений
+loss = 1 - formula.value</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Дифференцируемые логические операции</h2>
+    <ul>
+      <li><strong>AND (конъюнкция)</strong>:
+        <ul>
+          <li>Product t-norm: <code>AND(a,b) = a × b</code></li>
+          <li>Minimum: <code>AND(a,b) = min(a,b)</code></li>
+          <li>Lukasiewicz: <code>AND(a,b) = max(0, a+b-1)</code></li>
+        </ul>
+      </li>
+      <li><strong>OR (дизъюнкция)</strong>:
+        <ul>
+          <li>Probabilistic sum: <code>OR(a,b) = a+b-a×b</code></li>
+          <li>Maximum: <code>OR(a,b) = max(a,b)</code></li>
+        </ul>
+      </li>
+      <li><strong>NOT (отрицание)</strong>:
+        <ul>
+          <li><code>NOT(a) = 1 - a</code></li>
+        </ul>
+      </li>
+      <li><strong>IMPLIES (импликация)</strong>:
+        <ul>
+          <li><code>IMPLIES(a,b) = OR(NOT(a), b)</code></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Нейро-символьные архитектуры</h2>
+    <pre><code>import torch
+import torch.nn as nn
+
+class NeuroSymbolicNet(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Нейронная часть для извлечения признаков
+        self.perception = nn.Sequential(
+            nn.Linear(784, 256),
+            nn.ReLU(),
+            nn.Linear(256, 64)
+        )
+        # Логический вывод
+        self.reasoning = LogicModule()
+    
+    def forward(self, x):
+        # Восприятие → символы
+        features = self.perception(x)
+        # Логический вывод
+        conclusion = self.reasoning(features)
+        return conclusion
+
+class LogicModule(nn.Module):
+    def forward(self, symbols):
+        # Применение логических правил
+        # IF (symbol_1 AND symbol_2) THEN conclusion
+        rule_1 = self.fuzzy_and(symbols[:, 0], symbols[:, 1])
+        return rule_1</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Индуктивное логическое программирование</h2>
+    <ul>
+      <li><strong>Задача ILP</strong>:
+        <ul>
+          <li>Дано: примеры (E+, E-) и фоновые знания (B)</li>
+          <li>Найти: гипотезу H, такую что B ∪ H ⊨ E+</li>
+        </ul>
+      </li>
+      <li><strong>Дифференцируемый ILP (∂ILP)</strong>:
+        <ul>
+          <li>Представление правил как параметров</li>
+          <li>Градиентная оптимизация структуры правил</li>
+          <li>Поиск логических программ через обучение</li>
+        </ul>
+      </li>
+    </ul>
+    <pre><code># Псевдокод ∂ILP
+rules = initialize_rules()
+for epoch in range(num_epochs):
+    # Применение правил к данным
+    predictions = apply_rules(rules, data)
+    # Вычисление потерь
+    loss = compute_loss(predictions, labels)
+    # Градиент по параметрам правил
+    rules = update_rules(rules, loss.backward())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Вероятностный логический вывод</h2>
+    <p><strong>ProbLog</strong> — вероятностная логика:</p>
+    <pre><code>% Факты с вероятностями
+0.8::stress(john).
+0.6::influences(stress, blood_pressure).
+
+% Правила
+high_bp(X) :- stress(X), influences(stress, blood_pressure).
+
+% Запрос вероятности
+query(high_bp(john)).  % P ≈ 0.48
+
+% Обучение параметров
+learn_probabilities(data, rules).</code></pre>
+    <blockquote>
+      ProbLog позволяет обучать вероятности в логических правилах из данных.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Semantic Loss Functions</h2>
+    <pre><code>def semantic_loss(predictions, logic_rules):
+    """
+    Функция потерь, учитывающая логические ограничения
+    """
+    # Стандартная supervised loss
+    data_loss = F.cross_entropy(predictions, labels)
+    
+    # Логические ограничения
+    logic_loss = 0.0
+    for rule in logic_rules:
+        # Нарушение правила
+        violation = evaluate_rule(rule, predictions)
+        logic_loss += violation
+    
+    # Комбинированная потеря
+    total_loss = data_loss + lambda_logic * logic_loss
+    return total_loss
+
+# Пример правила:
+# "Если предсказан класс A, то не может быть B"
+rule = lambda pred: torch.max(
+    0, 
+    pred[:, class_A] * pred[:, class_B]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Neural Logic Machines</h2>
+    <ul>
+      <li><strong>Архитектура</strong>:
+        <ul>
+          <li>Представление знаний как тензоров</li>
+          <li>Логические операции через нейронные модули</li>
+          <li>End-to-end обучение</li>
+        </ul>
+      </li>
+      <li><strong>Компоненты</strong>:
+        <ul>
+          <li>Unary predicates: свойства объектов</li>
+          <li>Binary predicates: отношения</li>
+          <li>Reasoning modules: логический вывод</li>
+        </ul>
+      </li>
+    </ul>
+    <pre><code>class NeuralLogicLayer(nn.Module):
+    def forward(self, unary, binary):
+        # Применение логических операций
+        # ∃y: R(x,y) ∧ P(y)
+        result = torch.einsum(
+            'bij,bj->bi',
+            binary,  # отношения R
+            unary    # свойства P
+        )
+        return torch.sigmoid(result)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применения</h2>
+    <table>
+      <tr><th>Область</th><th>Задача</th><th>Подход</th></tr>
+      <tr><td>Computer Vision</td><td>Visual reasoning</td><td>LTN для объектов</td></tr>
+      <tr><td>NLP</td><td>Логический вывод над текстом</td><td>Neural Theorem Proving</td></tr>
+      <tr><td>Робототехника</td><td>Планирование действий</td><td>Differentiable planning</td></tr>
+      <tr><td>Knowledge Graphs</td><td>Reasoning over KG</td><td>Neural LP</td></tr>
+      <tr><td>Медицина</td><td>Диагностика с правилами</td><td>Semantic Loss</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Библиотеки и фреймворки</h2>
+    <ul>
+      <li><strong>LTN (Logic Tensor Networks)</strong>:
+        <pre><code>pip install ltn
+# Реализация логики через тензоры</code></pre>
+      </li>
+      <li><strong>DeepProbLog</strong>:
+        <pre><code>from deepproblog.model import Model
+# Вероятностный логический вывод с NN</code></pre>
+      </li>
+      <li><strong>Neural-LP</strong>:
+        <ul>
+          <li>Differentiable ILP</li>
+          <li>Обучение логических программ</li>
+        </ul>
+      </li>
+      <li><strong>TensorLog</strong>:
+        <ul>
+          <li>Логический вывод на тензорах</li>
+          <li>Интеграция с TensorFlow</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Преимущества и вызовы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>Преимущества</h3>
+        <ul>
+          <li>Интерпретируемость решений</li>
+          <li>Включение априорных знаний</li>
+          <li>Лучшая обобщающая способность</li>
+          <li>Работа при малых данных</li>
+          <li>Логическая консистентность</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>Вызовы</h3>
+        <ul>
+          <li>Сложность масштабирования</li>
+          <li>Требуется определение логики</li>
+          <li>Вычислительная сложность</li>
+          <li>Проблемы с градиентами</li>
+          <li>Ограниченная экспрессивность</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

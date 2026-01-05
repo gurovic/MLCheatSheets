@@ -524,28 +524,28 @@
 ### **26. Квантовое машинное обучение**
 1. [Квантовые алгоритмы для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantum_algorithms_ml_cheatsheet.html)
 1. [Квантовые нейронные сети](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantum_neural_networks_cheatsheet.html)
-1. Квантовое усиление классических алгоритмов
+1. [Квантовое усиление классических алгоритмов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantum_classical_enhancement_cheatsheet.html)
 
 ### **27. Нейро-символьное ИИ**
 1. [Гибридные нейро-символьные системы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neuro_symbolic_ai_systems_cheatsheet.html)
-1. Rule-based системы с ML
-1. Логический вывод с обучением
+1. [Rule-based системы с ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rule_based_ml_systems_cheatsheet.html)
+1. [Логический вывод с обучением](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/logical_inference_learning_cheatsheet.html)
 
 ## III Разные темы машинного обучения
 
 ### **1. Мета-обучение (Meta-learning) - продвинутые темы**
 1. [Model-agnostic meta-learning (MAML)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/maml_meta_learning_cheatsheet.html)
 1. [Metric-based (Siamese networks, Matching networks)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/metric_based_learning_siamese_cheatsheet.html)
-1. Optimization-based meta-learning
-1. Few-shot learning (традиционные подходы)
-1. Meta-features и meta-learning
+1. [Optimization-based meta-learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/optimization_based_meta_learning_cheatsheet.html)
+1. [Few-shot learning (традиционные подходы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/few_shot_learning_traditional_cheatsheet.html)
+1. [Meta-features и meta-learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/meta_features_learning_cheatsheet.html)
 
 ### **2. Специализированные прикладные области**
 1. [Биоинформатика и computational biology](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bioinformatics_computational_biology_cheatsheet.html)
 1. [Computational chemistry](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/computational_chemistry_ml_cheatsheet.html)
 1. [Астрофизика и космология](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/astrophysics_cosmology_ml_cheatsheet.html)
 1. [Геоинформационные системы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/geoinformation_systems_ml_cheatsheet.html)
-1. Цифровая гуманитаристика
+1. [Цифровая гуманитаристика](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/digital_humanities_cheatsheet.html)
 1. Computational social science
 
 ### **3. Композиционное и структурное обучение**
@@ -561,9 +561,9 @@
 ### **5. Квантовое машинное обучение**
 1. [Квантовые алгоритмы для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantum_algorithms_ml_cheatsheet.html)
 1. [Квантовые нейронные сети](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantum_neural_networks_cheatsheet.html)
-1. Квантовое усиление классических алгоритмов
+1. [Квантовое усиление классических алгоритмов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantum_classical_enhancement_cheatsheet.html)
 
 ### **6. Нейро-символьное ИИ**
 1. [Гибридные нейро-символьные системы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neuro_symbolic_ai_systems_cheatsheet.html)
-1. Rule-based системы с ML
-1. Логический вывод с обучением
+1. [Rule-based системы с ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/rule_based_ml_systems_cheatsheet.html)
+1. [Логический вывод с обучением](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/logical_inference_learning_cheatsheet.html)
