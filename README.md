@@ -94,8 +94,8 @@
 1. [Prophet и современные методы временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/prophet_time_series_cheatsheet.html)
 1. [State space models](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/state_space_models_cheatsheet.html)
 1. [Kalman filters](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/kalman_filters_cheatsheet.html)
-1. Сезонная декомпозиция
-1. Теория временных рядов Box-Jenkins
+1. [Сезонная декомпозиция](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/seasonal_decomposition_cheatsheet.html)
+1. [Теория временных рядов Box-Jenkins](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/box_jenkins_cheatsheet.html)
 
 ### **9. Обнаружение аномалий**
 1. [Isolation Forest](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/isolation_forest_cheatsheet.html)
@@ -127,8 +127,8 @@
 1. [AdaBoost](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adaboost_cheatsheet.html)
 1. [Стекинг и Voting (Stacking, Voting)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/voting_stacking_cheatsheet.html)
 1. [Advanced Model Ensembling](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/advanced_ensembling_cheatsheet.html)
-1. Блендинг (Blending)
-1. Ансамбли деревьев
+1. [Блендинг (Blending)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/blending_cheatsheet.html)
+1. [Ансамбли деревьев](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tree_ensembles_cheatsheet.html)
 1. [Ансамбли линейных моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/linear_ensembles_cheatsheet.html)
 1. [Диверсификация ансамблей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ensemble_diversification_cheatsheet.html)
 
@@ -204,7 +204,7 @@
 1. [Теория информации в ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/information_theory_ml_cheatsheet.html)
 1. [Линейная алгебра и оптимизация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/linear_algebra_optimization_cheatsheet.html)
 1. [Теория графов для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/graph_theory_ml_cheatsheet.html)
-1. Теория решений
+1. [Теория решений](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/decision_theory_cheatsheet.html)
 
 ### **20. Инструменты и библиотеки**
 1. [Scikit-learn полный обзор](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/sklearn_overview_cheatsheet.html)
@@ -285,7 +285,7 @@
 1. Shape constraints
 
 ### **31. Комбинаторная оптимизация и ML**
-1. Генетические алгоритмы
+1. [Генетические алгоритмы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/genetic_algorithms_cheatsheet.html)
 1. Эволюционные стратегии
 1. Swarm intelligence (PSO, ant colony)
 1. Simulated annealing
