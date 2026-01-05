@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Adversarial Attacks Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Adversarial Attacks Cheatsheet</h1>
+  <div class="subtitle">Состязательные атаки на нейронные сети • Методы и защита<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое adversarial attacks?</h2>
+    <p><strong>Adversarial attack</strong> — добавление малых возмущений к входным данным для обмана модели.</p>
+    <ul>
+      <li><strong>Цель</strong>: вызвать неправильное предсказание</li>
+      <li><strong>Особенность</strong>: возмущения незаметны для человека</li>
+      <li><strong>Угроза</strong>: безопасность ML систем</li>
+      <li><strong>Применение</strong>: CV, NLP, speech recognition</li>
+    </ul>
+    <blockquote>💡 "Небольшое изменение изображения может превратить панду в гиббона"</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы атак</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th></tr>
+      <tr>
+        <td><strong>White-box</strong></td>
+        <td>Полный доступ к модели и весам</td>
+      </tr>
+      <tr>
+        <td><strong>Black-box</strong></td>
+        <td>Доступ только к выходам модели</td>
+      </tr>
+      <tr>
+        <td><strong>Gray-box</strong></td>
+        <td>Частичный доступ к архитектуре</td>
+      </tr>
+      <tr>
+        <td><strong>Targeted</strong></td>
+        <td>Целевая ошибка на конкретный класс</td>
+      </tr>
+      <tr>
+        <td><strong>Untargeted</strong></td>
+        <td>Любая неправильная классификация</td>
+      </tr>
+      <tr>
+        <td><strong>Physical</strong></td>
+        <td>Атаки в реальном мире (стикеры)</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. FGSM (Fast Gradient Sign Method)</h2>
+    <p>Простейший и быстрый метод генерации adversarial examples.</p>
+    <p><strong>Формула</strong>: x_adv = x + ε × sign(∇_x L(θ, x, y))</p>
+    
+    <pre><code>import torch
+import torch.nn.functional as F
+
+def fgsm_attack(model, x, y, epsilon=0.03):
+    """
+    FGSM атака на модель
+    
+    Args:
+        model: нейронная сеть
+        x: входное изображение
+        y: истинная метка
+        epsilon: сила возмущения
+    """
+    # Требуем градиенты
+    x.requires_grad = True
+    
+    # Forward pass
+    output = model(x)
+    loss = F.cross_entropy(output, y)
+    
+    # Backward pass
+    model.zero_grad()
+    loss.backward()
+    
+    # Знак градиента
+    data_grad = x.grad.data
+    
+    # Создаем adversarial example
+    perturbed_x = x + epsilon * data_grad.sign()
+    
+    # Клипинг к валидному диапазону
+    perturbed_x = torch.clamp(perturbed_x, 0, 1)
+    
+    return perturbed_x
+
+# Использование
+x_adv = fgsm_attack(model, image, label, epsilon=0.03)
+pred_clean = model(image).argmax()
+pred_adv = model(x_adv).argmax()
+print(f"Clean: {pred_clean}, Adversarial: {pred_adv}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. PGD (Projected Gradient Descent)</h2>
+    <p>Итеративный метод, более сильный чем FGSM.</p>
+    <ul>
+      <li>Несколько шагов с малым ε</li>
+      <li>Проекция на допустимую область</li>
+      <li>Случайная инициализация</li>
+    </ul>
+
+    <pre><code>def pgd_attack(model, x, y, epsilon=0.03, 
+               alpha=0.01, num_iter=40):
+    """
+    PGD атака - итеративный FGSM
+    
+    Args:
+        alpha: размер шага
+        num_iter: количество итераций
+    """
+    # Случайная инициализация
+    delta = torch.zeros_like(x).uniform_(-epsilon, epsilon)
+    delta.requires_grad = True
+    
+    for i in range(num_iter):
+        # Forward
+        output = model(x + delta)
+        loss = F.cross_entropy(output, y)
+        
+        # Backward
+        loss.backward()
+        
+        # Gradient ascent step
+        delta.data = delta + alpha * delta.grad.sign()
+        
+        # Проекция на epsilon-шар
+        delta.data = torch.clamp(delta.data, -epsilon, epsilon)
+        
+        # Обнулить градиенты
+        delta.grad.zero_()
+    
+    # Финальный adversarial example
+    x_adv = torch.clamp(x + delta, 0, 1)
+    return x_adv</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. C&W (Carlini & Wagner) Attack</h2>
+    <p>Оптимизационный подход для поиска minimal perturbation.</p>
+    <p><strong>Формула</strong>: minimize ||δ||_p + c × f(x + δ)</p>
+    
+    <pre><code>def cw_attack(model, x, target, c=1.0, 
+              learning_rate=0.01, max_iter=1000):
+    """
+    C&W L2 атака - ищет минимальное возмущение
+    """
+    # Переменная для оптимизации
+    delta = torch.zeros_like(x, requires_grad=True)
+    optimizer = torch.optim.Adam([delta], lr=learning_rate)
+    
+    for i in range(max_iter):
+        # Adversarial example
+        x_adv = x + delta
+        
+        # Logits модели
+        logits = model(x_adv)
+        
+        # C&W loss function
+        real = logits.gather(1, target.unsqueeze(1))
+        other = logits.gather(1, 
+            logits.argsort(descending=True)[:, 1:2])
+        
+        # f(x') = max(0, real - other + κ)
+        f = torch.clamp(real - other + 0.0, min=0)
+        
+        # Total loss: L2 norm + classification loss
+        loss = torch.norm(delta, p=2) + c * f.sum()
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+    
+    return torch.clamp(x + delta, 0, 1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. DeepFool</h2>
+    <p>Ищет closest decision boundary для минимального возмущения.</p>
+    <ul>
+      <li>Линеаризация границы решения</li>
+      <li>Итеративное приближение</li>
+      <li>Минимальное l2 возмущение</li>
+    </ul>
+
+    <pre><code>def deepfool_attack(model, x, num_classes=10, 
+                    max_iter=50, overshoot=0.02):
+    """
+    DeepFool атака - minimal perturbation
+    """
+    x_adv = x.clone().detach()
+    x_adv.requires_grad = True
+    
+    # Исходный класс
+    logits = model(x_adv)
+    pred_class = logits.argmax().item()
+    
+    for i in range(max_iter):
+        logits = model(x_adv)
+        
+        # Вычисляем градиенты для всех классов
+        grads = []
+        for k in range(num_classes):
+            if k == pred_class:
+                continue
+            
+            model.zero_grad()
+            logits[0, k].backward(retain_graph=True)
+            grads.append(x_adv.grad.clone())
+            x_adv.grad.zero_()
+        
+        # Находим ближайшую границу
+        min_dist = float('inf')
+        best_grad = None
+        
+        for grad in grads:
+            # Расстояние до boundary
+            w_norm = torch.norm(grad.flatten())
+            dist = abs(logits[0, pred_class] - logits[0, k]) / w_norm
+            
+            if dist < min_dist:
+                min_dist = dist
+                best_grad = grad
+        
+        # Обновляем x_adv
+        perturbation = (1 + overshoot) * min_dist * best_grad / torch.norm(best_grad)
+        x_adv = x_adv + perturbation
+        
+        # Проверяем изменение класса
+        if model(x_adv).argmax() != pred_class:
+            break
+    
+    return x_adv</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Universal Adversarial Perturbations</h2>
+    <p>Одно возмущение работает на многих примерах.</p>
+    
+    <pre><code>def universal_perturbation(model, dataloader, 
+                           epsilon=0.1, max_iter=10):
+    """
+    Находит универсальное возмущение
+    """
+    # Инициализация
+    v = torch.zeros(1, 3, 224, 224)
+    
+    for iteration in range(max_iter):
+        print(f"Iteration {iteration+1}/{max_iter}")
+        
+        for batch_x, batch_y in dataloader:
+            # Применяем текущее возмущение
+            x_perturbed = batch_x + v
+            
+            # Проверяем предсказания
+            pred_clean = model(batch_x).argmax(dim=1)
+            pred_perturbed = model(x_perturbed).argmax(dim=1)
+            
+            # Для правильно классифицированных
+            correct_mask = (pred_clean == batch_y)
+            
+            if correct_mask.sum() > 0:
+                # Находим минимальное возмущение DeepFool
+                for i in range(len(batch_x)):
+                    if correct_mask[i]:
+                        delta = deepfool_attack(
+                            model, 
+                            x_perturbed[i:i+1]
+                        )
+                        v += delta - x_perturbed[i:i+1]
+                        
+                        # Проекция на epsilon-шар
+                        v = torch.clamp(v, -epsilon, epsilon)
+    
+    return v</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Black-box атаки</h2>
+    <p>Атаки без доступа к модели:</p>
+    
+    <p><strong>1. Transferability</strong>:</p>
+    <ul>
+      <li>Обучаем surrogate модель</li>
+      <li>Генерируем атаку на surrogate</li>
+      <li>Применяем к целевой модели</li>
+    </ul>
+
+    <pre><code># Transfer attack
+def transfer_attack(surrogate_model, target_model, x, y):
+    # Генерируем атаку на surrogate
+    x_adv = pgd_attack(surrogate_model, x, y)
+    
+    # Проверяем на target
+    pred_clean = target_model(x).argmax()
+    pred_adv = target_model(x_adv).argmax()
+    
+    success = (pred_clean != pred_adv)
+    return x_adv, success</code></pre>
+
+    <p><strong>2. Query-based атаки</strong>:</p>
+    <pre><code>def query_based_attack(model_query_fn, x, y, 
+                       num_queries=1000):
+    """
+    Атака только с доступом к предсказаниям
+    """
+    best_x = x.clone()
+    best_loss = float('inf')
+    
+    for i in range(num_queries):
+        # Случайное возмущение
+        noise = torch.randn_like(x) * 0.01
+        x_perturbed = torch.clamp(x + noise, 0, 1)
+        
+        # Query модель
+        pred = model_query_fn(x_perturbed)
+        loss = F.cross_entropy(pred, y)
+        
+        # Сохраняем лучшее
+        if loss < best_loss:
+            best_loss = loss
+            best_x = x_perturbed
+    
+    return best_x</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Физические атаки</h2>
+    <p>Adversarial examples в реальном мире:</p>
+    <ul>
+      <li><strong>Adversarial patches</strong>: стикеры на объектах</li>
+      <li><strong>3D adversarial objects</strong>: физические объекты</li>
+      <li><strong>Robust perturbations</strong>: устойчивые к трансформациям</li>
+    </ul>
+
+    <pre><code>def adversarial_patch(model, target_class, 
+                      patch_size=50, num_iter=1000):
+    """
+    Генерирует adversarial patch
+    """
+    # Инициализация патча
+    patch = torch.rand(3, patch_size, patch_size, 
+                       requires_grad=True)
+    optimizer = torch.optim.Adam([patch], lr=0.01)
+    
+    for i in range(num_iter):
+        # Применяем патч к случайным изображениям
+        images = get_random_images(batch_size=32)
+        
+        # Случайное размещение патча
+        patched_images = apply_patch_random(images, patch)
+        
+        # Loss для целевого класса
+        logits = model(patched_images)
+        target = torch.full((32,), target_class)
+        loss = F.cross_entropy(logits, target)
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+        
+        # Клип патч к валидному диапазону
+        patch.data = torch.clamp(patch.data, 0, 1)
+    
+    return patch</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Метрики атак</h2>
+    <table>
+      <tr><th>Метрика</th><th>Описание</th></tr>
+      <tr>
+        <td><strong>Attack Success Rate</strong></td>
+        <td>Доля успешных атак</td>
+      </tr>
+      <tr>
+        <td><strong>L∞ distance</strong></td>
+        <td>Максимальное изменение пикселя</td>
+      </tr>
+      <tr>
+        <td><strong>L2 distance</strong></td>
+        <td>Евклидово расстояние</td>
+      </tr>
+      <tr>
+        <td><strong>L0 distance</strong></td>
+        <td>Число измененных пикселей</td>
+      </tr>
+      <tr>
+        <td><strong>SSIM</strong></td>
+        <td>Структурное сходство</td>
+      </tr>
+      <tr>
+        <td><strong>Robustness</strong></td>
+        <td>Устойчивость к атакам</td>
+      </tr>
+    </table>
+
+    <pre><code>def evaluate_attack(model, x_clean, x_adv, y_true):
+    """Оценка качества атаки"""
+    
+    # Success rate
+    pred_clean = model(x_clean).argmax(dim=1)
+    pred_adv = model(x_adv).argmax(dim=1)
+    success = (pred_clean != pred_adv).float().mean()
+    
+    # Perturbation metrics
+    l_inf = (x_adv - x_clean).abs().max()
+    l_2 = torch.norm(x_adv - x_clean, p=2)
+    l_0 = (x_adv != x_clean).float().sum()
+    
+    return {
+        'success_rate': success.item(),
+        'l_inf': l_inf.item(),
+        'l_2': l_2.item(),
+        'l_0': l_0.item()
+    }</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Защита: Adversarial Training</h2>
+    <p>Обучение на adversarial examples:</p>
+    
+    <pre><code>def adversarial_training(model, train_loader, 
+                         epochs=10, epsilon=0.03):
+    """
+    Adversarial training для robustness
+    """
+    optimizer = torch.optim.Adam(model.parameters())
+    
+    for epoch in range(epochs):
+        for x, y in train_loader:
+            # Генерируем adversarial examples
+            x_adv = pgd_attack(model, x, y, epsilon=epsilon)
+            
+            # Смешиваем clean и adversarial
+            x_mixed = torch.cat([x, x_adv], dim=0)
+            y_mixed = torch.cat([y, y], dim=0)
+            
+            # Обычное обучение
+            optimizer.zero_grad()
+            output = model(x_mixed)
+            loss = F.cross_entropy(output, y_mixed)
+            loss.backward()
+            optimizer.step()
+        
+        print(f"Epoch {epoch+1} completed")
+    
+    return model</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Certified defenses</h2>
+    <p>Гарантированная устойчивость:</p>
+    <ul>
+      <li><strong>Randomized smoothing</strong></li>
+      <li><strong>Interval bound propagation</strong></li>
+      <li><strong>Lipschitz constraints</strong></li>
+    </ul>
+
+    <pre><code>import torch.nn.functional as F
+
+class RandomizedSmoothing:
+    """Certified defense через случайный шум"""
+    
+    def __init__(self, model, sigma=0.1, n_samples=100):
+        self.model = model
+        self.sigma = sigma
+        self.n_samples = n_samples
+    
+    def predict(self, x):
+        """Robust предсказание"""
+        predictions = []
+        
+        # Множественные предсказания с шумом
+        for _ in range(self.n_samples):
+            noise = torch.randn_like(x) * self.sigma
+            x_noisy = x + noise
+            pred = self.model(x_noisy).argmax()
+            predictions.append(pred.item())
+        
+        # Возвращаем most common
+        from collections import Counter
+        return Counter(predictions).most_common(1)[0][0]
+    
+    def certify(self, x, pred_class, alpha=0.001):
+        """Вычисляем certified radius"""
+        from scipy.stats import norm
+        
+        # Подсчитываем votes
+        counts = [0] * 10
+        for _ in range(self.n_samples):
+            noise = torch.randn_like(x) * self.sigma
+            pred = self.model(x + noise).argmax()
+            counts[pred.item()] += 1
+        
+        # Сертификат
+        p_a = counts[pred_class] / self.n_samples
+        
+        if p_a > 0.5:
+            radius = self.sigma * norm.ppf(p_a)
+            return radius
+        else:
+            return 0.0  # Not certified</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>

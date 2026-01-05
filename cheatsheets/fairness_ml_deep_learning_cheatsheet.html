@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Fairness в ML Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⚖️ Fairness в Machine Learning Cheatsheet</h1>
+  <div class="subtitle">Справедливость моделей • Этика и предвзятость<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое fairness в ML?</h2>
+    <p><strong>Fairness</strong> — обеспечение справедливости моделей по отношению к разным группам людей.</p>
+    <ul>
+      <li><strong>Цель</strong>: устранение дискриминации</li>
+      <li><strong>Проблема</strong>: bias в данных и моделях</li>
+      <li><strong>Важность</strong>: этические и юридические аспекты</li>
+      <li><strong>Применение</strong>: кредитование, найм, медицина, суд</li>
+    </ul>
+    <blockquote>💡 "Модель не должна дискриминировать по полу, расе, возрасту или другим защищенным признакам"</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Источники bias</h2>
+    <p><strong>Где возникает предвзятость</strong>:</p>
+    <ul>
+      <li><strong>Исторические данные</strong>: прошлые решения людей</li>
+      <li><strong>Sampling bias</strong>: неравномерная выборка</li>
+      <li><strong>Label bias</strong>: предвзятая разметка</li>
+      <li><strong>Feature selection</strong>: выбор признаков</li>
+      <li><strong>Algorithm bias</strong>: алгоритм усиливает bias</li>
+      <li><strong>Feedback loops</strong>: модель создает новый bias</li>
+    </ul>
+
+    <pre><code># Пример bias в данных
+import pandas as pd
+
+# Данные о зарплате
+df = pd.DataFrame({
+    'gender': ['M', 'M', 'F', 'F', 'M'],
+    'experience': [5, 3, 5, 3, 4],
+    'salary': [100, 80, 70, 60, 90]
+})
+
+# Средняя зарплата по полу
+print(df.groupby('gender')['salary'].mean())
+# M    90.0  <- выше
+# F    65.0  <- ниже
+
+# Модель выучит этот bias!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Типы fairness</h2>
+    <table>
+      <tr><th>Тип</th><th>Определение</th></tr>
+      <tr>
+        <td><strong>Individual Fairness</strong></td>
+        <td>Похожие люди → похожие предсказания</td>
+      </tr>
+      <tr>
+        <td><strong>Group Fairness</strong></td>
+        <td>Равные метрики для разных групп</td>
+      </tr>
+      <tr>
+        <td><strong>Demographic Parity</strong></td>
+        <td>Равная вероятность положительного исхода</td>
+      </tr>
+      <tr>
+        <td><strong>Equal Opportunity</strong></td>
+        <td>Равный TPR для всех групп</td>
+      </tr>
+      <tr>
+        <td><strong>Equalized Odds</strong></td>
+        <td>Равные TPR и FPR</td>
+      </tr>
+      <tr>
+        <td><strong>Predictive Parity</strong></td>
+        <td>Равный PPV для всех групп</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Demographic Parity</h2>
+    <p><strong>Определение</strong>: P(Ŷ=1|A=0) = P(Ŷ=1|A=1)</p>
+    <p>Где A — защищенный признак (пол, раса и т.д.)</p>
+    
+    <pre><code>def demographic_parity(y_pred, sensitive_attr):
+    """
+    Проверка demographic parity
+    
+    Args:
+        y_pred: предсказания модели
+        sensitive_attr: защищенный признак
+    
+    Returns:
+        difference: разница в acceptance rates
+    """
+    # Разбиваем на группы
+    group_0 = y_pred[sensitive_attr == 0]
+    group_1 = y_pred[sensitive_attr == 1]
+    
+    # Acceptance rate для каждой группы
+    rate_0 = (group_0 == 1).mean()
+    rate_1 = (group_1 == 1).mean()
+    
+    # Разница (должна быть близка к 0)
+    difference = abs(rate_0 - rate_1)
+    
+    return {
+        'group_0_rate': rate_0,
+        'group_1_rate': rate_1,
+        'difference': difference,
+        'is_fair': difference < 0.1  # порог
+    }
+
+# Использование
+result = demographic_parity(predictions, gender)
+print(f"Difference: {result['difference']:.3f}")
+print(f"Fair: {result['is_fair']}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Equal Opportunity</h2>
+    <p><strong>Определение</strong>: P(Ŷ=1|Y=1, A=0) = P(Ŷ=1|Y=1, A=1)</p>
+    <p>Равный True Positive Rate для всех групп.</p>
+    
+    <pre><code>from sklearn.metrics import confusion_matrix
+
+def equal_opportunity(y_true, y_pred, sensitive_attr):
+    """
+    Проверка equal opportunity (равный TPR)
+    """
+    groups = sensitive_attr.unique()
+    tprs = {}
+    
+    for group in groups:
+        # Маска для группы
+        mask = (sensitive_attr == group)
+        
+        # Confusion matrix
+        tn, fp, fn, tp = confusion_matrix(
+            y_true[mask], 
+            y_pred[mask]
+        ).ravel()
+        
+        # True Positive Rate
+        tpr = tp / (tp + fn) if (tp + fn) > 0 else 0
+        tprs[group] = tpr
+    
+    # Разница в TPR
+    tpr_values = list(tprs.values())
+    difference = max(tpr_values) - min(tpr_values)
+    
+    return {
+        'tprs': tprs,
+        'difference': difference,
+        'is_fair': difference < 0.1
+    }
+
+# Пример
+result = equal_opportunity(y_test, y_pred, gender)
+print(f"TPRs: {result['tprs']}")
+print(f"Difference: {result['difference']:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Equalized Odds</h2>
+    <p>Равные TPR и FPR для всех групп:</p>
+    <ul>
+      <li>P(Ŷ=1|Y=1, A=0) = P(Ŷ=1|Y=1, A=1)</li>
+      <li>P(Ŷ=1|Y=0, A=0) = P(Ŷ=1|Y=0, A=1)</li>
+    </ul>
+
+    <pre><code>def equalized_odds(y_true, y_pred, sensitive_attr):
+    """
+    Проверка equalized odds (равные TPR и FPR)
+    """
+    groups = sensitive_attr.unique()
+    metrics = {}
+    
+    for group in groups:
+        mask = (sensitive_attr == group)
+        tn, fp, fn, tp = confusion_matrix(
+            y_true[mask], 
+            y_pred[mask]
+        ).ravel()
+        
+        tpr = tp / (tp + fn) if (tp + fn) > 0 else 0
+        fpr = fp / (fp + tn) if (fp + tn) > 0 else 0
+        
+        metrics[group] = {'tpr': tpr, 'fpr': fpr}
+    
+    # Разница в TPR и FPR
+    tpr_vals = [m['tpr'] for m in metrics.values()]
+    fpr_vals = [m['fpr'] for m in metrics.values()]
+    
+    tpr_diff = max(tpr_vals) - min(tpr_vals)
+    fpr_diff = max(fpr_vals) - min(fpr_vals)
+    
+    return {
+        'metrics': metrics,
+        'tpr_difference': tpr_diff,
+        'fpr_difference': fpr_diff,
+        'is_fair': (tpr_diff < 0.1 and fpr_diff < 0.1)
+    }</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Measuring fairness with AIF360</h2>
+    <p><strong>AI Fairness 360</strong> — библиотека от IBM для fairness.</p>
+    
+    <pre><code>from aif360.datasets import BinaryLabelDataset
+from aif360.metrics import BinaryLabelDatasetMetric
+
+# Подготовка датасета
+dataset = BinaryLabelDataset(
+    df=df,
+    label_names=['outcome'],
+    protected_attribute_names=['gender', 'race']
+)
+
+# Метрики fairness
+metric = BinaryLabelDatasetMetric(
+    dataset,
+    unprivileged_groups=[{'gender': 0}],
+    privileged_groups=[{'gender': 1}]
+)
+
+# Различные метрики
+print(f"Statistical Parity: {metric.statistical_parity_difference()}")
+print(f"Disparate Impact: {metric.disparate_impact()}")
+print(f"Consistency: {metric.consistency()}")
+
+# Для модели
+from aif360.metrics import ClassificationMetric
+
+# После предсказаний
+dataset_pred = dataset.copy()
+dataset_pred.labels = predictions
+
+metric_pred = ClassificationMetric(
+    dataset, dataset_pred,
+    unprivileged_groups=[{'gender': 0}],
+    privileged_groups=[{'gender': 1}]
+)
+
+print(f"Equal Opportunity: {metric_pred.equal_opportunity_difference()}")
+print(f"Average Odds: {metric_pred.average_odds_difference()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Pre-processing: устранение bias в данных</h2>
+    <p><strong>Методы</strong>:</p>
+    <ul>
+      <li><strong>Reweighting</strong>: изменение весов примеров</li>
+      <li><strong>Sampling</strong>: балансировка групп</li>
+      <li><strong>Learning fair representations</strong></li>
+    </ul>
+
+    <pre><code>from aif360.algorithms.preprocessing import Reweighing
+
+# Reweighing для fair данных
+reweigher = Reweighing(
+    unprivileged_groups=[{'gender': 0}],
+    privileged_groups=[{'gender': 1}]
+)
+
+# Применяем к данным
+dataset_transf = reweigher.fit_transform(dataset)
+
+# Теперь используем веса в обучении
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression()
+model.fit(
+    X_train, y_train,
+    sample_weight=dataset_transf.instance_weights
+)</code></pre>
+
+    <p><strong>Sampling</strong>:</p>
+    <pre><code># Балансировка групп
+from imblearn.over_sampling import SMOTE
+
+# Over-sample underrepresented group
+smote = SMOTE()
+X_balanced, y_balanced = smote.fit_resample(
+    X_train[sensitive_col == 0], 
+    y_train[sensitive_col == 0]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. In-processing: fair алгоритмы</h2>
+    <p>Обучение с fairness constraints:</p>
+    
+    <pre><code>from aif360.algorithms.inprocessing import PrejudiceRemover
+
+# Fair classifier
+model = PrejudiceRemover(
+    sensitive_attr='gender',
+    eta=25.0  # fairness penalty
+)
+
+model.fit(dataset)
+predictions = model.predict(dataset_test)
+
+# Альтернатива: Adversarial Debiasing
+from aif360.algorithms.inprocessing import AdversarialDebiasing
+
+# Использует adversarial network
+model = AdversarialDebiasing(
+    unprivileged_groups=[{'gender': 0}],
+    privileged_groups=[{'gender': 1}],
+    scope_name='debiased_classifier',
+    debias=True,
+    num_epochs=50
+)
+
+model.fit(dataset)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Post-processing: калибровка предсказаний</h2>
+    <p>Корректировка после обучения модели:</p>
+    
+    <pre><code>from aif360.algorithms.postprocessing import CalibratedEqOddsPostprocessing
+
+# Обучаем обычную модель
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Предсказания
+y_pred_proba = model.predict_proba(X_val)[:, 1]
+
+# Post-processing для fairness
+cpp = CalibratedEqOddsPostprocessing(
+    unprivileged_groups=[{'gender': 0}],
+    privileged_groups=[{'gender': 1}],
+    cost_constraint='weighted'
+)
+
+# Обучаем калибратор на validation
+dataset_val_pred = dataset_val.copy()
+dataset_val_pred.scores = y_pred_proba
+
+cpp.fit(dataset_val, dataset_val_pred)
+
+# Применяем к test
+dataset_test_pred = cpp.predict(dataset_test_pred)
+
+# Теперь предсказания более fair!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Trade-offs: accuracy vs fairness</h2>
+    <p>Часто приходится жертвовать accuracy ради fairness:</p>
+    
+    <pre><code>import matplotlib.pyplot as plt
+
+# Обучаем модели с разными fairness constraints
+fairness_params = [0, 0.1, 0.5, 1.0, 5.0]
+results = {'accuracy': [], 'fairness': []}
+
+for eta in fairness_params:
+    model = train_fair_model(eta=eta)
+    
+    # Оцениваем
+    acc = model.score(X_test, y_test)
+    fairness = measure_fairness(model, X_test, sensitive)
+    
+    results['accuracy'].append(acc)
+    results['fairness'].append(fairness)
+
+# Визуализация trade-off
+plt.plot(results['fairness'], results['accuracy'], 'o-')
+plt.xlabel('Fairness (lower is better)')
+plt.ylabel('Accuracy')
+plt.title('Accuracy-Fairness Trade-off')
+plt.grid(True)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Fairness в практике</h2>
+    <p><strong>Best practices</strong>:</p>
+    <ul>
+      <li>✅ Определить защищенные группы</li>
+      <li>✅ Выбрать подходящую метрику fairness</li>
+      <li>✅ Измерить bias в данных</li>
+      <li>✅ Применить mitigation methods</li>
+      <li>✅ Валидировать на разных группах</li>
+      <li>✅ Мониторить fairness в production</li>
+      <li>✅ Документировать решения</li>
+      <li>✅ Привлекать domain experts</li>
+    </ul>
+
+    <pre><code># Пример fairness pipeline
+class FairMLPipeline:
+    def __init__(self, sensitive_attrs):
+        self.sensitive_attrs = sensitive_attrs
+        self.metrics_history = []
+    
+    def fit(self, X, y):
+        # 1. Анализ данных
+        bias_report = self.analyze_data_bias(X, y)
+        
+        # 2. Pre-processing
+        X_fair, y_fair, weights = self.debias_data(X, y)
+        
+        # 3. Обучение с fairness constraints
+        self.model = self.train_fair_model(X_fair, y_fair, weights)
+        
+        # 4. Post-processing
+        self.calibrator = self.fit_calibrator(X_fair, y_fair)
+        
+        return self
+    
+    def predict(self, X):
+        # Базовые предсказания
+        y_pred = self.model.predict_proba(X)
+        
+        # Калибровка для fairness
+        y_pred_fair = self.calibrator.transform(y_pred, X[self.sensitive_attrs])
+        
+        return y_pred_fair
+    
+    def evaluate_fairness(self, X, y):
+        y_pred = self.predict(X)
+        
+        metrics = {
+            'demographic_parity': self.calc_demographic_parity(y_pred, X),
+            'equal_opportunity': self.calc_equal_opportunity(y, y_pred, X),
+            'equalized_odds': self.calc_equalized_odds(y, y_pred, X)
+        }
+        
+        self.metrics_history.append(metrics)
+        return metrics</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>
