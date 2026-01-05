@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>📊 TF-IDF Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 TF-IDF Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Векторное представление текстов • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>TF-IDF</strong>: Term Frequency - Inverse Document Frequency</li>
+      <li><strong>Цель</strong>: оценка важности слова в документе</li>
+      <li><strong>Применение</strong>: поиск, классификация текстов, keyword extraction</li>
+      <li><strong>Принцип</strong>: частые в док-те + редкие в корпусе = важные</li>
+    </ul>
+    <blockquote>TF-IDF присваивает вес словам на основе частоты в документе и редкости в корпусе</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Формула</h2>
+    <pre><code>TF-IDF(t, d) = TF(t, d) × IDF(t)
+
+TF(t, d) = count(t в d) / |d|
+
+IDF(t) = log(N / df(t))
+
+где:
+- t - термин (слово)
+- d - документ
+- N - число документов
+- df(t) - число документов с термином t</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Sklearn реализация</h2>
+    <pre><code>from sklearn.feature_extraction.text import TfidfVectorizer
+
+documents = [
+    "This is the first document",
+    "This document is the second document",
+    "And this is the third one",
+    "Is this the first document"
+]
+
+# Создание TF-IDF матрицы
+vectorizer = TfidfVectorizer()
+tfidf_matrix = vectorizer.fit_transform(documents)
+
+# Получение feature names
+feature_names = vectorizer.get_feature_names_out()
+
+# TF-IDF веса
+print(tfidf_matrix.toarray())
+print(feature_names)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Параметры TfidfVectorizer</h2>
+    <pre><code># Основные параметры
+vectorizer = TfidfVectorizer(
+    max_features=100,      # Топ N слов
+    min_df=2,              # Мин. частота документа
+    max_df=0.8,            # Макс. частота (удалить стоп-слова)
+    ngram_range=(1, 2),    # Униграммы и биграммы
+    norm='l2',             # L2 нормализация
+    use_idf=True,          # Использовать IDF
+    smooth_idf=True,       # Сглаживание IDF
+    sublinear_tf=True      # log(TF) вместо TF
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. N-граммы</h2>
+    <pre><code># Биграммы и триграммы
+vectorizer = TfidfVectorizer(ngram_range=(1, 3))
+tfidf = vectorizer.fit_transform(documents)
+
+# Примеры n-грамм
+# "machine learning" (биграмма)
+# "deep learning model" (триграмма)
+
+# Извлечение топ N-грамм
+import numpy as np
+
+def get_top_ngrams(tfidf_matrix, feature_names, n=10):
+    scores = np.asarray(tfidf_matrix.sum(axis=0)).ravel()
+    top_indices = scores.argsort()[-n:][::-1]
+    
+    for idx in top_indices:
+        print(f"{feature_names[idx]}: {scores[idx]:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Вариации TF</h2>
+    <table>
+      <tr>
+        <th>Схема</th>
+        <th>Формула</th>
+        <th>Когда использовать</th>
+      </tr>
+      <tr>
+        <td>Raw Count</td>
+        <td>count(t)</td>
+        <td>Короткие тексты</td>
+      </tr>
+      <tr>
+        <td>Term Frequency</td>
+        <td>count(t) / |d|</td>
+        <td>Разная длина</td>
+      </tr>
+      <tr>
+        <td>Log Normalization</td>
+        <td>log(1 + count(t))</td>
+        <td>Снизить влияние частых</td>
+      </tr>
+      <tr>
+        <td>Binary</td>
+        <td>1 если t в d, иначе 0</td>
+        <td>Presence/absence</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Keyword extraction</h2>
+    <pre><code>def extract_keywords(text, top_n=10):
+    """
+    Извлечение ключевых слов
+    """
+    vectorizer = TfidfVectorizer(
+        max_features=100,
+        ngram_range=(1, 2),
+        stop_words='english'
+    )
+    
+    tfidf = vectorizer.fit_transform([text])
+    feature_names = vectorizer.get_feature_names_out()
+    scores = tfidf.toarray()[0]
+    
+    # Сортировка по убыванию
+    top_indices = scores.argsort()[-top_n:][::-1]
+    keywords = [(feature_names[i], scores[i]) 
+                for i in top_indices]
+    
+    return keywords
+
+# Использование
+keywords = extract_keywords(document)
+for word, score in keywords:
+    print(f"{word}: {score:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Similarity поиск</h2>
+    <pre><code>from sklearn.metrics.pairwise import cosine_similarity
+
+# TF-IDF векторы
+tfidf_matrix = vectorizer.fit_transform(documents)
+
+# Косинусное сходство
+similarity_matrix = cosine_similarity(tfidf_matrix)
+
+# Поиск похожих документов
+def find_similar(query_idx, top_n=3):
+    scores = similarity_matrix[query_idx]
+    top_indices = scores.argsort()[-top_n-1:-1][::-1]
+    
+    for idx in top_indices:
+        print(f"Doc {idx}: similarity = {scores[idx]:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Сравнение с Bag-of-Words</h2>
+    <table>
+      <tr>
+        <th>Метрика</th>
+        <th>BoW</th>
+        <th>TF-IDF</th>
+      </tr>
+      <tr>
+        <td>Редкие слова</td>
+        <td>Равный вес</td>
+        <td>Высокий вес</td>
+      </tr>
+      <tr>
+        <td>Частые слова</td>
+        <td>Высокий вес</td>
+        <td>Низкий вес</td>
+      </tr>
+      <tr>
+        <td>Стоп-слова</td>
+        <td>Шум</td>
+        <td>Автоматически подавляются</td>
+      </tr>
+      <tr>
+        <td>Интерпретация</td>
+        <td>Проще</td>
+        <td>Сложнее</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Лучшие практики</h2>
+    <ul>
+      <li><strong>Стоп-слова</strong>: удаляйте с помощью max_df</li>
+      <li><strong>min_df</strong>: исключайте редкие слова (min_df=2)</li>
+      <li><strong>Нормализация</strong>: используйте L2</li>
+      <li><strong>N-граммы</strong>: (1,2) для контекста</li>
+      <li><strong>Sublinear TF</strong>: включайте для больших текстов</li>
+      <li><strong>Валидация</strong>: проверяйте топ слова</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

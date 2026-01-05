@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><title>Self-Training Cheatsheet</title>
+<style>
+@media screen {body {font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;color: #333;background: #fafcff;padding: 10px;}}
+@media print {body {background: white;padding: 0;}@page {size: A4 landscape;margin: 10mm;}}
+.container {column-count: 3;column-gap: 20px;max-width: 100%;}
+.block {break-inside: avoid;margin-bottom: 1.2em;padding: 12px;background: white;border-radius: 6px;box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+h1 {font-size: 1.6em;font-weight: 700;color: #1a5fb4;text-align: center;margin: 0 0 8px;column-span: all;}
+.subtitle {text-align: center;color: #666;font-size: 0.9em;margin-bottom: 12px;column-span: all;}
+h2 {font-size: 1.15em;font-weight: 700;color: #1a5fb4;margin: 0 0 8px;padding-bottom: 4px;border-bottom: 1px solid #e0e7ff;}
+p, ul, ol {font-size: 0.92em;margin: 0.6em 0;}
+ul, ol {padding-left: 18px;}
+li {margin-bottom: 4px;}
+code {font-family: 'Consolas', 'Courier New', monospace;background-color: #f0f4ff;padding: 1px 4px;border-radius: 3px;font-size: 0.88em;}
+pre {background-color: #f0f4ff;padding: 8px;border-radius: 4px;overflow-x: auto;font-size: 0.84em;margin: 6px 0;}
+pre code {padding: 0;background: none;white-space: pre-wrap;}
+table {width: 100%;border-collapse: collapse;font-size: 0.82em;margin: 6px 0;}
+th {background-color: #e6f0ff;text-align: left;padding: 4px 6px;font-weight: 600;}
+td {padding: 4px 6px;border-bottom: 1px solid #f0f4ff;}
+tr:nth-child(even) {background-color: #f8fbff;}
+blockquote {font-style: italic;margin: 8px 0;padding: 6px 10px;background: #f8fbff;border-left: 2px solid #1a5fb4;font-size: 0.88em;}
+@media print {.container {column-gap: 12px;}.block {box-shadow: none;}code, pre, table {font-size: 0.78em;}h1 {font-size: 1.4em;}h2 {font-size: 1em;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔁 Self-Training Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Полуконтролируемое обучение • Практический фокус<br>📅 Январь 2026</div>
+  
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Подход</strong>: использовать предсказания модели как метки</li>
+      <li><strong>Итерации</strong>: обучить → предсказать → добавить → повторить</li>
+      <li><strong>Псевдо-метки</strong>: уверенные предсказания становятся метками</li>
+      <li><strong>Риск</strong>: может усилить ошибки</li>
+      <li><strong>Применение</strong>: любой классификатор</li>
+    </ul>
+    <blockquote>Self-training - простой метод полуконтролируемого обучения, использующий собственные предсказания модели</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Алгоритм</h2>
+    <pre><code># Псевдокод:
+1. Обучить модель на L (labeled data)
+2. Предсказать на U (unlabeled data)
+3. Выбрать уверенные предсказания
+4. Добавить к L как псевдо-метки
+5. Переобучить модель
+6. Удалить из U
+7. Повторять до сходимости</code></pre>
+    
+    <p><strong>Критерий уверенности:</strong></p>
+    <pre><code>P(y|x) > threshold  # обычно 0.75-0.95</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Sklearn реализация</h2>
+    <pre><code>from sklearn.semi_supervised import SelfTrainingClassifier
+from sklearn.ensemble import RandomForestClassifier
+import numpy as np
+
+# Данные: -1 для неразмеченных
+X_train = np.array([[1, 2], [2, 3], [3, 4], [4, 5], [5, 6]])
+y_train = np.array([0, 1, 0, -1, -1])  # -1 = unlabeled
+
+# Базовый классификатор
+base_clf = RandomForestClassifier(n_estimators=100, random_state=42)
+
+# Self-training wrapper
+st_clf = SelfTrainingClassifier(
+    base_clf,
+    threshold=0.75,      # Уверенность
+    criterion='threshold',
+    k_best=10,           # Топ-K примеров
+    max_iter=10,         # Макс итераций
+    verbose=True
+)
+
+# Обучение
+st_clf.fit(X_train, y_train)
+
+# Предсказание
+X_test = np.array([[1.5, 2.5], [4.5, 5.5]])
+y_pred = st_clf.predict(X_test)
+print(f"Predictions: {y_pred}")
+
+# Labeled samples (индексы помеченных на последней итерации)
+print(f"Labeled samples: {st_clf.labeled_iter_}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Критерии отбора</h2>
+    <table>
+      <tr>
+        <th>Критерий</th>
+        <th>Описание</th>
+        <th>Когда использовать</th>
+      </tr>
+      <tr>
+        <td>threshold</td>
+        <td>P(y|x) > θ</td>
+        <td>Консервативный отбор</td>
+      </tr>
+      <tr>
+        <td>k_best</td>
+        <td>Топ-K по уверенности</td>
+        <td>Фиксированный размер</td>
+      </tr>
+      <tr>
+        <td>combination</td>
+        <td>threshold AND k_best</td>
+        <td>Оба условия</td>
+      </tr>
+    </table>
+    
+    <pre><code># Пример с k_best
+st_clf = SelfTrainingClassifier(
+    base_clf,
+    criterion='k_best',
+    k_best=5  # Добавлять по 5 примеров за итерацию
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Ручная реализация</h2>
+    <pre><code>def self_training(clf, X_labeled, y_labeled, 
+                  X_unlabeled, threshold=0.9, max_iter=10):
+    """
+    Ручная реализация self-training
+    """
+    for iteration in range(max_iter):
+        print(f"Iteration {iteration + 1}")
+        
+        # 1. Обучение на labeled
+        clf.fit(X_labeled, y_labeled)
+        
+        # 2. Предсказания на unlabeled
+        probs = clf.predict_proba(X_unlabeled)
+        preds = clf.predict(X_unlabeled)
+        
+        # 3. Отбор уверенных предсказаний
+        max_probs = probs.max(axis=1)
+        confident_mask = max_probs > threshold
+        
+        if not confident_mask.any():
+            print("No confident predictions")
+            break
+        
+        # 4. Добавление к labeled
+        X_confident = X_unlabeled[confident_mask]
+        y_confident = preds[confident_mask]
+        
+        X_labeled = np.vstack([X_labeled, X_confident])
+        y_labeled = np.hstack([y_labeled, y_confident])
+        
+        # 5. Удаление из unlabeled
+        X_unlabeled = X_unlabeled[~confident_mask]
+        
+        print(f"Added {confident_mask.sum()} samples")
+        print(f"Remaining unlabeled: {len(X_unlabeled)}")
+        
+        if len(X_unlabeled) == 0:
+            break
+    
+    return clf, X_labeled, y_labeled
+
+# Использование
+clf_trained, X_final, y_final = self_training(
+    RandomForestClassifier(),
+    X_labeled, y_labeled, X_unlabeled,
+    threshold=0.85, max_iter=5
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Улучшения метода</h2>
+    <ul>
+      <li><strong>Co-training</strong>: две модели на разных признаках
+        <pre><code># Модель 1 на признаках A
+# Модель 2 на признаках B
+# Взаимное обучение</code></pre>
+      </li>
+      <li><strong>Tri-training</strong>: три модели голосуют
+        <pre><code># 3 модели обучаются независимо
+# Соглашение 2 из 3 → метка</code></pre>
+      </li>
+      <li><strong>Mixup</strong>: смешивание примеров
+        <pre><code>x_mix = λx₁ + (1-λ)x₂
+y_mix = λy₁ + (1-λ)y₂</code></pre>
+      </li>
+      <li><strong>Data Augmentation</strong>: аугментация + согласованность</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Применения</h2>
+    <ul>
+      <li><strong>Классификация текстов</strong>
+        <ul><li>Sentiment analysis с мало разметки</li></ul>
+      </li>
+      <li><strong>Computer Vision</strong>
+        <ul><li>Классификация изображений</li></ul>
+      </li>
+      <li><strong>NLP задачи</strong>
+        <ul><li>Named Entity Recognition</li><li>Text categorization</li></ul>
+      </li>
+      <li><strong>Медицинская диагностика</strong>
+        <ul><li>Дорогая разметка экспертов</li></ul>
+      </li>
+      <li><strong>Распознавание речи</strong>
+        <ul><li>Транскрипция без разметки</li></ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Параметры</h2>
+    <ul>
+      <li><code>threshold</code>: 0.7-0.95
+        <ul><li>Выше → консервативнее, меньше ошибок</li><li>Ниже → больше данных, больше шума</li></ul>
+      </li>
+      <li><code>k_best</code>: 5-50
+        <ul><li>Зависит от размера unlabeled</li></ul>
+      </li>
+      <li><code>max_iter</code>: 5-20
+        <ul><li>Обычно хватает 5-10</li></ul>
+      </li>
+      <li><code>verbose</code>: True
+        <ul><li>Мониторинг прогресса</li></ul>
+      </li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Проблемы и решения</h2>
+    <table>
+      <tr>
+        <th>Проблема</th>
+        <th>Решение</th>
+      </tr>
+      <tr>
+        <td>Усиление ошибок</td>
+        <td>Высокий threshold</td>
+      </tr>
+      <tr>
+        <td>Медленная сходимость</td>
+        <td>Увеличить k_best</td>
+      </tr>
+      <tr>
+        <td>Дисбаланс классов</td>
+        <td>Class weights</td>
+      </tr>
+      <tr>
+        <td>Переобучение</td>
+        <td>Регуляризация базового clf</td>
+      </tr>
+      <tr>
+        <td>Плохая калибровка</td>
+        <td>CalibratedClassifierCV</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Лучшие практики</h2>
+    <ul>
+      <li><strong>Калибровка</strong>: используйте calibrated probabilities</li>
+      <li><strong>Threshold</strong>: начните с 0.8-0.9</li>
+      <li><strong>Валидация</strong>: hold-out для мониторинга</li>
+      <li><strong>Ранняя остановка</strong>: если точность падает</li>
+      <li><strong>Базовая модель</strong>: выбирайте с хорошей калибровкой</li>
+      <li><strong>Инициализация</strong>: качество начальной модели критично</li>
+      <li><strong>Мониторинг</strong>: следите за количеством псевдо-меток</li>
+    </ul>
+    
+    <pre><code># Пример с калибровкой
+from sklearn.calibration import CalibratedClassifierCV
+
+base_clf = RandomForestClassifier()
+calibrated_clf = CalibratedClassifierCV(base_clf, cv=5)
+
+st_clf = SelfTrainingClassifier(
+    calibrated_clf,
+    threshold=0.8
+)</code></pre>
+  </div>
+
+</div>
+</body>
+</html>
