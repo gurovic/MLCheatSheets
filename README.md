@@ -249,27 +249,27 @@
 1. [TF-IDF и векторное пространство](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tfidf_cheatsheet.html)
 1. [Латентно-семантический анализ (LSA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/latent_semantic_analysis_cheatsheet.html)
 1. [Стемминг, лемматизация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/stemming_lemmatization_cheatsheet.html)
-1. Правила и паттерны (regex, finite-state)
+1. [Правила и паттерны (regex, finite-state)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/regex_finite_state_cheatsheet.html)
 1. [CRF (Conditional Random Fields) для NER](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/crf_conditional_random_fields_cheatsheet.html)
-1. Синтаксический разбор (constituency, dependency)
+1. [Синтаксический разбор (constituency, dependency)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/syntactic_parsing_cheatsheet.html)
 
 ### **27. Полуавтоматическое обучение (Semi-supervised)**
 1. [Semi-supervised Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/semi_supervised_learning_cheatsheet.html)
 1. [Self-training](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/self_training_cheatsheet.html)
-1. Co-training
+1. [Co-training](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cotraining_cheatsheet.html)
 1. [Label propagation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/label_propagation_cheatsheet.html)
-1. Graph-based SSL
-1. Pseudo-labeling
-1. Generative models (классические)
+1. [Graph-based SSL](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/graph_based_ssl_cheatsheet.html)
+1. [Pseudo-labeling](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pseudo_labeling_cheatsheet.html)
+1. [Generative models (классические)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/generative_models_classical_cheatsheet.html)
 
 ### **28. Онлайн обучение и инкрементное обучение**
 1. [Online Learning (SGD, Perceptron, Concept Drift)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/online_learning_cheatsheet.html)
 1. [Incremental Learning (Инкрементное обучение)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/incremental_learning_cheatsheet.html)
 1. [Concept drift detection](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/concept_drift_cheatsheet.html)
-1. Adaptive windowing
-1. Ensemble methods для streaming
-1. Reservoir sampling
-1. Hoeffding trees
+1. [Adaptive windowing](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adaptive_windowing_cheatsheet.html)
+1. [Ensemble methods для streaming](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ensemble_methods_streaming_cheatsheet.html)
+1. [Reservoir sampling](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/reservoir_sampling_cheatsheet.html)
+1. [Hoeffding trees](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hoeffding_trees_cheatsheet.html)
 
 ### **29. Мультимодальное обучение (классическое)**
 1. Early fusion и late fusion

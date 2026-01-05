@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Ensemble Methods для Streaming Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎭 Ensemble Methods для Streaming Cheatsheet</h1>
+  <div class="subtitle">Online Learning • Adaptive Ensembles • Streaming ML<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Online Ensembles</strong>: ансамбли для streaming данных</li>
+      <li><strong>Инкрементное обучение</strong>: обновление моделей на лету</li>
+      <li><strong>Diversity</strong>: разнообразие моделей для лучшего обобщения</li>
+      <li><strong>Адаптация</strong>: реагирование на concept drift</li>
+      <li><strong>Применение</strong>: финансы, IoT, мониторинг сетей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Online Bagging</h2>
+    <p><strong>Адаптация Bagging для streaming:</strong></p>
+    <ul>
+      <li>Каждая модель обучается на Poisson(1) копиях примера</li>
+      <li>K ~ Poisson(λ=1): k = 0, 1, 2, 3...</li>
+      <li>Имитирует bootstrap sampling</li>
+    </ul>
+    
+    <pre><code>from river import ensemble
+from river import tree
+import numpy as np
+
+# Online Bagging
+bagging = ensemble.BaggingClassifier(
+    model=tree.HoeffdingTreeClassifier(),
+    n_models=10,
+    seed=42
+)
+
+for x, y in stream:
+    # Каждый пример идёт в каждую модель
+    # с весом из Poisson(1)
+    bagging.learn_one(x, y)
+    y_pred = bagging.predict_one(x)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Adaptive Random Forest</h2>
+    <p><strong>Online Random Forest с drift detection:</strong></p>
+    <pre><code>from river import ensemble
+
+arf = ensemble.AdaptiveRandomForestClassifier(
+    n_models=10,
+    max_features='sqrt',
+    lambda_value=6,  # для Poisson
+    drift_detector='adwin',
+    warning_detector='adwin'
+)
+
+for x, y in stream:
+    arf.learn_one(x, y)
+    pred = arf.predict_one(x)</code></pre>
+    
+    <p><strong>Особенности:</strong></p>
+    <ul>
+      <li>Background learners для каждого дерева</li>
+      <li>ADWIN для детекции drift</li>
+      <li>Автоматическая замена деревьев</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Online Boosting</h2>
+    <p><strong>ADABOOST.OL:</strong></p>
+    <pre><code>from river import ensemble
+
+# Online AdaBoost
+boosting = ensemble.AdaBoostClassifier(
+    model=tree.HoeffdingTreeClassifier(),
+    n_models=10,
+    seed=42
+)
+
+# Обновление весов на основе ошибок
+for x, y in stream:
+    boosting.learn_one(x, y)
+    pred = boosting.predict_proba_one(x)</code></pre>
+    
+    <p><strong>Веса обновляются:</strong></p>
+    <pre><code>λ_t = λ_{t-1} * β^(-error)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Streaming Random Patches</h2>
+    <p><strong>Разнообразие через признаки:</strong></p>
+    <ul>
+      <li>Каждая модель видит случайное подмножество признаков</li>
+      <li>Субсемплирование и признаков, и примеров</li>
+      <li>Баланс accuracy и diversity</li>
+    </ul>
+    
+    <pre><code>from river import ensemble
+
+srp = ensemble.SRPClassifier(
+    model=tree.HoeffdingTreeClassifier(),
+    n_models=10,
+    subspace_size=0.6,  # 60% признаков
+    training_method='patches'  # или 'resampling'
+)
+
+for x, y in stream:
+    srp.learn_one(x, y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Leveraging Bagging</h2>
+    <p><strong>Более агрессивный Bagging:</strong></p>
+    <pre><code># Poisson(λ) с λ > 1
+from river import ensemble
+
+lev_bag = ensemble.LeveragingBaggingClassifier(
+    model=tree.HoeffdingTreeClassifier(),
+    n_models=10,
+    w=6,  # lambda для Poisson
+    adwin_delta=0.002
+)
+
+# Более высокое разнообразие
+# Лучше для сложных задач</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Adaptive Windowing Ensemble</h2>
+    <p><strong>Окна разных размеров:</strong></p>
+    <ul>
+      <li>Модели с разными окнами истории</li>
+      <li>Короткие окна: быстрая адаптация</li>
+      <li>Длинные окна: стабильность</li>
+      <li>Взвешивание по качеству</li>
+    </ul>
+    
+    <pre><code>class MultiWindowEnsemble:
+    def __init__(self, windows=[100, 500, 2000]):
+        self.models = [create_model() for _ in windows]
+        self.windows = windows
+        self.weights = [1.0] * len(windows)
+        self.errors = [[] for _ in windows]
+    
+    def predict(self, x):
+        preds = [m.predict_proba_one(x) for m in self.models]
+        # Взвешенное усреднение
+        avg = {}
+        for cls in preds[0].keys():
+            avg[cls] = sum(w * p.get(cls, 0) 
+                          for w, p in zip(self.weights, preds))
+        return avg</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Dynamic Weighted Majority</h2>
+    <p><strong>Веса моделей изменяются:</strong></p>
+    <ul>
+      <li>Начать с набором моделей</li>
+      <li>Уменьшать веса при ошибках</li>
+      <li>Удалять слабые модели</li>
+      <li>Добавлять новые при drift</li>
+    </ul>
+    
+    <pre><code>class DWM:
+    def __init__(self, beta=0.5, theta=0.01):
+        self.models = [create_model()]
+        self.weights = [1.0]
+        self.beta = beta  # penalty
+        self.theta = theta  # threshold
+    
+    def update(self, x, y):
+        # Обновить веса
+        for i, model in enumerate(self.models):
+            pred = model.predict_one(x)
+            if pred != y:
+                self.weights[i] *= self.beta
+        
+        # Удалить слабые
+        self.models = [m for m, w in zip(self.models, self.weights) 
+                      if w > self.theta]
+        self.weights = [w for w in self.weights if w > self.theta]
+        
+        # Добавить новую при необходимости
+        if accuracy < threshold:
+            self.models.append(create_model())
+            self.weights.append(1.0)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Diversity</th><th>Drift Handling</th><th>Сложность</th></tr>
+      <tr><td>Online Bagging</td><td>Средняя</td><td>Нет</td><td>O(n*k)</td></tr>
+      <tr><td>ARF</td><td>Высокая</td><td>Да (ADWIN)</td><td>O(n*k*log(m))</td></tr>
+      <tr><td>Online Boosting</td><td>Низкая</td><td>Частично</td><td>O(n*k)</td></tr>
+      <tr><td>SRP</td><td>Очень высокая</td><td>Нет</td><td>O(n*k)</td></tr>
+      <tr><td>DWM</td><td>Адаптивная</td><td>Да</td><td>O(n*k)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Hyperparameters</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>n_models</code></td><td>Число моделей</td><td>10-100</td></tr>
+      <tr><td><code>lambda/w</code></td><td>Параметр Poisson</td><td>1-10</td></tr>
+      <tr><td><code>max_features</code></td><td>Признаков на модель</td><td>'sqrt', 0.5-0.8</td></tr>
+      <tr><td><code>drift_detector</code></td><td>Метод детекции</td><td>'adwin', 'ddm'</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Streaming данные с concept drift</li>
+          <li>Нужна высокая точность</li>
+          <li>Критично робастность</li>
+          <li>Достаточно вычислительных ресурсов</li>
+          <li>Нелинейные зависимости</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень ограниченные ресурсы</li>
+          <li>Нужна интерпретируемость</li>
+          <li>Простая задача (одна модель достаточна)</li>
+          <li>Критично время отклика</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать тип ensemble (bagging, boosting, hybrid)</li>
+      <li>[ ] Определить число моделей</li>
+      <li>[ ] Настроить diversity механизм</li>
+      <li>[ ] Добавить drift detection если нужно</li>
+      <li>[ ] Мониторить качество по времени</li>
+      <li>[ ] Измерить overhead по памяти и CPU</li>
+      <li>[ ] Сравнить с single model baseline</li>
+      <li>[ ] Настроить trade-off accuracy vs latency</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Ensemble methods для streaming — это команда моделей, которые работают вместе и учатся на лету. 
+      Каждая модель видит данные немного по-разному, что делает команду более надёжной. Когда данные 
+      меняются, слабые модели заменяются новыми. Это как команда экспертов, где каждый специализируется 
+      на своей области, а вместе они дают более точные предсказания».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

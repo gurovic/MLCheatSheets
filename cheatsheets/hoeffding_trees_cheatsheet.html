@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Hoeffding Trees Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    .good-vs-bad { display: flex; flex-direction: column; gap: 8px; }
+    .good-vs-bad div { flex: 1; padding: 6px 8px; border-radius: 4px; }
+    .good { background-color: #f0f9f4; border-left: 3px solid #2e8b57; }
+    .bad { background-color: #fdf0f2; border-left: 3px solid #d32f2f; }
+    .good h3, .bad h3 { margin: 0 0 4px; font-size: 1em; font-weight: 700; }
+    .good ul, .bad ul { padding-left: 20px; margin: 0; }
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+    @media print { .container { column-gap: 12px; } .block { box-shadow: none; } code, pre, table { font-size: 0.78em; } h1 { font-size: 1.4em; } h2 { font-size: 1em; } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🌲 Hoeffding Trees Cheatsheet</h1>
+  <div class="subtitle">Incremental Decision Trees • VFDT • Streaming<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Hoeffding Tree</strong>: инкрементное дерево решений для streaming данных</li>
+      <li><strong>VFDT</strong>: Very Fast Decision Tree</li>
+      <li><strong>Hoeffding Bound</strong>: статистическая граница для выбора атрибута</li>
+      <li><strong>Одноразовый проход</strong>: обрабатывает каждый пример только раз</li>
+      <li><strong>Константная память</strong>: не растёт с размером данных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Hoeffding Bound</h2>
+    <p><strong>Теорема Хёффдинга:</strong></p>
+    <pre><code>ε = √((R²ln(1/δ)) / (2n))
+
+где:
+- R: диапазон значений (max - min)
+- δ: уровень confidence (обычно 0.01)
+- n: число наблюдений
+- ε: граница ошибки</code></pre>
+    
+    <p>С вероятностью 1-δ, истинное среднее отличается от наблюдаемого не более чем на ε.</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Алгоритм VFDT</h2>
+    <ol>
+      <li>Начать с одного листа</li>
+      <li>Для каждого примера (x, y): обновить статистики в листе</li>
+      <li>Если накоплено достаточно примеров: вычислить информационный выигрыш для атрибутов</li>
+      <li>Если лучший атрибут достаточно хорош (по Hoeffding bound): создать разбиение</li>
+      <li>Повторять для новых листьев</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Базовый код</h2>
+    <pre><code>from river import tree
+
+# Hoeffding Tree Classifier
+model = tree.HoeffdingTreeClassifier(
+    grace_period=200,  # мин. примеров перед разбиением
+    delta=0.01,        # confidence level
+    tau=0.05,          # tie threshold
+    leaf_prediction='nb'  # naive bayes в листьях
+)
+
+# Обучение на потоке
+for x, y in stream:
+    model.learn_one(x, y)
+    
+    # Предсказание
+    y_pred = model.predict_one(x)
+
+# Для регрессии
+regressor = tree.HoeffdingTreeRegressor()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Параметры</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>grace_period</code></td><td>Мин. примеров перед split</td><td>100-500</td></tr>
+      <tr><td><code>delta</code></td><td>Confidence level</td><td>0.001-0.01</td></tr>
+      <tr><td><code>tau</code></td><td>Tie-breaking threshold</td><td>0.01-0.1</td></tr>
+      <tr><td><code>max_depth</code></td><td>Макс. глубина</td><td>None или 10-20</td></tr>
+      <tr><td><code>leaf_prediction</code></td><td>Модель в листьях</td><td>'mc', 'nb', 'nba'</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Adaptive Hoeffding Trees</h2>
+    <p><strong>ADWIN для детекции drift:</strong></p>
+    <pre><code>from river import tree
+
+# Adaptive Hoeffding Tree
+model = tree.HoeffdingAdaptiveTreeClassifier(
+    grace_period=200,
+    delta=0.01
+)
+
+# Автоматически обнаруживает drift
+# и перестраивает поддеревья</code></pre>
+    
+    <p><strong>Возможности:</strong></p>
+    <ul>
+      <li>Обнаружение изменений в листьях</li>
+      <li>Замена устаревших ветвей</li>
+      <li>Адаптация к concept drift</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Extremely Fast Decision Tree</h2>
+    <p><strong>EFDT улучшения:</strong></p>
+    <ul>
+      <li>Переоценка split решений</li>
+      <li>Удаление плохих split-ов</li>
+      <li>Более агрессивное дерево</li>
+    </ul>
+    
+    <pre><code>from river import tree
+
+efdt = tree.ExtremelyFastDecisionTreeClassifier(
+    grace_period=50,  # меньше, чем VFDT
+    min_samples_reevaluate=20
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Split Criteria</h2>
+    <table>
+      <tr><th>Критерий</th><th>Формула</th><th>Применение</th></tr>
+      <tr><td>Information Gain</td><td>H(S) - Σ|S_v|/|S|·H(S_v)</td><td>Классификация</td></tr>
+      <tr><td>Gini</td><td>1 - Σp_i²</td><td>Классификация</td></tr>
+      <tr><td>Variance Reduction</td><td>Var(S) - Σ|S_v|/|S|·Var(S_v)</td><td>Регрессия</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Memory Management</h2>
+    <ul>
+      <li><strong>Деактивация листьев</strong>: удалять малоиспользуемые</li>
+      <li><strong>Poor attributes</strong>: не хранить статистики для плохих атрибутов</li>
+      <li><strong>Pre-pruning</strong>: ограничение размера дерева</li>
+    </ul>
+    
+    <pre><code># С ограничением памяти
+model = tree.HoeffdingTreeClassifier(
+    max_size=100,  # макс. MB
+    remove_poor_attrs=True,
+    memory_estimate_period=1000000
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применения</h2>
+    <ul>
+      <li><strong>IoT sensors</strong>: классификация в реальном времени</li>
+      <li><strong>Network intrusion detection</strong>: потоковый анализ трафика</li>
+      <li><strong>Financial streams</strong>: предсказание трендов</li>
+      <li><strong>Social media</strong>: анализ постов</li>
+      <li><strong>Log analysis</strong>: классификация событий</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Streaming данные</li>
+          <li>Онлайн обучение</li>
+          <li>Concept drift ожидается</li>
+          <li>Ограниченная память</li>
+          <li>Нужна интерпретируемость</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Статичные данные в batch</li>
+          <li>Нужна максимальная точность</li>
+          <li>Сложные нелинейные зависимости</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать grace_period и delta</li>
+      <li>[ ] Решить: обычный или Adaptive HT</li>
+      <li>[ ] Настроить leaf_prediction</li>
+      <li>[ ] Мониторить размер дерева</li>
+      <li>[ ] Проверить качество на тесте prequentially</li>
+      <li>[ ] Рассмотреть ensemble (см. следующий cheatsheet)</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Hoeffding Trees — это деревья решений, которые учатся на ходу из потока данных. Они не требуют 
+      хранить все данные в памяти и могут адаптироваться к изменениям. Статистическая теория Хёффдинга 
+      гарантирует, что решения о разбиении близки к оптимальным даже при ограниченных данных».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

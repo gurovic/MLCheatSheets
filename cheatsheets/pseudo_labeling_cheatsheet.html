@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Pseudo-labeling Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🏷️ Pseudo-labeling Cheatsheet</h1>
+  <div class="subtitle">Self-training • Полуконтролируемое обучение • Псевдо-метки<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Псевдо-метки</strong>: использование предсказаний модели как истинных меток</li>
+      <li><strong>Self-training</strong>: итеративное добавление уверенных предсказаний</li>
+      <li><strong>Полуконтролируемое</strong>: мало размеченных, много неразмеченных</li>
+      <li><strong>Bootstrapping</strong>: модель обучает саму себя</li>
+      <li><strong>Применение</strong>: классификация изображений, NLP, табличные данные</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовый алгоритм</h2>
+    <ol>
+      <li>Обучить модель на размеченных данных</li>
+      <li>Предсказать метки для неразмеченных</li>
+      <li>Выбрать наиболее уверенные предсказания (confidence threshold)</li>
+      <li>Добавить их в обучающую выборку с псевдо-метками</li>
+      <li>Переобучить модель на расширенной выборке</li>
+      <li>Повторять до сходимости или исчерпания данных</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код</h2>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+import numpy as np
+
+# Инициализация
+clf = RandomForestClassifier(n_estimators=100, random_state=42)
+confidence_threshold = 0.9
+max_iterations = 5
+
+X_labeled, y_labeled = X_train, y_train
+X_unlabeled = X_unlabeled_pool.copy()
+
+for iteration in range(max_iterations):
+    # Обучение на текущих размеченных
+    clf.fit(X_labeled, y_labeled)
+    
+    # Предсказания на неразмеченных
+    proba = clf.predict_proba(X_unlabeled)
+    confidence = np.max(proba, axis=1)
+    predictions = np.argmax(proba, axis=1)
+    
+    # Выбор уверенных
+    high_conf_mask = confidence >= confidence_threshold
+    
+    if high_conf_mask.sum() == 0:
+        print(f"Iteration {iteration}: No confident predictions")
+        break
+    
+    # Добавление псевдо-размеченных
+    X_labeled = np.vstack([X_labeled, X_unlabeled[high_conf_mask]])
+    y_labeled = np.hstack([y_labeled, predictions[high_conf_mask]])
+    
+    # Удаление использованных
+    X_unlabeled = X_unlabeled[~high_conf_mask]
+    
+    print(f"Iteration {iteration}: Added {high_conf_mask.sum()} examples")
+
+# Финальная модель
+clf.fit(X_labeled, y_labeled)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Выбор порога уверенности</h2>
+    <table>
+      <tr><th>Порог</th><th>Описание</th><th>Когда использовать</th></tr>
+      <tr><td>0.90-0.95</td><td>Очень высокая</td><td>Малая терпимость к ошибкам</td></tr>
+      <tr><td>0.80-0.90</td><td>Высокая</td><td>Стандартный выбор</td></tr>
+      <tr><td>0.70-0.80</td><td>Средняя</td><td>Мало размеченных данных</td></tr>
+      <tr><td>&lt;0.70</td><td>Низкая</td><td>Рискованно, может навредить</td></tr>
+    </table>
+    
+    <p><strong>Динамический порог:</strong></p>
+    <pre><code># Адаптивный порог по перцентилю
+percentile = 90
+threshold = np.percentile(confidence, percentile)
+
+# Или по количеству примеров
+k_best = 100  # добавить топ-100 на итерацию
+idx = np.argsort(confidence)[-k_best:]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Стратегии выбора примеров</h2>
+    <ul>
+      <li><strong>Maximum confidence</strong>: max P(y|x) > threshold</li>
+      <li><strong>Margin-based</strong>: разница между top-2 классами</li>
+      <li><strong>Entropy-based</strong>: низкая энтропия предсказания</li>
+      <li><strong>Balanced sampling</strong>: равное число из каждого класса</li>
+      <li><strong>Curriculum learning</strong>: от простых к сложным</li>
+    </ul>
+    
+    <pre><code># Margin sampling
+def select_by_margin(proba, k):
+    sorted_proba = np.sort(proba, axis=1)
+    margins = sorted_proba[:, -1] - sorted_proba[:, -2]
+    return np.argsort(margins)[-k:]  # большой margin = уверенность
+
+# Entropy sampling
+def select_by_entropy(proba, k):
+    entropy = -np.sum(proba * np.log(proba + 1e-10), axis=1)
+    return np.argsort(entropy)[:k]  # низкая энтропия = уверенность
+
+# Balanced sampling
+def balanced_sample(proba, k_per_class):
+    predictions = np.argmax(proba, axis=1)
+    confidence = np.max(proba, axis=1)
+    selected = []
+    for cls in np.unique(predictions):
+        cls_mask = predictions == cls
+        cls_conf = confidence[cls_mask]
+        top_k = np.argsort(cls_conf)[-k_per_class:]
+        selected.extend(np.where(cls_mask)[0][top_k])
+    return np.array(selected)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Вариации метода</h2>
+    <p><strong>Hard pseudo-labeling:</strong></p>
+    <ul>
+      <li>Использовать предсказанный класс (argmax)</li>
+      <li>Простой и быстрый</li>
+      <li>Может накапливать ошибки</li>
+    </ul>
+    
+    <p><strong>Soft pseudo-labeling:</strong></p>
+    <ul>
+      <li>Использовать распределение вероятностей</li>
+      <li>Более гибкий, меньше ошибок</li>
+      <li>Требует поддержки soft labels</li>
+    </ul>
+    
+    <pre><code># Soft labeling с нейросетями
+model.fit(X_labeled, y_labeled_onehot, epochs=10)
+soft_labels = model.predict(X_unlabeled)
+
+# Добавить с весом уверенности
+confidence_weights = np.max(soft_labels, axis=1)
+model.fit(X_combined, y_combined, 
+          sample_weight=confidence_weights)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Накопление ошибок</td><td>Высокий порог, валидация на каждой итерации</td></tr>
+      <tr><td>Смещение к частым классам</td><td>Сбалансированный выбор примеров</td></tr>
+      <tr><td>Переобучение</td><td>Регуляризация, ранняя остановка</td></tr>
+      <tr><td>Малая уверенность</td><td>Улучшить базовую модель, больше размеченных</td></tr>
+      <tr><td>Расхождение моделей</td><td>Ensemble pseudo-labeling</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Ensemble Pseudo-labeling</h2>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+
+# Несколько базовых моделей
+models = [
+    RandomForestClassifier(n_estimators=100),
+    GradientBoostingClassifier(n_estimators=100),
+    LogisticRegression(max_iter=1000)
+]
+
+# Обучить все модели
+for model in models:
+    model.fit(X_labeled, y_labeled)
+
+# Усреднение предсказаний
+probas = [m.predict_proba(X_unlabeled) for m in models]
+avg_proba = np.mean(probas, axis=0)
+
+# Выбор только с консенсусом
+predictions = [np.argmax(p, axis=1) for p in probas]
+consensus_mask = np.all(
+    [pred == predictions[0] for pred in predictions],
+    axis=0
+)
+
+# Использовать только согласованные предсказания
+high_conf = np.max(avg_proba, axis=1) > threshold
+final_mask = consensus_mask & high_conf</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Применение в Deep Learning</h2>
+    <pre><code>import tensorflow as tf
+from tensorflow import keras
+
+# Базовая модель
+model = keras.Sequential([
+    keras.layers.Dense(128, activation='relu'),
+    keras.layers.Dropout(0.3),
+    keras.layers.Dense(64, activation='relu'),
+    keras.layers.Dense(num_classes, activation='softmax')
+])
+
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Pseudo-labeling loop
+for iteration in range(5):
+    # Обучение
+    model.fit(X_labeled, y_labeled, 
+              epochs=10, verbose=0, 
+              validation_split=0.1)
+    
+    # Предсказания
+    proba = model.predict(X_unlabeled)
+    conf = np.max(proba, axis=1)
+    preds = np.argmax(proba, axis=1)
+    
+    # Выбор уверенных
+    mask = conf > 0.9
+    
+    # Добавление
+    X_labeled = np.vstack([X_labeled, X_unlabeled[mask]])
+    y_labeled = np.hstack([y_labeled, preds[mask]])
+    X_unlabeled = X_unlabeled[~mask]
+    
+    print(f"Iter {iteration}: added {mask.sum()} examples")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Оценка качества</h2>
+    <pre><code>from sklearn.metrics import accuracy_score, confusion_matrix
+
+# Отслеживание метрик по итерациям
+metrics_history = []
+
+for iteration in range(max_iterations):
+    clf.fit(X_labeled, y_labeled)
+    
+    # Оценка на валидации
+    val_pred = clf.predict(X_val)
+    val_acc = accuracy_score(y_val, val_pred)
+    
+    # Оценка на неразмеченных (если есть истина)
+    if y_unlabeled_true is not None:
+        test_pred = clf.predict(X_unlabeled)
+        test_acc = accuracy_score(y_unlabeled_true, test_pred)
+    
+    # Качество псевдо-меток
+    proba = clf.predict_proba(X_unlabeled)
+    avg_conf = np.mean(np.max(proba, axis=1))
+    
+    metrics_history.append({
+        'iteration': iteration,
+        'val_acc': val_acc,
+        'test_acc': test_acc,
+        'avg_confidence': avg_conf,
+        'labeled_size': len(X_labeled)
+    })
+    
+    # Остановка если качество падает
+    if iteration > 0 and val_acc < metrics_history[-2]['val_acc']:
+        print("Validation accuracy decreased, stopping")
+        break</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Мало размеченных данных</li>
+          <li>Много неразмеченных данных</li>
+          <li>Разметка дорогая</li>
+          <li>Базовая модель достаточно точная</li>
+          <li>Классы хорошо разделимы</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень мало размеченных (&lt;50 на класс)</li>
+          <li>Базовая модель плохая</li>
+          <li>Сильный дисбаланс классов</li>
+          <li>Нужна 100% точность</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Продвинутые техники</h2>
+    <p><strong>Pseudo-labeling с аугментацией:</strong></p>
+    <ul>
+      <li>Использовать аугментированные версии для большей уверенности</li>
+      <li>Consistency regularization: модель должна предсказывать одинаково для оригинала и аугментации</li>
+    </ul>
+    
+    <p><strong>Meta Pseudo Labels:</strong></p>
+    <ul>
+      <li>Обучать «учителя» на основе того, как его псевдо-метки помогают «ученику»</li>
+      <li>Более сложный, но эффективный подход</li>
+    </ul>
+    
+    <p><strong>Noisy Student:</strong></p>
+    <ul>
+      <li>Обучить учителя на размеченных</li>
+      <li>Генерировать псевдо-метки</li>
+      <li>Обучить ученика с шумом (dropout, аугментация)</li>
+      <li>Ученик становится новым учителем</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Обучить сильную базовую модель</li>
+      <li>[ ] Выбрать порог уверенности через валидацию</li>
+      <li>[ ] Мониторить качество на валидации</li>
+      <li>[ ] Проверить баланс классов в псевдо-метках</li>
+      <li>[ ] Ограничить число итераций (обычно 3-10)</li>
+      <li>[ ] Использовать early stopping</li>
+      <li>[ ] Рассмотреть ансамбль для большей надёжности</li>
+      <li>[ ] Сравнить с baseline (только размеченные)</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Pseudo-labeling — это когда модель обучает саму себя. Сначала учим на небольшом количестве 
+      размеченных данных, затем модель предсказывает метки для остальных данных. Самые уверенные 
+      предсказания добавляем в обучение как "истинные". Так модель становится сильнее с каждой итерацией».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
