@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Сериализация нейросетей Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>💾 Сериализация нейронных сетей Cheatsheet</h1>
+  <div class="subtitle">Сохранение и загрузка моделей • Best practices<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Зачем сериализация?</h2>
+    <p><strong>Сериализация</strong> — сохранение модели на диск для последующего использования.</p>
+    <ul>
+      <li><strong>Deployment</strong>: развертывание в production</li>
+      <li><strong>Checkpoint</strong>: сохранение во время обучения</li>
+      <li><strong>Sharing</strong>: передача модели другим</li>
+      <li><strong>Versioning</strong>: управление версиями</li>
+      <li><strong>Inference</strong>: быстрая загрузка для предсказаний</li>
+    </ul>
+    <blockquote>💡 "Правильная сериализация — ключ к успешному deployment"</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Что сохранять?</h2>
+    <table>
+      <tr><th>Компонент</th><th>Описание</th></tr>
+      <tr>
+        <td><strong>Веса модели</strong></td>
+        <td>Обученные параметры сети</td>
+      </tr>
+      <tr>
+        <td><strong>Архитектура</strong></td>
+        <td>Структура сети</td>
+      </tr>
+      <tr>
+        <td><strong>Optimizer state</strong></td>
+        <td>Состояние оптимизатора</td>
+      </tr>
+      <tr>
+        <td><strong>Training config</strong></td>
+        <td>Гиперпараметры</td>
+      </tr>
+      <tr>
+        <td><strong>Preprocessing</strong></td>
+        <td>Нормализация, скейлеры</td>
+      </tr>
+      <tr>
+        <td><strong>Metadata</strong></td>
+        <td>Версия, метрики, дата</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. PyTorch сериализация</h2>
+    <p><strong>Сохранение весов</strong>:</p>
+    <pre><code>import torch
+
+# Сохранить только веса
+torch.save(model.state_dict(), 'model_weights.pth')
+
+# Загрузить веса
+model = MyModel()  # создать модель
+model.load_state_dict(torch.load('model_weights.pth'))
+model.eval()
+
+# Для inference
+with torch.no_grad():
+    output = model(input_tensor)</code></pre>
+
+    <p><strong>Сохранение всей модели</strong>:</p>
+    <pre><code># Сохранить модель целиком (не рекомендуется)
+torch.save(model, 'model_full.pth')
+
+# Загрузить
+model = torch.load('model_full.pth')
+model.eval()</code></pre>
+
+    <p><strong>Checkpoint (рекомендуется)</strong>:</p>
+    <pre><code># Сохранить все для продолжения обучения
+checkpoint = {
+    'epoch': epoch,
+    'model_state_dict': model.state_dict(),
+    'optimizer_state_dict': optimizer.state_dict(),
+    'loss': loss,
+    'accuracy': accuracy
+}
+torch.save(checkpoint, 'checkpoint.pth')
+
+# Загрузить checkpoint
+checkpoint = torch.load('checkpoint.pth')
+model.load_state_dict(checkpoint['model_state_dict'])
+optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+epoch = checkpoint['epoch']
+loss = checkpoint['loss']</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. TensorFlow/Keras сериализация</h2>
+    <p><strong>Keras API (рекомендуется)</strong>:</p>
+    <pre><code>import tensorflow as tf
+
+# Сохранить модель (архитектура + веса)
+model.save('my_model.keras')  # новый формат
+# или
+model.save('my_model.h5')  # старый формат
+
+# Загрузить модель
+model = tf.keras.models.load_model('my_model.keras')
+
+# Предсказание
+predictions = model.predict(test_data)</code></pre>
+
+    <p><strong>SavedModel format (production)</strong>:</p>
+    <pre><code># Сохранить в SavedModel формате
+model.save('saved_model_dir')
+
+# Структура:
+# saved_model_dir/
+#   - saved_model.pb
+#   - variables/
+#   - assets/
+
+# Загрузить
+model = tf.keras.models.load_model('saved_model_dir')</code></pre>
+
+    <p><strong>Только веса</strong>:</p>
+    <pre><code># Сохранить веса
+model.save_weights('model_weights.h5')
+
+# Загрузить (нужна архитектура)
+model = create_model()  # создать модель
+model.load_weights('model_weights.h5')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. ONNX формат</h2>
+    <p><strong>Open Neural Network Exchange</strong> — универсальный формат.</p>
+    
+    <p><strong>PyTorch → ONNX</strong>:</p>
+    <pre><code>import torch.onnx
+
+# Dummy input для trace
+dummy_input = torch.randn(1, 3, 224, 224)
+
+# Экспорт в ONNX
+torch.onnx.export(
+    model,
+    dummy_input,
+    "model.onnx",
+    export_params=True,
+    opset_version=11,
+    do_constant_folding=True,
+    input_names=['input'],
+    output_names=['output'],
+    dynamic_axes={
+        'input': {0: 'batch_size'},
+        'output': {0: 'batch_size'}
+    }
+)
+
+# Загрузка с ONNX Runtime
+import onnxruntime as ort
+
+session = ort.InferenceSession("model.onnx")
+outputs = session.run(
+    None,
+    {"input": input_data.numpy()}
+)</code></pre>
+
+    <p><strong>TensorFlow → ONNX</strong>:</p>
+    <pre><code>import tf2onnx
+
+# Конвертация
+spec = (tf.TensorSpec((None, 224, 224, 3), tf.float32),)
+model_proto, _ = tf2onnx.convert.from_keras(
+    model,
+    input_signature=spec,
+    opset=13
+)
+
+# Сохранение
+with open("model.onnx", "wb") as f:
+    f.write(model_proto.SerializeToString())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. TorchScript</h2>
+    <p>Независимая от Python представление PyTorch модели.</p>
+    
+    <p><strong>Tracing</strong>:</p>
+    <pre><code>import torch.jit
+
+# Trace модель
+example = torch.rand(1, 3, 224, 224)
+traced_script_module = torch.jit.trace(model, example)
+
+# Сохранить
+traced_script_module.save("model_traced.pt")
+
+# Загрузить (без Python кода)
+loaded_model = torch.jit.load("model_traced.pt")
+
+# Inference
+output = loaded_model(input_tensor)</code></pre>
+
+    <p><strong>Scripting (для control flow)</strong>:</p>
+    <pre><code># Для моделей с if/for statements
+scripted_module = torch.jit.script(model)
+scripted_module.save("model_scripted.pt")
+
+# Или аннотации
+class MyModel(torch.nn.Module):
+    @torch.jit.export
+    def forward(self, x):
+        if x.sum() > 0:
+            return x * 2
+        return x
+
+# Script
+model = torch.jit.script(MyModel())
+model.save("model.pt")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Pickle (не рекомендуется для production)</h2>
+    <p>Стандартная Python сериализация.</p>
+    
+    <pre><code>import pickle
+
+# Сохранить
+with open('model.pkl', 'wb') as f:
+    pickle.dump(model, f)
+
+# Загрузить
+with open('model.pkl', 'rb') as f:
+    model = pickle.load(f)
+
+# Проблемы:
+# - Зависимость от версии Python
+# - Требует исходного кода класса
+# - Медленная загрузка
+# - Уязвимости безопасности
+
+# Лучше использовать joblib для scikit-learn
+from joblib import dump, load
+
+# Сохранить
+dump(sklearn_model, 'model.joblib')
+
+# Загрузить
+model = load('model.joblib')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сохранение preprocessing</h2>
+    <p>Важно сохранять препроцессинг вместе с моделью!</p>
+    
+    <pre><code>import pickle
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+
+# Обучение
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X_train)
+
+# Сохранить scaler
+with open('scaler.pkl', 'wb') as f:
+    pickle.dump(scaler, f)
+
+# Полный pipeline
+class ModelWithPreprocessing:
+    def __init__(self, model, scaler):
+        self.model = model
+        self.scaler = scaler
+    
+    def predict(self, X):
+        X_scaled = self.scaler.transform(X)
+        return self.model.predict(X_scaled)
+
+# Сохранить все вместе
+pipeline = ModelWithPreprocessing(model, scaler)
+torch.save({
+    'model': model.state_dict(),
+    'scaler': scaler
+}, 'full_pipeline.pth')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Quantization при сохранении</h2>
+    <p>Уменьшение размера модели через квантизацию.</p>
+    
+    <p><strong>PyTorch dynamic quantization</strong>:</p>
+    <pre><code>import torch.quantization
+
+# Квантизация
+model_fp32 = MyModel()
+model_int8 = torch.quantization.quantize_dynamic(
+    model_fp32,
+    {torch.nn.Linear},  # слои для квантизации
+    dtype=torch.qint8
+)
+
+# Сохранить квантованную модель
+torch.save(model_int8.state_dict(), 'model_int8.pth')
+
+# Размер файла уменьшается в 4 раза!</code></pre>
+
+    <p><strong>TensorFlow Lite</strong>:</p>
+    <pre><code># Конвертация в TFLite с квантизацией
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+
+# Квантизация
+tflite_model = converter.convert()
+
+# Сохранить
+with open('model.tflite', 'wb') as f:
+    f.write(tflite_model)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Version control для моделей</h2>
+    <p>Управление версиями моделей.</p>
+    
+    <pre><code># Добавление метаданных
+import json
+from datetime import datetime
+
+metadata = {
+    'model_name': 'ResNet50',
+    'version': '1.2.0',
+    'created_at': datetime.now().isoformat(),
+    'framework': 'pytorch',
+    'accuracy': 0.95,
+    'dataset': 'ImageNet',
+    'hyperparameters': {
+        'learning_rate': 0.001,
+        'batch_size': 32,
+        'epochs': 100
+    }
+}
+
+# Сохранить с метаданными
+torch.save({
+    'model_state_dict': model.state_dict(),
+    'metadata': metadata
+}, 'model_v1.2.0.pth')
+
+# DVC для версионирования
+# dvc add model.pth
+# git add model.pth.dvc
+# git commit -m "Add model v1.2.0"
+
+# MLflow для tracking
+import mlflow
+
+with mlflow.start_run():
+    mlflow.log_param("learning_rate", 0.001)
+    mlflow.log_metric("accuracy", 0.95)
+    mlflow.pytorch.log_model(model, "model")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Cross-platform сериализация</h2>
+    <p>Сохранение для разных платформ.</p>
+    
+    <pre><code># CoreML для iOS (из PyTorch)
+import coremltools as ct
+
+# Trace модель
+traced_model = torch.jit.trace(model, example_input)
+
+# Конвертация в CoreML
+coreml_model = ct.convert(
+    traced_model,
+    inputs=[ct.TensorType(shape=(1, 3, 224, 224))]
+)
+
+# Сохранить
+coreml_model.save('model.mlmodel')
+
+# TensorFlow Lite для Android
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+
+with open('model.tflite', 'wb') as f:
+    f.write(tflite_model)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Best practices</h2>
+    <ul>
+      <li>✅ Используйте framework-specific форматы</li>
+      <li>✅ Сохраняйте архитектуру и веса отдельно</li>
+      <li>✅ Добавляйте метаданные (версия, дата, метрики)</li>
+      <li>✅ Сохраняйте preprocessing вместе с моделью</li>
+      <li>✅ Используйте checksums для валидации</li>
+      <li>✅ Версионируйте модели (git, DVC, MLflow)</li>
+      <li>✅ Тестируйте загрузку после сохранения</li>
+      <li>✅ Используйте ONNX для inter-framework</li>
+      <li>✅ Квантизуйте для production</li>
+      <li>❌ Избегайте pickle для production</li>
+    </ul>
+
+    <pre><code># Пример полного pipeline сохранения
+def save_model_complete(model, scaler, metadata, path):
+    """Сохранить модель со всем необходимым"""
+    
+    # Создать checkpoint
+    checkpoint = {
+        'model_state_dict': model.state_dict(),
+        'scaler': scaler,
+        'metadata': metadata,
+        'pytorch_version': torch.__version__
+    }
+    
+    # Сохранить
+    torch.save(checkpoint, path)
+    
+    # Вычислить checksum
+    import hashlib
+    with open(path, 'rb') as f:
+        file_hash = hashlib.sha256(f.read()).hexdigest()
+    
+    # Сохранить checksum
+    with open(f"{path}.sha256", 'w') as f:
+        f.write(file_hash)
+    
+    print(f"Model saved: {path}")
+    print(f"Checksum: {file_hash}")</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>
