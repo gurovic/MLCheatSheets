@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Neural ODEs Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>∂ Neural ODEs Cheatsheet</h1>
+  <div class="subtitle">Непрерывные нейронные сети • Дифференциальные уравнения<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основная идея</h2>
+    <p><strong>Neural ODE:</strong> Вместо дискретных слоёв используется непрерывная трансформация, описываемая ОДУ.</p>
+    <pre><code>Традиционная ResNet:
+h_{t+1} = h_t + f(h_t, θ_t)
+
+Neural ODE (непрерывный предел):
+dh(t)/dt = f(h(t), t, θ)
+h(T) = h(0) + ∫_0^T f(h(t), t, θ) dt</code></pre>
+    <ul>
+      <li><strong>Глубина</strong>: Непрерывный параметр T</li>
+      <li><strong>Решение</strong>: ODE solver (RK4, Dopri5)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Архитектура</h2>
+    <p><strong>Компоненты Neural ODE:</strong></p>
+    <ul>
+      <li><strong>Начальное состояние</strong>: h(0) = x (вход)</li>
+      <li><strong>Dynamics function</strong>: f(h, t, θ) - нейросеть</li>
+      <li><strong>ODE solver</strong>: Численный интегратор</li>
+      <li><strong>Конечное состояние</strong>: h(T) = output</li>
+    </ul>
+    <blockquote>
+      Neural ODE — это ResNet с бесконечным числом слоёв, объединённых в непрерывную динамику
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Adjoint method для backprop</h2>
+    <p><strong>Проблема:</strong> Нельзя хранить промежуточные активации (их бесконечно много!)</p>
+    <p><strong>Решение:</strong> Adjoint sensitivity method</p>
+    <pre><code>Вместо backprop через ODE solver:
+
+1. Forward pass: решить ODE
+   h(T) = ODESolve(h(0), f, [0,T])
+
+2. Backward pass: решить augmented ODE
+   [dL/dh(0), dL/dθ] = ODESolve([dL/dh(T), 0], g, [T,0])
+
+где g - adjoint dynamics
+
+Преимущество: O(1) память!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Практическая реализация</h2>
+    <pre><code>import torch
+import torch.nn as nn
+from torchdiffeq import odeint
+
+class ODEFunc(nn.Module):
+    def __init__(self, dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(dim, 64),
+            nn.Tanh(),
+            nn.Linear(64, dim)
+        )
+    
+    def forward(self, t, h):
+        return self.net(h)
+
+class NeuralODE(nn.Module):
+    def __init__(self, func):
+        super().__init__()
+        self.func = func
+    
+    def forward(self, x):
+        # Интегрировать от t=0 до t=1
+        t = torch.tensor([0., 1.])
+        h = odeint(self.func, x, t, method='dopri5')
+        return h[1]  # Вернуть h(1)
+
+# Использование
+func = ODEFunc(dim=64)
+model = NeuralODE(func)
+output = model(input_data)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. ODE Solvers</h2>
+    <table>
+      <tr><th>Solver</th><th>Порядок</th><th>Adaptive?</th></tr>
+      <tr><td><strong>Euler</strong></td><td>1</td><td>❌</td></tr>
+      <tr><td><strong>RK4</strong></td><td>4</td><td>❌</td></tr>
+      <tr><td><strong>Dopri5</strong></td><td>5</td><td>✅ Рекомендуется</td></tr>
+      <tr><td><strong>Adams</strong></td><td>Переменный</td><td>✅</td></tr>
+    </table>
+    <p><strong>Adaptive solvers:</strong> Автоматически подбирают шаг интегрирования</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Преимущества</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Плюсы Neural ODE</h3>
+        <ul>
+          <li>O(1) память (adjoint method)</li>
+          <li>Адаптивная глубина (trade-off accuracy/speed)</li>
+          <li>Обратимые преобразования</li>
+          <li>Continuous normalizing flows</li>
+          <li>Элегантная математика</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Минусы</h3>
+        <ul>
+          <li>Медленнее обычных сетей</li>
+          <li>Numerical instability</li>
+          <li>Сложнее отлаживать</li>
+          <li>Меньше контроля над depth</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Continuous Normalizing Flows</h2>
+    <p><strong>Применение к генеративным моделям:</strong></p>
+    <pre><code>log p(x) = log p(z) - ∫_0^T tr(∂f/∂h(t)) dt
+
+где tr(∂f/∂h) - trace Jacobian
+
+Преимущество: Не нужна обратимость каждого слоя!
+
+# Пример
+class CNF(nn.Module):
+    def __init__(self, func, T=1.0):
+        super().__init__()
+        self.func = func
+        self.T = T
+    
+    def forward(self, x):
+        # Augment with log determinant
+        h_aug = torch.cat([x, torch.zeros(x.shape[0], 1)], 1)
+        
+        # Integrate
+        t = torch.tensor([0., self.T])
+        h_T = odeint(self.func, h_aug, t)
+        
+        z, log_det = h_T[1][:, :-1], h_T[1][:, -1]
+        return z, log_det</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Augmented Neural ODEs</h2>
+    <p><strong>Проблема:</strong> Neural ODE ограничены topologically</p>
+    <p><strong>Решение:</strong> Добавить дополнительные измерения</p>
+    <pre><code>h_augmented = [h, a_1, a_2, ..., a_k]
+
+где a_i - вспомогательные переменные
+
+dh/dt = f_h(h, a, t)
+da_i/dt = f_a_i(h, a, t)
+
+Эффект: Больше representational power</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Применения</h2>
+    <ul>
+      <li><strong>Time series</strong>: Irregular time series modeling</li>
+      <li><strong>Generative models</strong>: CNF для плотностей</li>
+      <li><strong>Dynamical systems</strong>: Физическое моделирование</li>
+      <li><strong>Point clouds</strong>: Continuous transformations</li>
+      <li><strong>Video</strong>: Temporal modeling</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Время-зависимые модели</h2>
+    <pre><code>class TimeDependentODEFunc(nn.Module):
+    def __init__(self, dim):
+        super().__init__()
+        # Параметризация зависит от t
+        self.net = nn.Sequential(
+            nn.Linear(dim + 1, 64),  # +1 для времени
+            nn.Tanh(),
+            nn.Linear(64, dim)
+        )
+    
+    def forward(self, t, h):
+        # Concatenate time
+        t_vec = torch.ones(h.shape[0], 1) * t
+        h_t = torch.cat([h, t_vec], dim=1)
+        return self.net(h_t)
+
+# Полезно для non-autonomous систем</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Latent ODEs</h2>
+    <p><strong>Для нерегулярных временных рядов:</strong></p>
+    <ul>
+      <li><strong>Encoder</strong>: RNN с обратным временем</li>
+      <li><strong>Latent ODE</strong>: Эволюция скрытого состояния</li>
+      <li><strong>Decoder</strong>: В любой момент времени</li>
+    </ul>
+    <pre><code># Architecture
+z_0 = Encoder(irregular_timeseries)
+z(t) = ODESolve(z_0, f, t)
+x_pred(t) = Decoder(z(t))
+
+# Преимущество: Предсказание в любой момент!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сравнение с ResNet</h2>
+    <table>
+      <tr><th>Аспект</th><th>ResNet</th><th>Neural ODE</th></tr>
+      <tr><td>Слои</td><td>Дискретные</td><td>Непрерывные</td></tr>
+      <tr><td>Память</td><td>O(L)</td><td>O(1)</td></tr>
+      <tr><td>Скорость</td><td>Быстрее</td><td>Медленнее</td></tr>
+      <tr><td>Глубина</td><td>Фиксированная</td><td>Адаптивная</td></tr>
+      <tr><td>Обратимость</td><td>Нет</td><td>Да</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Численные проблемы</h2>
+    <ul>
+      <li><strong>Stiff ODEs</strong>: Нужны специальные solvers</li>
+      <li><strong>Numerical error</strong>: Влияет на градиенты</li>
+      <li><strong>Tolerance tuning</strong>: rtol, atol параметры</li>
+      <li><strong>NFE (Number of Function Evaluations)</strong>: Мониторинг эффективности</li>
+    </ul>
+    <pre><code># Monitoring NFE
+class ODEFuncWithCount(nn.Module):
+    def __init__(self, net):
+        super().__init__()
+        self.net = net
+        self.nfe = 0
+    
+    def forward(self, t, h):
+        self.nfe += 1
+        return self.net(h)
+
+print(f"NFE during forward: {func.nfe}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Ключевые выводы</h2>
+    <ul>
+      <li>[ ] Neural ODE = <strong>непрерывный ResNet</strong></li>
+      <li>[ ] Adjoint method → <strong>O(1) память</strong></li>
+      <li>[ ] Полезны для <strong>time series и flows</strong></li>
+      <li>[ ] Медленнее обычных сетей</li>
+      <li>[ ] Элегантная математика, <strong>но не всегда практичны</strong></li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Neural ODE — это нейросеть, которая не имеет фиксированного числа слоёв. Вместо этого данные "текут" через непрерывное время, как вода по реке. Это даёт гибкость и экономит память, но работает медленнее обычных сетей».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

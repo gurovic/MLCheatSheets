@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Теория обобщения для нейросетей Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 Теория обобщения для нейросетей Cheatsheet</h1>
+  <div class="subtitle">Почему нейросети работают на новых данных • Теоретические основы<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основная проблема</h2>
+    <p><strong>Generalization gap (разрыв обобщения):</strong></p>
+    <pre><code>Gen_error = Test_error - Train_error
+
+Цель: Минимизировать Gen_error</code></pre>
+    <ul>
+      <li><strong>Переобучение</strong>: Gen_error большой</li>
+      <li><strong>Хорошая генерализация</strong>: Gen_error малый</li>
+      <li><strong>Парадокс</strong>: Переобученные нейросети хорошо обобщают</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Классическая теория (VC-dimension)</h2>
+    <p><strong>Vapnik-Chervonenkis теория:</strong></p>
+    <pre><code>Generalization bound:
+
+R(f) ≤ R̂(f) + O(√(VC(H)/n))
+
+где:
+R(f) - истинный риск
+R̂(f) - эмпирический риск
+VC(H) - VC-размерность
+n - размер выборки</code></pre>
+    <p><strong>Проблема:</strong> Для нейросетей VC-dimension ~ число параметров → слишком пессимистичная оценка</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. PAC Learning</h2>
+    <p><strong>Probably Approximately Correct:</strong></p>
+    <ul>
+      <li><strong>Определение</strong>: С вероятностью (1-δ) ошибка < ε</li>
+      <li><strong>Sample complexity</strong>: Сколько данных нужно?</li>
+      <li><strong>Формула</strong>: n = O((1/ε²) log(|H|/δ))</li>
+    </ul>
+    <p><strong>Для нейросетей:</strong> |H| экспоненциально велико → нужно много данных (теоретически)</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Rademacher сложность</h2>
+    <p><strong>Современная мера сложности:</strong></p>
+    <pre><code>Rad(H) = E[sup_{h∈H} (1/n)Σ σ_i h(x_i)]
+
+где σ_i - случайные ±1
+
+Generalization bound:
+R(f) ≤ R̂(f) + 2·Rad(H) + O(√(log(1/δ)/n))</code></pre>
+    <p><strong>Преимущества:</strong></p>
+    <ul>
+      <li>Учитывает распределение данных</li>
+      <li>Лучшие оценки для нейросетей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Norm-based bounds</h2>
+    <p><strong>Зависимость от норм весов:</strong></p>
+    <pre><code>Для сети глубины L:
+
+Gen_error ≤ O((∏||W_i||)/√n)
+
+где ||W_i|| - спектральная норма матриц весов</code></pre>
+    <ul>
+      <li><strong>Insight</strong>: Важна не размерность, а норма весов</li>
+      <li><strong>Практика</strong>: Weight decay помогает</li>
+      <li><strong>Проблема</strong>: Bounds всё ещё слабые</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Implicit regularization</h2>
+    <p><strong>SGD как регуляризатор:</strong></p>
+    <ul>
+      <li><strong>Неявная регуляризация</strong>: SGD выбирает "простые" решения</li>
+      <li><strong>Flat minima</strong>: Широкие минимумы → лучшая генерализация</li>
+      <li><strong>Edge of stability</strong>: Обучение на грани нестабильности</li>
+    </ul>
+    <blockquote>
+      SGD не просто минимизирует loss, но и выбирает решения с хорошими свойствами обобщения
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Double descent phenomenon</h2>
+    <p><strong>Парадокс переобучения:</strong></p>
+    <pre><code>Классическая теория:
+bias-variance tradeoff ∩
+
+Современная реальность:
+     ∩      ∖
+    /  \      ∖
+   /    \______∖___
+  small     interpolation   overparameterized
+  model     threshold       regime</code></pre>
+    <ul>
+      <li><strong>Phase 1</strong>: Классический U-образный график</li>
+      <li><strong>Interpolation threshold</strong>: Пик ошибки</li>
+      <li><strong>Phase 2</strong>: Ошибка снова падает!</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Измерение генерализации</h2>
+    <pre><code>import numpy as np
+from sklearn.model_selection import learning_curve
+
+# Learning curves
+train_sizes, train_scores, val_scores = learning_curve(
+    model, X, y, 
+    cv=5, 
+    train_sizes=np.linspace(0.1, 1.0, 10)
+)
+
+# Generalization gap
+train_mean = np.mean(train_scores, axis=1)
+val_mean = np.mean(val_scores, axis=1)
+gen_gap = train_mean - val_mean
+
+print(f"Generalization gap: {gen_gap[-1]:.4f}")
+
+# Complexity measures
+def measure_complexity(model):
+    total_norm = sum(np.linalg.norm(p.detach().cpu().numpy()) 
+                     for p in model.parameters())
+    return total_norm</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Практические факторы</h2>
+    <table>
+      <tr><th>Фактор</th><th>Влияние на генерализацию</th></tr>
+      <tr><td><strong>Размер данных</strong></td><td>↑ данные → ↑ генерализация</td></tr>
+      <tr><td><strong>Архитектура</strong></td><td>Правильная архитектура критична</td></tr>
+      <tr><td><strong>Регуляризация</strong></td><td>Dropout, weight decay помогают</td></tr>
+      <tr><td><strong>Data augmentation</strong></td><td>Увеличивает эффективный размер</td></tr>
+      <tr><td><strong>Batch size</strong></td><td>Меньше batch → лучше генерализация</td></tr>
+      <tr><td><strong>Learning rate</strong></td><td>Влияет на implicit bias</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Техники для улучшения</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Эффективные методы</h3>
+        <ul>
+          <li>Early stopping по validation loss</li>
+          <li>Dropout (0.3-0.5)</li>
+          <li>Weight decay (L2 reg)</li>
+          <li>Data augmentation</li>
+          <li>Batch normalization</li>
+          <li>Ensemble methods</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Признаки переобучения</h3>
+        <ul>
+          <li>Train loss << Val loss</li>
+          <li>Val loss растёт</li>
+          <li>Слишком большая модель</li>
+          <li>Мало данных</li>
+          <li>Нет регуляризации</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Neural Tangent Kernel</h2>
+    <p><strong>Связь с kernel methods:</strong></p>
+    <ul>
+      <li><strong>При бесконечной ширине</strong>: нейросеть = kernel method</li>
+      <li><strong>NTK теория</strong>: Объясняет обучение в lazy regime</li>
+      <li><strong>Гарантии сходимости</strong>: К глобальному минимуму</li>
+      <li><strong>Ограничение</strong>: Реальные сети не в lazy regime</li>
+    </ul>
+    <blockquote>
+      NTK показывает, что очень широкие сети похожи на kernel methods, но это не объясняет успех практических сетей
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Открытые вопросы</h2>
+    <ul>
+      <li><strong>Почему SGD находит хорошие решения?</strong> Неясен механизм implicit bias</li>
+      <li><strong>Double descent</strong>: Полного понимания нет</li>
+      <li><strong>Scaling laws</strong>: Как предсказать производительность больших моделей?</li>
+      <li><strong>Бенчмарки vs реальность</strong>: Разрыв между теорией и практикой</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Проверка обобщения</h2>
+    <pre><code># Практический чеклист
+def check_generalization(model, train_loader, val_loader):
+    train_loss = evaluate(model, train_loader)
+    val_loss = evaluate(model, val_loader)
+    
+    gen_gap = train_loss - val_loss
+    
+    if gen_gap > 0.1:  # Порог зависит от задачи
+        print("⚠️ Возможное переобучение")
+        print("Рекомендации:")
+        print("- Добавить dropout")
+        print("- Увеличить weight decay")
+        print("- Early stopping")
+        print("- Больше данных / augmentation")
+    
+    # Мониторинг норм весов
+    weight_norms = [p.norm().item() for p in model.parameters()]
+    print(f"Max weight norm: {max(weight_norms):.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Ключевые инсайты</h2>
+    <ul>
+      <li>[ ] Классическая теория (VC) <strong>недостаточна</strong> для нейросетей</li>
+      <li>[ ] <strong>Переобучение ≠ плохая генерализация</strong> (double descent)</li>
+      <li>[ ] SGD создаёт <strong>implicit regularization</strong></li>
+      <li>[ ] Важна <strong>норма весов</strong>, не число параметров</li>
+      <li>[ ] Теория <strong>отстаёт от практики</strong></li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Генерализация — это способность модели работать на новых данных. Парадокс нейросетей: они могут запомнить весь тренировочный набор (что теория считает плохим), но всё равно хорошо работают на новых данных. Учёные до сих пор не до конца понимают почему, но знают практические рецепты».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

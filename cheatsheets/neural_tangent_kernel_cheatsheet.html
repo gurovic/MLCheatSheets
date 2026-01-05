@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Neural Tangent Kernel Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔬 Neural Tangent Kernel Cheatsheet</h1>
+  <div class="subtitle">Связь нейросетей и kernel methods • Теория бесконечной ширины<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основная идея</h2>
+    <p><strong>NTK (Neural Tangent Kernel):</strong> При бесконечной ширине нейросеть ведёт себя как линейная модель в feature space, определяемом kernel.</p>
+    <ul>
+      <li><strong>Открытие</strong>: Jacot et al. (2018)</li>
+      <li><strong>Режим</strong>: Lazy training (веса почти не меняются)</li>
+      <li><strong>Результат</strong>: Детерминированная сходимость</li>
+      <li><strong>Связь</strong>: Neural networks ↔ Kernel methods</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Математическое определение</h2>
+    <p><strong>Для сети f(x; θ):</strong></p>
+    <pre><code>NTK: Θ(x, x') = ⟨∇_θ f(x; θ), ∇_θ f(x'; θ)⟩
+
+При m → ∞ (ширина → ∞):
+- Θ(x, x') → Θ_∞(x, x') (детерминированный предел)
+- Θ остаётся постоянным во время обучения
+
+Обучение:
+f_t(x) = f_0(x) + ∫_0^t Θ(x, x_train) dy(x_train)/dt dt</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Lazy training режим</h2>
+    <ul>
+      <li><strong>Определение</strong>: Веса θ изменяются мало: ||θ_t - θ_0|| → 0</li>
+      <li><strong>Условие</strong>: Очень широкая сеть (m → ∞)</li>
+      <li><strong>Следствие</strong>: Линеаризация вокруг θ_0</li>
+      <li><strong>Kernel постоянен</strong>: Θ_t ≈ Θ_0</li>
+    </ul>
+    <blockquote>
+      В lazy режиме нейросеть не учится представлениям, а только линейно комбинирует фиксированные признаки
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Примеры NTK для разных архитектур</h2>
+    <table>
+      <tr><th>Архитектура</th><th>NTK формула</th></tr>
+      <tr><td><strong>Fully connected (1 layer)</strong></td><td>Θ(x,x') = x^T x' σ'(w^T x)σ'(w^T x')</td></tr>
+      <tr><td><strong>Deep network</strong></td><td>Рекуррентная формула через слои</td></tr>
+      <tr><td><strong>CNN</strong></td><td>Учитывает локальность и трансляционную инвариантность</td></tr>
+      <tr><td><strong>ResNet</strong></td><td>NTK = NNGP + путевые эффекты</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Гарантии сходимости</h2>
+    <p><strong>Теорема (Jacot et al.):</strong></p>
+    <pre><code>Для широкой сети (m → ∞):
+
+1. Глобальная сходимость к 0 training loss
+2. Скорость: экспоненциальная
+3. Траектория: детерминированная
+4. Условие: λ_min(Θ) > 0 (kernel невырожден)
+
+Loss динамика:
+L(t) = L(0) exp(-λ_min t)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Связь с Gaussian Process</h2>
+    <p><strong>Neural Network Gaussian Process (NNGP):</strong></p>
+    <ul>
+      <li><strong>До обучения</strong>: f(x; θ_0) ~ GP с kernel K_NNGP</li>
+      <li><strong>После обучения</strong>: Использует NTK</li>
+      <li><strong>Связь</strong>: NTK = ∇K_NNGP</li>
+    </ul>
+    <pre><code># Пример вычисления NNGP kernel
+import neural_tangents as nt
+
+# Определение архитектуры
+init_fn, apply_fn, kernel_fn = nt.stax.serial(
+    nt.stax.Dense(512), 
+    nt.stax.Relu(),
+    nt.stax.Dense(1)
+)
+
+# NTK и NNGP kernels
+ntk = kernel_fn(x_train, x_test, 'ntk')
+nngp = kernel_fn(x_train, x_test, 'nngp')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Практическое применение</h2>
+    <pre><code>import neural_tangents as nt
+
+# Обучение с NTK (без градиентного спуска!)
+kernel_fn = nt.empirical_ntk_fn(apply_fn)
+ntk_train_train = kernel_fn(x_train, x_train, params)
+
+# Предсказание
+from jax.experimental import stax
+predict_fn = nt.predict.gradient_descent_mse_ensemble(
+    kernel_fn, 
+    x_train, 
+    y_train
+)
+
+# Получение предсказаний
+y_pred = predict_fn(t=None, x_test=x_test)
+
+# Преимущество: Аналитическое решение!</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Feature learning vs Lazy</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Feature Learning режим</h3>
+        <ul>
+          <li>Конечная ширина</li>
+          <li>Веса значительно меняются</li>
+          <li>Kernel эволюционирует</li>
+          <li>Лучшая производительность</li>
+          <li>Типичный для практики</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>⚠️ Lazy режим (NTK)</h3>
+        <ul>
+          <li>Бесконечная ширина</li>
+          <li>Веса почти не меняются</li>
+          <li>Kernel постоянен</li>
+          <li>Хуже практически</li>
+          <li>Теоретическая модель</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Когда NTK применим</h2>
+    <table>
+      <tr><th>Сценарий</th><th>NTK применим?</th></tr>
+      <tr><td>Очень широкие сети</td><td>✅ Да</td></tr>
+      <tr><td>Малый learning rate</td><td>✅ Приближённо</td></tr>
+      <tr><td>Начало обучения</td><td>✅ Хорошее приближение</td></tr>
+      <tr><td>Стандартные ResNet</td><td>❌ Feature learning доминирует</td></tr>
+      <tr><td>Transfer learning</td><td>❌ Не lazy</td></tr>
+      <tr><td>Малые сети</td><td>❌ Далеко от бесконечности</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Эмпирическая проверка</h2>
+    <pre><code>import torch
+
+def check_lazy_regime(model, data_loader):
+    """Проверка: в lazy режиме или нет?"""
+    # Сохранить начальные веса
+    init_params = {name: p.clone() 
+                   for name, p in model.named_parameters()}
+    
+    # Обучить несколько шагов
+    for _ in range(100):
+        train_step(model, data_loader)
+    
+    # Измерить изменение
+    total_change = 0
+    total_norm = 0
+    for name, p in model.named_parameters():
+        change = (p - init_params[name]).norm()
+        norm = init_params[name].norm()
+        total_change += change
+        total_norm += norm
+    
+    relative_change = total_change / total_norm
+    
+    if relative_change < 0.01:
+        print("Lazy regime: веса почти не меняются")
+    else:
+        print("Feature learning: веса значительно меняются")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Ограничения NTK теории</h2>
+    <ul>
+      <li><strong>Не объясняет успех практических сетей</strong>: Реальные сети не в lazy режиме</li>
+      <li><strong>Производительность хуже</strong>: Kernel methods < feature learning</li>
+      <li><strong>Нет transfer learning</strong>: Фиксированные признаки</li>
+      <li><strong>Масштабируемость</strong>: Kernel matrix O(n²)</li>
+    </ul>
+    <blockquote>
+      NTK важен для теории, но практические сети работают иначе - они учат представления
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Современные расширения</h2>
+    <ul>
+      <li><strong>Finite width corrections</strong>: Учёт конечной ширины</li>
+      <li><strong>Feature learning theory</strong>: Выход за пределы lazy</li>
+      <li><strong>Mean field theory</strong>: Альтернативный подход</li>
+      <li><strong>Tensor programs</strong>: Общая теория для любой ширины</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Практические инсайты</h2>
+    <ul>
+      <li><strong>Инициализация важна</strong>: NTK зависит от θ_0</li>
+      <li><strong>Ширина vs глубина</strong>: Широкие → lazy, глубокие → feature learning</li>
+      <li><strong>Learning rate</strong>: Малый LR → ближе к lazy</li>
+      <li><strong>Архитектура</strong>: ResNet дальше от lazy, чем vanilla</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Ключевые выводы</h2>
+    <ul>
+      <li>[ ] NTK объясняет <strong>очень широкие сети</strong></li>
+      <li>[ ] В lazy режиме сеть = <strong>kernel method</strong></li>
+      <li>[ ] Гарантирует <strong>глобальную сходимость</strong></li>
+      <li>[ ] НЕ объясняет <strong>практические сети</strong></li>
+      <li>[ ] Feature learning <strong>лучше</strong> lazy training</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «NTK показывает, что очень-очень широкая нейросеть становится простой — она не учится новым способам смотреть на данные, а просто комбинирует то, что уже умеет. Это как нанять миллион стажёров вместо одного эксперта — они сделают работу, но не принесут новых идей».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
