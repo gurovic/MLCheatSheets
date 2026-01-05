@@ -233,22 +233,22 @@
 
 ### **24. Финансовое и бизнес ML**
 1. [Алгоритмический трейдинг](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/algorithmic_trading_cheatsheet.html)
-1. Кредитный скоринг
-1. Risk management
+1. [Кредитный скоринг](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/credit_scoring_cheatsheet.html)
+1. [Risk management](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/risk_management_cheatsheet.html)
 
 ### **25. Графовые алгоритмы (классические)**
-1. Алгоритмы на графах (кластеризация, поиск путей)
-1. Социальный сетевой анализ
-1. Графовые эмбеддинги (Node2Vec, DeepWalk)
+1. [Алгоритмы на графах (кластеризация, поиск путей)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/graph_algorithms_cheatsheet.html)
+1. [Социальный сетевой анализ](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/social_network_analysis_cheatsheet.html)
+1. [Графовые эмбеддинги (Node2Vec, DeepWalk)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/graph_embeddings_cheatsheet.html)
 1. [Community detection](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/community_detection_cheatsheet.html)
-1. Графовые ядра (Graph kernels)
-1. Influence maximization
+1. [Графовые ядра (Graph kernels)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/graph_kernels_cheatsheet.html)
+1. [Influence maximization](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/influence_maximization_cheatsheet.html)
 
 ### **26. Традиционная обработка текста (NLP)**
-1. Тематическое моделирование (LDA, NMF)
+1. [Тематическое моделирование (LDA, NMF)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/topic_modeling_lda_nmf_cheatsheet.html)
 1. [TF-IDF и векторное пространство](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tfidf_cheatsheet.html)
-1. Латентно-семантический анализ (LSA)
-1. Стемминг, лемматизация
+1. [Латентно-семантический анализ (LSA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/latent_semantic_analysis_cheatsheet.html)
+1. [Стемминг, лемматизация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/stemming_lemmatization_cheatsheet.html)
 1. Правила и паттерны (regex, finite-state)
 1. [CRF (Conditional Random Fields) для NER](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/crf_conditional_random_fields_cheatsheet.html)
 1. Синтаксический разбор (constituency, dependency)
