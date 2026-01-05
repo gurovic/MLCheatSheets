@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Graph-based SSL Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🕸️ Graph-based Semi-Supervised Learning Cheatsheet</h1>
+  <div class="subtitle">Графы • Распространение меток • Полуконтролируемое обучение<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Графовое представление</strong>: данные как узлы, похожесть как рёбра</li>
+      <li><strong>Распространение меток</strong>: метки распространяются от размеченных к неразмеченным</li>
+      <li><strong>Гладкость (Smoothness)</strong>: соседние узлы имеют похожие метки</li>
+      <li><strong>Полуконтролируемое</strong>: использует структуру неразмеченных данных</li>
+      <li><strong>Трансдуктивное обучение</strong>: предсказание только для известных узлов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Построение графа</h2>
+    <p><strong>Методы создания рёбер:</strong></p>
+    <ul>
+      <li><strong>k-NN граф</strong>: соединить k ближайших соседей</li>
+      <li><strong>ε-граф</strong>: соединить если расстояние < ε</li>
+      <li><strong>Полносвязный</strong>: все со всеми с весами</li>
+    </ul>
+    
+    <p><strong>Веса рёбер:</strong></p>
+    <ul>
+      <li><strong>RBF kernel</strong>: w_ij = exp(-||x_i - x_j||² / 2σ²)</li>
+      <li><strong>Cosine similarity</strong>: w_ij = (x_i · x_j) / (||x_i|| ||x_j||)</li>
+      <li><strong>Бинарные</strong>: w_ij = 1 если соседи, иначе 0</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Label Propagation</h2>
+    <p><strong>Алгоритм:</strong></p>
+    <ol>
+      <li>Построить граф сходства</li>
+      <li>Инициализировать метки: Y_l — известны, Y_u — неизвестны</li>
+      <li>Создать матрицу переходов: P = D^(-1)W</li>
+      <li>Итеративно обновлять: Y^(t+1) = αPY^(t) + (1-α)Y_0</li>
+      <li>Повторять до сходимости</li>
+    </ol>
+    
+    <pre><code>from sklearn.semi_supervised import LabelPropagation
+
+# Подготовка данных
+y_train = y.copy()
+y_train[unlabeled_indices] = -1  # -1 для неразмеченных
+
+# Label Propagation
+lp = LabelPropagation(
+    kernel='knn',  # или 'rbf'
+    n_neighbors=7,
+    alpha=0.2,
+    max_iter=1000
+)
+lp.fit(X, y_train)
+
+# Предсказания
+y_pred = lp.predict(X[unlabeled_indices])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Label Spreading</h2>
+    <p><strong>Отличия от Label Propagation:</strong></p>
+    <ul>
+      <li>Метки размеченных данных могут изменяться</li>
+      <li>Более устойчив к шуму</li>
+      <li>Использует нормализованный граф Лапласа</li>
+    </ul>
+    
+    <pre><code>from sklearn.semi_supervised import LabelSpreading
+
+ls = LabelSpreading(
+    kernel='rbf',
+    gamma=20,  # параметр RBF ядра
+    alpha=0.2,
+    max_iter=30
+)
+ls.fit(X, y_train)
+
+# Уверенность в предсказаниях
+proba = ls.predict_proba(X)
+confidence = np.max(proba, axis=1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Основные алгоритмы</h2>
+    <table>
+      <tr><th>Метод</th><th>Идея</th><th>Особенность</th></tr>
+      <tr><td><strong>Label Propagation</strong></td><td>Распространение через граф</td><td>Фиксированные метки</td></tr>
+      <tr><td><strong>Label Spreading</strong></td><td>Мягкое распространение</td><td>Изменяемые метки</td></tr>
+      <tr><td><strong>Harmonic</strong></td><td>Гармонические функции</td><td>Минимизация энергии</td></tr>
+      <tr><td><strong>Manifold Regularization</strong></td><td>Регуляризация на многообразии</td><td>SVM + граф</td></tr>
+      <tr><td><strong>Graph Cuts</strong></td><td>Минимальный разрез</td><td>Дискретная оптимизация</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Матричная формулировка</h2>
+    <p><strong>Обозначения:</strong></p>
+    <ul>
+      <li><strong>W</strong>: матрица весов рёбер (n × n)</li>
+      <li><strong>D</strong>: диагональная степенная матрица, D_ii = Σ_j W_ij</li>
+      <li><strong>L = D - W</strong>: матрица Лапласа</li>
+      <li><strong>L_norm = D^(-1/2) L D^(-1/2)</strong>: нормализованный Лаплас</li>
+    </ul>
+    
+    <p><strong>Задача оптимизации:</strong></p>
+    <pre><code>min_f Σ_ij W_ij (f_i - f_j)² + μ Σ_i (f_i - y_i)²
+
+Решение: f = (I + μL)^(-1) y</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Построение графа на практике</h2>
+    <pre><code>import numpy as np
+from sklearn.neighbors import kneighbors_graph
+from sklearn.metrics.pairwise import rbf_kernel
+
+# k-NN граф
+W_knn = kneighbors_graph(
+    X, n_neighbors=10, 
+    mode='distance',
+    include_self=False
+).toarray()
+
+# Сделать симметричным
+W_knn = np.maximum(W_knn, W_knn.T)
+
+# RBF граф
+gamma = 1.0
+W_rbf = rbf_kernel(X, gamma=gamma)
+
+# Разреженный: оставить топ-k соседей
+k = 10
+for i in range(len(W_rbf)):
+    # Обнулить все кроме топ-k
+    idx = np.argsort(W_rbf[i])[:-(k+1)]
+    W_rbf[i, idx] = 0
+
+# Степенная матрица
+D = np.diag(W_rbf.sum(axis=1))
+
+# Матрица переходов
+P = np.linalg.inv(D) @ W_rbf</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Выбор гиперпараметров</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Рекомендации</th></tr>
+      <tr><td><code>k</code> (k-NN)</td><td>Число соседей</td><td>5-20, зависит от размера данных</td></tr>
+      <tr><td><code>gamma</code> (RBF)</td><td>Ширина ядра</td><td>1 / (n_features * X.var())</td></tr>
+      <tr><td><code>alpha</code></td><td>Вес начальных меток</td><td>0.1-0.3</td></tr>
+      <tr><td><code>max_iter</code></td><td>Макс. итераций</td><td>30-100</td></tr>
+    </table>
+    
+    <pre><code># Подбор параметров через кросс-валидацию
+from sklearn.model_selection import GridSearchCV
+
+param_grid = {
+    'kernel': ['knn', 'rbf'],
+    'n_neighbors': [5, 7, 10],
+    'gamma': [1, 10, 20],
+    'alpha': [0.1, 0.2, 0.3]
+}
+
+# Создать маску для валидации
+# (использовать только размеченные для оценки)
+gs = GridSearchCV(
+    LabelSpreading(),
+    param_grid,
+    cv=3
+)
+# Подобрать на размеченном подмножестве</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Продвинутые техники</h2>
+    <p><strong>Multi-view Graph SSL:</strong></p>
+    <ul>
+      <li>Несколько графов для разных представлений</li>
+      <li>Объединение через взвешенное усреднение</li>
+    </ul>
+    
+    <p><strong>Active Learning + Graph SSL:</strong></p>
+    <ul>
+      <li>Выбирать для разметки узлы с низкой уверенностью</li>
+      <li>Узлы, связывающие разные сообщества</li>
+    </ul>
+    
+    <p><strong>Deep Graph SSL:</strong></p>
+    <ul>
+      <li>Graph Convolutional Networks (GCN)</li>
+      <li>Graph Attention Networks (GAT)</li>
+      <li>Обучение эмбеддингов + классификация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применения</h2>
+    <ul>
+      <li><strong>Классификация документов</strong>: граф цитирований</li>
+      <li><strong>Социальные сети</strong>: распространение меток по связям</li>
+      <li><strong>Биоинформатика</strong>: protein-protein interaction</li>
+      <li><strong>Рекомендательные системы</strong>: user-item граф</li>
+      <li><strong>Сегментация изображений</strong>: пиксели как узлы</li>
+    </ul>
+    
+    <pre><code># Пример: классификация документов
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# TF-IDF признаки
+vectorizer = TfidfVectorizer(max_features=1000)
+X_tfidf = vectorizer.fit_transform(documents).toarray()
+
+# Построить граф
+W = rbf_kernel(X_tfidf, gamma=0.1)
+
+# Label Spreading
+y_train = labels.copy()
+y_train[unlabeled_mask] = -1
+
+ls = LabelSpreading(kernel='precomputed', alpha=0.2)
+# Передать матрицу весов напрямую
+ls.fit(W, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Оценка качества</h2>
+    <pre><code>from sklearn.metrics import accuracy_score, f1_score
+
+# Разделение на labeled и unlabeled
+labeled_mask = y_train != -1
+unlabeled_mask = ~labeled_mask
+
+# Обучение
+lp = LabelPropagation()
+lp.fit(X, y_train)
+
+# Оценка на неразмеченных (если есть истинные метки)
+y_pred_unlabeled = lp.predict(X[unlabeled_mask])
+y_true_unlabeled = y[unlabeled_mask]
+
+acc = accuracy_score(y_true_unlabeled, y_pred_unlabeled)
+f1 = f1_score(y_true_unlabeled, y_pred_unlabeled, 
+              average='macro')
+
+print(f"Accuracy: {acc:.3f}")
+print(f"F1-score: {f1:.3f}")
+
+# Распределение уверенности
+confidence = np.max(lp.predict_proba(X), axis=1)
+print(f"Mean confidence: {confidence.mean():.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>�� 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Мало размеченных данных</li>
+          <li>Данные образуют кластеры/многообразия</li>
+          <li>Естественная графовая структура</li>
+          <li>Гладкость меток обоснована</li>
+          <li>Трансдуктивная задача (фиксированные данные)</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Данные равномерно распределены</li>
+          <li>Нет явной структуры</li>
+          <li>Нужны предсказания на новых данных</li>
+          <li>Очень большие данные (O(n²) память)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Масштабируемость</td><td>Sparse graphs, approximate methods</td></tr>
+      <tr><td>Выбор k или γ</td><td>Кросс-валидация на размеченном</td></tr>
+      <tr><td>Шум в графе</td><td>Label Spreading, фильтрация рёбер</td></tr>
+      <tr><td>Несбалансированные классы</td><td>Взвешивание при распространении</td></tr>
+      <tr><td>Новые данные</td><td>Индуктивные методы (GNN)</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Выбрать метод построения графа (k-NN, RBF)</li>
+      <li>[ ] Определить веса рёбер</li>
+      <li>[ ] Подобрать гиперпараметры через валидацию</li>
+      <li>[ ] Проверить сбалансированность размеченных данных</li>
+      <li>[ ] Визуализировать граф (если возможно)</li>
+      <li>[ ] Сравнить с baseline (только размеченные)</li>
+      <li>[ ] Проверить уверенность предсказаний</li>
+      <li>[ ] Оценить масштабируемость для продакшена</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Graph-based SSL — это как распространение слухов в сети. Если у нас есть несколько 
+      помеченных примеров, метки "растекаются" по связям к похожим неразмеченным примерам. 
+      Чем ближе объекты в пространстве признаков, тем больше вероятность, что у них одинаковая метка».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

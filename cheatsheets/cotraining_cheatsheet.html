@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Co-training Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🤝 Co-training Cheatsheet</h1>
+  <div class="subtitle">Semi-supervised • Multi-view • Совместное обучение<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Полуконтролируемое обучение</strong>: использует размеченные и неразмеченные данные</li>
+      <li><strong>Несколько представлений (views)</strong>: данные описаны разными наборами признаков</li>
+      <li><strong>Взаимное обучение</strong>: модели обучают друг друга на неразмеченных данных</li>
+      <li><strong>Цель</strong>: улучшить качество при малом количестве размеченных примеров</li>
+      <li><strong>Ключевая идея</strong>: разные представления дополняют друг друга</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основной алгоритм</h2>
+    <p><strong>Шаги co-training:</strong></p>
+    <ol>
+      <li>Разделить признаки на два независимых набора (view1, view2)</li>
+      <li>Обучить две модели на размеченных данных</li>
+      <li>Каждая модель предсказывает метки для неразмеченных данных</li>
+      <li>Выбрать наиболее уверенные предсказания</li>
+      <li>Добавить их в обучающую выборку другой модели</li>
+      <li>Повторять до сходимости или исчерпания данных</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Требования к представлениям</h2>
+    <ul>
+      <li><strong>Достаточность (Sufficiency)</strong>: каждое представление должно быть достаточным для обучения</li>
+      <li><strong>Условная независимость</strong>: представления независимы при заданной метке класса</li>
+      <li><strong>Избыточность (Redundancy)</strong>: содержат перекрывающуюся информацию</li>
+      <li><strong>Баланс</strong>: примерно одинаковая предсказательная способность</li>
+    </ul>
+    
+    <p><strong>Примеры разделения:</strong></p>
+    <table>
+      <tr><th>Задача</th><th>View 1</th><th>View 2</th></tr>
+      <tr><td>Веб-страницы</td><td>Текст страницы</td><td>Текст ссылок</td></tr>
+      <tr><td>Видео</td><td>Изображения</td><td>Аудио</td></tr>
+      <tr><td>Email</td><td>Тело письма</td><td>Заголовок</td></tr>
+      <tr><td>Документы</td><td>Содержание</td><td>Метаданные</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Базовый код</h2>
+    <pre><code>import numpy as np
+from sklearn.naive_bayes import GaussianNB
+from sklearn.model_selection import train_test_split
+
+class CoTraining:
+    def __init__(self, clf1, clf2, k=5, max_iter=10):
+        self.clf1 = clf1  # Модель для view 1
+        self.clf2 = clf2  # Модель для view 2
+        self.k = k        # Примеров для добавления на итерацию
+        self.max_iter = max_iter
+    
+    def fit(self, X1_labeled, X2_labeled, y_labeled,
+            X1_unlabeled, X2_unlabeled):
+        
+        # Инициализация
+        X1_l, X2_l, y_l = X1_labeled.copy(), X2_labeled.copy(), y_labeled.copy()
+        X1_u, X2_u = X1_unlabeled.copy(), X2_unlabeled.copy()
+        
+        for iteration in range(self.max_iter):
+            # Обучение на текущих размеченных данных
+            self.clf1.fit(X1_l, y_l)
+            self.clf2.fit(X2_l, y_l)
+            
+            # Предсказания на неразмеченных
+            proba1 = self.clf1.predict_proba(X1_u)
+            proba2 = self.clf2.predict_proba(X2_u)
+            
+            # Выбор наиболее уверенных
+            conf1 = np.max(proba1, axis=1)
+            conf2 = np.max(proba2, axis=1)
+            
+            # Топ-k от каждой модели
+            idx1 = np.argsort(conf1)[-self.k:]
+            idx2 = np.argsort(conf2)[-self.k:]
+            
+            # Добавление в обучающую выборку
+            X1_l = np.vstack([X1_l, X1_u[idx2]])
+            X2_l = np.vstack([X2_l, X2_u[idx2]])
+            y_l = np.hstack([y_l, self.clf2.predict(X2_u[idx2])])
+            
+            X1_l = np.vstack([X1_l, X1_u[idx1]])
+            X2_l = np.vstack([X2_l, X2_u[idx1]])
+            y_l = np.hstack([y_l, self.clf1.predict(X1_u[idx1])])
+            
+            # Удаление использованных неразмеченных
+            mask = np.ones(len(X1_u), dtype=bool)
+            mask[np.concatenate([idx1, idx2])] = False
+            X1_u = X1_u[mask]
+            X2_u = X2_u[mask]
+            
+            if len(X1_u) < self.k:
+                break
+        
+        # Финальное обучение
+        self.clf1.fit(X1_l, y_l)
+        self.clf2.fit(X2_l, y_l)
+        
+    def predict(self, X1, X2):
+        # Комбинирование предсказаний
+        pred1 = self.clf1.predict_proba(X1)
+        pred2 = self.clf2.predict_proba(X2)
+        return np.argmax((pred1 + pred2) / 2, axis=1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Пример использования</h2>
+    <pre><code># Генерация данных
+from sklearn.datasets import make_classification
+
+X, y = make_classification(n_samples=1000, n_features=20, 
+                           n_informative=15, random_state=42)
+
+# Разделение на два представления
+X_view1 = X[:, :10]
+X_view2 = X[:, 10:]
+
+# Малая часть размеченных, остальное - неразмеченное
+labeled_size = 50
+X1_labeled = X_view1[:labeled_size]
+X2_labeled = X_view2[:labeled_size]
+y_labeled = y[:labeled_size]
+
+X1_unlabeled = X_view1[labeled_size:]
+X2_unlabeled = X_view2[labeled_size:]
+
+# Co-training
+clf1 = GaussianNB()
+clf2 = GaussianNB()
+
+cotrainer = CoTraining(clf1, clf2, k=10, max_iter=20)
+cotrainer.fit(X1_labeled, X2_labeled, y_labeled,
+              X1_unlabeled, X2_unlabeled)
+
+# Тестирование
+# Используем оставшиеся данные для теста
+from sklearn.metrics import accuracy_score
+y_pred = cotrainer.predict(X_view1[labeled_size:], 
+                          X_view2[labeled_size:])
+print(f"Accuracy: {accuracy_score(y[labeled_size:], y_pred)}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Варианты и расширения</h2>
+    <p><strong>Democratic Co-Learning:</strong></p>
+    <ul>
+      <li>Несколько классификаторов голосуют</li>
+      <li>Добавляются примеры с консенсусом</li>
+    </ul>
+    
+    <p><strong>Tri-training:</strong></p>
+    <ul>
+      <li>Три классификатора</li>
+      <li>Два согласных обучают третьего</li>
+    </ul>
+    
+    <p><strong>Co-EM:</strong></p>
+    <ul>
+      <li>Вероятностные метки вместо жёстких</li>
+      <li>EM-алгоритм для уточнения</li>
+    </ul>
+    
+    <p><strong>Self-training с разделением:</strong></p>
+    <ul>
+      <li>Одна модель, разные входы</li>
+      <li>Упрощённый вариант co-training</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Ошибки накапливаются</td><td>Порог уверенности, валидация</td></tr>
+      <tr><td>Представления не независимы</td><td>PCA, случайное разбиение</td></tr>
+      <tr><td>Дисбаланс классов</td><td>Балансированный выбор примеров</td></tr>
+      <tr><td>Модели расходятся</td><td>Ограничить количество итераций</td></tr>
+      <tr><td>Нет естественных view</td><td>Случайное разбиение признаков</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Стратегии выбора примеров</h2>
+    <ul>
+      <li><strong>Максимальная уверенность</strong>: выбирать с max P(y|x)</li>
+      <li><strong>Margin sampling</strong>: разница между топ-2 классами</li>
+      <li><strong>Entropy</strong>: наименьшая энтропия предсказаний</li>
+      <li><strong>Сбалансированный выбор</strong>: равное число из каждого класса</li>
+      <li><strong>Динамический порог</strong>: адаптивный выбор по итерациям</li>
+    </ul>
+    
+    <pre><code># Пример с margin sampling
+def select_by_margin(proba, k):
+    """Выбрать k примеров с наибольшим margin"""
+    sorted_proba = np.sort(proba, axis=1)
+    margins = sorted_proba[:, -1] - sorted_proba[:, -2]
+    return np.argsort(margins)[-k:]
+
+# Пример с entropy
+def select_by_entropy(proba, k):
+    """Выбрать k примеров с наименьшей энтропией"""
+    entropy = -np.sum(proba * np.log(proba + 1e-10), axis=1)
+    return np.argsort(entropy)[:k]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Метрики и валидация</h2>
+    <ul>
+      <li><strong>Качество на тесте</strong>: основная метрика</li>
+      <li><strong>Согласованность моделей</strong>: % совпадений предсказаний</li>
+      <li><strong>Динамика обучения</strong>: качество по итерациям</li>
+      <li><strong>Размер псевдо-размеченных</strong>: сколько добавлено примеров</li>
+    </ul>
+    
+    <pre><code>def evaluate_cotraining(cotrainer, X1_test, X2_test, y_test):
+    # Предсказания каждой модели
+    pred1 = cotrainer.clf1.predict(X1_test)
+    pred2 = cotrainer.clf2.predict(X2_test)
+    pred_combined = cotrainer.predict(X1_test, X2_test)
+    
+    # Метрики
+    from sklearn.metrics import accuracy_score
+    acc1 = accuracy_score(y_test, pred1)
+    acc2 = accuracy_score(y_test, pred2)
+    acc_comb = accuracy_score(y_test, pred_combined)
+    
+    # Согласованность
+    agreement = np.mean(pred1 == pred2)
+    
+    return {
+        'acc_view1': acc1,
+        'acc_view2': acc2,
+        'acc_combined': acc_comb,
+        'agreement': agreement
+    }</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Мало размеченных данных</li>
+          <li>Много неразмеченных данных</li>
+          <li>Естественные view (текст+метаданные)</li>
+          <li>Разметка дорогая</li>
+          <li>Мультимодальные данные</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Достаточно размеченных данных</li>
+          <li>Невозможно разделить признаки</li>
+          <li>Представления сильно коррелированы</li>
+          <li>Нужна высокая точность</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Продвинутые техники</h2>
+    <p><strong>Co-training с глубоким обучением:</strong></p>
+    <pre><code>from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+
+def create_view_network(input_dim):
+    model = Sequential([
+        Dense(64, activation='relu', input_dim=input_dim),
+        Dense(32, activation='relu'),
+        Dense(2, activation='softmax')
+    ])
+    model.compile(optimizer='adam', 
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+    return model
+
+# Две нейросети для разных view
+model1 = create_view_network(X_view1.shape[1])
+model2 = create_view_network(X_view2.shape[1])
+
+# Co-training цикл
+for epoch in range(10):
+    model1.fit(X1_labeled, y_labeled, epochs=1, verbose=0)
+    model2.fit(X2_labeled, y_labeled, epochs=1, verbose=0)
+    
+    # Псевдо-метки с высокой уверенностью
+    proba1 = model1.predict(X1_unlabeled)
+    conf_mask = np.max(proba1, axis=1) > 0.95
+    
+    if conf_mask.sum() > 0:
+        X2_labeled = np.vstack([X2_labeled, X2_unlabeled[conf_mask]])
+        y_labeled = np.hstack([y_labeled, 
+                               np.argmax(proba1[conf_mask], axis=1)])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сравнение с другими методами</h2>
+    <table>
+      <tr><th>Метод</th><th>Особенности</th><th>Когда лучше</th></tr>
+      <tr><td>Co-training</td><td>Два view</td><td>Естественные view</td></tr>
+      <tr><td>Self-training</td><td>Один view</td><td>Нет разделения</td></tr>
+      <tr><td>Label propagation</td><td>Граф</td><td>Похожие объекты</td></tr>
+      <tr><td>Semi-supervised GAN</td><td>Генератор</td><td>Изображения</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Проверить достаточность каждого view</li>
+      <li>[ ] Убедиться в условной независимости</li>
+      <li>[ ] Выбрать стратегию отбора примеров</li>
+      <li>[ ] Установить порог уверенности</li>
+      <li>[ ] Ограничить число итераций</li>
+      <li>[ ] Мониторить качество на валидации</li>
+      <li>[ ] Проверить согласованность моделей</li>
+      <li>[ ] Сравнить с baseline (только размеченные данные)</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Co-training — это когда две модели обучают друг друга. Представьте двух учителей: 
+      один знает математику, другой — физику. Они по очереди решают задачи и помогают друг другу. 
+      Так можно обучиться с меньшим количеством готовых решений, используя неразмеченные данные».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
