@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Генетические алгоритмы Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🧬 Генетические алгоритмы Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Genetic Algorithms</strong>: оптимизация на основе эволюции</li>
+      <li><strong>Популяция</strong>: набор решений (хромосом)</li>
+      <li><strong>Fitness</strong>: оценка качества решения</li>
+      <li><strong>Селекция</strong>: выживают лучшие</li>
+      <li><strong>Кроссовер</strong>: скрещивание решений</li>
+      <li><strong>Мутация</strong>: случайные изменения</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные шаги</h2>
+    <ol>
+      <li><strong>Инициализация</strong>: случайная популяция</li>
+      <li><strong>Оценка fitness</strong>: для каждой особи</li>
+      <li><strong>Селекция</strong>: выбор родителей</li>
+      <li><strong>Кроссовер</strong>: создание потомков</li>
+      <li><strong>Мутация</strong>: внесение изменений</li>
+      <li><strong>Замещение</strong>: новая популяция</li>
+      <li><strong>Повтор</strong>: пока не достигнута цель</li>
+    </ol>
+
+    <p><strong>Псевдокод:</strong></p>
+    <pre><code>population = initialize_population()
+while not termination_condition():
+    fitness = evaluate(population)
+    parents = selection(population, fitness)
+    offspring = crossover(parents)
+    offspring = mutation(offspring)
+    population = replacement(population, offspring)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовая реализация</h2>
+    <pre><code>import numpy as np
+
+class GeneticAlgorithm:
+    def __init__(self, fitness_func, n_genes, pop_size=100,
+                 n_generations=100, mutation_rate=0.01,
+                 crossover_rate=0.8):
+        self.fitness_func = fitness_func
+        self.n_genes = n_genes
+        self.pop_size = pop_size
+        self.n_generations = n_generations
+        self.mutation_rate = mutation_rate
+        self.crossover_rate = crossover_rate
+    
+    def initialize_population(self):
+        """Случайная бинарная популяция"""
+        return np.random.randint(0, 2, (self.pop_size, self.n_genes))
+    
+    def evaluate(self, population):
+        """Оценка fitness для каждой особи"""
+        return np.array([self.fitness_func(ind) for ind in population])
+    
+    def selection(self, population, fitness):
+        """Турнирная селекция"""
+        selected = []
+        for _ in range(self.pop_size):
+            # Выбрать 3 случайных особи
+            competitors = np.random.choice(self.pop_size, 3, replace=False)
+            # Взять лучшую
+            winner = competitors[np.argmax(fitness[competitors])]
+            selected.append(population[winner])
+        return np.array(selected)
+    
+    def crossover(self, parent1, parent2):
+        """Одноточечный кроссовер"""
+        if np.random.random() < self.crossover_rate:
+            point = np.random.randint(1, self.n_genes)
+            child1 = np.concatenate([parent1[:point], parent2[point:]])
+            child2 = np.concatenate([parent2[:point], parent1[point:]])
+            return child1, child2
+        return parent1.copy(), parent2.copy()
+    
+    def mutate(self, individual):
+        """Битовая мутация"""
+        for i in range(self.n_genes):
+            if np.random.random() < self.mutation_rate:
+                individual[i] = 1 - individual[i]
+        return individual
+    
+    def run(self):
+        """Запуск алгоритма"""
+        population = self.initialize_population()
+        best_fitness_history = []
+        
+        for generation in range(self.n_generations):
+            fitness = self.evaluate(population)
+            best_fitness_history.append(np.max(fitness))
+            
+            # Селекция
+            parents = self.selection(population, fitness)
+            
+            # Кроссовер и мутация
+            offspring = []
+            for i in range(0, self.pop_size, 2):
+                child1, child2 = self.crossover(parents[i], parents[i+1])
+                offspring.append(self.mutate(child1))
+                offspring.append(self.mutate(child2))
+            
+            population = np.array(offspring)
+            
+            if generation % 10 == 0:
+                print(f"Generation {generation}: Best fitness = {np.max(fitness):.4f}")
+        
+        # Финальная оценка
+        fitness = self.evaluate(population)
+        best_idx = np.argmax(fitness)
+        
+        return population[best_idx], np.max(fitness), best_fitness_history</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Пример: OneMax задача</h2>
+    <pre><code># Задача: максимизировать количество единиц
+def onemax_fitness(individual):
+    return np.sum(individual)
+
+ga = GeneticAlgorithm(
+    fitness_func=onemax_fitness,
+    n_genes=50,
+    pop_size=100,
+    n_generations=50,
+    mutation_rate=0.01
+)
+
+best_solution, best_fitness, history = ga.run()
+print(f"Best solution: {best_solution}")
+print(f"Best fitness: {best_fitness}")
+
+# Визуализация
+import matplotlib.pyplot as plt
+plt.plot(history)
+plt.xlabel('Generation')
+plt.ylabel('Best Fitness')
+plt.title('GA Convergence')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Типы селекции</h2>
+    <pre><code># 1. Рулеточная селекция (Roulette Wheel)
+def roulette_selection(population, fitness):
+    # Нормализованные вероятности
+    probs = fitness / np.sum(fitness)
+    selected_idx = np.random.choice(
+        len(population), size=len(population), p=probs
+    )
+    return population[selected_idx]
+
+# 2. Ранговая селекция
+def rank_selection(population, fitness):
+    # Сортировка по fitness
+    ranks = np.argsort(np.argsort(fitness)) + 1
+    probs = ranks / np.sum(ranks)
+    selected_idx = np.random.choice(
+        len(population), size=len(population), p=probs
+    )
+    return population[selected_idx]
+
+# 3. Турнирная селекция
+def tournament_selection(population, fitness, tournament_size=3):
+    selected = []
+    for _ in range(len(population)):
+        competitors = np.random.choice(len(population), tournament_size)
+        winner = competitors[np.argmax(fitness[competitors])]
+        selected.append(population[winner])
+    return np.array(selected)
+
+# 4. Элитизм (сохранение лучших)
+def elitist_selection(population, fitness, n_elite=5):
+    elite_idx = np.argsort(fitness)[-n_elite:]
+    return population[elite_idx]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Типы кроссовера</h2>
+    <pre><code># 1. Одноточечный кроссовер
+def one_point_crossover(parent1, parent2):
+    point = np.random.randint(1, len(parent1))
+    child1 = np.concatenate([parent1[:point], parent2[point:]])
+    child2 = np.concatenate([parent2[:point], parent1[point:]])
+    return child1, child2
+
+# 2. Двухточечный кроссовер
+def two_point_crossover(parent1, parent2):
+    points = sorted(np.random.choice(len(parent1), 2, replace=False))
+    child1 = np.concatenate([
+        parent1[:points[0]],
+        parent2[points[0]:points[1]],
+        parent1[points[1]:]
+    ])
+    child2 = np.concatenate([
+        parent2[:points[0]],
+        parent1[points[0]:points[1]],
+        parent2[points[1]:]
+    ])
+    return child1, child2
+
+# 3. Uniform кроссовер
+def uniform_crossover(parent1, parent2):
+    mask = np.random.random(len(parent1)) < 0.5
+    child1 = np.where(mask, parent1, parent2)
+    child2 = np.where(mask, parent2, parent1)
+    return child1, child2
+
+# 4. Arithmetic кроссовер (для вещественных)
+def arithmetic_crossover(parent1, parent2, alpha=0.5):
+    child1 = alpha * parent1 + (1 - alpha) * parent2
+    child2 = (1 - alpha) * parent1 + alpha * parent2
+    return child1, child2</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Типы мутации</h2>
+    <pre><code># 1. Битовая мутация (для бинарных)
+def bit_flip_mutation(individual, mutation_rate=0.01):
+    for i in range(len(individual)):
+        if np.random.random() < mutation_rate:
+            individual[i] = 1 - individual[i]
+    return individual
+
+# 2. Swap мутация (для перестановок)
+def swap_mutation(individual):
+    i, j = np.random.choice(len(individual), 2, replace=False)
+    individual[i], individual[j] = individual[j], individual[i]
+    return individual
+
+# 3. Gaussian мутация (для вещественных)
+def gaussian_mutation(individual, mutation_rate=0.1, sigma=0.1):
+    for i in range(len(individual)):
+        if np.random.random() < mutation_rate:
+            individual[i] += np.random.normal(0, sigma)
+    return individual
+
+# 4. Uniform мутация (для вещественных)
+def uniform_mutation(individual, mutation_rate=0.1, 
+                    bounds=(-10, 10)):
+    for i in range(len(individual)):
+        if np.random.random() < mutation_rate:
+            individual[i] = np.random.uniform(bounds[0], bounds[1])
+    return individual
+
+# 5. Creep мутация (маленькие изменения)
+def creep_mutation(individual, mutation_rate=0.1, 
+                  creep_size=0.01):
+    for i in range(len(individual)):
+        if np.random.random() < mutation_rate:
+            individual[i] += np.random.uniform(-creep_size, creep_size)
+    return individual</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Оптимизация гиперпараметров ML</h2>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import cross_val_score
+
+def optimize_rf_hyperparameters(X_train, y_train):
+    """Оптимизация гиперпараметров Random Forest"""
+    
+    def decode_chromosome(chromosome):
+        """Декодирование хромосомы в параметры"""
+        # chromosome: [n_estimators (8 бит), max_depth (6 бит), 
+        #              min_samples_split (5 бит)]
+        n_estimators = int(''.join(map(str, chromosome[:8])), 2)
+        n_estimators = max(10, min(n_estimators, 200))
+        
+        max_depth = int(''.join(map(str, chromosome[8:14])), 2)
+        max_depth = max(2, min(max_depth, 30))
+        
+        min_samples = int(''.join(map(str, chromosome[14:19])), 2)
+        min_samples = max(2, min(min_samples, 20))
+        
+        return {
+            'n_estimators': n_estimators,
+            'max_depth': max_depth,
+            'min_samples_split': min_samples
+        }
+    
+    def fitness_function(chromosome):
+        """Fitness = кросс-валидация accuracy"""
+        params = decode_chromosome(chromosome)
+        
+        rf = RandomForestClassifier(
+            n_estimators=params['n_estimators'],
+            max_depth=params['max_depth'],
+            min_samples_split=params['min_samples_split'],
+            random_state=42
+        )
+        
+        scores = cross_val_score(rf, X_train, y_train, cv=3)
+        return np.mean(scores)
+    
+    # Запуск GA
+    ga = GeneticAlgorithm(
+        fitness_func=fitness_function,
+        n_genes=19,  # 8 + 6 + 5 битов
+        pop_size=20,
+        n_generations=10,
+        mutation_rate=0.05
+    )
+    
+    best_chromosome, best_fitness, _ = ga.run()
+    best_params = decode_chromosome(best_chromosome)
+    
+    return best_params, best_fitness</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Travelling Salesman Problem</h2>
+    <pre><code># TSP с генетическим алгоритмом
+def tsp_fitness(route, distance_matrix):
+    """Фитнес = обратное расстояние маршрута"""
+    total_distance = 0
+    for i in range(len(route) - 1):
+        total_distance += distance_matrix[route[i], route[i+1]]
+    # Вернуться в начало
+    total_distance += distance_matrix[route[-1], route[0]]
+    return 1.0 / total_distance  # минимизация → максимизация
+
+def tsp_crossover(parent1, parent2):
+    """PMX (Partially Mapped Crossover)"""
+    size = len(parent1)
+    p1, p2 = sorted(np.random.choice(size, 2, replace=False))
+    
+    child = np.full(size, -1)
+    child[p1:p2] = parent1[p1:p2]
+    
+    for i in range(size):
+        if child[i] == -1:
+            val = parent2[i]
+            while val in child:
+                idx = np.where(parent1 == val)[0][0]
+                val = parent2[idx]
+            child[i] = val
+    
+    return child
+
+# Пример использования
+n_cities = 20
+distance_matrix = np.random.rand(n_cities, n_cities)
+distance_matrix = (distance_matrix + distance_matrix.T) / 2  # симметричная
+
+# Модифицированный GA для TSP
+class TSP_GA(GeneticAlgorithm):
+    def initialize_population(self):
+        return np.array([np.random.permutation(self.n_genes) 
+                        for _ in range(self.pop_size)])
+    
+    def crossover(self, parent1, parent2):
+        return tsp_crossover(parent1, parent2), tsp_crossover(parent2, parent1)
+    
+    def mutate(self, individual):
+        return swap_mutation(individual.copy())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. DEAP библиотека</h2>
+    <pre><code>from deap import base, creator, tools, algorithms
+import random
+
+# Определение задачи
+creator.create("FitnessMax", base.Fitness, weights=(1.0,))
+creator.create("Individual", list, fitness=creator.FitnessMax)
+
+toolbox = base.Toolbox()
+toolbox.register("attr_bool", random.randint, 0, 1)
+toolbox.register("individual", tools.initRepeat, creator.Individual,
+                toolbox.attr_bool, n=100)
+toolbox.register("population", tools.initRepeat, list, toolbox.individual)
+
+# Операторы
+def evalOneMax(individual):
+    return sum(individual),
+
+toolbox.register("evaluate", evalOneMax)
+toolbox.register("mate", tools.cxTwoPoint)
+toolbox.register("mutate", tools.mutFlipBit, indpb=0.05)
+toolbox.register("select", tools.selTournament, tournsize=3)
+
+# Запуск
+population = toolbox.population(n=300)
+CXPB, MUTPB, NGEN = 0.5, 0.2, 40
+
+for gen in range(NGEN):
+    offspring = algorithms.varAnd(population, toolbox, CXPB, MUTPB)
+    fits = toolbox.map(toolbox.evaluate, offspring)
+    for fit, ind in zip(fits, offspring):
+        ind.fitness.values = fit
+    population = toolbox.select(offspring, k=len(population))
+
+best_ind = tools.selBest(population, k=1)[0]
+print(f"Best individual: fitness = {best_ind.fitness.values[0]}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Настройка параметров</h2>
+    <table>
+      <tr><th>Параметр</th><th>Типичные значения</th><th>Влияние</th></tr>
+      <tr><td>pop_size</td><td>50-500</td><td>Больше = лучше исследование</td></tr>
+      <tr><td>n_generations</td><td>100-1000</td><td>Больше = лучше сходимость</td></tr>
+      <tr><td>mutation_rate</td><td>0.001-0.1</td><td>Баланс: исследование vs эксплуатация</td></tr>
+      <tr><td>crossover_rate</td><td>0.6-0.9</td><td>Высокая = больше рекомбинаций</td></tr>
+      <tr><td>elite_size</td><td>1-10%</td><td>Сохранение лучших решений</td></tr>
+    </table>
+
+    <p><strong>Советы:</strong></p>
+    <ul>
+      <li>Начните с: pop=100, gen=100, mut=0.01, cross=0.8</li>
+      <li>Увеличьте популяцию для сложных задач</li>
+      <li>Низкая мутация в конце для fine-tuning</li>
+      <li>Используйте элитизм (2-5 особей)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Преимущества и недостатки</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Преимущества</h3>
+        <ul>
+          <li>Не требуют градиентов</li>
+          <li>Работают с дискретными пространствами</li>
+          <li>Глобальная оптимизация</li>
+          <li>Параллелизуемы</li>
+          <li>Робастны к шуму</li>
+          <li>Легко адаптируются</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Недостатки</h3>
+        <ul>
+          <li>Медленная сходимость</li>
+          <li>Много вычислений fitness</li>
+          <li>Настройка параметров сложна</li>
+          <li>Нет гарантии оптимальности</li>
+          <li>Могут застрять в локальных минимумах</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Когда использовать</h2>
+    <ul>
+      <li><strong>Комбинаторная оптимизация</strong>: TSP, расписания</li>
+      <li><strong>Feature selection</strong>: выбор подмножества признаков</li>
+      <li><strong>Hyperparameter tuning</strong>: альтернатива grid search</li>
+      <li><strong>Neural Architecture Search</strong>: поиск архитектур</li>
+      <li><strong>Game AI</strong>: эволюция стратегий</li>
+      <li><strong>Черный ящик</strong>: когда нет градиентов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить представление решения (хромосома)</li>
+      <li>[ ] Создать fitness функцию</li>
+      <li>[ ] Выбрать операторы (селекция, кроссовер, мутация)</li>
+      <li>[ ] Настроить параметры (pop_size, mutation_rate)</li>
+      <li>[ ] Реализовать инициализацию популяции</li>
+      <li>[ ] Добавить элитизм</li>
+      <li>[ ] Мониторить сходимость</li>
+      <li>[ ] Использовать адаптивные параметры</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Генетический алгоритм — это как эволюция в природе: мы создаем популяцию решений, лучшие "выживают" и "размножаются", создавая новые варианты. Через много поколений получаем очень хорошее решение, даже не зная математической формулы оптимальности».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
