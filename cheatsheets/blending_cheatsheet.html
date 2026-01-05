@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Блендинг (Blending) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Блендинг (Blending) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Blending</strong>: комбинирование предсказаний нескольких моделей</li>
+      <li><strong>Holdout set</strong>: отдельный набор для обучения мета-модели</li>
+      <li><strong>Простота</strong>: проще чем стекинг, нет кросс-валидации</li>
+      <li><strong>Эффективность</strong>: часто побеждает в Kaggle</li>
+      <li><strong>Гибкость</strong>: можно комбинировать любые модели</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Блендинг vs Стекинг</h2>
+    <table>
+      <tr><th>Характеристика</th><th>Блендинг</th><th>Стекинг</th></tr>
+      <tr><td><strong>Данные</strong></td><td>Train/Holdout/Test</td><td>Train/Test + CV</td></tr>
+      <tr><td><strong>Мета-модель</strong></td><td>На holdout</td><td>На out-of-fold</td></tr>
+      <tr><td><strong>Сложность</strong></td><td>Простая</td><td>Сложная</td></tr>
+      <tr><td><strong>Переобучение</strong></td><td>Меньше риск</td><td>Больше риск</td></tr>
+      <tr><td><strong>Данные</strong></td><td>Теряем holdout</td><td>Используем все</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый пример</h2>
+    <pre><code>from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+import numpy as np
+
+# Разделение данных: train (50%) / holdout (25%) / test (25%)
+X_temp, X_test, y_temp, y_test = train_test_split(
+    X, y, test_size=0.25, random_state=42
+)
+X_train, X_holdout, y_train, y_holdout = train_test_split(
+    X_temp, y_temp, test_size=0.33, random_state=42
+)
+
+# Базовые модели
+model1 = RandomForestClassifier(n_estimators=100, random_state=42)
+model2 = GradientBoostingClassifier(n_estimators=100, random_state=42)
+
+# Обучение на train
+model1.fit(X_train, y_train)
+model2.fit(X_train, y_train)
+
+# Предсказания на holdout (для обучения мета-модели)
+holdout_pred1 = model1.predict_proba(X_holdout)[:, 1]
+holdout_pred2 = model2.predict_proba(X_holdout)[:, 1]
+holdout_features = np.column_stack([holdout_pred1, holdout_pred2])
+
+# Мета-модель (блендер)
+meta_model = LogisticRegression()
+meta_model.fit(holdout_features, y_holdout)
+
+# Предсказания на test
+test_pred1 = model1.predict_proba(X_test)[:, 1]
+test_pred2 = model2.predict_proba(X_test)[:, 1]
+test_features = np.column_stack([test_pred1, test_pred2])
+
+# Финальные предсказания
+final_predictions = meta_model.predict(test_features)
+accuracy = accuracy_score(y_test, final_predictions)
+print(f"Blending Accuracy: {accuracy:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Простое усреднение</h2>
+    <pre><code># Простое среднее (простейший блендинг)
+def simple_average_blend(predictions_list):
+    return np.mean(predictions_list, axis=0)
+
+# Пример
+pred1 = model1.predict_proba(X_test)[:, 1]
+pred2 = model2.predict_proba(X_test)[:, 1]
+pred3 = model3.predict_proba(X_test)[:, 1]
+
+final_pred = simple_average_blend([pred1, pred2, pred3])
+final_class = (final_pred > 0.5).astype(int)
+
+# Взвешенное среднее
+def weighted_average_blend(predictions_list, weights):
+    weighted_sum = np.zeros_like(predictions_list[0])
+    for pred, weight in zip(predictions_list, weights):
+        weighted_sum += pred * weight
+    return weighted_sum / sum(weights)
+
+# Веса подобраны на holdout
+weights = [0.5, 0.3, 0.2]
+final_pred = weighted_average_blend([pred1, pred2, pred3], weights)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Оптимизация весов</h2>
+    <pre><code>from scipy.optimize import minimize
+
+# Функция для оптимизации весов
+def optimize_weights(predictions_list, y_true):
+    def loss_function(weights):
+        # Нормализуем веса
+        weights = np.array(weights) / np.sum(weights)
+        
+        # Взвешенное среднее
+        blended = np.zeros_like(predictions_list[0])
+        for pred, weight in zip(predictions_list, weights):
+            blended += pred * weight
+        
+        # Лог-лосс
+        from sklearn.metrics import log_loss
+        return log_loss(y_true, blended)
+    
+    # Начальные веса (равномерные)
+    initial_weights = [1.0] * len(predictions_list)
+    
+    # Ограничения: все веса положительные
+    bounds = [(0.0, 1.0)] * len(predictions_list)
+    
+    # Оптимизация
+    result = minimize(
+        loss_function,
+        initial_weights,
+        method='SLSQP',
+        bounds=bounds
+    )
+    
+    # Нормализованные веса
+    optimal_weights = result.x / np.sum(result.x)
+    return optimal_weights
+
+# Получение предсказаний на holdout
+holdout_preds = [
+    model1.predict_proba(X_holdout)[:, 1],
+    model2.predict_proba(X_holdout)[:, 1],
+    model3.predict_proba(X_holdout)[:, 1]
+]
+
+# Оптимизация весов
+optimal_weights = optimize_weights(holdout_preds, y_holdout)
+print(f"Optimal weights: {optimal_weights}")
+
+# Применение на test
+test_preds = [
+    model1.predict_proba(X_test)[:, 1],
+    model2.predict_proba(X_test)[:, 1],
+    model3.predict_proba(X_test)[:, 1]
+]
+final_pred = weighted_average_blend(test_preds, optimal_weights)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Rank averaging</h2>
+    <pre><code>from scipy.stats import rankdata
+
+# Rank averaging - робастный к выбросам
+def rank_average_blend(predictions_list):
+    # Ранжируем каждый набор предсказаний
+    ranked_predictions = []
+    for pred in predictions_list:
+        ranked = rankdata(pred) / len(pred)
+        ranked_predictions.append(ranked)
+    
+    # Усредняем ранги
+    return np.mean(ranked_predictions, axis=0)
+
+# Пример
+pred1 = model1.predict_proba(X_test)[:, 1]
+pred2 = model2.predict_proba(X_test)[:, 1]
+pred3 = model3.predict_proba(X_test)[:, 1]
+
+final_pred = rank_average_blend([pred1, pred2, pred3])
+
+# Преобразование обратно в вероятности (опционально)
+# можно оставить ранги для ranking задач</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Геометрическое среднее</h2>
+    <pre><code># Геометрическое среднее
+def geometric_mean_blend(predictions_list):
+    product = np.ones_like(predictions_list[0])
+    for pred in predictions_list:
+        # Избегаем log(0)
+        pred_safe = np.clip(pred, 1e-15, 1 - 1e-15)
+        product *= pred_safe
+    return np.power(product, 1.0 / len(predictions_list))
+
+# Пример
+pred1 = model1.predict_proba(X_test)[:, 1]
+pred2 = model2.predict_proba(X_test)[:, 1]
+pred3 = model3.predict_proba(X_test)[:, 1]
+
+final_pred = geometric_mean_blend([pred1, pred2, pred3])
+
+# Альтернатива через логарифмы (численно стабильнее)
+def geometric_mean_blend_log(predictions_list):
+    log_sum = np.zeros_like(predictions_list[0])
+    for pred in predictions_list:
+        pred_safe = np.clip(pred, 1e-15, 1 - 1e-15)
+        log_sum += np.log(pred_safe)
+    return np.exp(log_sum / len(predictions_list))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Мета-признаки</h2>
+    <pre><code># Создание расширенных мета-признаков
+def create_meta_features(base_predictions, X_original):
+    meta_features = []
+    
+    # 1. Базовые предсказания
+    for pred in base_predictions:
+        meta_features.append(pred)
+    
+    # 2. Взаимодействия предсказаний
+    for i in range(len(base_predictions)):
+        for j in range(i + 1, len(base_predictions)):
+            # Произведение
+            meta_features.append(base_predictions[i] * base_predictions[j])
+            # Разность
+            meta_features.append(np.abs(base_predictions[i] - base_predictions[j]))
+    
+    # 3. Статистики
+    meta_features.append(np.mean(base_predictions, axis=0))
+    meta_features.append(np.std(base_predictions, axis=0))
+    meta_features.append(np.min(base_predictions, axis=0))
+    meta_features.append(np.max(base_predictions, axis=0))
+    
+    # 4. Оригинальные признаки (опционально)
+    # Можно добавить важные исходные признаки
+    
+    return np.column_stack(meta_features)
+
+# Использование
+holdout_preds = [
+    model1.predict_proba(X_holdout)[:, 1],
+    model2.predict_proba(X_holdout)[:, 1],
+    model3.predict_proba(X_holdout)[:, 1]
+]
+
+meta_features_holdout = create_meta_features(holdout_preds, X_holdout)
+
+# Обучение мета-модели на расширенных признаках
+from sklearn.ensemble import GradientBoostingClassifier
+meta_model = GradientBoostingClassifier(n_estimators=100)
+meta_model.fit(meta_features_holdout, y_holdout)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Многоуровневый блендинг</h2>
+    <pre><code># Двухуровневый блендинг
+# Уровень 1: несколько групп моделей
+group1_models = [RandomForestClassifier(), GradientBoostingClassifier()]
+group2_models = [LogisticRegression(), SVC(probability=True)]
+
+# Обучение и предсказания для группы 1
+group1_preds_holdout = []
+group1_preds_test = []
+for model in group1_models:
+    model.fit(X_train, y_train)
+    group1_preds_holdout.append(model.predict_proba(X_holdout)[:, 1])
+    group1_preds_test.append(model.predict_proba(X_test)[:, 1])
+
+# Блендинг группы 1
+group1_blend_holdout = np.mean(group1_preds_holdout, axis=0)
+group1_blend_test = np.mean(group1_preds_test, axis=0)
+
+# То же для группы 2
+group2_preds_holdout = []
+group2_preds_test = []
+for model in group2_models:
+    model.fit(X_train, y_train)
+    group2_preds_holdout.append(model.predict_proba(X_holdout)[:, 1])
+    group2_preds_test.append(model.predict_proba(X_test)[:, 1])
+
+group2_blend_holdout = np.mean(group2_preds_holdout, axis=0)
+group2_blend_test = np.mean(group2_preds_test, axis=0)
+
+# Уровень 2: блендинг групп
+meta_features_holdout = np.column_stack([group1_blend_holdout, group2_blend_holdout])
+meta_features_test = np.column_stack([group1_blend_test, group2_blend_test])
+
+meta_model = LogisticRegression()
+meta_model.fit(meta_features_holdout, y_holdout)
+final_pred = meta_model.predict(meta_features_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Блендинг для регрессии</h2>
+    <pre><code>from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.linear_model import Ridge
+from sklearn.metrics import mean_squared_error
+
+# Базовые модели
+model1 = RandomForestRegressor(n_estimators=100, random_state=42)
+model2 = GradientBoostingRegressor(n_estimators=100, random_state=42)
+model3 = Ridge(alpha=1.0)
+
+# Обучение
+model1.fit(X_train, y_train)
+model2.fit(X_train, y_train)
+model3.fit(X_train, y_train)
+
+# Предсказания на holdout
+holdout_pred1 = model1.predict(X_holdout)
+holdout_pred2 = model2.predict(X_holdout)
+holdout_pred3 = model3.predict(X_holdout)
+holdout_features = np.column_stack([holdout_pred1, holdout_pred2, holdout_pred3])
+
+# Мета-модель (Ridge регрессия для блендинга)
+meta_model = Ridge(alpha=0.1)
+meta_model.fit(holdout_features, y_holdout)
+
+# Предсказания на test
+test_pred1 = model1.predict(X_test)
+test_pred2 = model2.predict(X_test)
+test_pred3 = model3.predict(X_test)
+test_features = np.column_stack([test_pred1, test_pred2, test_pred3])
+
+# Финальные предсказания
+final_predictions = meta_model.predict(test_features)
+rmse = np.sqrt(mean_squared_error(y_test, final_predictions))
+print(f"Blending RMSE: {rmse:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Практические советы</h2>
+    <ul>
+      <li><strong>Размер holdout</strong>: 15-33% от train данных</li>
+      <li><strong>Разнообразие моделей</strong>: используйте разные типы (tree, linear, neural)</li>
+      <li><strong>Корреляция</strong>: модели должны ошибаться по-разному</li>
+      <li><strong>Начните с простого</strong>: простое среднее часто работает хорошо</li>
+      <li><strong>Мета-модель</strong>: начните с линейной (Logistic/Ridge)</li>
+      <li><strong>Проверка</strong>: валидируйте на отдельном test set</li>
+      <li><strong>Время</strong>: блендинг быстрее стекинга</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Соревнования (Kaggle)</li>
+          <li>Множество готовых моделей</li>
+          <li>Ограниченное время</li>
+          <li>Простота важнее точности</li>
+          <li>Большой dataset</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Очень малый dataset</li>
+          <li>Нужна интерпретируемость</li>
+          <li>Production с жесткими требованиями</li>
+          <li>Нельзя терять данные на holdout</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Типичные ошибки</h2>
+    <ul>
+      <li><strong>Утечка данных</strong>: holdout должен быть полностью изолирован</li>
+      <li><strong>Слишком маленький holdout</strong>: < 10% = ненадежные веса</li>
+      <li><strong>Переобучение мета-модели</strong>: используйте регуляризацию</li>
+      <li><strong>Игнорирование корреляции</strong>: похожие модели не улучшают результат</li>
+      <li><strong>Сложная мета-модель</strong>: начните с простой</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Разделить данные на train/holdout/test</li>
+      <li>[ ] Обучить разнообразные базовые модели на train</li>
+      <li>[ ] Проверить корреляцию предсказаний моделей</li>
+      <li>[ ] Получить предсказания на holdout</li>
+      <li>[ ] Обучить мета-модель на holdout</li>
+      <li>[ ] Проверить на test set</li>
+      <li>[ ] Сравнить с отдельными моделями</li>
+      <li>[ ] Попробовать разные методы блендинга</li>
+      <li>[ ] Оптимизировать веса если нужно</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Блендинг — это как консилиум врачей: каждый специалист дает свой диагноз, а главврач (мета-модель) принимает финальное решение, учитывая мнения всех. Мы используем отдельную группу пациентов (holdout), чтобы понять, кому из врачей стоит больше доверять».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

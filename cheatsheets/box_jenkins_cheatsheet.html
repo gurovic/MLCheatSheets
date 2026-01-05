@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Теория временных рядов Box-Jenkins Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📈 Теория временных рядов Box-Jenkins Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть методологии</h2>
+    <ul>
+      <li><strong>Авторы</strong>: George Box и Gwilym Jenkins (1970)</li>
+      <li><strong>Цель</strong>: систематический подход к построению ARIMA моделей</li>
+      <li><strong>Итеративный процесс</strong>: идентификация → оценка → диагностика</li>
+      <li><strong>ARIMA</strong>: AutoRegressive Integrated Moving Average</li>
+      <li><strong>Применение</strong>: прогнозирование временных рядов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Этапы методологии</h2>
+    <ol>
+      <li><strong>Идентификация модели</strong>
+        <ul>
+          <li>Проверка стационарности</li>
+          <li>Определение порядков p, d, q</li>
+          <li>Анализ ACF и PACF</li>
+        </ul>
+      </li>
+      <li><strong>Оценка параметров</strong>
+        <ul>
+          <li>Подбор коэффициентов</li>
+          <li>Максимизация правдоподобия</li>
+        </ul>
+      </li>
+      <li><strong>Диагностика</strong>
+        <ul>
+          <li>Анализ остатков</li>
+          <li>Тесты адекватности</li>
+        </ul>
+      </li>
+      <li><strong>Прогнозирование</strong>
+        <ul>
+          <li>Генерация прогнозов</li>
+          <li>Доверительные интервалы</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Модель ARIMA(p,d,q)</h2>
+    <pre><code>ARIMA(p, d, q):
+p = порядок авторегрессии (AR)
+d = порядок дифференцирования (I)
+q = порядок скользящего среднего (MA)
+
+Формула:
+Φ(B)(1-B)^d y_t = Θ(B)ε_t
+
+где:
+Φ(B) = AR полином
+Θ(B) = MA полином
+B = оператор сдвига назад
+ε_t = белый шум</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Проверка стационарности</h2>
+    <pre><code>from statsmodels.tsa.stattools import adfuller, kpss
+import pandas as pd
+
+# Augmented Dickey-Fuller тест
+def check_stationarity(series):
+    # ADF тест (H0: нестационарен)
+    adf_result = adfuller(series)
+    print(f'ADF Statistic: {adf_result[0]:.4f}')
+    print(f'p-value: {adf_result[1]:.4f}')
+    
+    # KPSS тест (H0: стационарен)
+    kpss_result = kpss(series)
+    print(f'KPSS Statistic: {kpss_result[0]:.4f}')
+    print(f'p-value: {kpss_result[1]:.4f}')
+    
+    if adf_result[1] < 0.05:
+        print("✅ Ряд стационарен (ADF)")
+    else:
+        print("❌ Ряд нестационарен (ADF)")
+
+check_stationarity(df['value'])</code></pre>
+
+    <p><strong>Признаки нестационарности:</strong></p>
+    <ul>
+      <li>Тренд в данных</li>
+      <li>Сезонность</li>
+      <li>Изменяющаяся дисперсия</li>
+      <li>p-value ADF > 0.05</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Дифференцирование</h2>
+    <pre><code>import numpy as np
+
+# Первое дифференцирование (d=1)
+df['diff1'] = df['value'].diff()
+
+# Второе дифференцирование (d=2)
+df['diff2'] = df['diff1'].diff()
+
+# Сезонное дифференцирование (для SARIMA)
+df['seasonal_diff'] = df['value'].diff(12)  # для месячных
+
+# Комбинированное
+df['combined'] = df['value'].diff(12).diff()
+
+# Визуализация
+import matplotlib.pyplot as plt
+fig, axes = plt.subplots(3, 1, figsize=(10, 8))
+df['value'].plot(ax=axes[0], title='Original')
+df['diff1'].plot(ax=axes[1], title='First Difference')
+df['diff2'].plot(ax=axes[2], title='Second Difference')
+plt.tight_layout()
+plt.show()
+
+# Проверка стационарности после дифференцирования
+check_stationarity(df['diff1'].dropna())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. ACF и PACF анализ</h2>
+    <pre><code>from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+
+# Построение ACF и PACF
+fig, axes = plt.subplots(1, 2, figsize=(12, 4))
+
+# ACF - автокорреляционная функция
+plot_acf(df['diff1'].dropna(), lags=40, ax=axes[0])
+axes[0].set_title('ACF')
+
+# PACF - частная автокорреляционная функция
+plot_pacf(df['diff1'].dropna(), lags=40, ax=axes[1])
+axes[1].set_title('PACF')
+
+plt.tight_layout()
+plt.show()</code></pre>
+
+    <p><strong>Правила определения p и q:</strong></p>
+    <table>
+      <tr><th>Модель</th><th>ACF</th><th>PACF</th></tr>
+      <tr><td>AR(p)</td><td>Затухает</td><td>Обрывается после lag p</td></tr>
+      <tr><td>MA(q)</td><td>Обрывается после lag q</td><td>Затухает</td></tr>
+      <tr><td>ARMA(p,q)</td><td>Затухает</td><td>Затухает</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Подбор модели ARIMA</h2>
+    <pre><code>from statsmodels.tsa.arima.model import ARIMA
+
+# Ручной подбор
+model = ARIMA(df['value'], order=(1, 1, 1))
+fitted_model = model.fit()
+
+# Вывод результатов
+print(fitted_model.summary())
+
+# Автоматический подбор
+from pmdarima import auto_arima
+
+auto_model = auto_arima(
+    df['value'],
+    start_p=0, start_q=0,
+    max_p=5, max_q=5,
+    d=None,  # автоматический выбор d
+    seasonal=False,
+    stepwise=True,
+    suppress_warnings=True,
+    error_action='ignore',
+    trace=True
+)
+
+print(auto_model.summary())
+print(f"Best model: ARIMA{auto_model.order}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Критерии выбора модели</h2>
+    <pre><code># Сравнение моделей
+models_to_test = [
+    (1, 1, 1),
+    (2, 1, 1),
+    (1, 1, 2),
+    (2, 1, 2)
+]
+
+results = []
+for order in models_to_test:
+    try:
+        model = ARIMA(df['value'], order=order)
+        fitted = model.fit()
+        results.append({
+            'order': order,
+            'AIC': fitted.aic,
+            'BIC': fitted.bic,
+            'HQIC': fitted.hqic
+        })
+    except:
+        pass
+
+# Вывод в DataFrame
+results_df = pd.DataFrame(results)
+print(results_df.sort_values('AIC'))</code></pre>
+
+    <p><strong>Информационные критерии:</strong></p>
+    <ul>
+      <li><strong>AIC</strong>: -2log(L) + 2k (меньше = лучше)</li>
+      <li><strong>BIC</strong>: -2log(L) + k*log(n) (штраф за параметры)</li>
+      <li><strong>HQIC</strong>: Hannan-Quinn</li>
+      <li>Выбирайте модель с минимальным значением</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Диагностика остатков</h2>
+    <pre><code>import scipy.stats as stats
+
+# Получение остатков
+residuals = fitted_model.resid
+
+# 1. Тест Ljung-Box (автокорреляция остатков)
+from statsmodels.stats.diagnostic import acorr_ljungbox
+lb_test = acorr_ljungbox(residuals, lags=10)
+print("Ljung-Box test:\n", lb_test)
+
+# 2. Тест на нормальность (Jarque-Bera)
+jb_stat, jb_pvalue = stats.jarque_bera(residuals)
+print(f"Jarque-Bera: stat={jb_stat:.4f}, p-value={jb_pvalue:.4f}")
+
+# 3. Визуализация
+fig, axes = plt.subplots(2, 2, figsize=(12, 8))
+
+# Остатки во времени
+residuals.plot(ax=axes[0, 0], title='Residuals over time')
+
+# ACF остатков
+plot_acf(residuals, lags=40, ax=axes[0, 1])
+
+# Гистограмма
+axes[1, 0].hist(residuals, bins=30, edgecolor='black')
+axes[1, 0].set_title('Residuals Distribution')
+
+# Q-Q plot
+stats.probplot(residuals, dist="norm", plot=axes[1, 1])
+
+plt.tight_layout()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Прогнозирование</h2>
+    <pre><code># Прогноз на 12 шагов вперед
+forecast_steps = 12
+forecast = fitted_model.forecast(steps=forecast_steps)
+
+# С доверительными интервалами
+forecast_result = fitted_model.get_forecast(steps=forecast_steps)
+forecast_df = forecast_result.summary_frame()
+
+# Визуализация
+plt.figure(figsize=(12, 6))
+plt.plot(df.index, df['value'], label='Historical')
+plt.plot(forecast_df.index, forecast_df['mean'], 
+         label='Forecast', color='red')
+plt.fill_between(forecast_df.index, 
+                 forecast_df['mean_ci_lower'],
+                 forecast_df['mean_ci_upper'],
+                 alpha=0.3, color='red')
+plt.legend()
+plt.title('ARIMA Forecast')
+plt.show()
+
+# Метрики точности (на тестовой выборке)
+from sklearn.metrics import mean_squared_error, mean_absolute_error
+rmse = np.sqrt(mean_squared_error(test['value'], forecast))
+mae = mean_absolute_error(test['value'], forecast)
+print(f"RMSE: {rmse:.4f}")
+print(f"MAE: {mae:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. SARIMA для сезонности</h2>
+    <pre><code>from statsmodels.tsa.statespace.sarimax import SARIMAX
+
+# SARIMA(p,d,q)(P,D,Q)m
+# m = период сезонности (12 для месячных данных)
+model = SARIMAX(
+    df['value'],
+    order=(1, 1, 1),           # несезонная часть
+    seasonal_order=(1, 1, 1, 12),  # сезонная часть
+    enforce_stationarity=False,
+    enforce_invertibility=False
+)
+
+fitted = model.fit()
+print(fitted.summary())
+
+# Прогноз
+forecast = fitted.forecast(steps=12)
+
+# Автоматический выбор SARIMA
+auto_sarima = auto_arima(
+    df['value'],
+    start_p=0, start_q=0,
+    max_p=3, max_q=3,
+    seasonal=True,
+    m=12,  # период сезонности
+    start_P=0, start_Q=0,
+    max_P=2, max_Q=2,
+    d=None, D=None,
+    trace=True,
+    stepwise=True
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Практические советы</h2>
+    <ul>
+      <li><strong>d обычно 0, 1 или 2</strong>: больше не требуется</li>
+      <li><strong>Начните с простых моделей</strong>: ARIMA(1,1,1)</li>
+      <li><strong>Используйте auto_arima</strong> для первичного анализа</li>
+      <li><strong>Проверяйте остатки</strong>: должны быть белым шумом</li>
+      <li><strong>Длина данных</strong>: минимум 50-100 наблюдений</li>
+      <li><strong>Сезонность</strong>: используйте SARIMA</li>
+      <li><strong>Валидация</strong>: out-of-sample тестирование</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Одномерные временные ряды</li>
+          <li>Линейные зависимости</li>
+          <li>Стационарные или приводимые к стационарности</li>
+          <li>Экономические и финансовые данные</li>
+          <li>Короткосрочные прогнозы</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Нелинейные зависимости</li>
+          <li>Множество внешних переменных</li>
+          <li>Структурные сдвиги</li>
+          <li>Малый объем данных (< 50)</li>
+          <li>Очень долгосрочные прогнозы</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист Box-Jenkins</h2>
+    <ul>
+      <li>[ ] Визуализировать временной ряд</li>
+      <li>[ ] Проверить стационарность (ADF, KPSS)</li>
+      <li>[ ] Применить дифференцирование при необходимости</li>
+      <li>[ ] Построить ACF и PACF графики</li>
+      <li>[ ] Определить порядки p, d, q</li>
+      <li>[ ] Подобрать несколько моделей</li>
+      <li>[ ] Сравнить по AIC/BIC</li>
+      <li>[ ] Проверить остатки (Ljung-Box, нормальность)</li>
+      <li>[ ] Выбрать финальную модель</li>
+      <li>[ ] Сделать прогноз с доверительными интервалами</li>
+      <li>[ ] Валидировать на out-of-sample данных</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Методология Box-Jenkins — это как систематический рецепт для прогнозирования: сначала готовим данные (делаем стационарными), затем выбираем правильную модель (анализируем графики), проверяем качество (смотрим на ошибки) и только потом делаем прогноз. Это золотой стандарт для временных рядов с 1970-х годов».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
