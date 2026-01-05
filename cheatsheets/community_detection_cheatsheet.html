@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Community Detection Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🕸️ Community Detection Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Обнаружение сообществ в графах • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Задача</strong>: найти плотно связанные группы узлов в графе</li>
+      <li><strong>Сообщество</strong>: группа узлов с большим числом внутренних связей</li>
+      <li><strong>Применение</strong>: социальные сети, биология, интернет</li>
+      <li><strong>Сложность</strong>: NP-полная задача в общем случае</li>
+      <li><strong>Подходы</strong>: модулярность, спектральные методы, label propagation</li>
+    </ul>
+    <blockquote>Community detection - задача разбиения графа на кластеры узлов с плотными внутренними связями и разреженными внешними</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Модулярность (Modularity)</h2>
+    <p><strong>Метрика качества разбиения:</strong></p>
+    <pre><code>Q = (1/2m) Σᵢⱼ [Aᵢⱼ - kᵢkⱼ/2m] δ(cᵢ, cⱼ)
+
+где:
+- Aᵢⱼ - матрица смежности
+- kᵢ - степень узла i
+- m - число ребер
+- cᵢ - сообщество узла i
+- δ(cᵢ, cⱼ) = 1 если cᵢ = cⱼ</code></pre>
+    
+    <p><strong>Значения:</strong></p>
+    <ul>
+      <li>Q = 0: случайное разбиение</li>
+      <li>Q > 0.3: хорошая структура сообществ</li>
+      <li>Q > 0.7: очень сильная структура</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Louvain алгоритм</h2>
+    <pre><code>import networkx as nx
+from community import community_louvain
+
+# Создание графа
+G = nx.karate_club_graph()
+
+# Обнаружение сообществ
+communities = community_louvain.best_partition(G)
+
+# Модулярность
+modularity = community_louvain.modularity(communities, G)
+print(f"Modularity: {modularity:.3f}")
+
+# Визуализация
+import matplotlib.pyplot as plt
+
+pos = nx.spring_layout(G)
+colors = [communities[node] for node in G.nodes()]
+
+nx.draw(G, pos, node_color=colors, 
+        with_labels=True, cmap=plt.cm.rainbow)
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Label Propagation</h2>
+    <pre><code>def label_propagation(G, max_iter=100):
+    """
+    Label Propagation алгоритм
+    Быстрый и простой метод
+    """
+    import random
+    
+    # Инициализация уникальными метками
+    labels = {node: node for node in G.nodes()}
+    
+    for iteration in range(max_iter):
+        # Случайный порядок узлов
+        nodes = list(G.nodes())
+        random.shuffle(nodes)
+        
+        changed = False
+        for node in nodes:
+            # Подсчет меток соседей
+            neighbor_labels = [labels[neighbor] 
+                             for neighbor in G.neighbors(node)]
+            
+            if not neighbor_labels:
+                continue
+            
+            # Выбор самой частой метки
+            from collections import Counter
+            most_common = Counter(neighbor_labels).most_common(1)[0][0]
+            
+            if labels[node] != most_common:
+                labels[node] = most_common
+                changed = True
+        
+        if not changed:
+            break
+    
+    return labels
+
+# Использование
+communities = label_propagation(G)
+
+# или через NetworkX
+from networkx.algorithms import community
+communities_nx = community.label_propagation_communities(G)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Girvan-Newman</h2>
+    <p><strong>Делительный (divisive) подход:</strong></p>
+    <pre><code>from networkx.algorithms.community import girvan_newman
+
+# Последовательное удаление ребер с максимальной betweenness
+communities_generator = girvan_newman(G)
+
+# Получить k сообществ
+k = 3
+communities = []
+for _ in range(k - 1):
+    communities = next(communities_generator)
+
+# Результат
+for i, community in enumerate(communities):
+    print(f"Community {i}: {community}")</code></pre>
+    
+    <p><strong>Алгоритм:</strong></p>
+    <ol>
+      <li>Вычислить betweenness для всех ребер</li>
+      <li>Удалить ребро с максимальной betweenness</li>
+      <li>Пересчитать betweenness</li>
+      <li>Повторять до достижения k сообществ</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Spectral Clustering</h2>
+    <pre><code>from sklearn.cluster import SpectralClustering
+import numpy as np
+
+# Матрица смежности
+A = nx.to_numpy_array(G)
+
+# Spectral clustering
+sc = SpectralClustering(n_clusters=3, affinity='precomputed')
+labels = sc.fit_predict(A)
+
+# Создание словаря сообществ
+communities = {node: label for node, label in enumerate(labels)}
+
+# Вручную
+def spectral_clustering_manual(A, k):
+    """
+    Спектральная кластеризация
+    """
+    from scipy.sparse.linalg import eigsh
+    
+    # Степенная матрица
+    D = np.diag(A.sum(axis=1))
+    
+    # Лапласиан
+    L = D - A
+    
+    # Нормализованный лапласиан
+    D_inv_sqrt = np.diag(1.0 / np.sqrt(D.diagonal()))
+    L_norm = D_inv_sqrt @ L @ D_inv_sqrt
+    
+    # k наименьших собственных векторов
+    eigenvalues, eigenvectors = eigsh(L_norm, k=k, which='SM')
+    
+    # K-means на собственных векторах
+    from sklearn.cluster import KMeans
+    kmeans = KMeans(n_clusters=k)
+    labels = kmeans.fit_predict(eigenvectors)
+    
+    return labels</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Infomap</h2>
+    <pre><code># Использует random walks и теорию информации
+# Минимизирует длину описания случайных блужданий
+
+try:
+    import infomap
+    
+    # Создание Infomap объекта
+    im = infomap.Infomap("--two-level")
+    
+    # Добавление ребер
+    for u, v in G.edges():
+        im.add_link(u, v)
+    
+    # Запуск
+    im.run()
+    
+    # Результаты
+    communities = {}
+    for node in im.tree:
+        if node.is_leaf:
+            communities[node.node_id] = node.module_id
+    
+    print(f"Found {im.num_top_modules} communities")
+    print(f"Codelength: {im.codelength}")
+    
+except ImportError:
+    print("Install infomap: pip install infomap")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сравнение алгоритмов</h2>
+    <table>
+      <tr>
+        <th>Алгоритм</th>
+        <th>Сложность</th>
+        <th>Качество</th>
+        <th>Скорость</th>
+      </tr>
+      <tr>
+        <td>Louvain</td>
+        <td>O(n log n)</td>
+        <td>⭐⭐⭐⭐</td>
+        <td>Быстрый</td>
+      </tr>
+      <tr>
+        <td>Label Prop.</td>
+        <td>O(m + n)</td>
+        <td>⭐⭐⭐</td>
+        <td>Очень быстрый</td>
+      </tr>
+      <tr>
+        <td>Girvan-Newman</td>
+        <td>O(m²n)</td>
+        <td>⭐⭐⭐⭐</td>
+        <td>Медленный</td>
+      </tr>
+      <tr>
+        <td>Spectral</td>
+        <td>O(n³)</td>
+        <td>⭐⭐⭐⭐</td>
+        <td>Средний</td>
+      </tr>
+      <tr>
+        <td>Infomap</td>
+        <td>O(n log n)</td>
+        <td>⭐⭐⭐⭐⭐</td>
+        <td>Быстрый</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Метрики оценки</h2>
+    <pre><code>from sklearn.metrics import adjusted_rand_score, normalized_mutual_info_score
+
+def evaluate_communities(true_labels, pred_labels):
+    """
+    Оценка качества обнаружения сообществ
+    """
+    # ARI (Adjusted Rand Index)
+    ari = adjusted_rand_score(true_labels, pred_labels)
+    
+    # NMI (Normalized Mutual Information)
+    nmi = normalized_mutual_info_score(true_labels, pred_labels)
+    
+    print(f"ARI: {ari:.3f}")
+    print(f"NMI: {nmi:.3f}")
+    
+    return ari, nmi
+
+# Внутренние метрики
+def internal_metrics(G, communities):
+    """
+    Метрики без ground truth
+    """
+    # Modularity
+    mod = nx.algorithms.community.modularity(G, communities)
+    
+    # Coverage
+    cov = nx.algorithms.community.coverage(G, communities)
+    
+    # Performance
+    perf = nx.algorithms.community.performance(G, communities)
+    
+    print(f"Modularity: {mod:.3f}")
+    print(f"Coverage: {cov:.3f}")
+    print(f"Performance: {perf:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Overlapping Communities</h2>
+    <p><strong>Перекрывающиеся сообщества:</strong></p>
+    <pre><code>from networkx.algorithms.community import k_clique_communities
+
+# k-clique communities
+# Узлы в одном сообществе если соединены k-кликой
+communities = list(k_clique_communities(G, k=3))
+
+for i, comm in enumerate(communities):
+    print(f"Community {i}: {comm}")
+
+# DEMON алгоритм (ego-network based)
+def demon_algorithm(G, epsilon=0.25):
+    """
+    DEMON - обнаружение перекрывающихся сообществ
+    """
+    communities = []
+    
+    for node in G.nodes():
+        # Ego-сеть узла
+        ego_net = nx.ego_graph(G, node)
+        
+        # Label propagation на ego-сети
+        labels = label_propagation(ego_net)
+        
+        # Извлечение сообществ
+        for label in set(labels.values()):
+            community = {n for n, l in labels.items() if l == label}
+            if len(community) >= 3:
+                communities.append(community)
+    
+    # Слияние похожих сообществ
+    merged = merge_similar_communities(communities, epsilon)
+    return merged</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Иерархические сообщества</h2>
+    <pre><code>from scipy.cluster.hierarchy import dendrogram, linkage
+import matplotlib.pyplot as plt
+
+def hierarchical_communities(G):
+    """
+    Иерархическая кластеризация для графов
+    """
+    # Матрица кратчайших путей
+    path_length = dict(nx.all_pairs_shortest_path_length(G))
+    
+    n = len(G.nodes())
+    distance_matrix = np.zeros((n, n))
+    
+    nodes = list(G.nodes())
+    for i, u in enumerate(nodes):
+        for j, v in enumerate(nodes):
+            if u in path_length and v in path_length[u]:
+                distance_matrix[i][j] = path_length[u][v]
+            else:
+                distance_matrix[i][j] = n  # Disconnected
+    
+    # Hierarchical clustering
+    Z = linkage(distance_matrix, method='ward')
+    
+    # Dendrogram
+    plt.figure(figsize=(10, 5))
+    dendrogram(Z, labels=nodes)
+    plt.title('Hierarchical Community Structure')
+    plt.show()
+    
+    return Z</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Лучшие практики</h2>
+    <ul>
+      <li><strong>Выбор алгоритма</strong>: Louvain для больших графов</li>
+      <li><strong>Валидация</strong>: используйте несколько метрик</li>
+      <li><strong>Параметры</strong>: resolution для Louvain</li>
+      <li><strong>Визуализация</strong>: проверяйте результаты глазами</li>
+      <li><strong>Масштабируемость</strong>: Label Prop. для огромных графов</li>
+      <li><strong>Качество</strong>: Infomap для максимального качества</li>
+    </ul>
+    
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✓ Когда использовать</h3>
+        <ul>
+          <li>Социальные сети</li>
+          <li>Биологические сети</li>
+          <li>Анализ веб-страниц</li>
+          <li>Рекомендательные системы</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>✗ Проблемы</h3>
+        <ul>
+          <li>Resolution limit</li>
+          <li>Нестабильность Label Prop.</li>
+          <li>Вычислительная сложность</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

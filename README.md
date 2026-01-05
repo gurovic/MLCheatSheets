@@ -93,7 +93,7 @@
 1. [Валидация временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/time_series_validation_cheatsheet.html)
 1. [Prophet и современные методы временных рядов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/prophet_time_series_cheatsheet.html)
 1. [State space models](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/state_space_models_cheatsheet.html)
-1. Kalman filters
+1. [Kalman filters](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/kalman_filters_cheatsheet.html)
 1. Сезонная декомпозиция
 1. Теория временных рядов Box-Jenkins
 
@@ -144,7 +144,7 @@
 1. [Гауссовские процессы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/gaussian_processes_cheatsheet.html)
 1. [Вариационный вывод](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/variational_inference_cheatsheet.html)
 1. [Марковские цепи Монте-Карло (MCMC) и Байесовский вывод](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mcmc_bayesian_inference_cheatsheet.html)
-1. Expectation-Maximization (EM)
+1. [Expectation-Maximization (EM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/expectation_maximization_cheatsheet.html)
 1. [Графические модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/graphical_models_cheatsheet.html)
 1. Наивный Байес (как байесовский метод)
 
@@ -222,8 +222,8 @@
 ### **22. Этика, безопасность и приватность**
 1. [Fairness в ML (Справедливость)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fairness_ml_cheatsheet.html)
 1. [Adversarial Attacks (Состязательные атаки)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adversarial_attacks_cheatsheet.html)
-1. Adversarial robustness (классические атаки)
-1. Differential privacy
+1. [Adversarial robustness (классические атаки)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adversarial_robustness_cheatsheet.html)
+1. [Differential privacy](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/differential_privacy_cheatsheet.html)
 1. Explainability и accountability
 
 ### **23. Безопасность и обнаружение аномалий в приложениях**
@@ -240,24 +240,24 @@
 1. Алгоритмы на графах (кластеризация, поиск путей)
 1. Социальный сетевой анализ
 1. Графовые эмбеддинги (Node2Vec, DeepWalk)
-1. Community detection
+1. [Community detection](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/community_detection_cheatsheet.html)
 1. Графовые ядра (Graph kernels)
 1. Influence maximization
 
 ### **26. Традиционная обработка текста (NLP)**
 1. Тематическое моделирование (LDA, NMF)
-1. TF-IDF и векторное пространство
+1. [TF-IDF и векторное пространство](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tfidf_cheatsheet.html)
 1. Латентно-семантический анализ (LSA)
 1. Стемминг, лемматизация
 1. Правила и паттерны (regex, finite-state)
-1. CRF (Conditional Random Fields) для NER
+1. [CRF (Conditional Random Fields) для NER](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/crf_conditional_random_fields_cheatsheet.html)
 1. Синтаксический разбор (constituency, dependency)
 
 ### **27. Полуавтоматическое обучение (Semi-supervised)**
 1. [Semi-supervised Learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/semi_supervised_learning_cheatsheet.html)
-1. Self-training
+1. [Self-training](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/self_training_cheatsheet.html)
 1. Co-training
-1. Label propagation
+1. [Label propagation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/label_propagation_cheatsheet.html)
 1. Graph-based SSL
 1. Pseudo-labeling
 1. Generative models (классические)
@@ -265,7 +265,7 @@
 ### **28. Онлайн обучение и инкрементное обучение**
 1. [Online Learning (SGD, Perceptron, Concept Drift)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/online_learning_cheatsheet.html)
 1. [Incremental Learning (Инкрементное обучение)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/incremental_learning_cheatsheet.html)
-1. Concept drift detection
+1. [Concept drift detection](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/concept_drift_cheatsheet.html)
 1. Adaptive windowing
 1. Ensemble methods для streaming
 1. Reservoir sampling
@@ -461,7 +461,7 @@
 1. Bias в нейросетях
 1. Fairness в ML
 1. Federated learning
-1. Differential privacy
+1. [Differential privacy](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/differential_privacy_cheatsheet.html)
 
 ### **18. Производство и MLOps**
 1. Model Deployment

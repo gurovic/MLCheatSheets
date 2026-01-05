@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>EM-алгоритм Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔄 Expectation-Maximization (EM) Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Оценка параметров со скрытыми переменными • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Проблема</strong>: оценка параметров при наличии скрытых переменных</li>
+      <li><strong>Подход</strong>: итеративная оптимизация через E- и M-шаги</li>
+      <li><strong>Гарантия</strong>: монотонное увеличение правдоподобия</li>
+      <li><strong>Применение</strong>: GMM, HMM, missing data, latent variables</li>
+      <li><strong>Особенность</strong>: находит локальный максимум</li>
+    </ul>
+    <blockquote>EM-алгоритм - итеративный метод максимизации правдоподобия в моделях с неполными данными или скрытыми переменными</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Алгоритм (два шага)</h2>
+    <p><strong>E-шаг (Expectation):</strong></p>
+    <pre><code>Q(θ|θ⁽ᵗ⁾) = E_Z|X,θ⁽ᵗ⁾[log P(X, Z|θ)]
+
+Вычисляем ожидаемое значение 
+log-правдоподобия полных данных</code></pre>
+    
+    <p><strong>M-шаг (Maximization):</strong></p>
+    <pre><code>θ⁽ᵗ⁺¹⁾ = argmax_θ Q(θ|θ⁽ᵗ⁾)
+
+Максимизируем Q относительно θ</code></pre>
+    
+    <p><strong>Итерации:</strong></p>
+    <ol>
+      <li>Инициализируем θ⁽⁰⁾</li>
+      <li>E-шаг: вычисляем Q(θ|θ⁽ᵗ⁾)</li>
+      <li>M-шаг: находим θ⁽ᵗ⁺¹⁾</li>
+      <li>Повторяем 2-3 до сходимости</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Gaussian Mixture Model (GMM)</h2>
+    <pre><code>import numpy as np
+from sklearn.mixture import GaussianMixture
+
+# Генерация данных из смеси
+np.random.seed(42)
+X = np.concatenate([
+    np.random.normal(0, 1, (100, 2)),
+    np.random.normal(5, 1.5, (100, 2)),
+    np.random.normal(2, 0.5, (100, 2))
+])
+
+# Обучение GMM с EM
+gmm = GaussianMixture(n_components=3, random_state=42)
+gmm.fit(X)
+
+# Параметры компонент
+print("Средние:", gmm.means_)
+print("Ковариации:", gmm.covariances_)
+print("Веса:", gmm.weights_)
+
+# Предсказание кластеров
+labels = gmm.predict(X)
+probs = gmm.predict_proba(X)  # Мягкие назначения</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. EM для GMM (детали)</h2>
+    <p><strong>E-шаг:</strong> вычисляем posterior вероятности</p>
+    <pre><code>γᵢₖ = P(zᵢ = k | xᵢ, θ⁽ᵗ⁾)
+    = πₖ N(xᵢ|μₖ, Σₖ) / Σⱼ πⱼ N(xᵢ|μⱼ, Σⱼ)
+
+где:
+- γᵢₖ - ответственность компоненты k за точку i
+- πₖ - вес компоненты k
+- N - плотность нормального распределения</code></pre>
+    
+    <p><strong>M-шаг:</strong> обновляем параметры</p>
+    <pre><code># Веса
+πₖ = (1/N) Σᵢ γᵢₖ
+
+# Средние
+μₖ = Σᵢ γᵢₖ xᵢ / Σᵢ γᵢₖ
+
+# Ковариации
+Σₖ = Σᵢ γᵢₖ (xᵢ - μₖ)(xᵢ - μₖ)ᵀ / Σᵢ γᵢₖ</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Реализация GMM с нуля</h2>
+    <pre><code>class GaussianMixtureEM:
+    def __init__(self, n_components, max_iter=100, tol=1e-4):
+        self.n_components = n_components
+        self.max_iter = max_iter
+        self.tol = tol
+    
+    def fit(self, X):
+        n_samples, n_features = X.shape
+        
+        # Инициализация k-means
+        from sklearn.cluster import KMeans
+        kmeans = KMeans(n_clusters=self.n_components)
+        labels = kmeans.fit_predict(X)
+        
+        self.means_ = kmeans.cluster_centers_
+        self.covariances_ = np.array([
+            np.cov(X[labels == k].T) + np.eye(n_features) * 1e-6
+            for k in range(self.n_components)
+        ])
+        self.weights_ = np.bincount(labels) / n_samples
+        
+        log_likelihood_old = 0
+        
+        for iteration in range(self.max_iter):
+            # E-step
+            responsibilities = self._e_step(X)
+            
+            # M-step
+            self._m_step(X, responsibilities)
+            
+            # Проверка сходимости
+            log_likelihood = self._log_likelihood(X)
+            if abs(log_likelihood - log_likelihood_old) < self.tol:
+                break
+            log_likelihood_old = log_likelihood
+        
+        return self
+    
+    def _e_step(self, X):
+        n_samples = X.shape[0]
+        responsibilities = np.zeros((n_samples, self.n_components))
+        
+        for k in range(self.n_components):
+            responsibilities[:, k] = self.weights_[k] * \
+                self._multivariate_gaussian(X, self.means_[k], 
+                                            self.covariances_[k])
+        
+        # Нормализация
+        responsibilities /= responsibilities.sum(axis=1, keepdims=True)
+        return responsibilities
+    
+    def _m_step(self, X, responsibilities):
+        n_samples = X.shape[0]
+        
+        # Обновление весов
+        self.weights_ = responsibilities.sum(axis=0) / n_samples
+        
+        # Обновление средних и ковариаций
+        for k in range(self.n_components):
+            resp_k = responsibilities[:, k]
+            sum_resp = resp_k.sum()
+            
+            self.means_[k] = (X.T @ resp_k) / sum_resp
+            
+            diff = X - self.means_[k]
+            self.covariances_[k] = (diff.T * resp_k) @ diff / sum_resp
+            self.covariances_[k] += np.eye(X.shape[1]) * 1e-6
+    
+    def _multivariate_gaussian(self, X, mean, cov):
+        n_features = X.shape[1]
+        diff = X - mean
+        return np.exp(-0.5 * np.sum(diff @ np.linalg.inv(cov) * diff, axis=1)) / \
+               np.sqrt((2 * np.pi) ** n_features * np.linalg.det(cov))
+    
+    def _log_likelihood(self, X):
+        likelihoods = np.zeros((X.shape[0], self.n_components))
+        for k in range(self.n_components):
+            likelihoods[:, k] = self.weights_[k] * \
+                self._multivariate_gaussian(X, self.means_[k], 
+                                           self.covariances_[k])
+        return np.log(likelihoods.sum(axis=1)).sum()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. EM для Missing Data</h2>
+    <pre><code>import numpy as np
+from sklearn.impute import SimpleImputer
+
+# Данные с пропусками
+X = np.array([
+    [1, 2, np.nan],
+    [3, np.nan, 5],
+    [np.nan, 4, 6],
+    [7, 8, 9]
+])
+
+# Простая импутация средним
+imputer = SimpleImputer(strategy='mean')
+X_imputed = imputer.fit_transform(X)
+
+# EM-based импутация (более сложная)
+def em_imputation(X, max_iter=100):
+    X_filled = X.copy()
+    
+    # Инициализация средними
+    col_means = np.nanmean(X, axis=0)
+    for j in range(X.shape[1]):
+        X_filled[np.isnan(X[:, j]), j] = col_means[j]
+    
+    for _ in range(max_iter):
+        # E-шаг: оценка параметров
+        mean = X_filled.mean(axis=0)
+        cov = np.cov(X_filled.T)
+        
+        # M-шаг: заполнение пропусков условными ожиданиями
+        for i in range(X.shape[0]):
+            missing_idx = np.isnan(X[i])
+            if not missing_idx.any():
+                continue
+            
+            obs_idx = ~missing_idx
+            
+            # Условное распределение
+            mu_miss = mean[missing_idx]
+            mu_obs = mean[obs_idx]
+            
+            Sigma_mm = cov[np.ix_(missing_idx, missing_idx)]
+            Sigma_mo = cov[np.ix_(missing_idx, obs_idx)]
+            Sigma_oo = cov[np.ix_(obs_idx, obs_idx)]
+            
+            # Условное ожидание
+            X_filled[i, missing_idx] = mu_miss + \
+                Sigma_mo @ np.linalg.inv(Sigma_oo) @ \
+                (X[i, obs_idx] - mu_obs)
+    
+    return X_filled
+
+X_em_imputed = em_imputation(X)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. EM для HMM</h2>
+    <p><strong>Скрытые Марковские Модели:</strong></p>
+    <pre><code>from hmmlearn import hmm
+
+# Создание HMM
+model = hmm.GaussianHMM(n_components=3, covariance_type="full")
+
+# Обучение (использует EM внутри)
+# E-шаг: Forward-Backward алгоритм
+# M-шаг: Baum-Welch алгоритм
+X = np.random.randn(100, 2)
+model.fit(X)
+
+# Параметры
+print("Начальные вероятности:", model.startprob_)
+print("Матрица переходов:", model.transmat_)
+print("Средние:", model.means_)
+
+# Декодирование (Viterbi)
+log_prob, states = model.decode(X)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сходимость и критерии остановки</h2>
+    <table>
+      <tr>
+        <th>Критерий</th>
+        <th>Формула</th>
+        <th>Применение</th>
+      </tr>
+      <tr>
+        <td>Log-likelihood</td>
+        <td><code>|L⁽ᵗ⁺¹⁾ - L⁽ᵗ⁾| < ε</code></td>
+        <td>Основной критерий</td>
+      </tr>
+      <tr>
+        <td>Параметры</td>
+        <td><code>||θ⁽ᵗ⁺¹⁾ - θ⁽ᵗ⁾|| < ε</code></td>
+        <td>Стабилизация θ</td>
+      </tr>
+      <tr>
+        <td>Максимум итераций</td>
+        <td><code>t > max_iter</code></td>
+        <td>Защита от зацикливания</td>
+      </tr>
+      <tr>
+        <td>Относительное изменение</td>
+        <td><code>|ΔL| / |L| < ε</code></td>
+        <td>Нормализация масштаба</td>
+      </tr>
+    </table>
+    
+    <blockquote>Теорема: EM гарантирует, что L(θ⁽ᵗ⁺¹⁾) ≥ L(θ⁽ᵗ⁾) на каждой итерации</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Инициализация</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✓ Хорошие стратегии</h3>
+        <ul>
+          <li>K-means для GMM</li>
+          <li>Несколько запусков с разными начальными</li>
+          <li>Использование prior knowledge</li>
+          <li>Иерархическая кластеризация</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>✗ Плохие стратегии</h3>
+        <ul>
+          <li>Случайная инициализация без проверок</li>
+          <li>Одинаковые начальные значения</li>
+          <li>Экстремальные значения</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Применения</h2>
+    <ul>
+      <li><strong>Кластеризация</strong>: GMM, soft clustering</li>
+      <li><strong>Временные ряды</strong>: HMM, state space models</li>
+      <li><strong>Missing data</strong>: импутация, оценка параметров</li>
+      <li><strong>Тематическое моделирование</strong>: LDA, pLSA</li>
+      <li><strong>Биоинформатика</strong>: выравнивание последовательностей</li>
+      <li><strong>Computer Vision</strong>: сегментация, tracking</li>
+      <li><strong>NLP</strong>: POS tagging, alignment</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Вариации EM</h2>
+    <p><strong>Generalized EM (GEM):</strong></p>
+    <ul>
+      <li>M-шаг увеличивает Q, но не обязательно максимизирует</li>
+      <li>Полезно когда M-шаг сложен</li>
+    </ul>
+    
+    <p><strong>Online EM:</strong></p>
+    <ul>
+      <li>Обновления на мини-батчах</li>
+      <li>Для больших датасетов</li>
+    </ul>
+    
+    <p><strong>Stochastic EM:</strong></p>
+    <ul>
+      <li>E-шаг с сэмплированием</li>
+      <li>Для сложных моделей</li>
+    </ul>
+    
+    <p><strong>Variational EM:</strong></p>
+    <ul>
+      <li>Вариационный вывод вместо точного E-шага</li>
+      <li>Для больших байесовских моделей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Преимущества и недостатки</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✓ Преимущества</h3>
+        <ul>
+          <li>Гарантия монотонности</li>
+          <li>Простая реализация</li>
+          <li>Интерпретируемость</li>
+          <li>Работа с missing data</li>
+          <li>Теоретически обоснован</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>✗ Недостатки</h3>
+        <ul>
+          <li>Локальные максимумы</li>
+          <li>Чувствительность к инициализации</li>
+          <li>Медленная сходимость</li>
+          <li>Требует знания модели</li>
+          <li>Может не сходиться к глобальному максимуму</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Ускорение EM</h2>
+    <ul>
+      <li><strong>Incremental EM</strong>: обновления на подвыборках</li>
+      <li><strong>Sparse EM</strong>: использование разреженности</li>
+      <li><strong>Parallel EM</strong>: параллелизация E-шага</li>
+      <li><strong>Conjugate gradients</strong>: для M-шага</li>
+      <li><strong>Newton-Raphson</strong>: второй порядок в M-шаге</li>
+    </ul>
+    
+    <pre><code># Пример: Mini-batch EM
+def minibatch_em(X, n_components, batch_size=100, n_epochs=10):
+    n_samples = X.shape[0]
+    gmm = GaussianMixture(n_components=n_components)
+    
+    # Инициализация на полных данных
+    gmm.fit(X[:1000])
+    
+    for epoch in range(n_epochs):
+        indices = np.random.permutation(n_samples)
+        
+        for i in range(0, n_samples, batch_size):
+            batch = X[indices[i:i+batch_size]]
+            
+            # E-шаг на батче
+            responsibilities = gmm.predict_proba(batch)
+            
+            # M-шаг с экспоненциальным сглаживанием
+            # (упрощенная версия)
+            gmm.fit(batch)
+    
+    return gmm</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Лучшие практики</h2>
+    <ul>
+      <li><strong>Множественные запуски</strong>: используйте разные инициализации</li>
+      <li><strong>Выбор n_components</strong>: BIC/AIC для GMM</li>
+      <li><strong>Регуляризация</strong>: добавляйте к ковариациям εI</li>
+      <li><strong>Мониторинг</strong>: отслеживайте log-likelihood</li>
+      <li><strong>Ранняя остановка</strong>: избегайте переобучения</li>
+      <li><strong>Валидация</strong>: проверяйте на отложенных данных</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
