@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Bias в нейронных сетях Cheatsheet</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>⚖️ Bias в нейронных сетях Cheatsheet</h1>
+  <div class="subtitle">Справедливость и предвзятость в ML • Этический AI<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое Bias</h2>
+    <ul>
+      <li><strong>Algorithm Bias</strong>: систематические ошибки в предсказаниях</li>
+      <li><strong>Причины</strong>: данные, дизайн модели, процесс обучения</li>
+      <li><strong>Последствия</strong>: дискриминация, неравенство, несправедливость</li>
+      <li><strong>Важность</strong>: этические, правовые и социальные риски</li>
+    </ul>
+    <blockquote>
+      Bias в ML может усиливать существующие социальные предрассудки и создавать новые формы дискриминации.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы Bias</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th></tr>
+      <tr><td>Selection Bias</td><td>Непредставительная выборка данных</td></tr>
+      <tr><td>Historical Bias</td><td>Отражение исторических предрассудков</td></tr>
+      <tr><td>Measurement Bias</td><td>Неточность в измерениях признаков</td></tr>
+      <tr><td>Aggregation Bias</td><td>Упрощение разнородных групп</td></tr>
+      <tr><td>Evaluation Bias</td><td>Несбалансированные тестовые данные</td></tr>
+      <tr><td>Deployment Bias</td><td>Использование в неподходящем контексте</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Источники Bias в данных</h2>
+    <p><strong>Проблемы с данными</strong>:</p>
+    <ul>
+      <li><strong>Underrepresentation</strong>: недостаток данных для групп</li>
+      <li><strong>Label bias</strong>: предвзятость в метках</li>
+      <li><strong>Sampling bias</strong>: неравномерная выборка</li>
+      <li><strong>Proxy variables</strong>: косвенные признаки дискриминации</li>
+    </ul>
+
+    <pre><code># Пример: гендерный bias в данных
+train_data = {
+    'male_doctors': 900,
+    'female_doctors': 100,
+    'male_nurses': 100,
+    'female_nurses': 900
+}
+# Модель может усилить стереотипы</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Protected Attributes</h2>
+    <p><strong>Защищённые признаки</strong> (не должны влиять на решения):</p>
+    <ul>
+      <li>Раса и этническая принадлежность</li>
+      <li>Пол и гендерная идентичность</li>
+      <li>Возраст</li>
+      <li>Религия</li>
+      <li>Сексуальная ориентация</li>
+      <li>Инвалидность</li>
+      <li>Национальность</li>
+    </ul>
+
+    <blockquote>
+      Даже без явного использования protected attributes, bias может проявляться через корреляции.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Метрики Fairness</h2>
+    <p><strong>Demographic Parity</strong>:</p>
+    <pre><code># P(ŷ=1|A=0) = P(ŷ=1|A=1)
+# Равная вероятность положительного предсказания
+
+from aif360.metrics import BinaryLabelDatasetMetric
+
+metric = BinaryLabelDatasetMetric(
+    dataset,
+    privileged_groups=[{'sex': 1}],
+    unprivileged_groups=[{'sex': 0}]
+)
+print(metric.mean_difference())</code></pre>
+
+    <p><strong>Equal Opportunity</strong>:</p>
+    <pre><code># P(ŷ=1|y=1,A=0) = P(ŷ=1|y=1,A=1)
+# Равная true positive rate</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Обнаружение Bias</h2>
+    <p><strong>Инструменты анализа</strong>:</p>
+    <pre><code># AI Fairness 360 (IBM)
+from aif360.datasets import AdultDataset
+from aif360.metrics import ClassificationMetric
+
+dataset = AdultDataset()
+privileged = [{'race': 1}]
+unprivileged = [{'race': 0}]
+
+metric = ClassificationMetric(
+    dataset_true, dataset_pred,
+    privileged_groups=privileged,
+    unprivileged_groups=unprivileged
+)
+
+print(f"Disparate impact: {metric.disparate_impact()}")
+print(f"Equal opportunity: {metric.equal_opportunity_difference()}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Pre-processing методы</h2>
+    <p><strong>Устранение bias перед обучением</strong>:</p>
+    <ul>
+      <li><strong>Reweighting</strong>: изменение весов примеров</li>
+      <li><strong>Resampling</strong>: балансировка групп</li>
+      <li><strong>Learning fair representations</strong>: удаление bias из признаков</li>
+    </ul>
+
+    <pre><code># Reweighting
+from aif360.algorithms.preprocessing import Reweighing
+
+RW = Reweighing(
+    unprivileged_groups=unprivileged,
+    privileged_groups=privileged
+)
+dataset_transformed = RW.fit_transform(dataset)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. In-processing методы</h2>
+    <p><strong>Модификация процесса обучения</strong>:</p>
+    <ul>
+      <li><strong>Adversarial debiasing</strong>: adversarial сеть для удаления bias</li>
+      <li><strong>Prejudice remover</strong>: регуляризация для fairness</li>
+      <li><strong>Fair constraints</strong>: ограничения в оптимизации</li>
+    </ul>
+
+    <pre><code># Adversarial debiasing
+from aif360.algorithms.inprocessing import AdversarialDebiasing
+
+debiaser = AdversarialDebiasing(
+    privileged_groups=privileged,
+    unprivileged_groups=unprivileged,
+    scope_name='debiaser',
+    debias=True
+)
+
+debiaser.fit(dataset_train)
+dataset_pred = debiaser.predict(dataset_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Post-processing методы</h2>
+    <p><strong>Коррекция после обучения</strong>:</p>
+    <ul>
+      <li><strong>Equalized odds</strong>: коррекция порогов</li>
+      <li><strong>Calibrated equalized odds</strong>: калибровка предсказаний</li>
+      <li><strong>Reject option classification</strong>: изменение решений вблизи границы</li>
+    </ul>
+
+    <pre><code># Reject Option Classification
+from aif360.algorithms.postprocessing import RejectOptionClassification
+
+ROC = RejectOptionClassification(
+    unprivileged_groups=unprivileged,
+    privileged_groups=privileged,
+    low_class_thresh=0.01,
+    high_class_thresh=0.99,
+    num_class_thresh=100,
+    num_ROC_margin=50,
+    metric_name="Statistical parity difference",
+    metric_ub=0.05,
+    metric_lb=-0.05
+)
+
+dataset_transformed = ROC.fit_predict(
+    dataset_valid, dataset_pred
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Fairness-Accuracy Trade-off</h2>
+    <table>
+      <tr><th>Подход</th><th>Accuracy</th><th>Fairness</th></tr>
+      <tr><td>Baseline model</td><td>0.85</td><td>0.60</td></tr>
+      <tr><td>Reweighting</td><td>0.83</td><td>0.75</td></tr>
+      <tr><td>Adversarial debiasing</td><td>0.82</td><td>0.82</td></tr>
+      <tr><td>Post-processing</td><td>0.84</td><td>0.78</td></tr>
+    </table>
+
+    <blockquote>
+      Часто приходится жертвовать небольшой точностью ради справедливости.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Практические примеры</h2>
+    <p><strong>Кредитный скоринг</strong>:</p>
+    <ul>
+      <li>Проблема: дискриминация по расе/полу</li>
+      <li>Решение: равные approval rates для групп</li>
+      <li>Метрика: demographic parity</li>
+    </ul>
+
+    <p><strong>Найм сотрудников</strong>:</p>
+    <ul>
+      <li>Проблема: bias против женщин в tech</li>
+      <li>Решение: blind recruiting, fair representations</li>
+      <li>Метрика: equal opportunity</li>
+    </ul>
+
+    <p><strong>Медицинская диагностика</strong>:</p>
+    <ul>
+      <li>Проблема: underrepresentation меньшинств</li>
+      <li>Решение: balanced data collection</li>
+      <li>Метрика: equalized odds</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Библиотеки для Fairness</h2>
+    <pre><code># AI Fairness 360 (IBM)
+pip install aif360
+
+# Fairlearn (Microsoft)
+pip install fairlearn
+
+# What-If Tool (Google)
+pip install witwidget
+
+# FairML
+pip install fairml</code></pre>
+
+    <p><strong>Пример с Fairlearn</strong>:</p>
+    <pre><code>from fairlearn.metrics import MetricFrame
+from sklearn.metrics import accuracy_score
+
+# Анализ по группам
+metric_frame = MetricFrame(
+    metrics=accuracy_score,
+    y_true=y_test,
+    y_pred=y_pred,
+    sensitive_features=sensitive_features
+)
+
+print(metric_frame.by_group)
+print(metric_frame.difference())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Best Practices</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Рекомендации</h3>
+        <ul>
+          <li>Собирать разнообразные данные</li>
+          <li>Регулярно проверять fairness метрики</li>
+          <li>Документировать решения о bias</li>
+          <li>Включать stakeholders в процесс</li>
+          <li>Использовать multiple fairness definitions</li>
+          <li>Мониторить модель в production</li>
+        </ul>
+      </div>
+      
+      <div class="bad">
+        <h3>❌ Избегать</h3>
+        <ul>
+          <li>Игнорирование protected attributes</li>
+          <li>Использование biased proxy variables</li>
+          <li>Тестирование только на accuracy</li>
+          <li>Отсутствие diversity в команде</li>
+          <li>Скрытие информации о bias</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Правовые аспекты</h2>
+    <ul>
+      <li><strong>GDPR</strong> (EU): право на объяснение решений</li>
+      <li><strong>Fair Credit Reporting Act</strong> (US): защита от дискриминации</li>
+      <li><strong>AI Act</strong> (EU): регуляция высокорискованных AI систем</li>
+      <li><strong>Равноправие</strong>: национальные законы о недискриминации</li>
+    </ul>
+
+    <blockquote>
+      Compliance с законами требует активного мониторинга и устранения bias.
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

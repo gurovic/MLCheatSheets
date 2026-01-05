@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Model Deployment Cheatsheet</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🚀 Model Deployment Cheatsheet</h1>
+  <div class="subtitle">Развёртывание ML моделей • От эксперимента к production<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы Deployment</h2>
+    <ul>
+      <li><strong>Model Deployment</strong>: запуск модели в production</li>
+      <li><strong>Цель</strong>: доступность модели для пользователей/систем</li>
+      <li><strong>Вызовы</strong>: масштабируемость, латентность, надёжность</li>
+      <li><strong>Подходы</strong>: batch, real-time, edge deployment</li>
+    </ul>
+    <blockquote>
+      Deployment — это не конец, а начало жизненного цикла ML модели в production.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы Deployment</h2>
+    <table>
+      <tr><th>Тип</th><th>Описание</th><th>Использование</th></tr>
+      <tr><td>Batch</td><td>Периодическая обработка</td><td>Рекомендации, аналитика</td></tr>
+      <tr><td>Real-time</td><td>Мгновенный ответ</td><td>Fraud detection, чат-боты</td></tr>
+      <tr><td>Streaming</td><td>Обработка потоков</td><td>IoT, мониторинг</td></tr>
+      <tr><td>Edge</td><td>На устройстве</td><td>Мобильные приложения</td></tr>
+      <tr><td>Hybrid</td><td>Комбинация подходов</td><td>Сложные системы</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Архитектуры Deployment</h2>
+    <p><strong>REST API</strong>:</p>
+    <pre><code># Flask API
+from flask import Flask, request, jsonify
+import joblib
+
+app = Flask(__name__)
+model = joblib.load('model.pkl')
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    data = request.get_json()
+    prediction = model.predict([data['features']])
+    return jsonify({'prediction': prediction.tolist()})
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)</code></pre>
+
+    <p><strong>FastAPI</strong> (современный подход):</p>
+    <pre><code>from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class PredictionInput(BaseModel):
+    features: list[float]
+
+@app.post("/predict")
+async def predict(input: PredictionInput):
+    prediction = model.predict([input.features])
+    return {"prediction": prediction.tolist()}</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Containerization с Docker</h2>
+    <p><strong>Dockerfile для ML модели</strong>:</p>
+    <pre><code>FROM python:3.9-slim
+
+WORKDIR /app
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY model.pkl app.py ./
+
+EXPOSE 5000
+
+CMD ["python", "app.py"]</code></pre>
+
+    <p><strong>Docker Compose</strong>:</p>
+    <pre><code>version: '3.8'
+services:
+  ml-api:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - MODEL_PATH=/app/model.pkl
+    volumes:
+      - ./models:/app/models</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Kubernetes Deployment</h2>
+    <p><strong>Deployment manifest</strong>:</p>
+    <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ml-model
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: ml-model
+  template:
+    metadata:
+      labels:
+        app: ml-model
+    spec:
+      containers:
+      - name: model
+        image: ml-model:latest
+        ports:
+        - containerPort: 5000
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Model Serving платформы</h2>
+    <table>
+      <tr><th>Платформа</th><th>Framework</th><th>Особенности</th></tr>
+      <tr><td>TensorFlow Serving</td><td>TensorFlow</td><td>High performance, gRPC</td></tr>
+      <tr><td>TorchServe</td><td>PyTorch</td><td>Multi-model, metrics</td></tr>
+      <tr><td>MLflow</td><td>Agnostic</td><td>Full lifecycle</td></tr>
+      <tr><td>Seldon Core</td><td>Agnostic</td><td>Kubernetes-native</td></tr>
+      <tr><td>KFServing</td><td>Agnostic</td><td>Serverless on K8s</td></tr>
+    </table>
+
+    <blockquote>
+      Выбор платформы зависит от framework, масштаба и требований к latency.
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Batch Inference</h2>
+    <p><strong>Периодическая обработка данных</strong>:</p>
+    <pre><code># Apache Airflow DAG
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from datetime import datetime, timedelta
+
+def batch_inference():
+    model = load_model('model.pkl')
+    data = load_data_from_db()
+    predictions = model.predict(data)
+    save_predictions(predictions)
+
+dag = DAG(
+    'batch_inference',
+    default_args={'retries': 2},
+    schedule_interval='0 2 * * *',  # Daily at 2am
+    start_date=datetime(2026, 1, 1)
+)
+
+inference_task = PythonOperator(
+    task_id='run_inference',
+    python_callable=batch_inference,
+    dag=dag
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. A/B Testing моделей</h2>
+    <p><strong>Canary Deployment</strong>:</p>
+    <ul>
+      <li>Постепенное переключение трафика</li>
+      <li>10% → 50% → 100%</li>
+      <li>Мониторинг метрик на каждом этапе</li>
+    </ul>
+
+    <pre><code># Простой A/B test
+import random
+
+def route_to_model(user_id):
+    if hash(user_id) % 100 < 10:  # 10% traffic
+        return model_v2.predict(features)
+    else:
+        return model_v1.predict(features)</code></pre>
+
+    <p><strong>Blue-Green Deployment</strong>:</p>
+    <ul>
+      <li>Две идентичные среды</li>
+      <li>Мгновенное переключение</li>
+      <li>Быстрый rollback</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Мониторинг Production</h2>
+    <p><strong>Ключевые метрики</strong>:</p>
+    <table>
+      <tr><th>Категория</th><th>Метрики</th></tr>
+      <tr><td>Performance</td><td>Latency, throughput, CPU/RAM</td></tr>
+      <tr><td>Model Quality</td><td>Accuracy, precision, recall</td></tr>
+      <tr><td>Data Quality</td><td>Feature drift, missing values</td></tr>
+      <tr><td>Business</td><td>Conversion, revenue impact</td></tr>
+    </table>
+
+    <pre><code># Prometheus metrics
+from prometheus_client import Counter, Histogram
+
+prediction_counter = Counter(
+    'predictions_total',
+    'Total predictions made'
+)
+
+latency_histogram = Histogram(
+    'prediction_latency_seconds',
+    'Prediction latency'
+)
+
+@latency_histogram.time()
+def predict(features):
+    prediction_counter.inc()
+    return model.predict(features)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Model Versioning</h2>
+    <p><strong>Управление версиями</strong>:</p>
+    <ul>
+      <li><strong>Semantic versioning</strong>: v1.2.3 (major.minor.patch)</li>
+      <li><strong>Git-based</strong>: привязка к коммиту</li>
+      <li><strong>Timestamp-based</strong>: модель_20260105_143000</li>
+      <li><strong>Hash-based</strong>: уникальный ID на основе данных/кода</li>
+    </ul>
+
+    <pre><code># MLflow model registry
+import mlflow
+
+# Регистрация модели
+mlflow.sklearn.log_model(
+    model,
+    "model",
+    registered_model_name="fraud_detection"
+)
+
+# Transition к production
+client = mlflow.tracking.MlflowClient()
+client.transition_model_version_stage(
+    name="fraud_detection",
+    version=3,
+    stage="Production"
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Оптимизация производительности</h2>
+    <p><strong>Методы ускорения</strong>:</p>
+    <ul>
+      <li><strong>Quantization</strong>: float32 → int8</li>
+      <li><strong>Pruning</strong>: удаление неважных весов</li>
+      <li><strong>Batching</strong>: обработка группами</li>
+      <li><strong>Caching</strong>: кэширование предсказаний</li>
+      <li><strong>GPU acceleration</strong>: использование GPU</li>
+    </ul>
+
+    <pre><code># Dynamic batching
+from collections import deque
+import asyncio
+
+class BatchPredictor:
+    def __init__(self, max_batch_size=32, max_wait=0.1):
+        self.queue = deque()
+        self.max_batch_size = max_batch_size
+        self.max_wait = max_wait
+    
+    async def predict(self, features):
+        future = asyncio.Future()
+        self.queue.append((features, future))
+        
+        if len(self.queue) >= self.max_batch_size:
+            await self._process_batch()
+        
+        return await future
+    
+    async def _process_batch(self):
+        batch = [self.queue.popleft() 
+                 for _ in range(min(len(self.queue), 
+                                   self.max_batch_size))]
+        features = [f for f, _ in batch]
+        predictions = model.predict(features)
+        
+        for (_, future), pred in zip(batch, predictions):
+            future.set_result(pred)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Security в Production</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Security Best Practices</h3>
+        <ul>
+          <li>Аутентификация API (JWT, OAuth)</li>
+          <li>Rate limiting</li>
+          <li>Input validation</li>
+          <li>HTTPS/TLS шифрование</li>
+          <li>Secrets management (Vault)</li>
+          <li>Regular security audits</li>
+        </ul>
+      </div>
+      
+      <div class="bad">
+        <h3>❌ Частые уязвимости</h3>
+        <ul>
+          <li>Hardcoded credentials</li>
+          <li>Отсутствие input sanitization</li>
+          <li>Открытые API без auth</li>
+          <li>Логирование sensitive data</li>
+          <li>Outdated dependencies</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. CI/CD для ML</h2>
+    <p><strong>GitHub Actions pipeline</strong>:</p>
+    <pre><code>name: ML Model CI/CD
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run tests
+        run: |
+          pip install -r requirements.txt
+          pytest tests/
+      
+      - name: Validate model
+        run: python scripts/validate_model.py
+  
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Build Docker image
+        run: docker build -t ml-model:latest .
+      
+      - name: Push to registry
+        run: docker push ml-model:latest
+      
+      - name: Deploy to K8s
+        run: kubectl apply -f k8s/deployment.yaml</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист перед Production</h2>
+    <ul>
+      <li>✅ Модель протестирована на разных данных</li>
+      <li>✅ Настроен мониторинг метрик</li>
+      <li>✅ Реализован graceful degradation</li>
+      <li>✅ Документированы API endpoints</li>
+      <li>✅ Настроены алерты</li>
+      <li>✅ Проведён load testing</li>
+      <li>✅ Подготовлен rollback план</li>
+      <li>✅ Настроено логирование</li>
+      <li>✅ Проверена безопасность</li>
+      <li>✅ Обучена команда поддержки</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
