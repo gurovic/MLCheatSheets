@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Графовые эмбеддинги Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔗 Графовые эмбеддинги Cheatsheet</h1>
+  <div class="subtitle">Node2Vec • DeepWalk • Graph Embeddings • Векторные представления графов<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы графовых эмбеддингов</h2>
+    <ul>
+      <li><strong>Цель</strong>: представить узлы графа в виде векторов фиксированной размерности</li>
+      <li><strong>Задача</strong>: сохранить структурную информацию графа в низкоразмерном пространстве</li>
+      <li><strong>Применение</strong>: классификация узлов, link prediction, кластеризация, визуализация</li>
+      <li><strong>Преимущество</strong>: работа с графами через стандартные ML алгоритмы</li>
+      <li><strong>Размерность</strong>: обычно 64-256 dimensions</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Методы эмбеддингов</h2>
+    <table>
+      <tr><th>Метод</th><th>Подход</th><th>Особенности</th></tr>
+      <tr><td><strong>DeepWalk</strong></td><td>Random walks + Skip-gram</td><td>Первый метод, простой</td></tr>
+      <tr><td><strong>Node2Vec</strong></td><td>Biased random walks</td><td>Контроль BFS/DFS баланса</td></tr>
+      <tr><td><strong>LINE</strong></td><td>Оптимизация близости</td><td>1st и 2nd order proximity</td></tr>
+      <tr><td><strong>Struc2Vec</strong></td><td>Структурная идентичность</td><td>Не зависит от позиции</td></tr>
+      <tr><td><strong>GraphSAGE</strong></td><td>Sampling + aggregation</td><td>Inductive learning</td></tr>
+      <tr><td><strong>Metapath2Vec</strong></td><td>Meta-paths для гетерогенных графов</td><td>Для сложных графов</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. DeepWalk - основа</h2>
+    <p><strong>Идея:</strong> Random walks → Word2Vec Skip-gram</p>
+    <p><strong>Алгоритм:</strong></p>
+    <ol>
+      <li>Генерация случайных блужданий из каждого узла</li>
+      <li>Обучение Skip-gram модели на последовательностях узлов</li>
+      <li>Получение векторных представлений</li>
+    </ol>
+    <pre><code>from gensim.models import Word2Vec
+import networkx as nx
+import random
+
+def deepwalk(G, walk_length=80, num_walks=10, 
+             dimensions=128, window_size=10):
+    # Генерация random walks
+    walks = []
+    for _ in range(num_walks):
+        for node in G.nodes():
+            walk = [node]
+            for _ in range(walk_length - 1):
+                neighbors = list(G.neighbors(walk[-1]))
+                if neighbors:
+                    walk.append(random.choice(neighbors))
+            walks.append([str(n) for n in walk])
+    
+    # Обучение Word2Vec
+    model = Word2Vec(
+        walks, 
+        vector_size=dimensions,
+        window=window_size,
+        min_count=0,
+        sg=1,  # Skip-gram
+        workers=4
+    )
+    
+    return model</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Node2Vec - улучшенный DeepWalk</h2>
+    <p><strong>Ключевая идея:</strong> biased random walks с параметрами p и q</p>
+    <ul>
+      <li><strong>p (return parameter)</strong>: вероятность вернуться к предыдущему узлу</li>
+      <li><strong>q (in-out parameter)</strong>: BFS vs DFS</li>
+      <li>q < 1: BFS (локальная структура)</li>
+      <li>q > 1: DFS (глобальная структура)</li>
+    </ul>
+    <pre><code>from node2vec import Node2Vec
+
+# Создание Node2Vec модели
+node2vec = Node2Vec(
+    G, 
+    dimensions=64,
+    walk_length=30,
+    num_walks=200,
+    p=1,  # return parameter
+    q=1,  # in-out parameter
+    workers=4
+)
+
+# Обучение
+model = node2vec.fit(
+    window=10,
+    min_count=1,
+    batch_words=4
+)
+
+# Получение эмбеддингов
+embeddings = {
+    node: model.wv[str(node)] 
+    for node in G.nodes()
+}</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Настройка параметров p и q</h2>
+    <table>
+      <tr><th>p</th><th>q</th><th>Поведение</th><th>Применение</th></tr>
+      <tr><td>низкий</td><td>низкий</td><td>Локальное окружение (BFS)</td><td>Структурная роль</td></tr>
+      <tr><td>низкий</td><td>высокий</td><td>Умеренное исследование</td><td>Баланс</td></tr>
+      <tr><td>высокий</td><td>низкий</td><td>Глубокое исследование (DFS)</td><td>Сообщества</td></tr>
+      <tr><td>высокий</td><td>высокий</td><td>Избегание возврата</td><td>Дальние связи</td></tr>
+    </table>
+    <p><strong>Рекомендации:</strong></p>
+    <ul>
+      <li>p=1, q=1: универсальные значения (DeepWalk)</li>
+      <li>p=1, q=0.5: для выявления сообществ</li>
+      <li>p=4, q=1: для структурных ролей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. LINE (Large-scale Information Network Embedding)</h2>
+    <p><strong>Два типа близости:</strong></p>
+    <ul>
+      <li><strong>1st-order</strong>: прямые связи между узлами</li>
+      <li><strong>2nd-order</strong>: похожесть окружения</li>
+    </ul>
+    <pre><code>from ge import LINE
+
+# LINE модель
+model = LINE(
+    G, 
+    embedding_size=128,
+    order='second'  # 'first', 'second', 'all'
+)
+
+# Обучение
+model.train(
+    batch_size=1024,
+    epochs=50,
+    verbose=2
+)
+
+# Получение эмбеддингов
+embeddings = model.get_embeddings()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Struc2Vec - структурная идентичность</h2>
+    <p><strong>Идея:</strong> узлы с похожей структурной ролью должны быть близки в векторном пространстве</p>
+    <ul>
+      <li>Не зависит от близости в графе</li>
+      <li>Фокус на структурной эквивалентности</li>
+      <li>Полезно для классификации ролей</li>
+    </ul>
+    <pre><code>from ge import Struc2Vec
+
+model = Struc2Vec(
+    G,
+    walk_length=80,
+    num_walks=10,
+    workers=4,
+    verbose=40
+)
+
+model.train(
+    window_size=5,
+    iter=3
+)
+
+embeddings = model.get_embeddings()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Применения эмбеддингов</h2>
+    <p><strong>1. Классификация узлов:</strong></p>
+    <pre><code>from sklearn.linear_model import LogisticRegression
+
+# Подготовка данных
+X_train = np.array([embeddings[node] 
+                    for node in train_nodes])
+y_train = np.array([labels[node] 
+                    for node in train_nodes])
+
+# Обучение классификатора
+clf = LogisticRegression()
+clf.fit(X_train, y_train)
+
+# Предсказание
+X_test = np.array([embeddings[node] 
+                   for node in test_nodes])
+y_pred = clf.predict(X_test)</code></pre>
+    <p><strong>2. Link Prediction:</strong></p>
+    <pre><code># Создание признаков для пар узлов
+def get_link_features(emb_u, emb_v):
+    return np.concatenate([
+        emb_u * emb_v,  # Hadamard
+        np.abs(emb_u - emb_v),  # L1
+        (emb_u + emb_v) / 2  # Average
+    ])
+
+X_edges = [get_link_features(embeddings[u], embeddings[v])
+           for u, v in candidate_pairs]
+y_edges = [1 if G.has_edge(u, v) else 0 
+           for u, v in candidate_pairs]
+
+model = RandomForestClassifier()
+model.fit(X_edges, y_edges)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Визуализация эмбеддингов</h2>
+    <pre><code>from sklearn.manifold import TSNE
+import matplotlib.pyplot as plt
+
+# Извлечение эмбеддингов
+nodes = list(G.nodes())
+X = np.array([embeddings[node] for node in nodes])
+
+# Снижение размерности до 2D
+tsne = TSNE(n_components=2, random_state=42)
+X_2d = tsne.fit_transform(X)
+
+# Визуализация
+plt.figure(figsize=(10, 8))
+colors = [labels[node] for node in nodes]
+plt.scatter(X_2d[:, 0], X_2d[:, 1], 
+           c=colors, cmap='tab10', alpha=0.6)
+plt.title('Graph Embeddings Visualization')
+plt.colorbar()
+plt.show()
+
+# С подписями важных узлов
+for i, node in enumerate(important_nodes):
+    idx = nodes.index(node)
+    plt.annotate(node, (X_2d[idx, 0], X_2d[idx, 1]))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. GraphSAGE - inductive learning</h2>
+    <p><strong>Ключевое отличие:</strong> может генерировать эмбеддинги для новых узлов</p>
+    <ul>
+      <li>Агрегация информации от соседей</li>
+      <li>Обучаемые функции агрегации</li>
+      <li>Работает с новыми узлами без переобучения</li>
+    </ul>
+    <pre><code># Используя PyTorch Geometric
+from torch_geometric.nn import SAGEConv
+
+class GraphSAGE(torch.nn.Module):
+    def __init__(self, in_channels, hidden_channels, 
+                 out_channels):
+        super().__init__()
+        self.conv1 = SAGEConv(in_channels, hidden_channels)
+        self.conv2 = SAGEConv(hidden_channels, out_channels)
+    
+    def forward(self, x, edge_index):
+        x = self.conv1(x, edge_index).relu()
+        x = F.dropout(x, p=0.5, training=self.training)
+        x = self.conv2(x, edge_index)
+        return x
+
+model = GraphSAGE(
+    in_channels=num_features,
+    hidden_channels=64,
+    out_channels=embedding_dim
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Оценка качества эмбеддингов</h2>
+    <table>
+      <tr><th>Метрика</th><th>Задача</th><th>Описание</th></tr>
+      <tr><td><strong>Link Prediction AUC</strong></td><td>Link prediction</td><td>Качество предсказания рёбер</td></tr>
+      <tr><td><strong>Node Classification F1</strong></td><td>Классификация</td><td>Качество классификации узлов</td></tr>
+      <tr><td><strong>NMI</strong></td><td>Кластеризация</td><td>Normalized Mutual Information</td></tr>
+      <tr><td><strong>Reconstruction Error</strong></td><td>Общее</td><td>Восстановление матрицы смежности</td></tr>
+    </table>
+    <pre><code>from sklearn.metrics import roc_auc_score
+
+# Link prediction evaluation
+def evaluate_link_prediction(embeddings, test_edges):
+    scores = []
+    labels = []
+    
+    for u, v, exists in test_edges:
+        score = np.dot(embeddings[u], embeddings[v])
+        scores.append(score)
+        labels.append(1 if exists else 0)
+    
+    auc = roc_auc_score(labels, scores)
+    return auc</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сравнение методов</h2>
+    <table>
+      <tr><th>Метод</th><th>Скорость</th><th>Точность</th><th>Inductive?</th></tr>
+      <tr><td>DeepWalk</td><td>Высокая</td><td>Средняя</td><td>Нет</td></tr>
+      <tr><td>Node2Vec</td><td>Средняя</td><td>Высокая</td><td>Нет</td></tr>
+      <tr><td>LINE</td><td>Очень высокая</td><td>Средняя</td><td>Нет</td></tr>
+      <tr><td>Struc2Vec</td><td>Низкая</td><td>Высокая (структура)</td><td>Нет</td></tr>
+      <tr><td>GraphSAGE</td><td>Средняя</td><td>Высокая</td><td>Да</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Библиотеки и инструменты</h2>
+    <pre><code># Установка библиотек
+pip install node2vec
+pip install gensim
+pip install ge  # Graph Embedding
+pip install torch-geometric
+pip install stellargraph
+
+# Использование
+from node2vec import Node2Vec
+from ge import DeepWalk, LINE, Struc2Vec
+from stellargraph import StellarGraph
+from stellargraph.mapper import GraphSAGENodeGenerator
+
+# Пример с StellarGraph
+G_stellar = StellarGraph.from_networkx(G)
+generator = GraphSAGENodeGenerator(
+    G_stellar, 
+    batch_size=50, 
+    num_samples=[10, 5]
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Гетерогенные графы</h2>
+    <p><strong>Metapath2Vec:</strong> для графов с разными типами узлов и рёбер</p>
+    <ul>
+      <li>Meta-paths определяют семантику</li>
+      <li>Пример: User-Product-User, Author-Paper-Venue</li>
+      <li>Guided random walks по meta-paths</li>
+    </ul>
+    <pre><code># Определение meta-paths
+# Пример: социальная сеть + товары
+meta_paths = [
+    ['user', 'friend', 'user'],
+    ['user', 'buy', 'product', 'buy', 'user']
+]
+
+# Генерация walks по meta-paths
+def metapath_walk(G, start_node, meta_path, length):
+    walk = [start_node]
+    for _ in range(length // len(meta_path)):
+        for edge_type in meta_path:
+            neighbors = get_neighbors_by_type(
+                G, walk[-1], edge_type
+            )
+            if neighbors:
+                walk.append(random.choice(neighbors))
+    return walk</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Масштабирование на большие графы</h2>
+    <ul>
+      <li><strong>Sampling</strong>: обучение на подвыборке узлов</li>
+      <li><strong>Mini-batch training</strong>: батчи вместо всего графа</li>
+      <li><strong>Distributed training</strong>: распределённое обучение</li>
+      <li><strong>GraphVite</strong>: GPU-ускоренная библиотека</li>
+    </ul>
+    <pre><code># Mini-batch Node2Vec
+def node2vec_minibatch(G, batch_size=1000):
+    nodes = list(G.nodes())
+    for i in range(0, len(nodes), batch_size):
+        batch_nodes = nodes[i:i+batch_size]
+        G_batch = G.subgraph(batch_nodes)
+        
+        model = Node2Vec(G_batch, ...)
+        model.fit(...)
+        
+        # Агрегация результатов
+        yield model.wv</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Динамические графы</h2>
+    <p><strong>Обновление эмбеддингов для изменяющихся графов:</strong></p>
+    <ul>
+      <li><strong>Incremental update</strong>: обновление только затронутых узлов</li>
+      <li><strong>Temporal embeddings</strong>: эмбеддинги с учётом времени</li>
+      <li><strong>DySAT</strong>: Dynamic Self-Attention Network</li>
+    </ul>
+    <pre><code># Инкрементальное обновление
+def update_embeddings(old_embeddings, new_edges):
+    affected_nodes = set()
+    for u, v in new_edges:
+        affected_nodes.update([u, v])
+    
+    # Переобучение только для затронутых узлов
+    G_local = G.subgraph(
+        affected_nodes | 
+        set(G.neighbors(affected_nodes))
+    )
+    
+    new_model = Node2Vec(G_local, ...)
+    updated_embeddings = new_model.fit()
+    
+    return updated_embeddings</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Чек-лист для графовых эмбеддингов</h2>
+    <ul>
+      <li>[ ] Выбран подходящий метод (transductive/inductive)</li>
+      <li>[ ] Подобраны параметры (p, q для Node2Vec)</li>
+      <li>[ ] Определена размерность эмбеддингов</li>
+      <li>[ ] Проведена оценка качества</li>
+      <li>[ ] Визуализация для проверки</li>
+      <li>[ ] Тестирование на downstream задачах</li>
+      <li>[ ] Учтена вычислительная сложность</li>
+      <li>[ ] План обновления для динамических графов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Практические советы</h2>
+    <ul>
+      <li><strong>Начните с DeepWalk/Node2Vec</strong>: простые и эффективные</li>
+      <li><strong>Гиперпараметры</strong>: grid search для p, q, dimensions</li>
+      <li><strong>Размерность</strong>: 64-128 обычно достаточно</li>
+      <li><strong>Walks</strong>: больше walks → лучше, но дольше</li>
+      <li><strong>Downstream задачи</strong>: тестируйте на реальных задачах</li>
+      <li><strong>Ensemble</strong>: комбинация нескольких методов</li>
+      <li><strong>Атрибуты узлов</strong>: можно комбинировать с node features</li>
+    </ul>
+    <blockquote>
+      💡 <strong>Объяснение заказчику:</strong> «Превращаем связи между объектами в числовые векторы, сохраняя информацию о структуре сети. Это позволяет применять стандартные ML алгоритмы для предсказания связей, классификации узлов и поиска похожих объектов».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
