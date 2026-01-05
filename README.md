@@ -302,7 +302,7 @@
 1. [Q-learning и SARSA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/q_learning_sarsa_cheatsheet.html)
 1. [Функции приближения (линейные, ядерные)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/function_approximation_rl_cheatsheet.html)
 1. [Иерархическое RL](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hierarchical_rl_detailed_cheatsheet.html)
-1. Многозадачное RL
+1. [Многозадачное RL](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multitask_rl_cheatsheet.html)
 1. [Инверсное RL](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/inverse_rl_cheatsheet.html)
 
 ## II Глубокое обучение
@@ -455,23 +455,23 @@
 1. [Сравнение с классическими методами](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/comparison_neural_classical_cheatsheet.html)
 
 ### **17. Этичные аспекты и безопасность**
-1. Adversarial attacks
+1. [Adversarial attacks](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adversarial_attacks_deep_learning_cheatsheet.html)
 1. [Defensive distillation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/defensive_distillation_cheatsheet.html)
 1. [Adversarial training](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adversarial_training_cheatsheet.html)
 1. [Bias в нейросетях](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/bias_neural_networks_cheatsheet.html)
-1. Fairness в ML
+1. [Fairness в ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fairness_ml_deep_learning_cheatsheet.html)
 1. [Federated learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/federated_learning_cheatsheet.html)
 1. [Differential privacy](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/differential_privacy_cheatsheet.html)
 
 ### **18. Производство и MLOps**
 1. [Model Deployment](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_deployment_cheatsheet.html)
-1. Сериализация нейросетей
+1. [Сериализация нейросетей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_network_serialization_cheatsheet.html)
 1. [ONNX формат](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/onnx_format_cheatsheet.html)
 1. [TensorFlow Serving](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/tensorflow_serving_cheatsheet.html)
 1. [TorchServe](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/torchserve_cheatsheet.html)
-1. Мониторинг моделей
-1. CI/CD для ML
-1. Feature stores
+1. [Мониторинг моделей](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/model_monitoring_cheatsheet.html)
+1. [CI/CD для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cicd_ml_cheatsheet.html)
+1. [Feature stores](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_stores_cheatsheet.html)
 
 ### **19. Фреймворки и библиотеки**
 1. [PyTorch полный гайд](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pytorch_full_guide_cheatsheet.html)
@@ -494,7 +494,7 @@
 1. Neural ODEs
 1. Differentiable programming
 1. Memory networks
-1. Hypernetworks
+1. [Hypernetworks](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hypernetworks_cheatsheet.html)
 
 ### **22. Нейронаука и биологически правдоподобные модели**
 1. Биологически вдохновленные архитектуры
@@ -505,8 +505,8 @@
 1. [Neural style transfer](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/neural_style_transfer_cheatsheet.html)
 1. [Image-to-image translation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/image_to_image_translation_cheatsheet.html)
 1. [Text-to-image generation](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/text_to_image_generation_cheatsheet.html)
-1. Музыкальные нейросети
-1. Генерация видео
+1. [Музыкальные нейросети](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/musical_neural_networks_cheatsheet.html)
+1. [Генерация видео](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/video_generation_cheatsheet.html)
 
 ### **24. Научные применения**
 1. Нейросети в физике

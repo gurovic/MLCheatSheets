@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Музыкальные нейросети Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🎯 Музыкальные нейросети Cheatsheet</h1>
+  <div class="subtitle">Генерация и анализ музыки • Music AI<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Что такое model monitoring?</h2>
+    <p><strong>Model monitoring</strong> — отслеживание работы модели в production.</p>
+<ul>
+  <li><strong>Цель</strong>: обнаружение проблем с моделью</li>
+  <li><strong>Performance drift</strong>: ухудшение метрик</li>
+  <li><strong>Data drift</strong>: изменение распределения данных</li>
+  <li><strong>Concept drift</strong>: изменение отношений в данных</li>
+</ul>
+<blockquote>💡 "Модели деградируют со временем — нужен постоянный мониторинг"</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Метрики для мониторинга</h2>
+    <table>
+  <tr><th>Категория</th><th>Метрики</th></tr>
+  <tr><td><strong>Performance</strong></td><td>Accuracy, F1, AUC, MAE, latency</td></tr>
+  <tr><td><strong>Data quality</strong></td><td>Missing values, outliers, schema violations</td></tr>
+  <tr><td><strong>Data drift</strong></td><td>KL divergence, PSI, KS test</td></tr>
+  <tr><td><strong>Infrastructure</strong></td><td>CPU, memory, throughput, errors</td></tr>
+  <tr><td><strong>Business</strong></td><td>Revenue, conversion, user satisfaction</td></tr>
+</table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Data drift detection</h2>
+    <pre><code>from scipy.stats import ks_2samp
+import numpy as np
+
+def detect_data_drift(reference_data, current_data, threshold=0.05):
+    """
+    Kolmogorov-Smirnov тест для drift detection
+    """
+    results = {}
+    
+    for column in reference_data.columns:
+        # KS test
+        statistic, pvalue = ks_2samp(
+            reference_data[column],
+            current_data[column]
+        )
+        
+        # Drift detected если p-value < threshold
+        drift = pvalue < threshold
+        
+        results[column] = {
+            'statistic': statistic,
+            'pvalue': pvalue,
+            'drift_detected': drift
+        }
+    
+    return results
+
+# PSI (Population Stability Index)
+def calculate_psi(expected, actual, bins=10):
+    """
+    PSI = sum((actual% - expected%) * ln(actual% / expected%))
+    """
+    # Бинирование
+    breakpoints = np.linspace(expected.min(), expected.max(), bins + 1)
+    
+    expected_percents = np.histogram(expected, breakpoints)[0] / len(expected)
+    actual_percents = np.histogram(actual, breakpoints)[0] / len(actual)
+    
+    # Avoid division by zero
+    expected_percents = np.where(expected_percents == 0, 0.0001, expected_percents)
+    actual_percents = np.where(actual_percents == 0, 0.0001, actual_percents)
+    
+    psi = np.sum((actual_percents - expected_percents) * np.log(actual_percents / expected_percents))
+    
+    return psi
+
+# Интерпретация PSI
+# PSI < 0.1: no significant change
+# 0.1 < PSI < 0.2: moderate change
+# PSI > 0.2: significant change</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Performance monitoring</h2>
+    <pre><code>import mlflow
+from sklearn.metrics import accuracy_score, f1_score
+
+class ModelMonitor:
+    def __init__(self, model_name, threshold=0.05):
+        self.model_name = model_name
+        self.threshold = threshold
+        self.baseline_metrics = {}
+    
+    def set_baseline(self, y_true, y_pred):
+        """Установить baseline метрики"""
+        self.baseline_metrics = {
+            'accuracy': accuracy_score(y_true, y_pred),
+            'f1': f1_score(y_true, y_pred, average='weighted')
+        }
+    
+    def check_performance(self, y_true, y_pred):
+        """Проверить текущую performance"""
+        current_metrics = {
+            'accuracy': accuracy_score(y_true, y_pred),
+            'f1': f1_score(y_true, y_pred, average='weighted')
+        }
+        
+        # Сравнение с baseline
+        alerts = []
+        for metric_name in current_metrics:
+            baseline = self.baseline_metrics.get(metric_name)
+            current = current_metrics[metric_name]
+            
+            if baseline and (baseline - current) > self.threshold:
+                alerts.append({
+                    'metric': metric_name,
+                    'baseline': baseline,
+                    'current': current,
+                    'degradation': baseline - current
+                })
+        
+        # Log в MLflow
+        with mlflow.start_run():
+            for metric_name, value in current_metrics.items():
+                mlflow.log_metric(metric_name, value)
+        
+        return {'metrics': current_metrics, 'alerts': alerts}</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Prometheus & Grafana</h2>
+    <pre><code># Экспорт метрик в Prometheus
+from prometheus_client import Counter, Histogram, Gauge
+
+# Метрики
+predictions_total = Counter('model_predictions_total', 'Total predictions')
+prediction_latency = Histogram('model_latency_seconds', 'Prediction latency')
+model_accuracy = Gauge('model_accuracy', 'Current model accuracy')
+
+# В коде модели
+@prediction_latency.time()
+def predict(data):
+    predictions_total.inc()
+    result = model.predict(data)
+    return result
+
+# Обновление accuracy
+def update_metrics(accuracy_value):
+    model_accuracy.set(accuracy_value)</code></pre>
+
+<p><strong>Grafana dashboard</strong>:</p>
+<ul>
+  <li>Predictions per second: rate(predictions_total[1m])</li>
+  <li>P95 latency: histogram_quantile(0.95, prediction_latency)</li>
+  <li>Accuracy trend: model_accuracy</li>
+</ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Alerting strategies</h2>
+    <pre><code># Настройка алертов
+from datetime import datetime, timedelta
+
+class AlertManager:
+    def __init__(self):
+        self.alert_rules = []
+        self.alert_history = []
+    
+    def add_rule(self, name, condition, severity='warning'):
+        """Добавить правило алерта"""
+        self.alert_rules.append({
+            'name': name,
+            'condition': condition,
+            'severity': severity
+        })
+    
+    def check_alerts(self, metrics):
+        """Проверить условия алертов"""
+        alerts = []
+        
+        for rule in self.alert_rules:
+            if rule['condition'](metrics):
+                alert = {
+                    'name': rule['name'],
+                    'severity': rule['severity'],
+                    'timestamp': datetime.now(),
+                    'metrics': metrics
+                }
+                alerts.append(alert)
+                self.alert_history.append(alert)
+                
+                # Отправка уведомления
+                self.send_notification(alert)
+        
+        return alerts
+    
+    def send_notification(self, alert):
+        """Отправить уведомление (Slack, email, PagerDuty)"""
+        # Slack webhook
+        import requests
+        webhook_url = "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+        
+        message = {
+            'text': f"🚨 Alert: {alert['name']}",
+            'attachments': [{
+                'color': 'danger' if alert['severity'] == 'critical' else 'warning',
+                'fields': [
+                    {'title': 'Severity', 'value': alert['severity']},
+                    {'title': 'Time', 'value': str(alert['timestamp'])}
+                ]
+            }]
+        }
+        
+        requests.post(webhook_url, json=message)
+
+# Пример использования
+monitor = AlertManager()
+
+# Добавляем правила
+monitor.add_rule(
+    'Low Accuracy',
+    lambda m: m.get('accuracy', 1.0) < 0.85,
+    severity='critical'
+)
+
+monitor.add_rule(
+    'High Latency',
+    lambda m: m.get('latency_p95', 0) > 1.0,
+    severity='warning'
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Logging predictions</h2>
+    <pre><code>import logging
+import json
+
+# Настройка logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('model_predictions.log'),
+        logging.StreamHandler()
+    ]
+)
+
+class PredictionLogger:
+    def __init__(self, model_version):
+        self.logger = logging.getLogger('model_predictions')
+        self.model_version = model_version
+    
+    def log_prediction(self, input_data, prediction, probability=None):
+        """Логировать каждое предсказание"""
+        log_entry = {
+            'model_version': self.model_version,
+            'timestamp': datetime.now().isoformat(),
+            'input': input_data.tolist() if hasattr(input_data, 'tolist') else input_data,
+            'prediction': int(prediction),
+            'probability': float(probability) if probability else None
+        }
+        
+        self.logger.info(json.dumps(log_entry))
+    
+    def log_batch(self, inputs, predictions, metadata=None):
+        """Логировать batch предсказаний"""
+        for i, (inp, pred) in enumerate(zip(inputs, predictions)):
+            self.log_prediction(inp, pred)
+
+# Использование
+logger = PredictionLogger(model_version='v1.2.0')
+
+# При каждом предсказании
+result = model.predict(input_data)
+logger.log_prediction(input_data, result)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Model retraining triggers</h2>
+    <pre><code>class RetrainingManager:
+    def __init__(self):
+        self.should_retrain = False
+        self.retrain_reasons = []
+    
+    def check_retrain_conditions(self, metrics, drift_results):
+        """Проверить условия для ретренинга"""
+        reasons = []
+        
+        # 1. Performance degradation
+        if metrics.get('accuracy', 1.0) < 0.85:
+            reasons.append('accuracy_drop')
+        
+        # 2. Data drift
+        drift_count = sum(1 for r in drift_results.values() if r['drift_detected'])
+        if drift_count > len(drift_results) * 0.3:  # >30% features drifted
+            reasons.append('data_drift')
+        
+        # 3. Time-based (30 days since last training)
+        days_since_training = (datetime.now() - self.last_training_date).days
+        if days_since_training > 30:
+            reasons.append('time_based')
+        
+        # 4. Volume (enough new data)
+        if self.new_data_count > 10000:
+            reasons.append('new_data_available')
+        
+        if reasons:
+            self.should_retrain = True
+            self.retrain_reasons = reasons
+            self.trigger_retraining()
+        
+        return {'should_retrain': self.should_retrain, 'reasons': reasons}
+    
+    def trigger_retraining(self):
+        """Запустить процесс ретренинга"""
+        print(f"Triggering retraining: {', '.join(self.retrain_reasons)}")
+        # Запуск ML pipeline
+        # trigger_airflow_dag('model_retraining')
+        # или
+        # trigger_kubeflow_pipeline('retrain_model_v2')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Tools для monitoring</h2>
+    <table>
+  <tr><th>Tool</th><th>Назначение</th></tr>
+  <tr><td><strong>Evidently AI</strong></td><td>Data & model drift detection</td></tr>
+  <tr><td><strong>WhyLabs</strong></td><td>ML observability platform</td></tr>
+  <tr><td><strong>Arize AI</strong></td><td>ML monitoring & explainability</td></tr>
+  <tr><td><strong>Fiddler</strong></td><td>ML model performance monitoring</td></tr>
+  <tr><td><strong>Neptune.ai</strong></td><td>Experiment tracking & monitoring</td></tr>
+  <tr><td><strong>Weights & Biases</strong></td><td>Experiment tracking + production monitoring</td></tr>
+</table>
+
+<pre><code># Пример с Evidently
+from evidently.dashboard import Dashboard
+from evidently.tabs import DataDriftTab
+
+dashboard = Dashboard(tabs=[DataDriftTab()])
+dashboard.calculate(reference_data, current_data)
+dashboard.save('data_drift_report.html')</code></pre>
+  </div>
+
+</div>
+
+</body>
+</html>
