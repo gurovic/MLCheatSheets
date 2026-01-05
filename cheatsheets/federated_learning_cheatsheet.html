@@ -2,452 +2,274 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>🌐 Federated Learning Cheatsheet — 3 колонки</title>
+  <title>Federated Learning Cheatsheet — 3 колонки</title>
   <style>
-    @media screen {
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-        color: #333;
-        background: #fafcff;
-        padding: 10px;
-      }
-    }
-    @media print {
-      body {
-        background: white;
-        padding: 0;
-      }
-      @page {
-        size: A4 landscape;
-        margin: 10mm;
-      }
-    }
-
-    .container {
-      column-count: 3;
-      column-gap: 20px;
-      max-width: 100%;
-    }
-
-    .block {
-      break-inside: avoid;
-      margin-bottom: 1.2em;
-      padding: 12px;
-      background: white;
-      border-radius: 6px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
-
-    h1 {
-      font-size: 1.6em;
-      font-weight: 700;
-      color: #1a5fb4;
-      text-align: center;
-      margin: 0 0 8px;
-      column-span: all;
-    }
-
-    .subtitle {
-      text-align: center;
-      color: #666;
-      font-size: 0.9em;
-      margin-bottom: 12px;
-      column-span: all;
-    }
-
-    h2 {
-      font-size: 1.15em;
-      font-weight: 700;
-      color: #1a5fb4;
-      margin: 0 0 8px;
-      padding-bottom: 4px;
-      border-bottom: 1px solid #e0e7ff;
-    }
-
-    p, ul, ol {
-      font-size: 0.92em;
-      margin: 0.6em 0;
-    }
-
-    ul, ol {
-      padding-left: 18px;
-    }
-
-    li {
-      margin-bottom: 4px;
-    }
-
-    code {
-      font-family: 'Consolas', 'Courier New', monospace;
-      background-color: #f0f4ff;
-      padding: 1px 4px;
-      border-radius: 3px;
-      font-size: 0.88em;
-    }
-
-    pre {
-      background-color: #f0f4ff;
-      padding: 8px;
-      border-radius: 4px;
-      overflow-x: auto;
-      font-size: 0.84em;
-      margin: 6px 0;
-    }
-
-    pre code {
-      padding: 0;
-      background: none;
-      white-space: pre-wrap;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.82em;
-      margin: 6px 0;
-    }
-
-    th {
-      background-color: #e6f0ff;
-      text-align: left;
-      padding: 4px 6px;
-      font-weight: 600;
-    }
-
-    td {
-      padding: 4px 6px;
-      border-bottom: 1px solid #f0f4ff;
-    }
-
-    tr:nth-child(even) {
-      background-color: #f8fbff;
-    }
-
-    .good-vs-bad {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .good-vs-bad div {
-      flex: 1;
-      padding: 6px 8px;
-      border-radius: 4px;
-    }
-
-    .good {
-      background-color: #f0f9f4;
-      border-left: 3px solid #2e8b57;
-    }
-
-    .bad {
-      background-color: #fdf0f2;
-      border-left: 3px solid #d32f2f;
-    }
-
-    .good h3, .bad h3 {
-      margin: 0 0 4px;
-      font-size: 1em;
-      font-weight: 700;
-    }
-
-    .good ul, .bad ul {
-      padding-left: 20px;
-      margin: 0;
-    }
-
-    .good li::before { content: "✅ "; font-weight: bold; }
-    .bad li::before { content: "❌ "; font-weight: bold; }
-
-    blockquote {
-      font-style: italic;
-      margin: 8px 0;
-      padding: 6px 10px;
-      background: #f8fbff;
-      border-left: 2px solid #1a5fb4;
-      font-size: 0.88em;
-    }
-
-    @media print {
-      .container { column-gap: 12px; }
-      .block { box-shadow: none; }
-      code, pre, table { font-size: 0.78em; }
-      h1 { font-size: 1.4em; }
-      h2 { font-size: 1em; }
-    }
+    @media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}
+    @media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}
+    .container{column-count:3;column-gap:20px;max-width:100%}
+    .block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+    h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}
+    .subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}
+    h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}
+    p,ul,ol{font-size:0.92em;margin:0.6em 0}
+    ul,ol{padding-left:18px}
+    li{margin-bottom:4px}
+    code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}
+    pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}
+    pre code{padding:0;background:none;white-space:pre-wrap}
+    strong{color:#1a5fb4}
   </style>
 </head>
 <body>
+  <h1>Federated Learning (Федеративное обучение)</h1>
+  <div class="subtitle">Децентрализованное обучение с сохранением приватности данных</div>
+  <div class="container">
+    <div class="block">
+      <h2>1. Основная концепция</h2>
+      <p><strong>Federated Learning (FL)</strong> — парадигма машинного обучения, где модель обучается на распределённых устройствах/серверах без централизованного сбора данных</p>
+      <p><strong>Ключевой принцип:</strong> "Bring the code to the data, not data to the code"</p>
+      <p><strong>Мотивация:</strong></p>
+      <ul>
+        <li><strong>Приватность</strong>: данные остаются у владельцев</li>
+        <li><strong>Безопасность</strong>: меньше рисков утечки</li>
+        <li><strong>Законодательство</strong>: GDPR, HIPAA compliance</li>
+        <li><strong>Bandwidth</strong>: экономия трафика</li>
+        <li><strong>Latency</strong>: edge computing</li>
+      </ul>
+    </div>
 
-<div class="container">
+    <div class="block">
+      <h2>2. Архитектура FL</h2>
+      <p><strong>Компоненты:</strong></p>
+      <ul>
+        <li><strong>Central Server</strong>: координатор, aggregator</li>
+        <li><strong>Clients</strong>: устройства с локальными данными (телефоны, больницы и т.д.)</li>
+        <li><strong>Global Model</strong>: общая модель на сервере</li>
+        <li><strong>Local Models</strong>: копии модели на клиентах</li>
+      </ul>
+      <p><strong>Типы топологий:</strong></p>
+      <ul>
+        <li><strong>Cross-device</strong>: миллионы мобильных устройств</li>
+        <li><strong>Cross-silo</strong>: несколько организаций/дата-центров</li>
+        <li><strong>Peer-to-peer</strong>: децентрализованная сеть без центрального сервера</li>
+      </ul>
+    </div>
 
-  <h1>🌐 Federated Learning</h1>
-  <div class="subtitle">Распределенное обучение • Privacy • Edge Computing<br>📅 Январь 2026</div>
+    <div class="block">
+      <h2>3. Federated Averaging (FedAvg)</h2>
+      <p><strong>Базовый алгоритм FL от Google:</strong></p>
+      <pre><code>Server side:
+1. Инициализировать w_global
+2. Для каждого раунда t:
+   a) Выбрать подмножество клиентов C_t
+   b) Отправить w_global клиентам
+   c) Получить обновления от клиентов
+   d) Агрегировать:
+      w_global ← Σ_k (n_k/n) · w_k
+      где n_k — размер данных клиента k
 
-  <div class="block">
-    <h2>🔷 1. Что такое Federated Learning?</h2>
-    <ul>
-      <li><strong>Определение</strong>: обучение без централизации данных</li>
-      <li><strong>Идея</strong>: модель к данным, а не данные к модели</li>
-      <li><strong>Privacy</strong>: данные остаются на устройствах</li>
-      <li><strong>Применение</strong>: мобильные устройства, медицина, IoT</li>
-      <li><strong>Примеры</strong>: Google Gboard, Apple Siri</li>
-    </ul>
-  </div>
+Client k side:
+1. Получить w_global
+2. Локальное обучение E эпох на своих данных
+3. Отправить обновлённые веса w_k серверу</code></pre>
+      <p><strong>Параметры:</strong> E (local epochs), B (batch size), C (fraction of clients)</p>
+    </div>
 
-  <div class="block">
-    <h2>🔷 2. Архитектура FL</h2>
-    <p>Основные компоненты:</p>
-    <ol>
-      <li><strong>Central Server</strong>: координирует обучение</li>
-      <li><strong>Clients</strong>: локальные устройства с данными</li>
-      <li><strong>Global Model</strong>: агрегированная модель</li>
-      <li><strong>Local Models</strong>: обучаются на клиентах</li>
-      <li><strong>Communication</strong>: обмен параметрами</li>
-    </ol>
-  </div>
+    <div class="block">
+      <h2>4. Вызовы FL</h2>
+      <p><strong>Statistical heterogeneity:</strong> non-IID данные у разных клиентов</p>
+      <ul>
+        <li>Разные распределения классов</li>
+        <li>Concept drift между клиентами</li>
+        <li>Несбалансированность данных</li>
+      </ul>
+      <p><strong>System heterogeneity:</strong></p>
+      <ul>
+        <li>Разная вычислительная мощность</li>
+        <li>Нестабильные сетевые соединения</li>
+        <li>Частые выпадения клиентов</li>
+      </ul>
+      <p><strong>Communication efficiency:</strong> огромные communication costs</p>
+      <p><strong>Privacy concerns:</strong> модель может leak информацию о данных</p>
+    </div>
 
-  <div class="block">
-    <h2>🔷 3. Federated Averaging (FedAvg)</h2>
-    <pre><code>import numpy as np
-from sklearn.linear_model import SGDClassifier
+    <div class="block">
+      <h2>5. Улучшения FedAvg</h2>
+      <p><strong>FedProx:</strong> добавляет proximal term для стабильности</p>
+      <pre><code>L_k(w) = F_k(w) + (μ/2)||w - w_global||²</code></pre>
+      <p><strong>FedOpt:</strong> использует адаптивные оптимизаторы (Adam, Yogi) на сервере</p>
+      <p><strong>FedNova:</strong> нормализация по числу локальных шагов</p>
+      <p><strong>SCAFFOLD:</strong> control variates для коррекции client drift</p>
+      <p><strong>FedBN:</strong> не агрегировать Batch Normalization statistics</p>
+      <p><strong>Personalized FL:</strong> каждый клиент адаптирует модель под себя</p>
+    </div>
 
-def federated_averaging(clients_data, n_rounds=10, 
-                       local_epochs=5):
-    # Инициализация глобальной модели
-    global_model = SGDClassifier(warm_start=True)
-    
-    # Инициализация на некоторых данных
-    X_init, y_init = clients_data[0]
-    global_model.fit(X_init[:10], y_init[:10])
-    
-    for round_num in range(n_rounds):
-        print(f"Round {round_num + 1}/{n_rounds}")
-        
-        # Локальные модели
-        local_models = []
-        sample_sizes = []
-        
-        for X_client, y_client in clients_data:
-            # Копируем веса глобальной модели
-            local_model = SGDClassifier(warm_start=True)
-            local_model.coef_ = global_model.coef_.copy()
-            local_model.intercept_ = global_model.intercept_.copy()
-            local_model.classes_ = global_model.classes_
-            
-            # Локальное обучение
-            for epoch in range(local_epochs):
-                local_model.partial_fit(
-                    X_client, y_client, 
-                    classes=np.unique(y_client)
-                )
-            
-            local_models.append(local_model)
-            sample_sizes.append(len(X_client))
-        
-        # Агрегация весов (weighted average)
-        total_samples = sum(sample_sizes)
-        global_weights = np.zeros_like(global_model.coef_)
-        global_intercept = np.zeros_like(global_model.intercept_)
-        
-        for model, n_samples in zip(local_models, sample_sizes):
-            weight = n_samples / total_samples
-            global_weights += weight * model.coef_
-            global_intercept += weight * model.intercept_
-        
-        # Обновление глобальной модели
-        global_model.coef_ = global_weights
-        global_model.intercept_ = global_intercept
-    
-    return global_model</code></pre>
-  </div>
+    <div class="block">
+      <h2>6. Differential Privacy в FL</h2>
+      <p><strong>Цель:</strong> гарантировать, что отдельные примеры не влияют на модель заметно</p>
+      <p><strong>DP-SGD (Differential Private SGD):</strong></p>
+      <ol>
+        <li>Clip градиенты по норме C</li>
+        <li>Добавить Gaussian шум σ·N(0,C²I)</li>
+        <li>Обновить веса</li>
+      </ol>
+      <p><strong>Privacy budget ε:</strong></p>
+      <pre><code>ε = O(q·T·σ⁻¹)
+где q — sampling rate, T — iterations</code></pre>
+      <p><strong>Trade-off:</strong> больше приватности (меньше ε) → хуже accuracy</p>
+      <p><strong>Local vs Central DP:</strong> в FL обычно применяют local DP на клиентах</p>
+    </div>
 
-  <div class="block">
-    <h2>🔷 4. Flower Framework</h2>
-    <pre><code># pip install flwr
+    <div class="block">
+      <h2>7. Secure Aggregation</h2>
+      <p><strong>Проблема:</strong> сервер может увидеть обновления отдельных клиентов</p>
+      <p><strong>Решение:</strong> криптографические протоколы для приватной агрегации</p>
+      <p><strong>Secure Aggregation Protocol:</strong></p>
+      <ul>
+        <li>Клиенты маскируют свои обновления случайными значениями</li>
+        <li>Сервер видит только сумму</li>
+        <li>Маски взаимно компенсируются</li>
+      </ul>
+      <p><strong>Схема:</strong></p>
+      <pre><code>Клиент k: отправляет w_k + mask_k
+Сервер: Σ_k (w_k + mask_k) = Σ_k w_k
+(маски сумма = 0 по дизайну)</code></pre>
+      <p><strong>Устойчивость к dropout:</strong> протокол работает даже если часть клиентов выпадает</p>
+    </div>
 
+    <div class="block">
+      <h2>8. Communication Efficiency</h2>
+      <p><strong>Проблема:</strong> передача полных моделей затратна</p>
+      <p><strong>Gradient Compression:</strong></p>
+      <ul>
+        <li><strong>Quantization</strong>: использовать меньше бит</li>
+        <li><strong>Sparsification</strong>: передавать только top-k градиентов</li>
+        <li><strong>Sketching</strong>: low-rank approximations</li>
+      </ul>
+      <p><strong>Local Computation:</strong></p>
+      <ul>
+        <li>Больше локальных эпох (E > 1)</li>
+        <li>Меньше частота коммуникации</li>
+      </ul>
+      <p><strong>Structured Updates:</strong></p>
+      <ul>
+        <li>Low-rank updates: ΔW = UV^T</li>
+        <li>Factorized models</li>
+      </ul>
+      <p><strong>Достижение:</strong> 100-1000x сжатие без потери accuracy</p>
+    </div>
+
+    <div class="block">
+      <h2>9. Реализация</h2>
+      <pre><code># Пример с Flower framework
 import flwr as fl
-from sklearn.linear_model import LogisticRegression
+import torch
 
-# Определение клиента
 class FlowerClient(fl.client.NumPyClient):
-    def __init__(self, X, y):
-        self.X = X
-        self.y = y
-        self.model = LogisticRegression()
+    def __init__(self, model, train_loader):
+        self.model = model
+        self.train_loader = train_loader
     
     def get_parameters(self, config):
-        return [self.model.coef_, self.model.intercept_]
+        return [val.cpu().numpy() 
+                for _, val in self.model.state_dict().items()]
     
     def set_parameters(self, parameters):
-        self.model.coef_ = parameters[0]
-        self.model.intercept_ = parameters[1]
+        params_dict = zip(
+            self.model.state_dict().keys(),
+            parameters
+        )
+        state_dict = {
+            k: torch.tensor(v) 
+            for k, v in params_dict
+        }
+        self.model.load_state_dict(state_dict)
     
     def fit(self, parameters, config):
         self.set_parameters(parameters)
-        self.model.fit(self.X, self.y)
-        return self.get_parameters(config), len(self.X), {}
+        # Local training
+        train(self.model, self.train_loader, 
+              epochs=config["local_epochs"])
+        return self.get_parameters(config={}), len(self.train_loader), {}
     
     def evaluate(self, parameters, config):
         self.set_parameters(parameters)
-        loss = 1 - self.model.score(self.X, self.y)
-        return loss, len(self.X), {"accuracy": self.model.score(self.X, self.y)}
+        loss, accuracy = test(self.model, self.test_loader)
+        return loss, len(self.test_loader), {"accuracy": accuracy}
 
-# Запуск клиента
+# Start client
 fl.client.start_numpy_client(
     server_address="localhost:8080",
-    client=FlowerClient(X_client, y_client)
+    client=FlowerClient(model, train_loader)
 )
 
-# Сервер
+# Server strategy
 strategy = fl.server.strategy.FedAvg(
-    min_available_clients=2,
-    min_fit_clients=2
+    fraction_fit=0.1,  # 10% клиентов на раунд
+    min_available_clients=10
 )
 
 fl.server.start_server(
-    server_address="0.0.0.0:8080",
-    config=fl.server.ServerConfig(num_rounds=10),
+    server_address="localhost:8080",
+    config=fl.server.ServerConfig(num_rounds=50),
     strategy=strategy
 )</code></pre>
-  </div>
+    </div>
 
-  <div class="block">
-    <h2>🔷 5. Differential Privacy</h2>
-    <pre><code># Добавление шума для privacy
-def add_gaussian_noise(params, noise_scale=0.1):
-    noisy_params = []
-    for param in params:
-        noise = np.random.normal(0, noise_scale, param.shape)
-        noisy_params.append(param + noise)
-    return noisy_params
+    <div class="block">
+      <h2>10. Варианты FL</h2>
+      <p><strong>Vertical FL:</strong> разные признаки у разных сторон, одни и те же примеры</p>
+      <p><strong>Horizontal FL:</strong> одни признаки, разные примеры (стандартный FL)</p>
+      <p><strong>Federated Transfer Learning:</strong> transfer learning в FL setting</p>
+      <p><strong>Split Learning:</strong> модель разделена между клиентом и сервером</p>
+      <p><strong>Asynchronous FL:</strong> клиенты обновляют модель асинхронно</p>
+      <p><strong>Hierarchical FL:</strong> многоуровневая иерархия aggregation</p>
+    </div>
 
-# Клиппинг градиентов
-def clip_gradients(gradients, max_norm=1.0):
-    total_norm = np.sqrt(sum(np.sum(g**2) for g in gradients))
-    clip_coef = max_norm / (total_norm + 1e-6)
-    
-    if clip_coef < 1:
-        gradients = [g * clip_coef for g in gradients]
-    
-    return gradients
+    <div class="block">
+      <h2>11. Применения</h2>
+      <p><strong>Mobile devices:</strong></p>
+      <ul>
+        <li>Клавиатурные предсказания (Gboard)</li>
+        <li>Voice assistants</li>
+        <li>Персонализация приложений</li>
+      </ul>
+      <p><strong>Healthcare:</strong></p>
+      <ul>
+        <li>Обучение на данных больниц без sharing PHI</li>
+        <li>Drug discovery</li>
+        <li>Medical imaging</li>
+      </ul>
+      <p><strong>Finance:</strong></p>
+      <ul>
+        <li>Fraud detection между банками</li>
+        <li>Credit scoring</li>
+      </ul>
+      <p><strong>IoT:</strong> edge devices, smart homes</p>
+    </div>
 
-# FL с DP
-def fedavg_with_dp(clients_data, n_rounds=10, 
-                   noise_scale=0.1, clip_norm=1.0):
-    global_model = SGDClassifier(warm_start=True)
-    
-    for round_num in range(n_rounds):
-        local_updates = []
-        
-        for X_client, y_client in clients_data:
-            local_model = train_local(X_client, y_client)
-            
-            # Вычисляем update (разницу весов)
-            update = local_model.coef_ - global_model.coef_
-            
-            # Клиппинг
-            update_clipped = clip_gradients([update], clip_norm)[0]
-            
-            # Добавляем шум
-            update_noisy = add_gaussian_noise([update_clipped], noise_scale)[0]
-            
-            local_updates.append(update_noisy)
-        
-        # Агрегация
-        avg_update = np.mean(local_updates, axis=0)
-        global_model.coef_ += avg_update
-    
-    return global_model</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>🔷 6. Проблемы FL</h2>
-    <table>
-      <tr><th>Проблема</th><th>Решение</th></tr>
-      <tr><td>Non-IID данные</td><td>Персонализация, FedProx</td></tr>
-      <tr><td>Communication overhead</td><td>Compression, quantization</td></tr>
-      <tr><td>Stragglers</td><td>Асинхронное обучение</td></tr>
-      <tr><td>Privacy leakage</td><td>Differential privacy, secure aggregation</td></tr>
-      <tr><td>Model poisoning</td><td>Byzantine-robust aggregation</td></tr>
-    </table>
-  </div>
-
-  <div class="block">
-    <h2>🔷 7. Персонализация</h2>
-    <pre><code># Локальная адаптация глобальной модели
-def personalized_fl(global_model, X_local, y_local, 
-                   adaptation_steps=5):
-    # Копируем глобальную модель
-    personal_model = clone(global_model)
-    
-    # Fine-tune на локальных данных
-    for step in range(adaptation_steps):
-        personal_model.partial_fit(X_local, y_local)
-    
-    return personal_model
-
-# Interpolation между глобальной и локальной
-def interpolate_models(global_model, local_model, alpha=0.5):
-    # alpha=0: полностью глобальная
-    # alpha=1: полностью локальная
-    
-    interpolated_weights = (
-        alpha * local_model.coef_ + 
-        (1 - alpha) * global_model.coef_
-    )
-    
-    model = clone(global_model)
-    model.coef_ = interpolated_weights
-    return model</code></pre>
-  </div>
-
-  <div class="block">
-    <h2>🔷 8. Когда использовать FL</h2>
-    <div class="good-vs-bad">
-      <div class="good">
-        <h3>✅ Хорошо подходит</h3>
-        <ul>
-          <li>Данные распределены и приватны</li>
-          <li>Нельзя централизовать данные (GDPR)</li>
-          <li>Edge computing / IoT</li>
-          <li>Медицинские данные</li>
-          <li>Персональные устройства</li>
-        </ul>
-      </div>
-      <div class="bad">
-        <h3>❌ Не подходит</h3>
-        <ul>
-          <li>Данные можно централизовать</li>
-          <li>Малое количество клиентов</li>
-          <li>Сильно non-IID данные</li>
-          <li>Ограниченная коммуникация</li>
-          <li>Нужна высокая точность</li>
-        </ul>
-      </div>
+    <div class="block">
+      <h2>12. Best Practices</h2>
+      <p><strong>Дизайн модели:</strong></p>
+      <ul>
+        <li>Компактные модели для мобильных устройств</li>
+        <li>Избегать очень глубоких сетей</li>
+        <li>Batch Normalization → Group/Layer Normalization</li>
+      </ul>
+      <p><strong>Параметры FedAvg:</strong></p>
+      <ul>
+        <li><strong>E</strong>: 1-5 локальных эпох</li>
+        <li><strong>C</strong>: 0.01-0.1 (fraction of clients)</li>
+        <li><strong>Learning rate</strong>: меньше чем централизованное обучение</li>
+      </ul>
+      <p><strong>Мониторинг:</strong></p>
+      <ul>
+        <li>Отслеживать convergence rate</li>
+        <li>Детектировать stragglers</li>
+        <li>Проверять fairness между клиентами</li>
+      </ul>
+      <p><strong>Privacy:</strong> всегда использовать Differential Privacy + Secure Aggregation в продакшене</p>
     </div>
   </div>
-
-  <div class="block">
-    <h2>🔷 9. Чек-лист</h2>
-    <ul>
-      <li>[ ] Определить клиентов и их данные</li>
-      <li>[ ] Выбрать стратегию агрегации</li>
-      <li>[ ] Настроить communication rounds</li>
-      <li>[ ] Добавить privacy (DP)</li>
-      <li>[ ] Обработать non-IID данные</li>
-      <li>[ ] Оптимизировать communication</li>
-      <li>[ ] Обеспечить безопасность</li>
-      <li>[ ] Мониторить convergence</li>
-    </ul>
-
-    <h3>💡 Объяснение заказчику:</h3>
-    <blockquote>
-      «Federated Learning — это как командная работа, где каждый учится на своих данных локально, а затем делится только знаниями (параметрами модели), но не самими данными. Это позволяет обучать мощные модели, сохраняя приватность».
-    </blockquote>
-  </div>
-
-</div>
-
 </body>
 </html>

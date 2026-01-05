@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Tabu Search Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    strong {
+      color: #1a5fb4;
+    }
+  </style>
+</head>
+<body>
+  <h1>Tabu Search (Поиск с запретами)</h1>
+  <div class="subtitle">Метаэвристика комбинаторной оптимизации</div>
+
+  <div class="container">
+
+    <div class="block">
+      <h2>1. Основная идея</h2>
+      <p><strong>Tabu Search</strong> — метод локального поиска с использованием памяти для избежания зацикливания и выхода из локальных оптимумов.</p>
+      <p><strong>Ключевые концепции:</strong></p>
+      <ul>
+        <li><strong>Tabu-список</strong>: список запрещённых ходов</li>
+        <li><strong>Aspiration criteria</strong>: условия отмены запретов</li>
+        <li><strong>Diversification</strong>: стратегия расширения поиска</li>
+        <li><strong>Intensification</strong>: углублённый поиск в перспективных областях</li>
+      </ul>
+      <p><strong>Преимущества:</strong> избегает застревания в локальных минимумах, эффективен для дискретных задач</p>
+    </div>
+
+    <div class="block">
+      <h2>2. Базовый алгоритм</h2>
+      <p><strong>Структура Tabu Search:</strong></p>
+      <ol>
+        <li>Инициализировать начальное решение s</li>
+        <li>Инициализировать пустой tabu-список</li>
+        <li>Установить лучшее решение s_best = s</li>
+        <li>Пока не выполнен критерий останова:
+          <ul>
+            <li>Генерировать окрестность N(s)</li>
+            <li>Выбрать лучшее допустимое решение s'</li>
+            <li>Обновить s = s'</li>
+            <li>Добавить ход в tabu-список</li>
+            <li>Обновить s_best при улучшении</li>
+          </ul>
+        </li>
+      </ol>
+      <p><strong>Критерии останова:</strong> максимум итераций, время, отсутствие улучшений</p>
+    </div>
+
+    <div class="block">
+      <h2>3. Tabu-список</h2>
+      <p><strong>Назначение:</strong> предотвращение возврата к недавно посещённым решениям</p>
+      <p><strong>Стратегии хранения:</strong></p>
+      <ul>
+        <li><strong>Решения</strong>: запоминать полные решения</li>
+        <li><strong>Ходы</strong>: запоминать отдельные изменения</li>
+        <li><strong>Атрибуты</strong>: запоминать характеристики</li>
+        <li><strong>Хэши</strong>: использовать хэш-функции</li>
+      </ul>
+      <p><strong>Длина tabu-списка:</strong></p>
+      <ul>
+        <li>Короткий (5-10): быстрая диверсификация</li>
+        <li>Средний (10-50): баланс</li>
+        <li>Длинный (>50): глубокая память</li>
+        <li>Адаптивный: динамическое изменение</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>4. Aspiration Criteria</h2>
+      <p><strong>Цель:</strong> отменить запрет, если найдено очень хорошее решение</p>
+      <p><strong>Типы критериев:</strong></p>
+      <ul>
+        <li><strong>По качеству</strong>: если решение лучше текущего лучшего</li>
+        <li><strong>По цели</strong>: достижение целевого значения</li>
+        <li><strong>По частоте</strong>: редко посещаемые решения</li>
+        <li><strong>По влиянию</strong>: критически важные ходы</li>
+      </ul>
+      <pre><code>if f(s') < f(s_best) and s' in tabu:
+    allow_move(s')  # aspiration</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>5. Diversification</h2>
+      <p><strong>Задача:</strong> исследование новых областей пространства решений</p>
+      <p><strong>Методы:</strong></p>
+      <ul>
+        <li><strong>Долговременная память</strong>: отслеживание частоты визитов</li>
+        <li><strong>Штрафы</strong>: за часто используемые элементы</li>
+        <li><strong>Рестарты</strong>: периодический перезапуск</li>
+        <li><strong>Случайность</strong>: добавление шума</li>
+      </ul>
+      <p><strong>Триггеры диверсификации:</strong></p>
+      <ul>
+        <li>Отсутствие улучшений N итераций</li>
+        <li>Зацикливание на одном решении</li>
+        <li>Периодическое применение</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>6. Intensification</h2>
+      <p><strong>Задача:</strong> углублённый поиск в перспективных регионах</p>
+      <p><strong>Стратегии:</strong></p>
+      <ul>
+        <li><strong>Elite solutions</strong>: хранение лучших решений</li>
+        <li><strong>Path relinking</strong>: соединение хороших решений</li>
+        <li><strong>Окрестности переменного размера</strong>: изменение радиуса поиска</li>
+        <li><strong>Сосредоточенный поиск</strong>: анализ общих черт хороших решений</li>
+      </ul>
+      <p><strong>Баланс:</strong> чередование интенсификации и диверсификации для эффективного поиска</p>
+    </div>
+
+    <div class="block">
+      <h2>7. Генерация соседей</h2>
+      <p><strong>Определение окрестности:</strong> множество решений, достижимых за один ход</p>
+      <p><strong>Операторы для разных задач:</strong></p>
+      <ul>
+        <li><strong>TSP</strong>: 2-opt, 3-opt, swap</li>
+        <li><strong>Knapsack</strong>: flip бита, swap предметов</li>
+        <li><strong>Scheduling</strong>: перестановка задач, изменение ресурсов</li>
+        <li><strong>Graph coloring</strong>: смена цвета вершины</li>
+      </ul>
+      <p><strong>Выбор хода:</strong></p>
+      <ul>
+        <li>Best improvement: лучший сосед</li>
+        <li>First improvement: первый улучшающий</li>
+        <li>Вероятностный: с вероятностями</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>8. Применение в ML</h2>
+      <p><strong>Задачи оптимизации:</strong></p>
+      <ul>
+        <li><strong>Feature selection</strong>: выбор подмножества признаков</li>
+        <li><strong>Hyperparameter tuning</strong>: настройка дискретных параметров</li>
+        <li><strong>Neural architecture search</strong>: поиск топологии сети</li>
+        <li><strong>Clustering</strong>: оптимизация разбиения</li>
+        <li><strong>Ensemble selection</strong>: выбор моделей ансамбля</li>
+      </ul>
+      <p><strong>Пример - Feature Selection:</strong></p>
+      <pre><code># Решение: бинарный вектор признаков
+s = [1, 0, 1, 1, 0, 1]  # выбранные признаки
+# Ход: flip бита
+# Tabu: недавно изменённые индексы
+# Цель: минимизировать ошибку валидации</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>9. Варианты и расширения</h2>
+      <p><strong>Reactive Tabu Search:</strong> адаптивная длина tabu-списка на основе истории поиска</p>
+      <p><strong>Robust Tabu Search:</strong> учёт неопределённости и робастность к шуму</p>
+      <p><strong>Parallel Tabu Search:</strong></p>
+      <ul>
+        <li>Независимые поиски с разных стартов</li>
+        <li>Обмен лучшими решениями</li>
+        <li>Распределённый tabu-список</li>
+      </ul>
+      <p><strong>Гибридные методы:</strong></p>
+      <ul>
+        <li>Tabu + Genetic Algorithms</li>
+        <li>Tabu + Simulated Annealing</li>
+        <li>Tabu + Branch and Bound</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>10. Реализация на Python</h2>
+      <pre><code>import numpy as np
+
+class TabuSearch:
+    def __init__(self, objective, neighbors,
+                 tabu_size=10, max_iter=1000):
+        self.objective = objective
+        self.neighbors = neighbors
+        self.tabu_size = tabu_size
+        self.max_iter = max_iter
+        self.tabu_list = []
+    
+    def search(self, initial_solution):
+        current = initial_solution
+        best = current
+        best_score = self.objective(best)
+        
+        for iteration in range(self.max_iter):
+            # Генерация соседей
+            neighborhood = self.neighbors(current)
+            
+            # Фильтрация tabu
+            candidates = [
+                n for n in neighborhood 
+                if n not in self.tabu_list
+            ]
+            
+            # Выбор лучшего
+            if candidates:
+                next_sol = min(
+                    candidates,
+                    key=self.objective
+                )
+            else:
+                break
+            
+            # Обновление tabu
+            self.tabu_list.append(current)
+            if len(self.tabu_list) > self.tabu_size:
+                self.tabu_list.pop(0)
+            
+            # Aspiration
+            score = self.objective(next_sol)
+            if score < best_score:
+                best = next_sol
+                best_score = score
+            
+            current = next_sol
+        
+        return best, best_score</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>11. Сравнение с другими методами</h2>
+      <p><strong>Tabu vs Simulated Annealing:</strong></p>
+      <ul>
+        <li>Tabu: детерминированный выбор</li>
+        <li>SA: вероятностное принятие</li>
+        <li>Tabu: память о поиске</li>
+        <li>SA: без памяти (марковский)</li>
+      </ul>
+      <p><strong>Tabu vs Genetic Algorithms:</strong></p>
+      <ul>
+        <li>Tabu: одно решение + траектория</li>
+        <li>GA: популяция решений</li>
+        <li>Tabu: локальный поиск</li>
+        <li>GA: глобальный поиск</li>
+      </ul>
+      <p><strong>Когда использовать Tabu:</strong></p>
+      <ul>
+        <li>Дискретные задачи оптимизации</li>
+        <li>Комбинаторные проблемы</li>
+        <li>Когда важна траектория поиска</li>
+        <li>Средний размер пространства поиска</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>12. Best Practices</h2>
+      <p><strong>Настройка параметров:</strong></p>
+      <ul>
+        <li><strong>Tabu size</strong>: начать с √n, где n — размер задачи</li>
+        <li><strong>Диверсификация</strong>: каждые 50-100 итераций</li>
+        <li><strong>Aspiration</strong>: всегда разрешать улучшение best</li>
+      </ul>
+      <p><strong>Критерии качества:</strong></p>
+      <ul>
+        <li>Разнообразие посещённых решений</li>
+        <li>Скорость сходимости к хорошим решениям</li>
+        <li>Способность выходить из локальных оптимумов</li>
+      </ul>
+      <p><strong>Отладка:</strong></p>
+      <ul>
+        <li>Отслеживание размера таbu-списка</li>
+        <li>Логирование улучшений</li>
+        <li>Визуализация траектории поиска</li>
+      </ul>
+    </div>
+
+  </div>
+</body>
+</html>

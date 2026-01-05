@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>TabNet Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen{body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#333;background:#fafcff;padding:10px}}
+    @media print{body{background:white;padding:0}@page{size:A4 landscape;margin:10mm}}
+    .container{column-count:3;column-gap:20px;max-width:100%}
+    .block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.05)}
+    h1{font-size:1.6em;font-weight:700;color:#1a5fb4;text-align:center;margin:0 0 8px;column-span:all}
+    .subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}
+    h2{font-size:1.15em;font-weight:700;color:#1a5fb4;margin:0 0 8px;padding-bottom:4px;border-bottom:1px solid #e0e7ff}
+    p,ul,ol{font-size:0.92em;margin:0.6em 0}
+    ul,ol{padding-left:18px}
+    li{margin-bottom:4px}
+    code{font-family:'Consolas','Courier New',monospace;background-color:#f0f4ff;padding:1px 4px;border-radius:3px;font-size:0.88em}
+    pre{background-color:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em;margin:6px 0}
+    pre code{padding:0;background:none;white-space:pre-wrap}
+    strong{color:#1a5fb4}
+  </style>
+</head>
+<body>
+  <h1>TabNet</h1>
+  <div class="subtitle">Attention-based Neural Network для табличных данных</div>
+  <div class="container">
+    <div class="block">
+      <h2>1. Обзор</h2>
+      <p><strong>TabNet</strong> — глубокая нейронная сеть от Google, специально разработанная для табличных данных с встроенной интерпретируемостью через attention механизмы</p>
+      <p><strong>Ключевые особенности:</strong></p>
+      <ul>
+        <li><strong>Sequential attention</strong>: выбор признаков на каждом шаге</li>
+        <li><strong>Sparse feature selection</strong>: автоматический feature selection</li>
+        <li><strong>Interpretability</strong>: важность признаков встроена</li>
+        <li><strong>Self-supervised learning</strong>: может учиться на unlabeled данных</li>
+        <li><strong>End-to-end обучение</strong>: без ручного feature engineering</li>
+      </ul>
+      <p><strong>Назначение:</strong> конкурировать с gradient boosting на табличных данных</p>
+    </div>
+
+    <div class="block">
+      <h2>2. Архитектура</h2>
+      <p><strong>Компоненты TabNet:</strong></p>
+      <ol>
+        <li><strong>Feature Transformer</strong>: обработка признаков</li>
+        <li><strong>Attentive Transformer</strong>: выбор важных признаков</li>
+        <li><strong>Decision steps</strong>: последовательность шагов принятия решения</li>
+      </ol>
+      <p><strong>Процесс работы:</strong></p>
+      <pre><code>На каждом decision step d:
+1. Attentive Transformer выбирает признаки
+   → создаёт маску M[d]
+2. Применить маску к признакам
+3. Feature Transformer обрабатывает
+4. Split: часть в выход, часть дальше
+5. Обновить информацию о prior scales</code></pre>
+      <p><strong>Число шагов N_steps:</strong> гиперпараметр (обычно 3-10)</p>
+    </div>
+
+    <div class="block">
+      <h2>3. Attentive Transformer</h2>
+      <p><strong>Задача:</strong> определить какие признаки использовать на текущем шаге</p>
+      <p><strong>Soft feature selection:</strong></p>
+      <pre><code>M[d] = sparsemax(P[d-1] · h_a)
+
+где:
+- P[d-1] — prior scale (из предыдущих шагов)
+- h_a — learnable transform
+- sparsemax — sparse softmax</code></pre>
+      <p><strong>Sparsemax:</strong> альтернатива softmax, дающая разреженные веса</p>
+      <p><strong>Prior scale:</strong> накопленная история использования признаков</p>
+      <pre><code>P[d] = ∏_{i=1}^{d} (γ - M[i])
+где γ — relaxation parameter</code></pre>
+      <p>Признаки, часто используемые ранее, получают меньший вес</p>
+    </div>
+
+    <div class="block">
+      <h2>4. Feature Transformer</h2>
+      <p><strong>Архитектура:</strong> последовательность GLU блоков с shared и decision-specific layers</p>
+      <p><strong>GLU (Gated Linear Units):</strong></p>
+      <pre><code>GLU(x) = σ(W_1·x + b_1) ⊙ (W_2·x + b_2)
+где σ — sigmoid, ⊙ — element-wise product</code></pre>
+      <p><strong>Структура блока:</strong></p>
+      <ul>
+        <li>Fully connected → Batch Norm → GLU</li>
+        <li>Residual connection</li>
+        <li>√2 нормализация для стабилизации</li>
+      </ul>
+      <p><strong>Shared layers:</strong> общие для всех decision steps</p>
+      <p><strong>Decision-specific layers:</strong> уникальные для каждого шага</p>
+    </div>
+
+    <div class="block">
+      <h2>5. Split mechanism</h2>
+      <p><strong>На каждом decision step:</strong> выход Feature Transformer разделяется</p>
+      <pre><code>a[d] — часть для выхода (decision output)
+d[d] — часть для следующего шага
+</code></pre>
+      <p><strong>Final prediction:</strong></p>
+      <pre><code>Output = Σ_{d=1}^{N_steps} ReLU(a[d])
+</code></pre>
+      <p><strong>Интуиция:</strong> каждый шаг добавляет свой вклад в финальное решение</p>
+      <p><strong>Skip connections:</strong> позволяют разным шагам специализироваться на разных аспектах</p>
+    </div>
+
+    <div class="block">
+      <h2>6. Feature importance</h2>
+      <p><strong>Interpretability:</strong> TabNet автоматически предоставляет feature importance</p>
+      <p><strong>Aggregate feature importance:</strong></p>
+      <pre><code>I_agg(f) = Σ_{d=1}^{N_steps} Σ_{samples} M[d][f]
+где M[d][f] — вес признака f на шаге d</code></pre>
+      <p><strong>Instance-wise importance:</strong> важность для конкретного примера</p>
+      <pre><code>I_instance(x, f) = Σ_{d=1}^{N_steps} M[d][f]</code></pre>
+      <p><strong>Визуализация:</strong> можно построить heatmap важности признаков по шагам</p>
+    </div>
+
+    <div class="block">
+      <h2>7. Self-supervised learning</h2>
+      <p><strong>Pretraining на unlabeled:</strong> TabNet поддерживает self-supervised pretraining</p>
+      <p><strong>Encoder-Decoder подход:</strong></p>
+      <ul>
+        <li><strong>Encoder</strong>: обычный TabNet</li>
+        <li><strong>Decoder</strong>: зеркальная архитектура</li>
+        <li><strong>Mask</strong>: случайно маскировать признаки</li>
+        <li><strong>Цель</strong>: восстановить замаскированные признаки</li>
+      </ul>
+      <p><strong>Loss:</strong></p>
+      <pre><code>L_reconstruction = ||X_masked - X_reconstructed||²</code></pre>
+      <p><strong>Finetuning:</strong> после pretraining дообучить на labeled данных</p>
+    </div>
+
+    <div class="block">
+      <h2>8. Гиперпараметры</h2>
+      <p><strong>Ключевые параметры:</strong></p>
+      <ul>
+        <li><strong>N_d, N_a</strong>: размерности decision и attention (обычно 8-64)</li>
+        <li><strong>N_steps</strong>: число decision steps (3-10)</li>
+        <li><strong>γ</strong>: relaxation factor (1.0-2.0)</li>
+        <li><strong>λ_sparse</strong>: коэффициент sparsity regularization</li>
+        <li><strong>N_shared, N_independent</strong>: число shared/independent GLU слоёв</li>
+      </ul>
+      <p><strong>Sparsity regularization:</strong></p>
+      <pre><code>L_sparse = Σ_{d=1}^{N_steps} Σ_{samples} Σ_b M[d][b] / (N_steps · batch_size)</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>9. Реализация</h2>
+      <pre><code>from pytorch_tabnet.tab_model import TabNetClassifier
+
+# Инициализация
+clf = TabNetClassifier(
+    n_d=64,              # decision dimension
+    n_a=64,              # attention dimension
+    n_steps=5,           # number of steps
+    gamma=1.5,           # relaxation parameter
+    lambda_sparse=1e-3,  # sparsity regularization
+    optimizer_fn=torch.optim.Adam,
+    optimizer_params=dict(lr=2e-2),
+    scheduler_params={"step_size":50, "gamma":0.9},
+    scheduler_fn=torch.optim.lr_scheduler.StepLR,
+    mask_type='entmax'   # or 'sparsemax'
+)
+
+# Обучение
+clf.fit(
+    X_train, y_train,
+    eval_set=[(X_valid, y_valid)],
+    eval_metric=['auc'],
+    max_epochs=200,
+    patience=20,
+    batch_size=1024,
+    virtual_batch_size=128
+)
+
+# Предсказание
+preds = clf.predict(X_test)
+
+# Feature importance
+importances = clf.feature_importances_</code></pre>
+    </div>
+
+    <div class="block">
+      <h2>10. Преимущества</h2>
+      <p><strong>Vs Gradient Boosting:</strong></p>
+      <ul>
+        <li>Сопоставимое качество на многих задачах</li>
+        <li>Интерпретируемость через attention</li>
+        <li>End-to-end обучение</li>
+        <li>Self-supervised pretraining</li>
+      </ul>
+      <p><strong>Vs обычные DNN:</strong></p>
+      <ul>
+        <li>Специально для табличных данных</li>
+        <li>Автоматический feature selection</li>
+        <li>Меньше overfitting</li>
+        <li>Instance-level interpretability</li>
+      </ul>
+      <p><strong>Online learning:</strong> можно дообучать инкрементально</p>
+    </div>
+
+    <div class="block">
+      <h2>11. Применения</h2>
+      <p><strong>Табличные задачи:</strong></p>
+      <ul>
+        <li>Кредитный скоринг</li>
+        <li>Fraud detection</li>
+        <li>Customer churn prediction</li>
+        <li>Medical diagnosis</li>
+        <li>Price prediction</li>
+      </ul>
+      <p><strong>Особенно полезен когда:</strong></p>
+      <ul>
+        <li>Нужна интерпретируемость</li>
+        <li>Много unlabeled данных (self-supervised)</li>
+        <li>High-cardinality категориальные признаки</li>
+        <li>Temporal patterns в данных</li>
+      </ul>
+    </div>
+
+    <div class="block">
+      <h2>12. Best Practices</h2>
+      <p><strong>Preprocessing:</strong></p>
+      <ul>
+        <li>Нормализация численных признаков</li>
+        <li>Label encoding для категориальных</li>
+        <li>Заполнение пропусков (TabNet может их handle)</li>
+      </ul>
+      <p><strong>Настройка:</strong></p>
+      <ul>
+        <li>Начать с N_d = N_a = 64, N_steps = 5</li>
+        <li>Использовать virtual batch size для стабильности</li>
+        <li>Early stopping по validation metric</li>
+        <li>Learning rate warmup может помочь</li>
+      </ul>
+      <p><strong>Self-supervised pretraining:</strong> особенно эффективен когда labeled < 10% данных</p>
+      <p><strong>Сравнение с boosting:</strong> всегда тестировать обе опции на конкретной задаче</p>
+    </div>
+  </div>
+</body>
+</html>
