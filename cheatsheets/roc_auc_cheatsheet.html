@@ -66,28 +66,28 @@
           <!-- Диагональ (случайная модель) -->
           <line x1="30" y1="160" x2="160" y2="30" stroke="#999" stroke-width="2" stroke-dasharray="4,4"/>
           
-          <!-- ROC кривая -->
-          <path d="M 30 160 Q 35 120, 50 90 T 80 60 Q 110 45, 160 30" stroke="#1565c0" stroke-width="3" fill="none"/>
+          <!-- ROC кривая (более реалистичная форма) -->
+          <path d="M 30 160 C 32 155, 33 145, 35 135 C 38 115, 42 105, 48 92 C 54 78, 62 68, 72 58 C 85 45, 100 38, 120 34 C 135 32, 148 30, 160 30" stroke="#1565c0" stroke-width="3" fill="none"/>
           
           <!-- Заливка AUC -->
-          <path d="M 30 160 Q 35 120, 50 90 T 80 60 Q 110 45, 160 30 L 160 160 Z" fill="#1565c0" fill-opacity="0.15"/>
+          <path d="M 30 160 C 32 155, 33 145, 35 135 C 38 115, 42 105, 48 92 C 54 78, 62 68, 72 58 C 85 45, 100 38, 120 34 C 135 32, 148 30, 160 30 L 160 160 Z" fill="#1565c0" fill-opacity="0.15"/>
           
           <!-- Метки -->
           <text x="80" y="110" font-size="10" fill="#1565c0" font-weight="bold">AUC</text>
           <text x="105" y="145" font-size="8" fill="#999">Случайная</text>
           
-          <!-- Точки на кривой с подписями порогов -->
-          <circle cx="35" cy="140" r="2.5" fill="#ef6c00"/>
-          <text x="38" y="138" font-size="7" fill="#666">t=0.9</text>
+          <!-- Точки на кривой с подписями порогов (обновленные позиции) -->
+          <circle cx="33" cy="145" r="2.5" fill="#ef6c00"/>
+          <text x="36" y="143" font-size="7" fill="#666">t=0.9</text>
           
-          <circle cx="50" cy="100" r="2.5" fill="#ef6c00"/>
-          <text x="53" y="98" font-size="7" fill="#666">t=0.7</text>
+          <circle cx="45" cy="100" r="2.5" fill="#ef6c00"/>
+          <text x="48" y="98" font-size="7" fill="#666">t=0.7</text>
           
-          <circle cx="80" cy="65" r="2.5" fill="#ef6c00"/>
-          <text x="83" y="63" font-size="7" fill="#666">t=0.5</text>
+          <circle cx="70" cy="62" r="2.5" fill="#ef6c00"/>
+          <text x="73" y="60" font-size="7" fill="#666">t=0.5</text>
           
-          <circle cx="120" cy="40" r="2.5" fill="#ef6c00"/>
-          <text x="123" y="38" font-size="7" fill="#666">t=0.3</text>
+          <circle cx="115" cy="35" r="2.5" fill="#ef6c00"/>
+          <text x="118" y="33" font-size="7" fill="#666">t=0.3</text>
           
           <!-- Метки на осях -->
           <text x="28" y="164" font-size="7" text-anchor="end" fill="#333">0</text>
@@ -251,12 +251,12 @@ plt.show()</code></pre>
         <path d="M 40 220 L 40 30 L 300 30" stroke="#2e7d32" stroke-width="2.5" fill="none"/>
         <text x="90" y="50" font-size="8" fill="#2e7d32" font-weight="bold">Идеальная (AUC=1.0)</text>
         
-        <!-- Хорошая модель -->
-        <path d="M 40 220 Q 60 100, 90 60 T 160 40 Q 210 35, 300 30" stroke="#1565c0" stroke-width="2.5" fill="none"/>
+        <!-- Хорошая модель (более плавная кривая) -->
+        <path d="M 40 220 C 42 210, 44 195, 48 175 C 52 155, 58 135, 68 110 C 78 85, 92 65, 110 50 C 130 35, 155 32, 180 31 C 210 30, 250 30, 300 30" stroke="#1565c0" stroke-width="2.5" fill="none"/>
         <text x="120" y="80" font-size="8" fill="#1565c0" font-weight="bold">Хорошая (AUC=0.85)</text>
         
-        <!-- Слабая модель -->
-        <path d="M 40 220 Q 100 180, 170 140 T 260 80 Q 280 60, 300 30" stroke="#ef6c00" stroke-width="2" fill="none"/>
+        <!-- Слабая модель (более реалистичная) -->
+        <path d="M 40 220 C 50 205, 65 190, 85 170 C 105 150, 130 130, 160 110 C 190 90, 220 70, 250 55 C 270 45, 285 38, 300 30" stroke="#ef6c00" stroke-width="2" fill="none"/>
         <text x="200" y="110" font-size="8" fill="#ef6c00">Слабая (AUC=0.65)</text>
         
         <!-- Метки на осях -->
@@ -269,7 +269,7 @@ plt.show()</code></pre>
         <text x="300" y="232" font-size="8" text-anchor="middle" fill="#333">1.0</text>
         
         <!-- Заливка под кривой (AUC) для хорошей модели -->
-        <path d="M 40 220 Q 60 100, 90 60 T 160 40 Q 210 35, 300 30 L 300 220 Z" fill="#1565c0" fill-opacity="0.1"/>
+        <path d="M 40 220 C 42 210, 44 195, 48 175 C 52 155, 58 135, 68 110 C 78 85, 92 65, 110 50 C 130 35, 155 32, 180 31 C 210 30, 250 30, 300 30 L 300 220 Z" fill="#1565c0" fill-opacity="0.1"/>
       </svg>
     </div>
   </div>
@@ -309,18 +309,18 @@ optimal_threshold = thresholds[optimal_idx]</code></pre>
           <!-- Диагональ -->
           <line x1="40" y1="160" x2="170" y2="30" stroke="#ddd" stroke-width="1.5" stroke-dasharray="3,3"/>
           
-          <!-- ROC кривая -->
-          <path d="M 40 160 Q 50 110, 70 80 T 110 50 Q 140 40, 170 30" stroke="#1565c0" stroke-width="2" fill="none"/>
+          <!-- ROC кривая (более плавная) -->
+          <path d="M 40 160 C 42 150, 45 135, 50 115 C 55 95, 62 80, 72 68 C 85 55, 100 47, 120 42 C 135 38, 150 35, 170 30" stroke="#1565c0" stroke-width="2" fill="none"/>
           
-          <!-- Точки на кривой -->
-          <circle cx="50" cy="130" r="3" fill="#ef6c00"/>
-          <circle cx="70" cy="90" r="3" fill="#2e7d32"/>
-          <circle cx="110" cy="55" r="3" fill="#ef6c00"/>
+          <!-- Точки на кривой (обновленные позиции) -->
+          <circle cx="44" cy="140" r="3" fill="#ef6c00"/>
+          <circle cx="65" cy="82" r="3" fill="#2e7d32"/>
+          <circle cx="115" cy="44" r="3" fill="#ef6c00"/>
           
-          <!-- Подписи точек -->
-          <text x="52" y="145" font-size="7" fill="#ef6c00">Threshold=0.8</text>
-          <text x="72" y="88" font-size="7" fill="#2e7d32" font-weight="bold">Optimal=0.5</text>
-          <text x="112" y="53" font-size="7" fill="#ef6c00">Threshold=0.2</text>
+          <!-- Подписи точек (обновленные позиции) -->
+          <text x="46" y="155" font-size="7" fill="#ef6c00">Threshold=0.8</text>
+          <text x="67" y="80" font-size="7" fill="#2e7d32" font-weight="bold">Optimal=0.5</text>
+          <text x="117" y="42" font-size="7" fill="#ef6c00">Threshold=0.2</text>
           
           <!-- Подписи осей -->
           <text x="105" y="175" font-size="8" text-anchor="middle" fill="#555">FPR</text>
@@ -334,13 +334,13 @@ optimal_threshold = thresholds[optimal_idx]</code></pre>
           <!-- Ось X -->
           <line x1="10" y1="130" x2="100" y2="130" stroke="#333" stroke-width="1"/>
           
-          <!-- Отрицательный класс (синяя кривая) -->
-          <path d="M 10 130 Q 20 110, 30 80 T 40 50 Q 45 60, 50 90 T 55 130" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
-          <text x="25" y="45" font-size="7" fill="#1565c0">Negative</text>
+          <!-- Отрицательный класс (более реалистичное нормальное распределение) -->
+          <path d="M 10 130 C 12 128, 15 120, 18 110 C 22 95, 26 75, 30 60 C 34 45, 37 38, 40 35 C 43 33, 45 35, 47 40 C 49 47, 51 60, 53 80 C 54 95, 55 115, 55 130" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+          <text x="30" y="30" font-size="7" fill="#1565c0" font-weight="bold">Class 0</text>
           
-          <!-- Положительный класс (зеленая кривая) -->
-          <path d="M 55 130 Q 60 110, 65 80 T 75 50 Q 80 60, 85 90 T 100 130" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
-          <text x="75" y="45" font-size="7" fill="#2e7d32">Positive</text>
+          <!-- Положительный класс (более реалистичное нормальное распределение) -->
+          <path d="M 55 130 C 57 115, 58 95, 60 80 C 62 60, 64 47, 66 40 C 68 35, 70 33, 73 35 C 76 38, 79 45, 83 60 C 87 75, 91 95, 95 110 C 98 120, 100 128, 100 130" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+          <text x="75" y="30" font-size="7" fill="#2e7d32" font-weight="bold">Class 1</text>
           
           <!-- Оптимальный порог -->
           <line x1="55" y1="10" x2="55" y2="130" stroke="#ef6c00" stroke-width="2" stroke-dasharray="4,2"/>
