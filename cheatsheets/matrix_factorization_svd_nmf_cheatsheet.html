@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Матричная факторизация (SVD, NMF) Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88em;
+      margin: 6px 0;
+    }
+
+    th, td {
+      padding: 6px 8px;
+      text-align: left;
+      border: 1px solid #e0e7ff;
+    }
+
+    th {
+      background-color: #1a5fb4;
+      color: white;
+      font-weight: 700;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🔢 Матричная факторизация: SVD & NMF</h1>
+  <div class="subtitle">Matrix Factorization • Рекомендательные системы<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть матричной факторизации</h2>
+    <p><strong>Matrix Factorization</strong>: разложение матрицы взаимодействий на произведение латентных факторов</p>
+    <ul>
+      <li><strong>Идея</strong>: представить пользователей и объекты в едином латентном пространстве</li>
+      <li><strong>Цель</strong>: R ≈ UV<sup>T</sup>, где R - матрица рейтингов (m×n)</li>
+      <li><strong>U</strong>: матрица пользователей (m×k) - латентные признаки пользователей</li>
+      <li><strong>V</strong>: матрица объектов (n×k) - латентные признаки объектов</li>
+      <li><strong>k</strong>: число латентных факторов (обычно 20-200)</li>
+      <li><strong>Преимущества</strong>: работает с разреженными данными, масштабируем</li>
+    </ul>
+    <blockquote>
+      💡 Латентные факторы могут соответствовать жанрам, темам или абстрактным характеристикам
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. SVD (Singular Value Decomposition)</h2>
+    <p><strong>SVD разложение</strong>: R = UΣV<sup>T</sup></p>
+    <ul>
+      <li><strong>U</strong>: левые сингулярные векторы (m×m)</li>
+      <li><strong>Σ</strong>: диагональная матрица сингулярных значений (m×n)</li>
+      <li><strong>V<sup>T</sup></strong>: правые сингулярные векторы (n×n)</li>
+      <li><strong>Усечённый SVD</strong>: оставляем k наибольших сингулярных значений</li>
+      <li><strong>Проблема</strong>: классический SVD требует полную матрицу (нет пропусков)</li>
+    </ul>
+    <pre><code><strong>Усечённый SVD:</strong>
+R ≈ U_k Σ_k V_k^T
+
+где:
+U_k - первые k столбцов U (m×k)
+Σ_k - первые k×k значений Σ
+V_k - первые k столбцов V (n×k)
+
+<strong>Предсказание рейтинга:</strong>
+r̂_ui = (U_k Σ_k V_k^T)_ui</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. SVD для рекомендаций (Surprise)</h2>
+    <pre><code>from surprise import SVD, Dataset, Reader
+from surprise.model_selection import cross_validate
+import pandas as pd
+
+# Данные: user, item, rating
+data = pd.DataFrame([
+    ('user1', 'movie1', 5),
+    ('user1', 'movie2', 3),
+    ('user2', 'movie1', 4),
+    ('user2', 'movie3', 2),
+    ('user3', 'movie2', 5),
+    ('user3', 'movie3', 4),
+])
+
+reader = Reader(rating_scale=(1, 5))
+dataset = Dataset.load_from_df(data, reader)
+
+# SVD модель
+model = SVD(
+    n_factors=50,        # Число латентных факторов
+    n_epochs=20,         # Число итераций
+    lr_all=0.005,        # Learning rate
+    reg_all=0.02,        # Регуляризация
+    random_state=42
+)
+
+# Кросс-валидация
+cv_results = cross_validate(
+    model, dataset, 
+    measures=['RMSE', 'MAE'], 
+    cv=5, 
+    verbose=True
+)
+
+# Обучение на полном наборе
+trainset = dataset.build_full_trainset()
+model.fit(trainset)
+
+# Предсказание
+prediction = model.predict('user1', 'movie3')
+print(f"Predicted rating: {prediction.est:.2f}")
+
+# Топ-N рекомендации
+def get_top_n_recommendations(model, user_id, n=10):
+    # Получить все объекты
+    all_items = trainset.all_items()
+    
+    # Предсказать рейтинги для всех объектов
+    predictions = []
+    for item_id in all_items:
+        pred = model.predict(user_id, item_id)
+        predictions.append((item_id, pred.est))
+    
+    # Сортировать и вернуть топ-N
+    predictions.sort(key=lambda x: x[1], reverse=True)
+    return predictions[:n]
+
+top_recs = get_top_n_recommendations(model, 'user1', n=5)
+print(f"Top-5 recommendations: {top_recs}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Функция потерь SVD</h2>
+    <p><strong>Оптимизационная задача</strong>: минимизация квадратичной ошибки с регуляризацией</p>
+    <pre><code><strong>Целевая функция:</strong>
+L = Σ(r_ui - û_i^T v̂_j)² + λ(||û_i||² + ||v̂_j||²)
+
+где:
+r_ui - реальный рейтинг
+û_i - латентный вектор пользователя i
+v̂_j - латентный вектор объекта j
+λ - коэффициент регуляризации
+
+<strong>Градиентный спуск:</strong>
+e_ui = r_ui - û_i^T v̂_j
+
+û_i ← û_i + α(e_ui · v̂_j - λ · û_i)
+v̂_j ← v̂_j + α(e_ui · û_i - λ · v̂_j)
+
+где α - learning rate</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. SVD с биасами (SVD++)</h2>
+    <p><strong>Расширенная модель</strong>: учет глобальных и индивидуальных смещений</p>
+    <pre><code><strong>Формула предсказания:</strong>
+r̂_ui = μ + b_u + b_i + û_i^T v̂_j
+
+где:
+μ - глобальное среднее всех рейтингов
+b_u - bias пользователя u
+b_i - bias объекта i
+
+<strong>Пример:</strong>
+Глобальное среднее: 3.5
+Пользователь строгий: b_u = -0.5
+Объект популярный: b_i = +0.8
+Базовое предсказание: 3.5 - 0.5 + 0.8 = 3.8
++ латентные факторы: û_i^T v̂_j</code></pre>
+    <pre><code>from surprise import SVDpp
+
+# SVD++ с учетом implicit feedback
+model_svdpp = SVDpp(
+    n_factors=20,
+    n_epochs=20,
+    lr_all=0.007,
+    reg_all=0.02
+)
+
+model_svdpp.fit(trainset)
+prediction = model_svdpp.predict('user1', 'movie3')
+print(f"SVD++ prediction: {prediction.est:.2f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. NMF (Non-negative Matrix Factorization)</h2>
+    <p><strong>Неотрицательная факторизация</strong>: R ≈ WH, где W,H ≥ 0</p>
+    <ul>
+      <li><strong>Ограничение</strong>: все элементы W и H неотрицательны</li>
+      <li><strong>Преимущество</strong>: интерпретируемость (аддитивная модель)</li>
+      <li><strong>W</strong>: матрица пользователей (m×k), W ≥ 0</li>
+      <li><strong>H</strong>: матрица объектов (k×n), H ≥ 0</li>
+      <li><strong>Интерпретация</strong>: "части целого" (например, жанры фильмов)</li>
+    </ul>
+    <pre><code><strong>Целевая функция:</strong>
+L = ||R - WH||²_F + α||W||²_F + β||H||²_F
+
+где ||·||²_F - норма Фробениуса
+
+<strong>Обновление (multiplicative updates):</strong>
+W ← W ⊙ [(RH^T) / (WHH^T + ε)]
+H ← H ⊙ [(W^TR) / (W^TWH + ε)]
+
+где ⊙ - поэлементное умножение
+ε - малая константа для стабильности</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. NMF для рекомендаций</h2>
+    <pre><code>from surprise import NMF
+
+# NMF модель
+model_nmf = NMF(
+    n_factors=15,
+    n_epochs=50,
+    biased=False,       # Без биасов
+    reg_pu=0.06,        # Регуляризация пользователей
+    reg_qi=0.06,        # Регуляризация объектов
+    random_state=42
+)
+
+# Обучение
+model_nmf.fit(trainset)
+
+# Предсказание
+prediction = model_nmf.predict('user1', 'movie3')
+print(f"NMF prediction: {prediction.est:.2f}")
+
+# Анализ латентных факторов
+print("User factors shape:", model_nmf.pu.shape)
+print("Item factors shape:", model_nmf.qi.shape)
+
+# Интерпретация латентных факторов
+import numpy as np
+
+# Топ объекты для каждого фактора
+def interpret_factors(item_factors, item_ids, top_n=5):
+    n_factors = item_factors.shape[1]
+    
+    for factor in range(n_factors):
+        # Объекты с наибольшим весом для этого фактора
+        top_items_idx = np.argsort(item_factors[:, factor])[-top_n:][::-1]
+        top_items = [item_ids[i] for i in top_items_idx]
+        print(f"Factor {factor}: {top_items}")
+
+# item_ids - список ID объектов в порядке матрицы
+# interpret_factors(model_nmf.qi, item_ids, top_n=3)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Сравнение SVD и NMF</h2>
+    <table>
+      <tr><th>Аспект</th><th>SVD</th><th>NMF</th></tr>
+      <tr><td><strong>Ограничения</strong></td><td>Нет</td><td>Неотрицательность</td></tr>
+      <tr><td><strong>Интерпретируемость</strong></td><td>Средняя</td><td>Высокая</td></tr>
+      <tr><td><strong>Точность</strong></td><td>Обычно выше</td><td>Чуть ниже</td></tr>
+      <tr><td><strong>Скорость</strong></td><td>Быстрее</td><td>Медленнее</td></tr>
+      <tr><td><strong>Разреженность</strong></td><td>Плотные факторы</td><td>Разреженные факторы</td></tr>
+      <tr><td><strong>Применение</strong></td><td>Общего назначения</td><td>Части целого</td></tr>
+    </table>
+    <blockquote>
+      💡 Выбор между SVD и NMF зависит от задачи и требований к интерпретируемости
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Реализация с NumPy/SciPy</h2>
+    <pre><code>import numpy as np
+from scipy.sparse.linalg import svds
+from sklearn.decomposition import NMF as sklearn_NMF
+
+# SVD с разреженной матрицей
+from scipy.sparse import csr_matrix
+
+# Матрица рейтингов (разреженная)
+ratings = np.array([
+    [5, 3, 0, 1],
+    [4, 0, 0, 1],
+    [1, 1, 0, 5],
+    [0, 1, 5, 4],
+])
+
+# Заменяем 0 на среднее (для SVD)
+ratings_filled = ratings.copy().astype(float)
+row_means = np.ma.masked_equal(ratings_filled, 0).mean(axis=1).data
+for i in range(len(ratings_filled)):
+    ratings_filled[i][ratings_filled[i] == 0] = row_means[i]
+
+# SVD разложение (k=2 фактора)
+U, sigma, Vt = svds(ratings_filled, k=2)
+
+# Восстановление матрицы
+sigma = np.diag(sigma)
+predicted_ratings = np.dot(np.dot(U, sigma), Vt)
+
+print("Predicted ratings:\n", predicted_ratings)
+
+# NMF с sklearn
+nmf_model = sklearn_NMF(
+    n_components=2,
+    init='random',
+    random_state=42,
+    max_iter=200
+)
+
+# Заменяем 0 на малое положительное число
+ratings_positive = np.where(ratings > 0, ratings, 0.1)
+
+W = nmf_model.fit_transform(ratings_positive)
+H = nmf_model.components_
+
+predicted_nmf = np.dot(W, H)
+print("\nNMF predicted ratings:\n", predicted_nmf)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Расширения и варианты</h2>
+    <p><strong>1. Probabilistic Matrix Factorization (PMF)</strong></p>
+    <ul>
+      <li>Байесовский подход к матричной факторизации</li>
+      <li>Моделирование неопределённости</li>
+    </ul>
+    <p><strong>2. Weighted Matrix Factorization</strong></p>
+    <ul>
+      <li>Разные веса для наблюдаемых/ненаблюдаемых рейтингов</li>
+      <li>Для implicit feedback</li>
+    </ul>
+    <p><strong>3. Temporal SVD</strong></p>
+    <pre><code># Учет временной динамики
+r̂_ui(t) = μ + b_u(t) + b_i(t) + û_i(t)^T v̂_j(t)
+
+где параметры зависят от времени</code></pre>
+    <p><strong>4. Factorization Machines</strong></p>
+    <ul>
+      <li>Обобщение матричной факторизации</li>
+      <li>Учет дополнительных признаков</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Гиперпараметры и настройка</h2>
+    <table>
+      <tr><th>Параметр</th><th>Описание</th><th>Типичные значения</th></tr>
+      <tr><td><code>n_factors</code></td><td>Число латентных факторов</td><td>20-200</td></tr>
+      <tr><td><code>n_epochs</code></td><td>Число итераций обучения</td><td>20-100</td></tr>
+      <tr><td><code>lr_all</code></td><td>Learning rate</td><td>0.001-0.01</td></tr>
+      <tr><td><code>reg_all</code></td><td>Регуляризация (L2)</td><td>0.01-0.1</td></tr>
+      <tr><td><code>biased</code></td><td>Использовать биасы</td><td>True (обычно)</td></tr>
+    </table>
+    <pre><code># Grid search для подбора параметров
+from surprise.model_selection import GridSearchCV
+
+param_grid = {
+    'n_factors': [20, 50, 100],
+    'n_epochs': [20, 30],
+    'lr_all': [0.002, 0.005],
+    'reg_all': [0.02, 0.05]
+}
+
+gs = GridSearchCV(SVD, param_grid, measures=['rmse'], cv=3)
+gs.fit(dataset)
+
+print(f"Best RMSE: {gs.best_score['rmse']}")
+print(f"Best params: {gs.best_params['rmse']}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Практические советы</h2>
+    <ul>
+      <li><strong>Число факторов</strong>: начинайте с 50, подбирайте по валидации</li>
+      <li><strong>Регуляризация</strong>: важна для избежания переобучения</li>
+      <li><strong>Масштабирование рейтингов</strong>: нормализуйте в [0,1] или [-1,1]</li>
+      <li><strong>Холодный старт</strong>: используйте гибридные методы</li>
+      <li><strong>Implicit feedback</strong>: используйте weighted approaches</li>
+      <li><strong>Обновление модели</strong>: инкрементальное обучение или переобучение</li>
+      <li><strong>Bias terms</strong>: почти всегда улучшают результаты</li>
+      <li><strong>Разреженность</strong>: MF хорошо работает даже при 90%+ разреженности</li>
+    </ul>
+    <blockquote>
+      💡 Матричная факторизация - основа многих современных рекомендательных систем
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

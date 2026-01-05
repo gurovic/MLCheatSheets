@@ -109,11 +109,11 @@
 1. [Контентная фильтрация](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/content_based_filtering_cheatsheet.html)
 1. [Матричная факторизация (SVD)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/matrix_factorization_svd_cheatsheet.html)
 1. [ALS (Alternating Least Squares)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/als_recommender_cheatsheet.html)
-1. Коллаборативная фильтрация (user-based, item-based)
-1. Матричная факторизация (SVD, NMF)
-1. Гибридные системы
-1. Context-aware рекомендации
-1. Sequence-aware рекомендации
+1. [Коллаборативная фильтрация (user-based, item-based)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/collaborative_filtering_user_item_based_cheatsheet.html)
+1. [Матричная факторизация (SVD, NMF)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/matrix_factorization_svd_nmf_cheatsheet.html)
+1. [Гибридные системы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hybrid_recommender_systems_cheatsheet.html)
+1. [Context-aware рекомендации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/context_aware_recommendations_cheatsheet.html)
+1. [Sequence-aware рекомендации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/sequence_aware_recommendations_cheatsheet.html)
 
 ### **11. Градиентный бустинг**
 1. [Градиентный бустинг для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/boosting_cheatsheet.html)
@@ -146,7 +146,7 @@
 1. [Марковские цепи Монте-Карло (MCMC) и Байесовский вывод](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mcmc_bayesian_inference_cheatsheet.html)
 1. [Expectation-Maximization (EM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/expectation_maximization_cheatsheet.html)
 1. [Графические модели](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/graphical_models_cheatsheet.html)
-1. Наивный Байес (как байесовский метод)
+1. [Наивный Байес (как байесовский метод)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/naive_bayes_bayesian_method_cheatsheet.html)
 
 ### **13. Проектирование признаков (Feature Engineering)**
 1. [Feature Engineering (основы)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/feature_engineering_cheatsheet.html)
@@ -224,15 +224,15 @@
 1. [Adversarial Attacks (Состязательные атаки)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adversarial_attacks_cheatsheet.html)
 1. [Adversarial robustness (классические атаки)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/adversarial_robustness_cheatsheet.html)
 1. [Differential privacy](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/differential_privacy_cheatsheet.html)
-1. Explainability и accountability
+1. [Explainability и accountability](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/explainability_accountability_cheatsheet.html)
 
 ### **23. Безопасность и обнаружение аномалий в приложениях**
-1. Обнаружение вторжений
-1. Malware detection
+1. [Обнаружение вторжений](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/intrusion_detection_cheatsheet.html)
+1. [Malware detection](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/malware_detection_cheatsheet.html)
 1. [Fraud detection](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fraud_detection_cheatsheet.html)
 
 ### **24. Финансовое и бизнес ML**
-1. Алгоритмический трейдинг
+1. [Алгоритмический трейдинг](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/algorithmic_trading_cheatsheet.html)
 1. Кредитный скоринг
 1. Risk management
 
