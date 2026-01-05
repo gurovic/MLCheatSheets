@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Фильтры Калмана Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📡 Фильтры Калмана Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Оптимальная оценка состояния • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Цель</strong>: оптимальная оценка состояния системы</li>
+      <li><strong>Подход</strong>: рекурсивная фильтрация шумных измерений</li>
+      <li><strong>Применение</strong>: навигация, отслеживание, прогнозирование</li>
+      <li><strong>Оптимальность</strong>: минимизирует среднеквадратичную ошибку</li>
+      <li><strong>Требования</strong>: линейная система, гауссовский шум</li>
+    </ul>
+    <blockquote>Фильтр Калмана - это рекурсивный алгоритм для оценки неизвестного состояния линейной динамической системы по зашумленным измерениям</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные уравнения</h2>
+    <p><strong>Прогноз (Predict):</strong></p>
+    <pre><code>x̂ₖ⁻ = F·x̂ₖ₋₁ + B·uₖ
+P⁻ₖ = F·Pₖ₋₁·Fᵀ + Q</code></pre>
+    
+    <p><strong>Обновление (Update):</strong></p>
+    <pre><code>Kₖ = P⁻ₖ·Hᵀ·(H·P⁻ₖ·Hᵀ + R)⁻¹
+x̂ₖ = x̂ₖ⁻ + Kₖ·(zₖ - H·x̂ₖ⁻)
+Pₖ = (I - Kₖ·H)·P⁻ₖ</code></pre>
+    
+    <p><strong>Обозначения:</strong></p>
+    <ul>
+      <li><code>x̂</code> - оценка состояния</li>
+      <li><code>P</code> - матрица ковариации ошибки</li>
+      <li><code>K</code> - матрица усиления Калмана</li>
+      <li><code>F</code> - матрица перехода состояния</li>
+      <li><code>H</code> - матрица наблюдения</li>
+      <li><code>Q</code> - ковариация шума процесса</li>
+      <li><code>R</code> - ковариация шума измерений</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Простая реализация (1D)</h2>
+    <pre><code>import numpy as np
+
+class KalmanFilter1D:
+    def __init__(self, F=1, H=1, Q=1, R=1, x0=0, P0=1):
+        self.F = F  # Матрица перехода
+        self.H = H  # Матрица наблюдения
+        self.Q = Q  # Шум процесса
+        self.R = R  # Шум измерений
+        self.x = x0  # Начальное состояние
+        self.P = P0  # Начальная ковариация
+    
+    def predict(self, u=0):
+        # Прогноз состояния
+        self.x = self.F * self.x + u
+        self.P = self.F * self.P * self.F + self.Q
+        return self.x
+    
+    def update(self, z):
+        # Коэффициент усиления Калмана
+        K = self.P * self.H / (self.H * self.P * self.H + self.R)
+        
+        # Обновление оценки
+        self.x = self.x + K * (z - self.H * self.x)
+        
+        # Обновление ковариации
+        self.P = (1 - K * self.H) * self.P
+        
+        return self.x
+
+# Использование
+kf = KalmanFilter1D(F=1, H=1, Q=0.01, R=0.1)
+measurements = [1.0, 2.1, 2.9, 4.2, 5.0]
+estimates = []
+
+for z in measurements:
+    kf.predict()
+    estimate = kf.update(z)
+    estimates.append(estimate)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Отслеживание объекта (2D)</h2>
+    <pre><code>import numpy as np
+
+class KalmanFilter2D:
+    def __init__(self, dt=1.0):
+        # Состояние: [x, y, vx, vy]
+        self.dt = dt
+        
+        # Матрица перехода состояния
+        self.F = np.array([
+            [1, 0, dt, 0],
+            [0, 1, 0, dt],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+        ])
+        
+        # Матрица наблюдения (измеряем только позицию)
+        self.H = np.array([
+            [1, 0, 0, 0],
+            [0, 1, 0, 0]
+        ])
+        
+        # Ковариация шума процесса
+        self.Q = np.eye(4) * 0.1
+        
+        # Ковариация шума измерений
+        self.R = np.eye(2) * 1.0
+        
+        # Начальное состояние
+        self.x = np.zeros(4)
+        self.P = np.eye(4) * 100
+    
+    def predict(self):
+        self.x = self.F @ self.x
+        self.P = self.F @ self.P @ self.F.T + self.Q
+        return self.x[:2]
+    
+    def update(self, z):
+        y = z - self.H @ self.x
+        S = self.H @ self.P @ self.H.T + self.R
+        K = self.P @ self.H.T @ np.linalg.inv(S)
+        
+        self.x = self.x + K @ y
+        self.P = (np.eye(4) - K @ self.H) @ self.P
+        
+        return self.x[:2]
+
+# Использование
+kf = KalmanFilter2D(dt=0.1)
+measurements = [(1, 1), (2, 2), (3, 3), (4, 4)]
+
+for z in measurements:
+    kf.predict()
+    position = kf.update(np.array(z))
+    print(f"Оценка позиции: {position}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Расширенный фильтр Калмана (EKF)</h2>
+    <p><strong>Для нелинейных систем:</strong></p>
+    <pre><code># Линеаризация через якобиан
+x̂ₖ⁻ = f(x̂ₖ₋₁, uₖ)
+P⁻ₖ = Fⱼ·Pₖ₋₁·Fⱼᵀ + Q
+
+# где Fⱼ - якобиан функции f
+Fⱼ = ∂f/∂x|ₓ₌ₓ̂ₖ₋₁</code></pre>
+    
+    <p><strong>Пример - радар:</strong></p>
+    <pre><code>def h(x):
+    # Нелинейная функция наблюдения
+    px, py = x[0], x[1]
+    r = np.sqrt(px**2 + py**2)
+    theta = np.arctan2(py, px)
+    return np.array([r, theta])
+
+def jacobian_H(x):
+    # Якобиан функции наблюдения
+    px, py = x[0], x[1]
+    r = np.sqrt(px**2 + py**2)
+    
+    H = np.array([
+        [px/r, py/r, 0, 0],
+        [-py/r**2, px/r**2, 0, 0]
+    ])
+    return H</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Unscented Kalman Filter (UKF)</h2>
+    <p><strong>Альтернатива EKF:</strong></p>
+    <ul>
+      <li>Не требует вычисления якобианов</li>
+      <li>Использует сигма-точки</li>
+      <li>Лучше для сильно нелинейных систем</li>
+      <li>Точность сравнима с EKF второго порядка</li>
+    </ul>
+    
+    <pre><code>from filterpy.kalman import UnscentedKalmanFilter
+from filterpy.kalman import MerweScaledSigmaPoints
+
+def fx(x, dt):
+    # Функция перехода состояния
+    F = np.array([[1, dt, 0, 0],
+                  [0, 1, 0, 0],
+                  [0, 0, 1, dt],
+                  [0, 0, 0, 1]])
+    return F @ x
+
+def hx(x):
+    # Функция наблюдения
+    return np.array([x[0], x[2]])
+
+# Создание UKF
+points = MerweScaledSigmaPoints(n=4, alpha=0.1, beta=2., kappa=-1)
+ukf = UnscentedKalmanFilter(dim_x=4, dim_z=2, dt=0.1, 
+                             fx=fx, hx=hx, points=points)
+
+ukf.x = np.array([0., 0., 0., 0.])
+ukf.P *= 0.2
+ukf.R = np.diag([0.5, 0.5])
+ukf.Q = np.eye(4) * 0.01
+
+# Обновление
+ukf.predict()
+ukf.update(measurement)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Настройка параметров</h2>
+    <table>
+      <tr>
+        <th>Параметр</th>
+        <th>Значение</th>
+        <th>Эффект</th>
+      </tr>
+      <tr>
+        <td><code>Q</code> (↑)</td>
+        <td>Больше</td>
+        <td>Больше доверия измерениям</td>
+      </tr>
+      <tr>
+        <td><code>Q</code> (↓)</td>
+        <td>Меньше</td>
+        <td>Больше доверия модели</td>
+      </tr>
+      <tr>
+        <td><code>R</code> (↑)</td>
+        <td>Больше</td>
+        <td>Больше доверия модели</td>
+      </tr>
+      <tr>
+        <td><code>R</code> (↓)</td>
+        <td>Меньше</td>
+        <td>Больше доверия измерениям</td>
+      </tr>
+      <tr>
+        <td><code>P0</code></td>
+        <td>Большое</td>
+        <td>Неуверенность в начальном состоянии</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Применения</h2>
+    <ul>
+      <li><strong>Навигация</strong>: GPS, IMU, объединение датчиков</li>
+      <li><strong>Отслеживание</strong>: объекты в видео, траектории</li>
+      <li><strong>Робототехника</strong>: локализация, SLAM</li>
+      <li><strong>Финансы</strong>: фильтрация временных рядов</li>
+      <li><strong>Обработка сигналов</strong>: шумоподавление</li>
+      <li><strong>Управление</strong>: оценка состояния для контроллера</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. filterpy библиотека</h2>
+    <pre><code>from filterpy.kalman import KalmanFilter
+import numpy as np
+
+# Создание фильтра
+kf = KalmanFilter(dim_x=2, dim_z=1)
+
+# Настройка матриц
+kf.F = np.array([[1., 1.],
+                 [0., 1.]])  # Матрица перехода
+
+kf.H = np.array([[1., 0.]])  # Матрица наблюдения
+
+kf.P *= 1000.  # Начальная неопределенность
+kf.R = 5       # Шум измерений
+kf.Q = np.array([[0.1, 0.1],
+                 [0.1, 0.1]])  # Шум процесса
+
+# Цикл фильтрации
+measurements = [1, 2, 3, 4, 5]
+for z in measurements:
+    kf.predict()
+    kf.update(z)
+    print(f'x = {kf.x[0]:.2f}, dx = {kf.x[1]:.2f}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Диагностика и проблемы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✓ Хорошие признаки</h3>
+        <ul>
+          <li>Инновации близки к нулю</li>
+          <li>P стабилизируется</li>
+          <li>Оценки плавные</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>✗ Проблемы</h3>
+        <ul>
+          <li>P растет неограниченно → проверьте Q</li>
+          <li>Оценки скачут → проверьте R</li>
+          <li>Расхождение → неправильная модель</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Particle Filter (альтернатива)</h2>
+    <p><strong>Когда использовать:</strong></p>
+    <ul>
+      <li>Сильно нелинейные системы</li>
+      <li>Не-гауссовский шум</li>
+      <li>Мультимодальные распределения</li>
+    </ul>
+    
+    <pre><code>class ParticleFilter:
+    def __init__(self, n_particles):
+        self.n_particles = n_particles
+        self.particles = np.random.randn(n_particles, 4)
+        self.weights = np.ones(n_particles) / n_particles
+    
+    def predict(self, u, noise_std):
+        # Прогноз с добавлением шума
+        self.particles += u + np.random.randn(
+            self.n_particles, 4) * noise_std
+    
+    def update(self, z, measurement_func, noise_std):
+        # Обновление весов
+        for i in range(self.n_particles):
+            predicted_z = measurement_func(self.particles[i])
+            self.weights[i] *= self._gaussian_likelihood(
+                z, predicted_z, noise_std)
+        
+        self.weights += 1.e-300  # Избежать деления на ноль
+        self.weights /= sum(self.weights)
+    
+    def resample(self):
+        # Ресемплинг частиц
+        indices = np.random.choice(
+            self.n_particles, 
+            self.n_particles, 
+            p=self.weights
+        )
+        self.particles = self.particles[indices]
+        self.weights.fill(1.0 / self.n_particles)
+    
+    def estimate(self):
+        return np.average(self.particles, weights=self.weights, axis=0)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Лучшие практики</h2>
+    <ul>
+      <li><strong>Инициализация</strong>: используйте большие P0 если неуверены</li>
+      <li><strong>Настройка Q, R</strong>: начните с экспериментальных данных</li>
+      <li><strong>Проверка сходимости</strong>: мониторьте P и инновации</li>
+      <li><strong>Численная устойчивость</strong>: используйте Joseph форму для P</li>
+      <li><strong>Выбор модели</strong>: правильная F критична</li>
+      <li><strong>Валидация</strong>: тестируйте на реальных данных</li>
+    </ul>
+    
+    <blockquote>Joseph форма обновления P более устойчива численно:
+P = (I - KH)P(I - KH)ᵀ + KRKᵀ</blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
