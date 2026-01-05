@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Ансамбли деревьев Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🌳 Ансамбли деревьев Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Ensemble</strong>: комбинация нескольких деревьев решений</li>
+      <li><strong>Мудрость толпы</strong>: много слабых моделей → сильная модель</li>
+      <li><strong>Уменьшение дисперсии</strong>: усреднение снижает переобучение</li>
+      <li><strong>Нелинейность</strong>: захватывают сложные зависимости</li>
+      <li><strong>SOTA</strong>: топ методы на табличных данных</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные типы</h2>
+    <table>
+      <tr><th>Метод</th><th>Стратегия</th><th>Базовые модели</th></tr>
+      <tr><td><strong>Bagging</strong></td><td>Параллельные независимые деревья</td><td>Полные деревья</td></tr>
+      <tr><td><strong>Random Forest</strong></td><td>Bagging + random features</td><td>Полные деревья</td></tr>
+      <tr><td><strong>Extra Trees</strong></td><td>Random splits</td><td>Полные деревья</td></tr>
+      <tr><td><strong>Boosting</strong></td><td>Последовательное обучение</td><td>Слабые деревья</td></tr>
+      <tr><td><strong>Stacking</strong></td><td>Мета-модель</td><td>Разные деревья</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Random Forest</h2>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
+
+# Классификация
+rf_clf = RandomForestClassifier(
+    n_estimators=100,      # число деревьев
+    max_depth=None,        # макс глубина (None = без ограничения)
+    min_samples_split=2,   # мин сэмплов для split
+    min_samples_leaf=1,    # мин сэмплов в листе
+    max_features='sqrt',   # число признаков для split
+    bootstrap=True,        # семплирование с возвратом
+    random_state=42,
+    n_jobs=-1             # параллельное обучение
+)
+
+rf_clf.fit(X_train, y_train)
+y_pred = rf_clf.predict(X_test)
+
+# Важность признаков
+importances = rf_clf.feature_importances_
+feature_names = X.columns
+for name, importance in zip(feature_names, importances):
+    print(f"{name}: {importance:.4f}")
+
+# Out-of-bag оценка (для bootstrap=True)
+rf_oob = RandomForestClassifier(
+    n_estimators=100,
+    bootstrap=True,
+    oob_score=True,
+    random_state=42
+)
+rf_oob.fit(X_train, y_train)
+print(f"OOB Score: {rf_oob.oob_score_:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Extra Trees</h2>
+    <pre><code>from sklearn.ensemble import ExtraTreesClassifier
+
+# Extremely Randomized Trees
+et_clf = ExtraTreesClassifier(
+    n_estimators=100,
+    max_depth=None,
+    min_samples_split=2,
+    min_samples_leaf=1,
+    max_features='sqrt',
+    bootstrap=False,      # обычно False для ET
+    random_state=42,
+    n_jobs=-1
+)
+
+et_clf.fit(X_train, y_train)
+y_pred = et_clf.predict(X_test)</code></pre>
+
+    <p><strong>Отличия от Random Forest:</strong></p>
+    <ul>
+      <li>Случайные пороги split (не оптимальные)</li>
+      <li>Быстрее обучение</li>
+      <li>Больше рандомизации → меньше дисперсия</li>
+      <li>Обычно без bootstrap</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Isolation Forest</h2>
+    <pre><code>from sklearn.ensemble import IsolationForest
+
+# Для обнаружения аномалий
+iso_forest = IsolationForest(
+    n_estimators=100,
+    max_samples='auto',   # размер подвыборки
+    contamination=0.1,    # доля аномалий (0.1 = 10%)
+    max_features=1.0,
+    bootstrap=False,
+    random_state=42,
+    n_jobs=-1
+)
+
+# Обучение (только X, без y)
+iso_forest.fit(X_train)
+
+# Предсказание: 1 = норма, -1 = аномалия
+y_pred = iso_forest.predict(X_test)
+
+# Аномальность score (меньше = более аномально)
+anomaly_scores = iso_forest.decision_function(X_test)
+
+# Выделение аномалий
+anomalies = X_test[y_pred == -1]
+print(f"Detected {len(anomalies)} anomalies")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Настройка гиперпараметров</h2>
+    <pre><code>from sklearn.model_selection import RandomizedSearchCV
+import numpy as np
+
+# Пространство поиска
+param_dist = {
+    'n_estimators': [100, 200, 300, 500],
+    'max_depth': [10, 20, 30, None],
+    'min_samples_split': [2, 5, 10],
+    'min_samples_leaf': [1, 2, 4],
+    'max_features': ['sqrt', 'log2', 0.3, 0.5],
+    'bootstrap': [True, False]
+}
+
+# Случайный поиск
+rf = RandomForestClassifier(random_state=42, n_jobs=-1)
+random_search = RandomizedSearchCV(
+    rf,
+    param_distributions=param_dist,
+    n_iter=50,           # число итераций
+    cv=5,                # кросс-валидация
+    scoring='accuracy',
+    random_state=42,
+    n_jobs=-1,
+    verbose=1
+)
+
+random_search.fit(X_train, y_train)
+print(f"Best parameters: {random_search.best_params_}")
+print(f"Best score: {random_search.best_score_:.4f}")
+
+# Лучшая модель
+best_rf = random_search.best_estimator_</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Feature importance</h2>
+    <pre><code>import matplotlib.pyplot as plt
+import pandas as pd
+
+# MDI importance (Mean Decrease Impurity)
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)
+importances = rf.feature_importances_
+
+# Сортировка
+indices = np.argsort(importances)[::-1]
+features = X.columns[indices]
+
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.bar(range(len(importances)), importances[indices])
+plt.xticks(range(len(importances)), features, rotation=90)
+plt.title('Feature Importances')
+plt.tight_layout()
+plt.show()
+
+# Permutation importance (более надежный)
+from sklearn.inspection import permutation_importance
+
+perm_importance = permutation_importance(
+    rf, X_test, y_test,
+    n_repeats=10,
+    random_state=42,
+    n_jobs=-1
+)
+
+# Результаты
+for i in indices[:10]:  # топ-10
+    print(f"{features[i]}: {perm_importance.importances_mean[i]:.4f} "
+          f"+/- {perm_importance.importances_std[i]:.4f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Voting ансамбль с деревьями</h2>
+    <pre><code>from sklearn.ensemble import VotingClassifier, VotingRegressor
+from sklearn.ensemble import RandomForestClassifier, ExtraTreesClassifier, GradientBoostingClassifier
+
+# Создание базовых моделей
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+et = ExtraTreesClassifier(n_estimators=100, random_state=42)
+gb = GradientBoostingClassifier(n_estimators=100, random_state=42)
+
+# Hard voting (голосование по классам)
+voting_clf_hard = VotingClassifier(
+    estimators=[('rf', rf), ('et', et), ('gb', gb)],
+    voting='hard'
+)
+
+voting_clf_hard.fit(X_train, y_train)
+y_pred = voting_clf_hard.predict(X_test)
+
+# Soft voting (усреднение вероятностей)
+voting_clf_soft = VotingClassifier(
+    estimators=[('rf', rf), ('et', et), ('gb', gb)],
+    voting='soft',
+    weights=[1, 1, 2]  # веса для каждой модели
+)
+
+voting_clf_soft.fit(X_train, y_train)
+y_pred_soft = voting_clf_soft.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Параллельное обучение</h2>
+    <pre><code># Параллельное обучение деревьев
+rf = RandomForestClassifier(
+    n_estimators=500,
+    n_jobs=-1,           # использовать все CPU
+    verbose=1,           # показать прогресс
+    random_state=42
+)
+
+# Warm start (добавление деревьев)
+rf_warm = RandomForestClassifier(
+    n_estimators=100,
+    warm_start=True,
+    random_state=42
+)
+
+rf_warm.fit(X_train, y_train)
+print(f"Accuracy with 100 trees: {rf_warm.score(X_test, y_test):.4f}")
+
+# Добавление еще 100 деревьев
+rf_warm.n_estimators = 200
+rf_warm.fit(X_train, y_train)
+print(f"Accuracy with 200 trees: {rf_warm.score(X_test, y_test):.4f}")
+
+# Мониторинг производительности
+from sklearn.metrics import accuracy_score
+scores = []
+for n in range(10, 201, 10):
+    rf_temp = RandomForestClassifier(n_estimators=n, random_state=42)
+    rf_temp.fit(X_train, y_train)
+    scores.append(rf_temp.score(X_test, y_test))
+
+plt.plot(range(10, 201, 10), scores)
+plt.xlabel('Number of trees')
+plt.ylabel('Accuracy')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Калибровка вероятностей</h2>
+    <pre><code>from sklearn.calibration import CalibratedClassifierCV
+
+# Random Forest может давать некалиброванные вероятности
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+
+# Калибровка методом Platt scaling
+calibrated_rf = CalibratedClassifierCV(
+    rf,
+    method='sigmoid',    # или 'isotonic'
+    cv=5
+)
+
+calibrated_rf.fit(X_train, y_train)
+y_pred_proba = calibrated_rf.predict_proba(X_test)
+
+# Визуализация калибровки
+from sklearn.calibration import calibration_curve
+
+prob_true, prob_pred = calibration_curve(
+    y_test,
+    y_pred_proba[:, 1],
+    n_bins=10
+)
+
+plt.plot(prob_pred, prob_true, marker='o')
+plt.plot([0, 1], [0, 1], linestyle='--', label='Perfect calibration')
+plt.xlabel('Predicted probability')
+plt.ylabel('True probability')
+plt.legend()
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Практические советы</h2>
+    <ul>
+      <li><strong>n_estimators</strong>: больше = лучше (100-500)</li>
+      <li><strong>max_features</strong>: sqrt для классификации, 1/3 для регрессии</li>
+      <li><strong>max_depth</strong>: обычно None, ограничить при переобучении</li>
+      <li><strong>min_samples_leaf</strong>: увеличить для сглаживания</li>
+      <li><strong>OOB score</strong>: быстрая оценка без CV</li>
+      <li><strong>n_jobs=-1</strong>: всегда используйте параллелизм</li>
+      <li><strong>Extra Trees</strong>: быстрее RF, попробуйте первым</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Сравнение методов</h2>
+    <table>
+      <tr><th>Характеристика</th><th>RF</th><th>Extra Trees</th><th>Isolation Forest</th></tr>
+      <tr><td>Скорость</td><td>Средняя</td><td>Быстрая</td><td>Очень быстрая</td></tr>
+      <tr><td>Точность</td><td>Высокая</td><td>Высокая</td><td>N/A</td></tr>
+      <tr><td>Переобучение</td><td>Низкое</td><td>Очень низкое</td><td>Низкое</td></tr>
+      <tr><td>Интерпретируемость</td><td>Средняя</td><td>Средняя</td><td>Низкая</td></tr>
+      <tr><td>Применение</td><td>Все задачи</td><td>Все задачи</td><td>Аномалии</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Табличные данные</li>
+          <li>Средние и большие датасеты</li>
+          <li>Нелинейные зависимости</li>
+          <li>Важность признаков нужна</li>
+          <li>Нужна робастность к выбросам</li>
+          <li>Базовая модель (baseline)</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо</h3>
+        <ul>
+          <li>Малый датасет (< 1000 сэмплов)</li>
+          <li>Высокоразмерные данные (text, images)</li>
+          <li>Нужна интерпретируемость</li>
+          <li>Строгие ограничения памяти</li>
+          <li>Экстраполяция за пределы данных</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Попробовать Random Forest как baseline</li>
+      <li>[ ] Сравнить с Extra Trees (быстрее)</li>
+      <li>[ ] Настроить n_estimators (100-500)</li>
+      <li>[ ] Оптимизировать max_depth если переобучение</li>
+      <li>[ ] Использовать OOB score для быстрой оценки</li>
+      <li>[ ] Проверить feature importances</li>
+      <li>[ ] Использовать n_jobs=-1 для ускорения</li>
+      <li>[ ] Калибровать вероятности если нужно</li>
+      <li>[ ] Рассмотреть voting ансамбль</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Ансамбль деревьев — это как коллективное принятие решений: мы обучаем 100 экспертов (деревьев), каждый из которых смотрит на данные немного по-своему, а затем голосуем. Итоговое решение обычно лучше, чем мнение любого отдельного эксперта».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
