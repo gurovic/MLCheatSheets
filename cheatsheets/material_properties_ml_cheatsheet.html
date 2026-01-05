@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Свойства материалов и ML</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>⚙️ Свойства материалов и ML</h1>
+  <div class="subtitle">Предсказание физических свойств • Structure-Property Relations • Многоцелевая оптимизация<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Классификация свойств материалов</h2>
+    <p><strong>Основные категории</strong>:</p>
+    <ul>
+      <li><strong>Механические</strong>: прочность, твёрдость, пластичность, упругость</li>
+      <li><strong>Электрические</strong>: проводимость, диэлектрическая проницаемость</li>
+      <li><strong>Термические</strong>: теплопроводность, теплоёмкость, расширение</li>
+      <li><strong>Магнитные</strong>: намагниченность, коэрцитивность</li>
+      <li><strong>Оптические</strong>: преломление, поглощение, прозрачность</li>
+      <li><strong>Химические</strong>: коррозионная стойкость, реакционная способность</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Механические свойства</h2>
+    <p><strong>Прочностные характеристики</strong>:</p>
+    <ul>
+      <li><strong>Модуль Юнга (E)</strong>: жёсткость, сопротивление деформации</li>
+      <li><strong>Предел текучести</strong>: напряжение начала пластической деформации</li>
+      <li><strong>Предел прочности</strong>: максимальное напряжение до разрушения</li>
+      <li><strong>Твёрдость</strong>: сопротивление вдавливанию (Mohs, Vickers, Brinell)</li>
+      <li><strong>Вязкость разрушения</strong>: сопротивление распространению трещин</li>
+      <li><strong>Коэффициент Пуассона</strong>: поперечная деформация</li>
+    </ul>
+    <pre><code># Предсказание модуля упругости
+from sklearn.ensemble import RandomForestRegressor
+model = RandomForestRegressor(n_estimators=100)
+model.fit(X_train, y_bulk_modulus)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Электронные свойства</h2>
+    <p><strong>Электронная структура</strong>:</p>
+    <ul>
+      <li><strong>Band gap</strong>: ширина запрещённой зоны (определяет проводимость)</li>
+      <li><strong>Плотность состояний (DOS)</strong>: распределение электронных уровней</li>
+      <li><strong>Effective mass</strong>: эффективная масса носителей заряда</li>
+      <li><strong>Работа выхода</strong>: энергия удаления электрона</li>
+      <li><strong>Электропроводность</strong>: σ = neμ (концентрация × подвижность)</li>
+      <li><strong>Диэлектрическая проницаемость</strong>: отклик на электрическое поле</li>
+    </ul>
+    <blockquote>Band gap критичен для полупроводников и фотовольтаики</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Термодинамические свойства</h2>
+    <p><strong>Энергетические характеристики</strong>:</p>
+    <ul>
+      <li><strong>Formation energy</strong>: энергия образования из элементов</li>
+      <li><strong>Cohesive energy</strong>: энергия связи атомов</li>
+      <li><strong>Phase stability</strong>: термодинамическая стабильность фазы</li>
+      <li><strong>Melting point</strong>: температура плавления</li>
+      <li><strong>Heat capacity</strong>: теплоёмкость</li>
+      <li><strong>Entropy</strong>: мера беспорядка в системе</li>
+    </ul>
+    <table>
+      <tr><th>Свойство</th><th>Единицы</th><th>Типичный диапазон</th></tr>
+      <tr><td>Formation energy</td><td>eV/atom</td><td>-5 до 0</td></tr>
+      <tr><td>Melting point</td><td>K</td><td>200-4000</td></tr>
+      <tr><td>Heat capacity</td><td>J/(mol·K)</td><td>10-50</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Предсказание band gap</h2>
+    <p><strong>ML подходы для band gap</strong>:</p>
+    <ul>
+      <li><strong>Регрессия</strong>: Random Forest, Gradient Boosting, Neural Networks</li>
+      <li><strong>Дескрипторы</strong>: состав, структура, электронная конфигурация</li>
+      <li><strong>Проблема</strong>: DFT недооценивает band gap (нужна коррекция)</li>
+      <li><strong>Гибридные функционалы</strong>: более точные, но дорогие</li>
+      <li><strong>GW approximation</strong>: улучшение точности расчёта</li>
+      <li><strong>ML correction</strong>: коррекция DFT предсказаний через ML</li>
+    </ul>
+    <pre><code># GNN для предсказания band gap
+from cgcnn.model import CrystalGraphConvNet
+model = CrystalGraphConvNet(
+    orig_atom_fea_len=92,
+    nbr_fea_len=41,
+    n_conv=5
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Магнитные свойства</h2>
+    <p><strong>Магнетизм материалов</strong>:</p>
+    <ul>
+      <li><strong>Магнитный момент</strong>: μ в μ_B (магнетоны Бора)</li>
+      <li><strong>Температура Кюри</strong>: переход в парамагнитное состояние</li>
+      <li><strong>Коэрцитивность</strong>: сопротивление размагничиванию</li>
+      <li><strong>Магнитная анизотропия</strong>: направленность намагниченности</li>
+      <li><strong>Spin polarization</strong>: степень поляризации спинов</li>
+      <li><strong>Exchange interactions</strong>: обменные взаимодействия</li>
+    </ul>
+    <blockquote>Магнитные свойства критичны для моторов, генераторов, хранения данных</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Теплопроводность</h2>
+    <p><strong>Тепловой транспорт</strong>:</p>
+    <ul>
+      <li><strong>Lattice thermal conductivity</strong>: через фононы</li>
+      <li><strong>Electronic thermal conductivity</strong>: через электроны</li>
+      <li><strong>Wiedemann-Franz law</strong>: связь электрической и тепловой проводимости</li>
+      <li><strong>Phonon scattering</strong>: рассеяние на дефектах, границах</li>
+      <li><strong>Figure of merit (ZT)</strong>: для термоэлектриков</li>
+      <li><strong>ML prediction</strong>: сложно из-за ангармоничности</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Оптические свойства</h2>
+    <p><strong>Взаимодействие с светом</strong>:</p>
+    <ul>
+      <li><strong>Показатель преломления</strong>: n = c/v</li>
+      <li><strong>Коэффициент поглощения</strong>: α(λ)</li>
+      <li><strong>Диэлектрическая функция</strong>: ε(ω) = ε₁ + iε₂</li>
+      <li><strong>Reflectivity</strong>: коэффициент отражения</li>
+      <li><strong>Photoluminescence</strong>: испускание света</li>
+      <li><strong>Нелинейные эффекты</strong>: второй гармоники, Керра</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Structure-Property Relations</h2>
+    <p><strong>Связь структуры и свойств</strong>:</p>
+    <ul>
+      <li><strong>Crystal structure</strong>: симметрия влияет на все свойства</li>
+      <li><strong>Bonding type</strong>: ковалентная, ионная, металлическая</li>
+      <li><strong>Defects</strong>: вакансии, дислокации изменяют свойства</li>
+      <li><strong>Grain boundaries</strong>: границы зёрен в поликристаллах</li>
+      <li><strong>Composition</strong>: легирование для настройки свойств</li>
+      <li><strong>Processing</strong>: термообработка, деформация</li>
+    </ul>
+    <blockquote>Одна структура → множество свойств; одно свойство ← множество структур</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Дескрипторы для свойств</h2>
+    <p><strong>Feature engineering</strong>:</p>
+    <ul>
+      <li><strong>Compositional</strong>: средний атомный радиус, электроотрицательность</li>
+      <li><strong>Structural</strong>: плотность, координационное число, симметрия</li>
+      <li><strong>Electronic</strong>: валентные электроны, конфигурация</li>
+      <li><strong>SOAP</strong>: локальное окружение атомов</li>
+      <li><strong>Graph-based</strong>: топология связей</li>
+      <li><strong>Physical intuition</strong>: включение физических законов</li>
+    </ul>
+    <pre><code># Matminer дескрипторы
+from matminer.featurizers.structure import *
+featurizer = GlobalSymmetryFeatures()
+featurizer.featurize(structure)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Множественные свойства</h2>
+    <p><strong>Multi-property prediction</strong>:</p>
+    <ul>
+      <li><strong>Multi-task learning</strong>: одновременное предсказание нескольких свойств</li>
+      <li><strong>Shared representations</strong>: общие эмбеддинги для разных задач</li>
+      <li><strong>Transfer learning</strong>: перенос знаний между свойствами</li>
+      <li><strong>Correlation</strong>: использование корреляций свойств</li>
+      <li><strong>Auxiliary tasks</strong>: вспомогательные задачи для улучшения</li>
+      <li><strong>Property networks</strong>: графы зависимостей свойств</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Неопределённость предсказаний</h2>
+    <p><strong>Uncertainty quantification</strong>:</p>
+    <ul>
+      <li><strong>Aleatoric uncertainty</strong>: шум в данных</li>
+      <li><strong>Epistemic uncertainty</strong>: неопределённость модели</li>
+      <li><strong>Ensemble methods</strong>: разброс предсказаний</li>
+      <li><strong>Bayesian approaches</strong>: Gaussian Processes, Bayesian NN</li>
+      <li><strong>Dropout uncertainty</strong>: Monte Carlo dropout</li>
+      <li><strong>Conformal prediction</strong>: интервалы предсказаний</li>
+    </ul>
+    <blockquote>Оценка неопределённости критична для принятия решений</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Экстраполяция vs интерполяция</h2>
+    <p><strong>Проблемы обобщения</strong>:</p>
+    <ul>
+      <li><strong>Interpolation</strong>: предсказания внутри обучающего пространства (надёжно)</li>
+      <li><strong>Extrapolation</strong>: вне обучающего пространства (рискованно)</li>
+      <li><strong>Chemical space</strong>: ограниченность известных материалов</li>
+      <li><strong>Similarity metrics</strong>: оценка близости к обучающим данным</li>
+      <li><strong>Applicability domain</strong>: область применимости модели</li>
+      <li><strong>Transfer learning</strong>: улучшение экстраполяции</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Корреляции свойств</h2>
+    <p><strong>Взаимосвязи между свойствами</strong>:</p>
+    <table>
+      <tr><th>Свойства</th><th>Корреляция</th></tr>
+      <tr><td>Band gap ↔ Optical absorption</td><td>Прямая связь</td></tr>
+      <tr><td>Модуль Юнга ↔ Твёрдость</td><td>Положительная</td></tr>
+      <tr><td>Проводимость ↔ Теплопроводность</td><td>Wiedemann-Franz</td></tr>
+      <tr><td>Плотность ↔ Прочность</td><td>Часто положительная</td></tr>
+      <tr><td>ZT ↔ Electrical conductivity</td><td>Сложная (нелинейная)</td></tr>
+    </table>
+    <p>Использование корреляций улучшает предсказания</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Температурная зависимость</h2>
+    <p><strong>Свойства при разных температурах</strong>:</p>
+    <ul>
+      <li><strong>Temperature scaling</strong>: большинство свойств зависят от T</li>
+      <li><strong>Phase transitions</strong>: структурные превращения</li>
+      <li><strong>Thermal expansion</strong>: изменение объёма</li>
+      <li><strong>Phonon contributions</strong>: роль колебаний решётки</li>
+      <li><strong>ML models</strong>: включение температуры как признака</li>
+      <li><strong>Arrhenius behavior</strong>: экспоненциальная зависимость</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Композиционная зависимость</h2>
+    <p><strong>Влияние состава на свойства</strong>:</p>
+    <ul>
+      <li><strong>Solid solutions</strong>: непрерывное изменение свойств</li>
+      <li><strong>Vegard's law</strong>: линейная зависимость параметра решётки</li>
+      <li><strong>Bowing parameters</strong>: нелинейные отклонения</li>
+      <li><strong>Percolation</strong>: пороговые концентрации</li>
+      <li><strong>Phase diagrams</strong>: области существования фаз</li>
+      <li><strong>High-entropy alloys</strong>: мультикомпонентные системы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Экспериментальные vs расчётные данные</h2>
+    <p><strong>Источники данных для обучения</strong>:</p>
+    <ul>
+      <li><strong>DFT calculations</strong>: систематические, но с погрешностью</li>
+      <li><strong>Experimental data</strong>: точнее, но разрозненные</li>
+      <li><strong>Calibration</strong>: коррекция DFT на эксперимент</li>
+      <li><strong>Multi-fidelity</strong>: комбинация данных разной точности</li>
+      <li><strong>Transfer learning</strong>: DFT → эксперимент</li>
+      <li><strong>Data fusion</strong>: объединение источников</li>
+    </ul>
+    <blockquote>Лучшие модели комбинируют расчётные и экспериментальные данные</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Scaling relations</h2>
+    <p><strong>Масштабные законы</strong>:</p>
+    <ul>
+      <li><strong>Sabatier principle</strong>: оптимум адсорбционной энергии</li>
+      <li><strong>BEP relations</strong>: связь энергии активации и реакции</li>
+      <li><strong>d-band center</strong>: центр d-зоны предсказывает каталитические свойства</li>
+      <li><strong>Descriptor-based design</strong>: использование ключевых дескрипторов</li>
+      <li><strong>Universal relations</strong>: общие закономерности для классов материалов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Инверсный дизайн</h2>
+    <p><strong>Inverse design (свойства → структура)</strong>:</p>
+    <ul>
+      <li><strong>Задача</strong>: найти материал с заданными свойствами</li>
+      <li><strong>Conditional VAE</strong>: генерация с условием на свойства</li>
+      <li><strong>GAN</strong>: генеративные модели с целевыми свойствами</li>
+      <li><strong>Bayesian optimization</strong>: оптимизация в пространстве структур</li>
+      <li><strong>Reinforcement learning</strong>: агент ищет оптимальные структуры</li>
+      <li><strong>Evolutionary algorithms</strong>: генетические алгоритмы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 20. Физические ограничения</h2>
+    <p><strong>Constraints в ML моделях</strong>:</p>
+    <ul>
+      <li><strong>Thermodynamic stability</strong>: энергия должна быть разумной</li>
+      <li><strong>Symmetry constraints</strong>: учёт симметрии кристалла</li>
+      <li><strong>Stoichiometry</strong>: валентность элементов</li>
+      <li><strong>Physical bounds</strong>: свойства не могут быть отрицательными</li>
+      <li><strong>Causality</strong>: Kramers-Kronig соотношения для оптики</li>
+      <li><strong>Conservation laws</strong>: энергия, заряд</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 21. Benchmarking и метрики</h2>
+    <p><strong>Оценка качества предсказаний</strong>:</p>
+    <ul>
+      <li><strong>MAE</strong>: средняя абсолютная ошибка</li>
+      <li><strong>RMSE</strong>: корень из средней квадратичной ошибки</li>
+      <li><strong>R²</strong>: коэффициент детерминации</li>
+      <li><strong>Relative error</strong>: относительная погрешность</li>
+      <li><strong>Chemical accuracy</strong>: 1 kcal/mol ≈ 43 meV для энергий</li>
+      <li><strong>Matbench</strong>: стандартные датасеты для сравнения</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 22. Конкретные применения</h2>
+    <p><strong>Примеры использования</strong>:</p>
+    <ul>
+      <li><strong>Батареи</strong>: voltage, ionic conductivity, stability window</li>
+      <li><strong>Катализаторы</strong>: adsorption energies, reaction barriers</li>
+      <li><strong>Термоэлектрики</strong>: Seebeck coefficient, ZT optimization</li>
+      <li><strong>Суперсплавы</strong>: creep resistance, high-temperature strength</li>
+      <li><strong>Полупроводники</strong>: band gap, carrier mobility</li>
+      <li><strong>Мембраны</strong>: selectivity, permeability</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
