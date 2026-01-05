@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Influence Maximization Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📢 Influence Maximization Cheatsheet</h1>
+  <div class="subtitle">Максимизация влияния • Социальные сети • Viral Marketing<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <ul>
+      <li><strong>Задача</strong>: выбрать k узлов для максимизации распространения</li>
+      <li><strong>Seed set</strong>: начальные активные узлы</li>
+      <li><strong>Каскад</strong>: процесс распространения</li>
+      <li><strong>NP-hard</strong>: точное решение неосуществимо</li>
+      <li><strong>Применение</strong>: маркетинг, вакцинация, информация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Модели распространения</h2>
+    <table>
+      <tr><th>Модель</th><th>Механизм</th></tr>
+      <tr><td><strong>Independent Cascade</strong></td><td>Независимая активация соседей</td></tr>
+      <tr><td><strong>Linear Threshold</strong></td><td>Активация при превышении порога</td></tr>
+      <tr><td><strong>Weighted Cascade</strong></td><td>IC с весами</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Independent Cascade</h2>
+    <pre><code>import numpy as np
+
+def independent_cascade(G, seeds, p=0.1):
+    active = set(seeds)
+    newly_active = set(seeds)
+    
+    while newly_active:
+        new_act = set()
+        for node in newly_active:
+            for neighbor in G.neighbors(node):
+                if neighbor not in active:
+                    if np.random.random() < p:
+                        new_act.add(neighbor)
+        newly_active = new_act
+        active.update(newly_active)
+    
+    return len(active)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Greedy Algorithm</h2>
+    <pre><code>def greedy_im(G, k, p=0.1, sims=1000):
+    seeds = []
+    for _ in range(k):
+        best_node = None
+        best_gain = -1
+        
+        for node in G.nodes():
+            if node in seeds:
+                continue
+            test = seeds + [node]
+            spread = monte_carlo(G, test, p, sims)
+            if spread > best_gain:
+                best_gain = spread
+                best_node = node
+        seeds.append(best_node)
+    return seeds</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. CELF Optimization</h2>
+    <ul>
+      <li>Cost-Effective Lazy Forward</li>
+      <li>Использует субмодулярность</li>
+      <li>До 700x быстрее greedy</li>
+      <li>Избегает переподсчёта gains</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Heuristics</h2>
+    <table>
+      <tr><th>Метод</th><th>Скорость</th><th>Точность</th></tr>
+      <tr><td>Degree</td><td>O(m)</td><td>Низкая</td></tr>
+      <tr><td>PageRank</td><td>O(km)</td><td>Средняя</td></tr>
+      <tr><td>Betweenness</td><td>O(nm)</td><td>Средняя</td></tr>
+      <tr><td>TIM/IMM</td><td>O(k(m+n)log n)</td><td>Высокая</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. RIS Methods</h2>
+    <p><strong>Reverse Influence Sampling:</strong></p>
+    <ul>
+      <li>Генерация reverse reachable sets</li>
+      <li>Выбор узлов покрывающих max RR sets</li>
+      <li>Быстрый для больших графов</li>
+    </ul>
+    <pre><code>def gen_rr_set(G, target):
+    rr = {target}
+    queue = [target]
+    while queue:
+        v = queue.pop(0)
+        for u in G.predecessors(v):
+            if u not in rr and np.random.random() < 0.1:
+                rr.add(u)
+                queue.append(u)
+    return rr</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Evaluation</h2>
+    <pre><code>def evaluate(G, seeds, p=0.1, n_sims=1000):
+    spreads = []
+    for _ in range(n_sims):
+        spread = independent_cascade(G, seeds, p)
+        spreads.append(spread)
+    
+    return {
+        'mean': np.mean(spreads),
+        'std': np.std(spreads),
+        'median': np.median(spreads)
+    }</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Applications</h2>
+    <table>
+      <tr><th>Область</th><th>Задача</th></tr>
+      <tr><td>Маркетинг</td><td>Вирусные кампании</td></tr>
+      <tr><td>Здравоохранение</td><td>Вакцинация</td></tr>
+      <tr><td>Политика</td><td>Мобилизация</td></tr>
+      <tr><td>Соцсети</td><td>Контент продвижение</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Практические советы</h2>
+    <ul>
+      <li>IC проще, LT точнее для порогов</li>
+      <li>Подбор p из данных</li>
+      <li>RIS для >100K узлов</li>
+      <li>A/B тесты для валидации</li>
+      <li>Учитывайте динамику сети</li>
+    </ul>
+    <blockquote>
+      💡 <strong>Объяснение:</strong> «Выбираем ключевых людей в сети, через которых информация распространится максимально широко. Как выбрать 10 блогеров для охвата миллионов».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

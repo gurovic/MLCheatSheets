@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Алгоритмы на графах Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🕸️ Алгоритмы на графах Cheatsheet</h1>
+  <div class="subtitle">Графы в ML • Кластеризация • Поиск путей • Практика<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы графов</h2>
+    <ul>
+      <li><strong>Граф</strong>: G = (V, E), где V — вершины, E — рёбра</li>
+      <li><strong>Направленный/ненаправленный</strong>: наличие/отсутствие направления рёбер</li>
+      <li><strong>Взвешенный</strong>: рёбра имеют веса</li>
+      <li><strong>Степень вершины</strong>: количество смежных рёбер</li>
+      <li><strong>Путь</strong>: последовательность вершин через рёбра</li>
+      <li><strong>Цикл</strong>: путь, начинающийся и заканчивающийся в одной вершине</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Представление графов</h2>
+    <pre><code>import networkx as nx
+import numpy as np
+
+# Создание графа
+G = nx.Graph()
+G.add_edges_from([(1, 2), (2, 3), (3, 4)])
+
+# Матрица смежности
+adj_matrix = nx.adjacency_matrix(G).todense()
+
+# Список смежности
+adj_list = {node: list(G.neighbors(node)) 
+            for node in G.nodes()}
+
+# Из pandas DataFrame
+import pandas as pd
+edges = pd.DataFrame({
+    'source': [1, 2, 3],
+    'target': [2, 3, 4],
+    'weight': [0.5, 0.8, 0.3]
+})
+G = nx.from_pandas_edgelist(
+    edges, 'source', 'target', 'weight'
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Алгоритмы поиска путей</h2>
+    <table>
+      <tr><th>Алгоритм</th><th>Сложность</th><th>Особенности</th></tr>
+      <tr><td><strong>BFS</strong></td><td>O(V+E)</td><td>Кратчайший путь в невзвешенном графе</td></tr>
+      <tr><td><strong>DFS</strong></td><td>O(V+E)</td><td>Обход в глубину, топологическая сортировка</td></tr>
+      <tr><td><strong>Dijkstra</strong></td><td>O((V+E)logV)</td><td>Кратчайший путь, положительные веса</td></tr>
+      <tr><td><strong>Bellman-Ford</strong></td><td>O(VE)</td><td>Работает с отрицательными весами</td></tr>
+      <tr><td><strong>A*</strong></td><td>O(E)</td><td>С эвристикой, быстрее Dijkstra</td></tr>
+      <tr><td><strong>Floyd-Warshall</strong></td><td>O(V³)</td><td>Все пары кратчайших путей</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. BFS и DFS</h2>
+    <pre><code>import networkx as nx
+from collections import deque
+
+# BFS (поиск в ширину)
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+    
+    while queue:
+        node = queue.popleft()
+        print(node, end=' ')
+        
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+
+# DFS (поиск в глубину)
+def dfs(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    print(start, end=' ')
+    
+    for neighbor in graph[start]:
+        if neighbor not in visited:
+            dfs(graph, neighbor, visited)
+
+# NetworkX BFS
+path = nx.shortest_path(G, source=1, target=4)
+print(f"Shortest path: {path}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Алгоритм Dijkstra</h2>
+    <pre><code>import heapq
+
+def dijkstra(graph, start):
+    distances = {node: float('inf') 
+                 for node in graph}
+    distances[start] = 0
+    pq = [(0, start)]
+    
+    while pq:
+        current_dist, current = heapq.heappop(pq)
+        
+        if current_dist > distances[current]:
+            continue
+            
+        for neighbor, weight in graph[current]:
+            distance = current_dist + weight
+            
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                heapq.heappush(pq, (distance, neighbor))
+    
+    return distances
+
+# С NetworkX
+path = nx.dijkstra_path(G, source=1, target=4)
+length = nx.dijkstra_path_length(G, 1, 4)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Кластеризация графов</h2>
+    <p><strong>Методы выделения сообществ:</strong></p>
+    <ul>
+      <li><strong>Louvain</strong>: максимизация модулярности</li>
+      <li><strong>Label Propagation</strong>: распространение меток</li>
+      <li><strong>Girvan-Newman</strong>: удаление рёбер с высокой betweenness</li>
+      <li><strong>Spectral Clustering</strong>: на основе собственных векторов лапласиана</li>
+    </ul>
+    <pre><code>import community as community_louvain
+
+# Louvain метод
+communities = community_louvain.best_partition(G)
+
+# Label Propagation
+from networkx.algorithms import community
+communities = community.label_propagation_communities(G)
+
+# Girvan-Newman
+comp = community.girvan_newman(G)
+communities = next(comp)
+
+# Spectral clustering
+from sklearn.cluster import SpectralClustering
+adj_matrix = nx.adjacency_matrix(G)
+sc = SpectralClustering(n_clusters=3, affinity='precomputed')
+labels = sc.fit_predict(adj_matrix)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Минимальное остовное дерево</h2>
+    <p><strong>Задача:</strong> найти подграф минимального веса, связывающий все вершины</p>
+    <table>
+      <tr><th>Алгоритм</th><th>Сложность</th><th>Подход</th></tr>
+      <tr><td><strong>Kruskal</strong></td><td>O(E log E)</td><td>Сортировка рёбер</td></tr>
+      <tr><td><strong>Prim</strong></td><td>O(E log V)</td><td>Жадный рост дерева</td></tr>
+    </table>
+    <pre><code># Kruskal's algorithm
+mst = nx.minimum_spanning_tree(G, algorithm='kruskal')
+
+# Prim's algorithm
+mst = nx.minimum_spanning_tree(G, algorithm='prim')
+
+# Получение рёбер MST
+mst_edges = list(mst.edges(data=True))
+total_weight = sum(e[2]['weight'] for e in mst_edges)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Центральности узлов</h2>
+    <p><strong>Метрики важности вершин:</strong></p>
+    <table>
+      <tr><th>Метрика</th><th>Описание</th><th>Применение</th></tr>
+      <tr><td><strong>Degree</strong></td><td>Количество связей</td><td>Базовая важность</td></tr>
+      <tr><td><strong>Betweenness</strong></td><td>Частота на путях между другими узлами</td><td>Мосты, посредники</td></tr>
+      <tr><td><strong>Closeness</strong></td><td>Близость ко всем узлам</td><td>Скорость распространения</td></tr>
+      <tr><td><strong>Eigenvector</strong></td><td>Важность соседей</td><td>Влиятельность</td></tr>
+      <tr><td><strong>PageRank</strong></td><td>Вероятность достижения</td><td>Ранжирование</td></tr>
+    </table>
+    <pre><code># Вычисление центральностей
+degree_cent = nx.degree_centrality(G)
+betweenness_cent = nx.betweenness_centrality(G)
+closeness_cent = nx.closeness_centrality(G)
+eigenvector_cent = nx.eigenvector_centrality(G)
+pagerank = nx.pagerank(G)
+
+# Топ-5 узлов по PageRank
+top_nodes = sorted(pagerank.items(), 
+                   key=lambda x: x[1], 
+                   reverse=True)[:5]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Поиск компонент связности</h2>
+    <pre><code># Компоненты связности
+components = list(nx.connected_components(G))
+n_components = nx.number_connected_components(G)
+
+# Сильно связные компоненты (для направленных)
+if G.is_directed():
+    scc = list(nx.strongly_connected_components(G))
+
+# Проверка связности
+is_connected = nx.is_connected(G)
+
+# Компонента, содержащая узел
+component = nx.node_connected_component(G, node=1)
+
+# Размер самой большой компоненты
+largest_cc = max(nx.connected_components(G), 
+                 key=len)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Поиск циклов</h2>
+    <pre><code># Проверка на ацикличность
+is_dag = nx.is_directed_acyclic_graph(G)
+
+# Поиск всех простых циклов
+cycles = list(nx.simple_cycles(G))
+
+# Топологическая сортировка (для DAG)
+if is_dag:
+    topo_sort = list(nx.topological_sort(G))
+
+# Поиск циклов через DFS
+def find_cycle_dfs(graph, start, visited, rec_stack):
+    visited[start] = True
+    rec_stack[start] = True
+    
+    for neighbor in graph[start]:
+        if not visited[neighbor]:
+            if find_cycle_dfs(graph, neighbor, 
+                             visited, rec_stack):
+                return True
+        elif rec_stack[neighbor]:
+            return True
+    
+    rec_stack[start] = False
+    return False</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Максимальный поток</h2>
+    <p><strong>Задача:</strong> найти максимальный поток из источника в сток</p>
+    <p><strong>Алгоритмы:</strong></p>
+    <ul>
+      <li><strong>Ford-Fulkerson</strong>: поиск увеличивающих путей</li>
+      <li><strong>Edmonds-Karp</strong>: BFS для путей, O(VE²)</li>
+      <li><strong>Dinic</strong>: уровневый граф, O(V²E)</li>
+      <li><strong>Push-Relabel</strong>: O(V²E)</li>
+    </ul>
+    <pre><code># Максимальный поток
+flow_value, flow_dict = nx.maximum_flow(
+    G, source='s', target='t'
+)
+
+# Минимальный разрез
+cut_value, partition = nx.minimum_cut(
+    G, source='s', target='t'
+)
+
+# Capacity scaling
+flow_value = nx.maximum_flow_value(
+    G, 's', 't', capacity='capacity'
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Клики и независимые множества</h2>
+    <pre><code># Поиск клик (полных подграфов)
+cliques = list(nx.find_cliques(G))
+
+# Максимальная клика
+max_clique = max(cliques, key=len)
+
+# Проверка, является ли множество кликой
+is_clique = nx.is_clique(G, [1, 2, 3])
+
+# Независимое множество (нет рёбер внутри)
+# Эквивалентно клике в дополнении графа
+complement = nx.complement(G)
+independent_set = max(nx.find_cliques(complement), 
+                      key=len)
+
+# Число кликов
+n_cliques = nx.graph_clique_number(G)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Применения в ML</h2>
+    <table>
+      <tr><th>Область</th><th>Задача</th><th>Алгоритм</th></tr>
+      <tr><td>Социальные сети</td><td>Выявление сообществ</td><td>Louvain, Label Propagation</td></tr>
+      <tr><td>Рекомендательные системы</td><td>Похожие пользователи/товары</td><td>Random Walk, PageRank</td></tr>
+      <tr><td>Биоинформатика</td><td>Анализ белковых сетей</td><td>Clustering, Path finding</td></tr>
+      <tr><td>Логистика</td><td>Оптимизация маршрутов</td><td>Dijkstra, A*</td></tr>
+      <tr><td>Мошенничество</td><td>Обнаружение колец</td><td>Cycle detection, Community</td></tr>
+      <tr><td>Knowledge graphs</td><td>Reasoning, link prediction</td><td>GNN, Path algorithms</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Случайные блуждания</h2>
+    <pre><code># Random walk на графе
+def random_walk(G, start, length=10):
+    walk = [start]
+    for _ in range(length - 1):
+        neighbors = list(G.neighbors(walk[-1]))
+        if not neighbors:
+            break
+        walk.append(np.random.choice(neighbors))
+    return walk
+
+# PageRank через random walk
+pagerank = nx.pagerank(G, alpha=0.85)
+
+# Персонализированный PageRank
+personalization = {node: 1.0 if node in seed_nodes 
+                   else 0.0 for node in G.nodes()}
+ppr = nx.pagerank(G, personalization=personalization)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Визуализация графов</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Базовая визуализация
+nx.draw(G, with_labels=True, 
+        node_color='lightblue', 
+        node_size=500, 
+        font_size=10)
+
+# С разными layout
+pos = nx.spring_layout(G)  # force-directed
+# pos = nx.circular_layout(G)
+# pos = nx.kamada_kawai_layout(G)
+
+nx.draw(G, pos, with_labels=True)
+
+# Цвет по сообществам
+colors = [communities[node] for node in G.nodes()]
+nx.draw(G, pos, node_color=colors, 
+        with_labels=True, cmap=plt.cm.Set3)
+
+# Размер по центральности
+sizes = [v * 1000 for v in pagerank.values()]
+nx.draw(G, pos, node_size=sizes)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Оптимизация и масштабирование</h2>
+    <p><strong>Большие графы:</strong></p>
+    <ul>
+      <li><strong>Разреженные структуры</strong>: scipy.sparse, CSR формат</li>
+      <li><strong>Параллелизация</strong>: NetworkX с Dask, graph-tool</li>
+      <li><strong>Аппроксимации</strong>: sampling для больших графов</li>
+      <li><strong>Специализированные библиотеки</strong>: igraph, graph-tool</li>
+    </ul>
+    <pre><code># Использование igraph для больших графов
+import igraph as ig
+
+g = ig.Graph.TupleList(edges, directed=False)
+communities = g.community_multilevel()
+
+# Graph-tool для экстремальной производительности
+import graph_tool.all as gt
+
+g = gt.Graph(directed=False)
+g.add_edge_list(edges)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Чек-лист для работы с графами</h2>
+    <ul>
+      <li>[ ] Выбран правильный тип графа (направленный/нет)</li>
+      <li>[ ] Определены веса рёбер (если нужны)</li>
+      <li>[ ] Проверена связность графа</li>
+      <li>[ ] Выбран подходящий алгоритм для задачи</li>
+      <li>[ ] Учтена сложность (важно для больших графов)</li>
+      <li>[ ] Визуализация для понимания структуры</li>
+      <li>[ ] Обработка изолированных вершин</li>
+      <li>[ ] Тестирование на разных размерах графа</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Практические советы</h2>
+    <ul>
+      <li><strong>Начните с малого</strong>: протестируйте на маленьком графе</li>
+      <li><strong>Выбор структуры</strong>: список смежности vs матрица</li>
+      <li><strong>Кэширование</strong>: результаты дорогих вычислений</li>
+      <li><strong>Предобработка</strong>: удаление самопетель, дубликатов</li>
+      <li><strong>Валидация</strong>: проверка корректности алгоритма</li>
+      <li><strong>Метрики графа</strong>: density, diameter, clustering coefficient</li>
+    </ul>
+    <blockquote>
+      💡 <strong>Объяснение заказчику:</strong> «Графы позволяют моделировать связи между объектами — людьми, товарами, страницами. Алгоритмы на графах помогают находить кратчайшие пути, выявлять группы похожих объектов и определять самые важные элементы сети».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Социальный сетевой анализ Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>👥 Социальный сетевой анализ Cheatsheet</h1>
+  <div class="subtitle">Social Network Analysis • Графы и сообщества • Python<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы SNA</h2>
+    <ul>
+      <li><strong>Social Network</strong>: граф социальных связей (дружба, подписки, взаимодействия)</li>
+      <li><strong>Узлы</strong>: люди, организации, аккаунты</li>
+      <li><strong>Рёбра</strong>: отношения, связи, взаимодействия</li>
+      <li><strong>Направленность</strong>: подписки (направленные), дружба (ненаправленные)</li>
+      <li><strong>Веса</strong>: частота взаимодействий, сила связи</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Базовая работа с NetworkX</h2>
+    <pre><code>import networkx as nx
+import pandas as pd
+
+# Создание графа
+G = nx.Graph()  # ненаправленный
+# G = nx.DiGraph()  # направленный
+
+# Добавление узлов и рёбер
+G.add_node("Alice", age=25)
+G.add_edge("Alice", "Bob", weight=5)
+
+# Из DataFrame
+edges = pd.DataFrame({
+    'from': ['Alice', 'Bob', 'Charlie'],
+    'to': ['Bob', 'Charlie', 'Alice'],
+    'weight': [5, 3, 2]
+})
+G = nx.from_pandas_edgelist(
+    edges, 'from', 'to', 
+    edge_attr='weight'
+)
+
+# Основная информация
+print(f"Nodes: {G.number_of_nodes()}")
+print(f"Edges: {G.number_of_edges()}")
+print(f"Density: {nx.density(G):.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Метрики узлов</h2>
+    <table>
+      <tr><th>Метрика</th><th>Значение</th><th>Интерпретация</th></tr>
+      <tr><td><strong>Degree</strong></td><td>Кол-во связей</td><td>Популярность, активность</td></tr>
+      <tr><td><strong>Betweenness</strong></td><td>На скольких путях лежит</td><td>Посредник, влияние</td></tr>
+      <tr><td><strong>Closeness</strong></td><td>Близость ко всем</td><td>Скорость распространения</td></tr>
+      <tr><td><strong>Eigenvector</strong></td><td>Важность соседей</td><td>Престиж, элитарность</td></tr>
+      <tr><td><strong>PageRank</strong></td><td>Вероятность попадания</td><td>Авторитет</td></tr>
+      <tr><td><strong>Clustering Coef</strong></td><td>Плотность окружения</td><td>Сплоченность круга</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Расчёт центральностей</h2>
+    <pre><code>import networkx as nx
+
+# Degree centrality
+degree_cent = nx.degree_centrality(G)
+
+# Betweenness centrality
+betweenness_cent = nx.betweenness_centrality(G)
+
+# Closeness centrality
+closeness_cent = nx.closeness_centrality(G)
+
+# Eigenvector centrality
+eigenvector_cent = nx.eigenvector_centrality(G)
+
+# PageRank
+pagerank = nx.pagerank(G, alpha=0.85)
+
+# Топ-10 влиятельных узлов
+top_nodes = sorted(
+    pagerank.items(), 
+    key=lambda x: x[1], 
+    reverse=True
+)[:10]
+
+# Clustering coefficient
+clustering = nx.clustering(G)
+avg_clustering = nx.average_clustering(G)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Выявление сообществ</h2>
+    <p><strong>Алгоритмы обнаружения community:</strong></p>
+    <ul>
+      <li><strong>Louvain</strong>: максимизация модулярности, быстрый</li>
+      <li><strong>Leiden</strong>: улучшенный Louvain</li>
+      <li><strong>Label Propagation</strong>: распространение меток</li>
+      <li><strong>Girvan-Newman</strong>: удаление рёбер</li>
+      <li><strong>Infomap</strong>: теория информации</li>
+    </ul>
+    <pre><code>import community as community_louvain
+
+# Louvain algorithm
+partition = community_louvain.best_partition(G)
+
+# Модулярность
+modularity = community_louvain.modularity(
+    partition, G
+)
+
+# Label Propagation
+from networkx.algorithms import community
+communities = community.label_propagation_communities(G)
+
+# Girvan-Newman
+comp = community.girvan_newman(G)
+limited = itertools.takewhile(
+    lambda c: len(c) <= 10, comp
+)
+communities = list(limited)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Анализ структуры сети</h2>
+    <pre><code># Основные характеристики
+n_nodes = G.number_of_nodes()
+n_edges = G.number_of_edges()
+density = nx.density(G)
+
+# Компоненты связности
+components = list(nx.connected_components(G))
+largest_cc = max(components, key=len)
+largest_cc_size = len(largest_cc)
+
+# Диаметр сети
+if nx.is_connected(G):
+    diameter = nx.diameter(G)
+    avg_path_length = nx.average_shortest_path_length(G)
+
+# Степенное распределение
+degrees = [G.degree(n) for n in G.nodes()]
+avg_degree = sum(degrees) / len(degrees)
+
+# Коэффициент ассортативности
+assortativity = nx.degree_assortativity_coefficient(G)
+
+# Transitivity (global clustering)
+transitivity = nx.transitivity(G)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Малый мир и безмасштабность</h2>
+    <p><strong>Small World Network:</strong></p>
+    <ul>
+      <li>Малое среднее расстояние между узлами</li>
+      <li>Высокий коэффициент кластеризации</li>
+      <li>Феномен "6 рукопожатий"</li>
+    </ul>
+    <p><strong>Scale-Free Network:</strong></p>
+    <ul>
+      <li>Степенное распределение степеней: P(k) ~ k^(-γ)</li>
+      <li>Наличие хабов (узлов с большим degree)</li>
+      <li>Устойчивость к случайным сбоям</li>
+    </ul>
+    <pre><code># Проверка на small world
+# Watts-Strogatz коэффициент
+C = nx.average_clustering(G)
+L = nx.average_shortest_path_length(G)
+
+# Сравнение с random graph
+G_rand = nx.random_reference(G)
+C_rand = nx.average_clustering(G_rand)
+L_rand = nx.average_shortest_path_length(G_rand)
+
+small_world_coef = (C / C_rand) / (L / L_rand)
+# > 1 означает small world</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Влиятельные узлы</h2>
+    <p><strong>Методы определения influencers:</strong></p>
+    <table>
+      <tr><th>Метод</th><th>Когда использовать</th></tr>
+      <tr><td>Degree</td><td>Много прямых связей</td></tr>
+      <tr><td>PageRank</td><td>Качество связей важнее количества</td></tr>
+      <tr><td>Betweenness</td><td>Контроль информационных потоков</td></tr>
+      <tr><td>K-core</td><td>Принадлежность к ядру сети</td></tr>
+    </table>
+    <pre><code># K-core decomposition
+core_numbers = nx.core_number(G)
+max_core = max(core_numbers.values())
+k_core_nodes = [n for n, c in core_numbers.items() 
+                if c == max_core]
+
+# Влияние на распространение
+# Greedy algorithm для influence maximization
+def greedy_influence_max(G, k):
+    seed_set = []
+    for _ in range(k):
+        best_node = None
+        best_influence = 0
+        
+        for node in G.nodes():
+            if node in seed_set:
+                continue
+            influence = estimate_influence(
+                G, seed_set + [node]
+            )
+            if influence > best_influence:
+                best_influence = influence
+                best_node = node
+        seed_set.append(best_node)
+    return seed_set</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Распространение информации</h2>
+    <p><strong>Модели распространения:</strong></p>
+    <ul>
+      <li><strong>Independent Cascade</strong>: вероятность активации соседа</li>
+      <li><strong>Linear Threshold</strong>: порог активации</li>
+      <li><strong>SIR model</strong>: Susceptible-Infected-Recovered</li>
+      <li><strong>SIS model</strong>: Susceptible-Infected-Susceptible</li>
+    </ul>
+    <pre><code># Симуляция Independent Cascade
+def independent_cascade(G, seeds, p=0.1, steps=10):
+    active = set(seeds)
+    newly_active = set(seeds)
+    
+    for _ in range(steps):
+        targets = set()
+        for node in newly_active:
+            for neighbor in G.neighbors(node):
+                if neighbor not in active:
+                    if np.random.random() < p:
+                        targets.add(neighbor)
+        
+        newly_active = targets
+        active.update(newly_active)
+        
+        if not newly_active:
+            break
+    
+    return active
+
+# Симуляция с начальными узлами
+seeds = ['Alice', 'Bob']
+infected = independent_cascade(G, seeds, p=0.2)
+print(f"Reached {len(infected)} nodes")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Триады и мотивы</h2>
+    <p><strong>Треугольники в сетях:</strong></p>
+    <ul>
+      <li>Транзитивность: друг друга моего друга — мой друг</li>
+      <li>Триадная перепись (triad census)</li>
+      <li>Структурные мотивы</li>
+    </ul>
+    <pre><code># Подсчёт треугольников
+triangles = nx.triangles(G)
+total_triangles = sum(triangles.values()) // 3
+
+# Triadic closure
+clustering_coef = nx.clustering(G)
+
+# Triad census (для направленных графов)
+if G.is_directed():
+    triad_census = nx.triadic_census(G)
+    # 16 типов триад
+
+# Поиск мотивов (паттернов)
+# Cliques (полные подграфы)
+cliques = list(nx.find_cliques(G))
+triangles = [c for c in cliques if len(c) == 3]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Ego-сети</h2>
+    <p><strong>Ego network:</strong> узел и его ближайшее окружение</p>
+    <pre><code># Извлечение ego-сети
+def get_ego_network(G, ego, radius=1):
+    nodes = set([ego])
+    for _ in range(radius):
+        neighbors = set()
+        for node in nodes:
+            neighbors.update(G.neighbors(node))
+        nodes.update(neighbors)
+    
+    return G.subgraph(nodes)
+
+ego_net = nx.ego_graph(G, 'Alice', radius=1)
+
+# Характеристики ego-сети
+ego_size = ego_net.number_of_nodes()
+ego_density = nx.density(ego_net)
+ego_clustering = nx.clustering(ego_net, 'Alice')
+
+# Структурные дыры (Burt)
+# Constraint measure
+constraint = nx.constraint(G, 'Alice')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Гомофилия и ассортативность</h2>
+    <p><strong>Гомофилия:</strong> подобное притягивает подобное</p>
+    <pre><code># Ассортативность по атрибутам
+# Numeric attribute
+assortativity_age = nx.attribute_assortativity_coefficient(
+    G, 'age'
+)
+
+# Categorical attribute
+assortativity_gender = nx.attribute_assortativity_coefficient(
+    G, 'gender'
+)
+
+# Degree assortativity
+degree_assort = nx.degree_assortativity_coefficient(G)
+# > 0: хабы связаны с хабами
+# < 0: хабы связаны с периферией
+
+# Mixing matrix
+from networkx.algorithms import assortativity
+mixing = assortativity.attribute_mixing_matrix(
+    G, 'category'
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Визуализация сетей</h2>
+    <pre><code>import matplotlib.pyplot as plt
+
+# Force-directed layout
+pos = nx.spring_layout(G, k=0.5, iterations=50)
+
+# Размер узлов по degree
+node_sizes = [G.degree(n) * 100 for n in G.nodes()]
+
+# Цвет узлов по community
+communities = community_louvain.best_partition(G)
+colors = [communities[n] for n in G.nodes()]
+
+# Визуализация
+plt.figure(figsize=(12, 8))
+nx.draw_networkx_nodes(
+    G, pos, node_size=node_sizes, 
+    node_color=colors, cmap='Set3', alpha=0.8
+)
+nx.draw_networkx_edges(G, pos, alpha=0.3)
+nx.draw_networkx_labels(G, pos, font_size=8)
+plt.axis('off')
+plt.show()
+
+# Интерактивная визуализация с Pyvis
+from pyvis.network import Network
+
+net = Network(height='750px', width='100%')
+net.from_nx(G)
+net.show('network.html')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Динамические сети</h2>
+    <p><strong>Временные сети:</strong> изменение структуры во времени</p>
+    <pre><code># Snapshot approach
+snapshots = {}
+for time_period in time_periods:
+    edges_t = edges[edges['time'] == time_period]
+    G_t = nx.from_pandas_edgelist(edges_t)
+    snapshots[time_period] = G_t
+
+# Эволюция метрик
+densities = [nx.density(G_t) for G_t in snapshots.values()]
+avg_degrees = [np.mean([d for n, d in G_t.degree()]) 
+               for G_t in snapshots.values()]
+
+# Стабильность сообществ
+communities_t1 = detect_communities(snapshots[t1])
+communities_t2 = detect_communities(snapshots[t2])
+stability = jaccard_similarity(communities_t1, 
+                                communities_t2)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Применения SNA</h2>
+    <table>
+      <tr><th>Область</th><th>Задачи</th></tr>
+      <tr><td>Маркетинг</td><td>Influencer marketing, viral campaigns</td></tr>
+      <tr><td>HR</td><td>Неформальные лидеры, коммуникационные паттерны</td></tr>
+      <tr><td>Безопасность</td><td>Обнаружение мошеннических колец</td></tr>
+      <tr><td>Здравоохранение</td><td>Распространение эпидемий</td></tr>
+      <tr><td>Политика</td><td>Анализ коалиций, влияние в парламенте</td></tr>
+      <tr><td>Рекомендации</td><td>Друзья друзей, collaborative filtering</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Link Prediction</h2>
+    <p><strong>Предсказание будущих связей:</strong></p>
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+
+# Признаки для пары узлов
+def extract_features(G, u, v):
+    return {
+        'common_neighbors': len(list(nx.common_neighbors(G, u, v))),
+        'jaccard_coef': nx.jaccard_coefficient(G, [(u, v)]),
+        'adamic_adar': nx.adamic_adar_index(G, [(u, v)]),
+        'preferential_attachment': nx.preferential_attachment(G, [(u, v)]),
+        'resource_allocation': nx.resource_allocation_index(G, [(u, v)])
+    }
+
+# Обучение модели
+X = [extract_features(G, u, v) 
+     for u, v in candidate_pairs]
+y = [1 if (u, v) in G.edges() else 0 
+     for u, v in candidate_pairs]
+
+model = RandomForestClassifier()
+model.fit(X, y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Чек-лист для SNA проекта</h2>
+    <ul>
+      <li>[ ] Определён тип графа (направленный/нет)</li>
+      <li>[ ] Собраны данные о взаимодействиях</li>
+      <li>[ ] Выбраны релевантные метрики</li>
+      <li>[ ] Проведён анализ сообществ</li>
+      <li>[ ] Идентифицированы влиятельные узлы</li>
+      <li>[ ] Визуализация создана</li>
+      <li>[ ] Результаты интерпретированы для бизнеса</li>
+      <li>[ ] Проверена стабильность результатов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Практические советы</h2>
+    <ul>
+      <li><strong>Данные</strong>: качество важнее количества</li>
+      <li><strong>Масштаб</strong>: для >1M узлов используйте spark-based решения</li>
+      <li><strong>Интерпретация</strong>: всегда связывайте с бизнес-контекстом</li>
+      <li><strong>Временной аспект</strong>: сети динамичны, не забывайте о времени</li>
+      <li><strong>Privacy</strong>: анонимизируйте персональные данные</li>
+      <li><strong>Валидация</strong>: используйте domain expertise</li>
+    </ul>
+    <blockquote>
+      💡 <strong>Объяснение заказчику:</strong> «Анализируем структуру связей между людьми, чтобы найти самых влиятельных, понять группы со схожими интересами и предсказать будущие связи. Это помогает в таргетинге рекламы, выявлении мошенников и понимании распространения информации».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

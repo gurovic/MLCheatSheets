@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Тематическое моделирование Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📚 Тематическое моделирование Cheatsheet</h1>
+  <div class="subtitle">LDA • NMF • Topic Modeling • Анализ текстов<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <ul>
+      <li><strong>Цель</strong>: автоматическое выявление тем в коллекции документов</li>
+      <li><strong>Topic</strong>: распределение вероятностей над словами</li>
+      <li><strong>Document</strong>: смесь тем</li>
+      <li><strong>Unsupervised</strong>: не требует меток</li>
+      <li><strong>Применение</strong>: классификация, рекомендации, анализ отзывов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Методы</h2>
+    <table>
+      <tr><th>Метод</th><th>Подход</th><th>Особенности</th></tr>
+      <tr><td><strong>LDA</strong></td><td>Вероятностный</td><td>Интерпретируемость</td></tr>
+      <tr><td><strong>NMF</strong></td><td>Матричная факторизация</td><td>Быстрый</td></tr>
+      <tr><td><strong>LSA/LSI</strong></td><td>SVD</td><td>Простой</td></tr>
+      <tr><td><strong>Top2Vec</strong></td><td>Embeddings</td><td>Современный</td></tr>
+      <tr><td><strong>BERTopic</strong></td><td>Transformers</td><td>State-of-the-art</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. LDA (Latent Dirichlet Allocation)</h2>
+    <p><strong>Идея:</strong> документ - смесь тем, тема - смесь слов</p>
+    <pre><code>from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.feature_extraction.text import CountVectorizer
+
+# Vectorization
+vectorizer = CountVectorizer(
+    max_features=1000,
+    max_df=0.8,
+    min_df=5,
+    stop_words='english'
+)
+X = vectorizer.fit_transform(documents)
+
+# LDA model
+lda = LatentDirichletAllocation(
+    n_components=10,  # число тем
+    random_state=42,
+    max_iter=20
+)
+doc_topics = lda.fit_transform(X)
+
+# Топ слов для каждой темы
+feature_names = vectorizer.get_feature_names_out()
+for topic_idx, topic in enumerate(lda.components_):
+    top_words_idx = topic.argsort()[-10:][::-1]
+    top_words = [feature_names[i] for i in top_words_idx]
+    print(f"Topic {topic_idx}: {', '.join(top_words)}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. NMF (Non-negative Matrix Factorization)</h2>
+    <pre><code>from sklearn.decomposition import NMF
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+# TF-IDF
+tfidf = TfidfVectorizer(
+    max_features=1000,
+    max_df=0.8,
+    min_df=5
+)
+X = tfidf.fit_transform(documents)
+
+# NMF
+nmf = NMF(
+    n_components=10,
+    random_state=42,
+    init='nndsvda',  # инициализация
+    max_iter=500
+)
+doc_topics = nmf.fit_transform(X)
+word_topics = nmf.components_
+
+# Вывод тем
+feature_names = tfidf.get_feature_names_out()
+for topic_idx, topic in enumerate(word_topics):
+    top_idx = topic.argsort()[-10:][::-1]
+    top_words = [feature_names[i] for i in top_idx]
+    print(f"Topic {topic_idx}: {', '.join(top_words)}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Сравнение LDA vs NMF</h2>
+    <table>
+      <tr><th>Аспект</th><th>LDA</th><th>NMF</th></tr>
+      <tr><td>Входные данные</td><td>Count matrix</td><td>TF-IDF</td></tr>
+      <tr><td>Скорость</td><td>Медленнее</td><td>Быстрее</td></tr>
+      <tr><td>Интерпретация</td><td>Вероятностная</td><td>Частичная</td></tr>
+      <tr><td>Качество</td><td>Лучше для текстов</td><td>Хорошо для коротких</td></tr>
+      <tr><td>Sparse data</td><td>Хорошо</td><td>Отлично</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Подбор числа тем</h2>
+    <pre><code>from sklearn.metrics import silhouette_score
+
+# Перебор количества тем
+coherence_scores = []
+perplexity_scores = []
+
+for n_topics in range(5, 51, 5):
+    lda = LatentDirichletAllocation(
+        n_components=n_topics,
+        random_state=42
+    )
+    doc_topics = lda.fit_transform(X)
+    
+    # Perplexity
+    perplexity = lda.perplexity(X)
+    perplexity_scores.append(perplexity)
+    
+    # Coherence (упрощённый)
+    coherence = compute_coherence(lda, X, vectorizer)
+    coherence_scores.append(coherence)
+
+# Elbow method
+import matplotlib.pyplot as plt
+plt.plot(range(5, 51, 5), coherence_scores)
+plt.xlabel('Number of topics')
+plt.ylabel('Coherence score')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Визуализация тем</h2>
+    <pre><code>import pyLDAvis.sklearn
+
+# pyLDAvis для LDA
+prepared = pyLDAvis.sklearn.prepare(
+    lda, X, vectorizer
+)
+pyLDAvis.save_html(prepared, 'lda_viz.html')
+
+# t-SNE для NMF
+from sklearn.manifold import TSNE
+tsne = TSNE(n_components=2, random_state=42)
+doc_topics_2d = tsne.fit_transform(doc_topics)
+
+plt.scatter(
+    doc_topics_2d[:, 0], 
+    doc_topics_2d[:, 1],
+    c=doc_topics.argmax(axis=1),
+    cmap='tab10'
+)
+plt.title('Document Topics Visualization')
+plt.show()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Gensim LDA</h2>
+    <pre><code>from gensim import corpora
+from gensim.models import LdaModel
+import gensim
+
+# Подготовка данных
+texts = [doc.split() for doc in documents]
+dictionary = corpora.Dictionary(texts)
+corpus = [dictionary.doc2bow(text) for text in texts]
+
+# LDA model
+lda_model = LdaModel(
+    corpus=corpus,
+    id2word=dictionary,
+    num_topics=10,
+    random_state=42,
+    passes=10,
+    alpha='auto'
+)
+
+# Топ слова тем
+for idx, topic in lda_model.print_topics(-1):
+    print(f'Topic {idx}: {topic}')
+
+# Coherence score
+coherence_model = gensim.models.CoherenceModel(
+    model=lda_model,
+    texts=texts,
+    dictionary=dictionary,
+    coherence='c_v'
+)
+coherence_score = coherence_model.get_coherence()
+print(f'Coherence Score: {coherence_score}')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. BERTopic - современный подход</h2>
+    <pre><code>from bertopic import BERTopic
+
+# Простая модель
+topic_model = BERTopic(language="russian")
+topics, probs = topic_model.fit_transform(documents)
+
+# Вывод тем
+topic_model.get_topic_info()
+
+# Визуализация
+topic_model.visualize_topics()
+topic_model.visualize_barchart()
+
+# Поиск похожих документов
+similar_topics, similarity = topic_model.find_topics(
+    "machine learning", 
+    top_n=5
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Предобработка текста</h2>
+    <ul>
+      <li><strong>Tokenization</strong>: разбиение на слова</li>
+      <li><strong>Lowercase</strong>: приведение к нижнему регистру</li>
+      <li><strong>Stop words</strong>: удаление стоп-слов</li>
+      <li><strong>Lemmatization</strong>: приведение к начальной форме</li>
+      <li><strong>Punctuation removal</strong>: удаление пунктуации</li>
+      <li><strong>Min/Max length</strong>: фильтрация по длине</li>
+    </ul>
+    <pre><code>import re
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+
+def preprocess(text):
+    # Lowercase
+    text = text.lower()
+    # Remove punctuation
+    text = re.sub(r'[^\w\s]', '', text)
+    # Tokenize
+    tokens = text.split()
+    # Remove stopwords
+    stop_words = set(stopwords.words('english'))
+    tokens = [t for t in tokens if t not in stop_words]
+    # Lemmatization
+    lemmatizer = WordNetLemmatizer()
+    tokens = [lemmatizer.lemmatize(t) for t in tokens]
+    return ' '.join(tokens)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Применения</h2>
+    <table>
+      <tr><th>Область</th><th>Задача</th></tr>
+      <tr><td>E-commerce</td><td>Категоризация товаров, анализ отзывов</td></tr>
+      <tr><td>Новости</td><td>Группировка статей, рекомендации</td></tr>
+      <tr><td>Академия</td><td>Анализ публикаций, тренды</td></tr>
+      <tr><td>Соцсети</td><td>Trending topics, модерация</td></tr>
+      <tr><td>Бизнес</td><td>Анализ feedback, customer insights</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Метрики качества</h2>
+    <ul>
+      <li><strong>Coherence</strong>: семантическая связность тем</li>
+      <li><strong>Perplexity</strong>: для LDA (меньше - лучше)</li>
+      <li><strong>Topic diversity</strong>: разнообразие тем</li>
+      <li><strong>Human evaluation</strong>: экспертная оценка</li>
+    </ul>
+    <pre><code>from gensim.models import CoherenceModel
+
+# Coherence score
+coherence_model = CoherenceModel(
+    model=lda_model,
+    texts=texts,
+    dictionary=dictionary,
+    coherence='c_v'  # или 'u_mass', 'c_uci'
+)
+coherence = coherence_model.get_coherence()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Динамическое моделирование</h2>
+    <p><strong>Dynamic Topic Models:</strong> темы меняются во времени</p>
+    <pre><code>from gensim.models import LdaSeqModel
+
+# Документы разбиты по временным отрезкам
+time_slices = [100, 150, 200]  # кол-во документов
+
+ldaseq = LdaSeqModel(
+    corpus=corpus,
+    id2word=dictionary,
+    time_slice=time_slices,
+    num_topics=10
+)
+
+# Эволюция темы 0
+ldaseq.print_topic_times(topic=0, top_terms=10)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Практические советы</h2>
+    <ul>
+      <li>Начните с 10-20 тем, затем подбирайте</li>
+      <li>Качественная предобработка критична</li>
+      <li>LDA для больших текстов, NMF для коротких</li>
+      <li>BERTopic для современных задач</li>
+      <li>Используйте domain stopwords</li>
+      <li>Coherence score важнее perplexity</li>
+      <li>Визуализация помогает интерпретации</li>
+    </ul>
+    <blockquote>
+      💡 <strong>Объяснение:</strong> «Автоматически находим темы в больших коллекциях текстов. Например, в 10000 новостей выявляем основные темы: политика, спорт, технологии — без ручной разметки».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

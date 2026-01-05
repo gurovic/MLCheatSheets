@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Risk Management Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📊 Risk Management с ML Cheatsheet</h1>
+  <div class="subtitle">Управление рисками • Финансы и ML • Практические методы<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы Risk Management</h2>
+    <ul>
+      <li><strong>Цель</strong>: выявление, оценка и минимизация рисков</li>
+      <li><strong>Виды рисков</strong>: кредитный, рыночный, операционный, ликвидности</li>
+      <li><strong>VaR (Value at Risk)</strong>: потенциальные потери за период с заданной вероятностью</li>
+      <li><strong>Expected Shortfall (ES)</strong>: средние потери при превышении VaR</li>
+      <li><strong>Stress testing</strong>: оценка устойчивости в кризисных сценариях</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы финансовых рисков</h2>
+    <table>
+      <tr><th>Тип риска</th><th>Описание</th><th>ML-методы</th></tr>
+      <tr><td><strong>Кредитный</strong></td><td>Риск невозврата кредита</td><td>Классификация, скоринг</td></tr>
+      <tr><td><strong>Рыночный</strong></td><td>Риск изменения цен</td><td>Временные ряды, волатильность</td></tr>
+      <tr><td><strong>Операционный</strong></td><td>Риск сбоев процессов</td><td>Обнаружение аномалий</td></tr>
+      <tr><td><strong>Ликвидности</strong></td><td>Нехватка средств</td><td>Прогнозирование потоков</td></tr>
+      <tr><td><strong>Репутационный</strong></td><td>Ущерб репутации</td><td>Анализ тональности, NLP</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Value at Risk (VaR)</h2>
+    <p><strong>Определение:</strong> максимальная ожидаемая потеря за период времени с заданной вероятностью</p>
+    <p><strong>Пример:</strong> VaR(95%, 1 день) = $1M означает, что с вероятностью 95% потери не превысят $1M за день</p>
+    <p><strong>Методы расчета:</strong></p>
+    <ul>
+      <li><strong>Исторический</strong>: на основе исторических данных</li>
+      <li><strong>Параметрический</strong>: предполагает нормальное распределение</li>
+      <li><strong>Монте-Карло</strong>: симуляция множества сценариев</li>
+    </ul>
+    <pre><code>import numpy as np
+
+# Исторический VaR
+returns = portfolio_returns  # массив доходностей
+confidence = 0.95
+var_95 = np.percentile(returns, (1 - confidence) * 100)
+
+# Параметрический VaR
+mean = returns.mean()
+std = returns.std()
+var_95_param = mean - 1.645 * std  # для 95%</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Базовый код для оценки рисков</h2>
+    <pre><code>import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
+
+# Кредитный риск - классификация дефолтов
+model = RandomForestClassifier(
+    n_estimators=100,
+    max_depth=10,
+    class_weight='balanced'
+)
+model.fit(X_train, y_train)
+default_prob = model.predict_proba(X_test)[:, 1]
+
+# Расчет Expected Loss
+EL = PD * EAD * LGD
+# PD - Probability of Default
+# EAD - Exposure at Default
+# LGD - Loss Given Default</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Модели кредитного риска</h2>
+    <table>
+      <tr><th>Модель</th><th>Применение</th><th>Особенности</th></tr>
+      <tr><td><strong>PD модель</strong></td><td>Вероятность дефолта</td><td>Логистическая регрессия, GBM</td></tr>
+      <tr><td><strong>LGD модель</strong></td><td>Потери при дефолте</td><td>Регрессия, beta-регрессия</td></tr>
+      <tr><td><strong>EAD модель</strong></td><td>Размер экспозиции</td><td>Регрессия, линейные модели</td></tr>
+      <tr><td><strong>CCF модель</strong></td><td>Credit Conversion Factor</td><td>Для лимитов и кредитных линий</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Рыночный риск</h2>
+    <p><strong>Задачи:</strong></p>
+    <ul>
+      <li>Прогнозирование волатильности (GARCH модели)</li>
+      <li>Оценка корреляций между активами</li>
+      <li>Стресс-тестирование портфеля</li>
+    </ul>
+    <pre><code>from arch import arch_model
+
+# GARCH(1,1) для моделирования волатильности
+model = arch_model(
+    returns, 
+    vol='Garch', 
+    p=1, 
+    q=1
+)
+result = model.fit()
+
+# Прогноз волатильности
+forecast = result.forecast(horizon=5)
+volatility = forecast.variance.values[-1, :]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Монте-Карло симуляции</h2>
+    <p><strong>Применение:</strong> оценка VaR, стресс-тестирование</p>
+    <pre><code>import numpy as np
+
+# Симуляция цен актива
+n_simulations = 10000
+n_days = 252  # торговых дней
+
+initial_price = 100
+returns = np.random.normal(0.0005, 0.02, 
+                          (n_simulations, n_days))
+price_paths = initial_price * np.exp(
+    np.cumsum(returns, axis=1)
+)
+
+# VaR на основе симуляций
+final_prices = price_paths[:, -1]
+var_95 = np.percentile(
+    initial_price - final_prices, 
+    95
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Стресс-тестирование</h2>
+    <p><strong>Виды стресс-тестов:</strong></p>
+    <ul>
+      <li><strong>Исторические сценарии</strong>: кризис 2008, пандемия 2020</li>
+      <li><strong>Гипотетические</strong>: "что если процентная ставка вырастет на 5%?"</li>
+      <li><strong>Обратные</strong>: какие условия приведут к потерям $X?</li>
+    </ul>
+    <pre><code># Применение стресс-сценария
+stress_scenarios = {
+    'crisis_2008': {'stock': -0.40, 'bond': -0.15},
+    'rate_shock': {'stock': -0.20, 'bond': -0.10},
+    'pandemic': {'stock': -0.35, 'bond': 0.05}
+}
+
+for name, shocks in stress_scenarios.items():
+    stressed_portfolio = apply_shocks(
+        portfolio, shocks
+    )
+    loss = calculate_loss(stressed_portfolio)
+    print(f"{name}: Loss = ${loss:,.0f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Операционный риск</h2>
+    <p><strong>Задачи ML:</strong></p>
+    <ul>
+      <li>Обнаружение мошенничества (fraud detection)</li>
+      <li>Выявление аномалий в транзакциях</li>
+      <li>Прогнозирование сбоев систем</li>
+      <li>Анализ рисков кибербезопасности</li>
+    </ul>
+    <pre><code>from sklearn.ensemble import IsolationForest
+
+# Обнаружение аномальных транзакций
+iso_forest = IsolationForest(
+    contamination=0.01,  # ожидаемая доля аномалий
+    random_state=42
+)
+anomaly_labels = iso_forest.fit_predict(
+    transactions_features
+)
+
+# -1 для аномалий, 1 для нормальных
+suspicious = transactions[anomaly_labels == -1]</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Портфельная оптимизация</h2>
+    <p><strong>Модель Марковица:</strong> максимизация доходности при заданном риске</p>
+    <pre><code>import numpy as np
+from scipy.optimize import minimize
+
+def portfolio_risk(weights, cov_matrix):
+    return np.sqrt(
+        weights @ cov_matrix @ weights
+    )
+
+def portfolio_return(weights, returns):
+    return weights @ returns
+
+# Оптимизация
+constraints = ({'type': 'eq', 'fun': lambda w: np.sum(w) - 1})
+bounds = tuple((0, 1) for _ in range(n_assets))
+
+result = minimize(
+    portfolio_risk,
+    x0=np.ones(n_assets) / n_assets,
+    args=(cov_matrix,),
+    method='SLSQP',
+    bounds=bounds,
+    constraints=constraints
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Backtesting моделей риска</h2>
+    <p><strong>Проверка точности VaR:</strong></p>
+    <ul>
+      <li><strong>Kupiec test</strong>: проверка частоты превышений VaR</li>
+      <li><strong>Christoffersen test</strong>: независимость превышений</li>
+      <li><strong>Expected Shortfall backtesting</strong></li>
+    </ul>
+    <pre><code># Подсчет превышений VaR
+var_95 = calculate_var(returns, 0.95)
+exceedances = returns < var_95
+exceedance_rate = exceedances.sum() / len(returns)
+
+# Для VaR(95%) ожидаем ~5% превышений
+print(f"Exceedance rate: {exceedance_rate:.2%}")
+
+# Kupiec test
+from scipy.stats import chi2
+n = len(returns)
+x = exceedances.sum()
+p = 0.05  # для 95% VaR
+lr = -2 * np.log(((1-p)**(n-x) * p**x) / 
+                 ((1-x/n)**(n-x) * (x/n)**x))
+p_value = 1 - chi2.cdf(lr, df=1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Machine Learning для риск-менеджмента</h2>
+    <table>
+      <tr><th>Задача</th><th>Модели ML</th><th>Метрики</th></tr>
+      <tr><td>Дефолт-предсказание</td><td>LightGBM, XGBoost, Логрег</td><td>AUC-ROC, Gini</td></tr>
+      <tr><td>Прогноз волатильности</td><td>LSTM, GARCH-ML гибриды</td><td>MSE, MAE</td></tr>
+      <tr><td>Обнаружение мошенничества</td><td>Isolation Forest, Autoencoder</td><td>Precision, Recall</td></tr>
+      <tr><td>Оценка LGD</td><td>Random Forest, Quantile Regression</td><td>MAE, R²</td></tr>
+      <tr><td>Прогноз ликвидности</td><td>ARIMA, Prophet, LSTM</td><td>MAPE, RMSE</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Feature Engineering для риск-моделей</h2>
+    <p><strong>Кредитный риск:</strong></p>
+    <ul>
+      <li>Debt-to-Income ratio</li>
+      <li>Payment history (DPD indicators)</li>
+      <li>Credit utilization</li>
+      <li>Макроэкономические индикаторы</li>
+    </ul>
+    <p><strong>Рыночный риск:</strong></p>
+    <ul>
+      <li>Исторические доходности (lag features)</li>
+      <li>Скользящие средние, волатильность</li>
+      <li>Корреляции с индексами</li>
+      <li>Technical indicators (RSI, MACD)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Регуляторные требования</h2>
+    <ul>
+      <li><strong>Базель III</strong>: минимальные требования к капиталу</li>
+      <li><strong>IFRS 9</strong>: оценка ожидаемых кредитных убытков (ECL)</li>
+      <li><strong>SR 11-7</strong> (ФРС): валидация моделей</li>
+      <li><strong>Model Risk Management</strong>: документирование, валидация</li>
+      <li><strong>Explainability</strong>: объяснимость решений моделей</li>
+    </ul>
+    <p><strong>Ключевые метрики Базель III:</strong></p>
+    <ul>
+      <li>CET1 ratio ≥ 4.5%</li>
+      <li>Tier 1 capital ratio ≥ 6%</li>
+      <li>Total capital ratio ≥ 8%</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Редкие события (дефолты)</td><td>SMOTE, synthetic data, transfer learning</td></tr>
+      <tr><td>Нестационарность рынков</td><td>Adaptive models, rolling windows</td></tr>
+      <tr><td>Model risk</td><td>Ensemble моделей, champion-challenger</td></tr>
+      <tr><td>Дрейф концепции</td><td>Регулярное переобучение, мониторинг PSI</td></tr>
+      <tr><td>Интерпретируемость</td><td>SHAP, LIME, линейные модели</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Мониторинг и управление моделями</h2>
+    <p><strong>Ключевые метрики мониторинга:</strong></p>
+    <ul>
+      <li><strong>PSI (Population Stability Index)</strong>: стабильность популяции</li>
+      <li><strong>CSI (Characteristic Stability Index)</strong>: стабильность признаков</li>
+      <li><strong>Model performance</strong>: AUC, Gini коэффициент</li>
+      <li><strong>Calibration</strong>: соответствие прогнозов реальности</li>
+    </ul>
+    <pre><code>def calculate_psi(expected, actual, bins=10):
+    """Population Stability Index"""
+    exp_pct = pd.cut(expected, bins=bins).value_counts() / len(expected)
+    act_pct = pd.cut(actual, bins=bins).value_counts() / len(actual)
+    
+    psi = ((act_pct - exp_pct) * np.log(act_pct / exp_pct)).sum()
+    return psi
+
+# PSI < 0.1: нет существенных изменений
+# PSI 0.1-0.25: умеренные изменения
+# PSI > 0.25: значительные изменения</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Чек-лист для продакшна</h2>
+    <ul>
+      <li>[ ] Модель соответствует регуляторным требованиям</li>
+      <li>[ ] Документация модели (model card)</li>
+      <li>[ ] Backtesting на исторических данных</li>
+      <li>[ ] Стресс-тестирование</li>
+      <li>[ ] Мониторинг model drift (PSI, CSI)</li>
+      <li>[ ] Plan для обновления модели</li>
+      <li>[ ] Процедуры для edge cases</li>
+      <li>[ ] A/B тестирование перед запуском</li>
+      <li>[ ] Disaster recovery план</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Практические советы</h2>
+    <ul>
+      <li><strong>Комбинируйте подходы</strong>: статистические + ML модели</li>
+      <li><strong>Консервативность</strong>: лучше переоценить риск, чем недооценить</li>
+      <li><strong>Diversification</strong>: не полагайтесь на одну модель</li>
+      <li><strong>Backtesting обязателен</strong>: проверяйте на кризисных периодах</li>
+      <li><strong>Expert judgement</strong>: ML не заменяет экспертов полностью</li>
+      <li><strong>Continuous learning</strong>: рынки меняются, модели должны обновляться</li>
+    </ul>
+    <blockquote>
+      💡 <strong>Объяснение заказчику:</strong> «Мы используем продвинутую аналитику для оценки различных рисков — от невозврата кредитов до рыночных потрясений. Модели помогают заранее выявлять проблемы и принимать меры для защиты капитала».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Стемминг и лемматизация Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>✂️ Стемминг и лемматизация Cheatsheet</h1>
+  <div class="subtitle">Нормализация текста • Stemming • Lemmatization • NLP<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы</h2>
+    <ul>
+      <li><strong>Цель</strong>: приведение слов к базовой форме</li>
+      <li><strong>Stemming</strong>: отсечение окончаний (грубо)</li>
+      <li><strong>Lemmatization</strong>: приведение к словарной форме (точно)</li>
+      <li><strong>Применение</strong>: поиск, классификация, topic modeling</li>
+      <li><strong>Преимущество</strong>: уменьшение словаря, обобщение</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Stemming vs Lemmatization</h2>
+    <table>
+      <tr><th>Аспект</th><th>Stemming</th><th>Lemmatization</th></tr>
+      <tr><td>Метод</td><td>Правила, эвристики</td><td>Словарь, морфология</td></tr>
+      <tr><td>Скорость</td><td>Быстро</td><td>Медленнее</td></tr>
+      <tr><td>Точность</td><td>Ниже</td><td>Выше</td></tr>
+      <tr><td>Результат</td><td>Может быть не словом</td><td>Всегда слово</td></tr>
+      <tr><td>Пример</td><td>running → run</td><td>running → run</td></tr>
+      <tr><td>Пример</td><td>better → better</td><td>better → good</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Porter Stemmer</h2>
+    <p><strong>Самый популярный stemmer для английского:</strong></p>
+    <pre><code>from nltk.stem import PorterStemmer
+
+stemmer = PorterStemmer()
+
+words = [
+    "running", "runs", "ran",
+    "easily", "fairly",
+    "maximum", "maximal"
+]
+
+for word in words:
+    stem = stemmer.stem(word)
+    print(f"{word:15s} → {stem}")
+
+# Результат:
+# running         → run
+# runs            → run
+# ran             → ran
+# easily          → easili
+# fairly          → fairli
+# maximum         → maximum
+# maximal         → maxim</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Snowball Stemmer</h2>
+    <p><strong>Улучшенная версия Porter, многоязычная:</strong></p>
+    <pre><code>from nltk.stem import SnowballStemmer
+
+# English
+en_stemmer = SnowballStemmer('english')
+print(en_stemmer.stem("generously"))  # generous
+
+# Russian
+ru_stemmer = SnowballStemmer('russian')
+words_ru = ["программирование", "программист", "программа"]
+for word in words_ru:
+    print(f"{word} → {ru_stemmer.stem(word)}")
+
+# Поддерживаемые языки
+print(SnowballStemmer.languages)
+# ('arabic', 'danish', 'dutch', 'english', 'finnish', 'french',
+#  'german', 'hungarian', 'italian', 'norwegian', 'porter',
+#  'portuguese', 'romanian', 'russian', 'spanish', 'swedish')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Lancaster Stemmer</h2>
+    <p><strong>Более агрессивный stemmer:</strong></p>
+    <pre><code>from nltk.stem import LancasterStemmer
+
+lancaster = LancasterStemmer()
+porter = PorterStemmer()
+
+words = ["maximum", "presumably", "multiply", "provision"]
+
+for word in words:
+    p = porter.stem(word)
+    l = lancaster.stem(word)
+    print(f"{word:15s} Porter: {p:10s} Lancaster: {l}")
+
+# Lancaster обрезает агрессивнее
+# maximum         Porter: maximum     Lancaster: maxim
+# presumably      Porter: presum      Lancaster: presum
+# multiply        Porter: multipli    Lancaster: mult
+# provision       Porter: provis      Lancaster: provid</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Lemmatization с NLTK</h2>
+    <pre><code>from nltk.stem import WordNetLemmatizer
+import nltk
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+
+lemmatizer = WordNetLemmatizer()
+
+# Без POS tag
+print(lemmatizer.lemmatize("running"))  # running
+print(lemmatizer.lemmatize("better"))   # better
+print(lemmatizer.lemmatize("rocks"))    # rock
+
+# С POS tag (важно!)
+from nltk.corpus import wordnet
+
+print(lemmatizer.lemmatize("running", pos='v'))  # run
+print(lemmatizer.lemmatize("better", pos='a'))   # good
+print(lemmatizer.lemmatize("rocks", pos='n'))    # rock
+print(lemmatizer.lemmatize("rocks", pos='v'))    # rock
+
+# POS tags: 'n'=noun, 'v'=verb, 'a'=adjective, 'r'=adverb</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. POS Tagging для lemmatization</h2>
+    <pre><code>from nltk import pos_tag, word_tokenize
+from nltk.corpus import wordnet
+
+def get_wordnet_pos(treebank_tag):
+    """Конвертация POS tag в WordNet формат"""
+    if treebank_tag.startswith('J'):
+        return wordnet.ADJ
+    elif treebank_tag.startswith('V'):
+        return wordnet.VERB
+    elif treebank_tag.startswith('N'):
+        return wordnet.NOUN
+    elif treebank_tag.startswith('R'):
+        return wordnet.ADV
+    else:
+        return wordnet.NOUN
+
+def lemmatize_sentence(sentence):
+    tokens = word_tokenize(sentence)
+    pos_tags = pos_tag(tokens)
+    
+    lemmatizer = WordNetLemmatizer()
+    lemmas = []
+    
+    for word, pos in pos_tags:
+        wordnet_pos = get_wordnet_pos(pos)
+        lemma = lemmatizer.lemmatize(word, pos=wordnet_pos)
+        lemmas.append(lemma)
+    
+    return lemmas
+
+sentence = "The cats are running and jumping better"
+lemmas = lemmatize_sentence(sentence)
+print(lemmas)
+# ['The', 'cat', 'be', 'run', 'and', 'jump', 'well']</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. spaCy Lemmatization</h2>
+    <p><strong>Современный подход с лучшим quality:</strong></p>
+    <pre><code>import spacy
+
+# Загрузка модели
+nlp = spacy.load('en_core_web_sm')
+
+text = "The striped bats are hanging better on the wires"
+doc = nlp(text)
+
+for token in doc:
+    print(f"{token.text:15s} → {token.lemma_:15s} POS: {token.pos_}")
+
+# Результат:
+# The             → the              POS: DET
+# striped         → strip            POS: VERB
+# bats            → bat              POS: NOUN
+# are             → be               POS: AUX
+# hanging         → hang             POS: VERB
+# better          → well             POS: ADV
+# on              → on               POS: ADP
+# the             → the              POS: DET
+# wires           → wire             POS: NOUN</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Russian Lemmatization</h2>
+    <pre><code># pymorphy2 для русского
+import pymorphy2
+
+morph = pymorphy2.MorphAnalyzer()
+
+words = ["программирование", "программист", "программировал", "красивее"]
+
+for word in words:
+    parsed = morph.parse(word)[0]
+    lemma = parsed.normal_form
+    print(f"{word:20s} → {lemma}")
+
+# программирование    → программирование
+# программист         → программист
+# программировал      → программировать
+# красивее            → красивый
+
+# spaCy для русского
+nlp_ru = spacy.load('ru_core_news_sm')
+doc = nlp_ru("Программисты программировали программу")
+for token in doc:
+    print(f"{token.text} → {token.lemma_}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Производительность</h2>
+    <table>
+      <tr><th>Метод</th><th>Скорость (1M words)</th><th>Качество</th></tr>
+      <tr><td>Porter Stemmer</td><td>~2 сек</td><td>Низкое</td></tr>
+      <tr><td>Snowball Stemmer</td><td>~3 сек</td><td>Среднее</td></tr>
+      <tr><td>NLTK Lemmatizer</td><td>~30 сек</td><td>Хорошее</td></tr>
+      <tr><td>spaCy</td><td>~60 сек</td><td>Отличное</td></tr>
+    </table>
+    <pre><code>import time
+
+text_list = documents * 1000  # большой список
+
+start = time.time()
+stemmed = [porter.stem(word) for doc in text_list 
+           for word in doc.split()]
+print(f"Porter: {time.time() - start:.2f}s")
+
+start = time.time()
+lemmatized = [lemmatizer.lemmatize(word) 
+              for doc in text_list for word in doc.split()]
+print(f"Lemmatizer: {time.time() - start:.2f}s")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. В pipeline preprocessing</h2>
+    <pre><code>import re
+from nltk.corpus import stopwords
+from nltk.stem import SnowballStemmer
+
+def preprocess_text(text, method='lemma'):
+    # Lowercase
+    text = text.lower()
+    
+    # Remove punctuation and numbers
+    text = re.sub(r'[^a-zA-Z\s]', '', text)
+    
+    # Tokenize
+    tokens = text.split()
+    
+    # Remove stopwords
+    stop_words = set(stopwords.words('english'))
+    tokens = [t for t in tokens if t not in stop_words]
+    
+    # Stemming or Lemmatization
+    if method == 'stem':
+        stemmer = SnowballStemmer('english')
+        tokens = [stemmer.stem(t) for t in tokens]
+    elif method == 'lemma':
+        lemmatizer = WordNetLemmatizer()
+        tokens = [lemmatizer.lemmatize(t) for t in tokens]
+    
+    return ' '.join(tokens)
+
+text = "The cats were running and jumping better than before!"
+print(preprocess_text(text, 'stem'))
+print(preprocess_text(text, 'lemma'))</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать что</h2>
+    <table>
+      <tr><th>Задача</th><th>Рекомендация</th></tr>
+      <tr><td>Поиск</td><td>Stemming (скорость)</td></tr>
+      <tr><td>Sentiment Analysis</td><td>Lemmatization (точность)</td></tr>
+      <tr><td>Topic Modeling</td><td>Lemmatization</td></tr>
+      <tr><td>Text Classification</td><td>Оба работают, тестируйте</td></tr>
+      <tr><td>Named Entity Recognition</td><td>Ни то ни другое</td></tr>
+      <tr><td>Machine Translation</td><td>Lemmatization</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Многоязычность</h2>
+    <pre><code># Snowball поддерживает много языков
+languages = {
+    'en': 'english',
+    'ru': 'russian',
+    'de': 'german',
+    'fr': 'french',
+    'es': 'spanish'
+}
+
+def multilingual_stem(text, lang='en'):
+    stemmer = SnowballStemmer(languages[lang])
+    return ' '.join([
+        stemmer.stem(word) 
+        for word in text.split()
+    ])
+
+# spaCy для lemmatization
+models = {
+    'en': 'en_core_web_sm',
+    'ru': 'ru_core_news_sm',
+    'de': 'de_core_news_sm'
+}
+
+def multilingual_lemma(text, lang='en'):
+    nlp = spacy.load(models[lang])
+    doc = nlp(text)
+    return ' '.join([token.lemma_ for token in doc])</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Специальные случаи</h2>
+    <ul>
+      <li><strong>Irregular verbs</strong>: stemming не справляется (went → went)</li>
+      <li><strong>Омонимы</strong>: нужен контекст (rock-камень vs rock-качаться)</li>
+      <li><strong>Compound words</strong>: могут разбиваться неправильно</li>
+      <li><strong>Neologisms</strong>: новые слова могут не быть в словаре</li>
+      <li><strong>Domain-specific</strong>: медицинские термины требуют специальных словарей</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Практические советы</h2>
+    <ul>
+      <li>Начните со stemming для прототипа</li>
+      <li>Lemmatization для финальной модели</li>
+      <li>Всегда используйте POS tags для lemmatization</li>
+      <li>spaCy лучше NLTK для production</li>
+      <li>Кэшируйте результаты для скорости</li>
+      <li>Не применяйте к именам собственным</li>
+      <li>Тестируйте на вашем домене</li>
+    </ul>
+    <blockquote>
+      💡 <strong>Объяснение:</strong> «Приводим все слова к базовой форме: "бегал", "бегает", "бежит" → "бежать". Это уменьшает словарь и улучшает обобщение в моделях NLP».
+    </blockquote>
+  </div>
+
+</div>
+</body>
+</html>

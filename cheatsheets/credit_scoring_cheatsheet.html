@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Кредитный скоринг Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>💳 Кредитный скоринг Cheatsheet</h1>
+  <div class="subtitle">Оценка кредитоспособности • ML для финансов • Практический подход<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть кредитного скоринга</h2>
+    <ul>
+      <li><strong>Цель</strong>: оценка вероятности дефолта (невозврата кредита)</li>
+      <li><strong>Задача</strong>: бинарная классификация (вернет/не вернет)</li>
+      <li><strong>Скоринговый балл</strong>: числовая оценка кредитоспособности</li>
+      <li><strong>Регуляторные требования</strong>: прозрачность, объяснимость решений</li>
+      <li><strong>Базель II/III</strong>: международные стандарты оценки рисков</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные типы скоринга</h2>
+    <table>
+      <tr><th>Тип</th><th>Назначение</th><th>Момент применения</th></tr>
+      <tr><td><strong>Application scoring</strong></td><td>Оценка заявки</td><td>До выдачи кредита</td></tr>
+      <tr><td><strong>Behavioral scoring</strong></td><td>Поведение клиента</td><td>В процессе кредита</td></tr>
+      <tr><td><strong>Collection scoring</strong></td><td>Работа с просрочкой</td><td>При возникновении задолженности</td></tr>
+      <tr><td><strong>Fraud scoring</strong></td><td>Обнаружение мошенничества</td><td>На всех этапах</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Основные признаки</h2>
+    <p><strong>Демографические:</strong></p>
+    <ul>
+      <li>Возраст, пол, семейное положение</li>
+      <li>Образование, место работы</li>
+      <li>Регион проживания</li>
+    </ul>
+    <p><strong>Финансовые:</strong></p>
+    <ul>
+      <li>Доход (подтвержденный/неподтвержденный)</li>
+      <li>Наличие активов (недвижимость, авто)</li>
+      <li>Долговая нагрузка (DTI - Debt-to-Income)</li>
+      <li>История занятости</li>
+    </ul>
+    <p><strong>Кредитная история:</strong></p>
+    <ul>
+      <li>Количество действующих кредитов</li>
+      <li>История платежей (DPD - Days Past Due)</li>
+      <li>Количество запросов в БКИ</li>
+      <li>Максимальная просрочка</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Базовый код</h2>
+    <pre><code>from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import roc_auc_score
+
+# Логистическая регрессия (классика)
+lr_model = LogisticRegression(
+    penalty='l2',
+    C=1.0,
+    class_weight='balanced',
+    random_state=42
+)
+lr_model.fit(X_train, y_train)
+
+# Градиентный бустинг (современный подход)
+from lightgbm import LGBMClassifier
+gbm_model = LGBMClassifier(
+    n_estimators=100,
+    learning_rate=0.05,
+    max_depth=5,
+    scale_pos_weight=5  # для дисбаланса
+)
+gbm_model.fit(X_train, y_train)
+
+# Предсказание вероятностей
+y_proba = gbm_model.predict_proba(X_test)[:, 1]
+auc = roc_auc_score(y_test, y_proba)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Популярные модели</h2>
+    <table>
+      <tr><th>Модель</th><th>Плюсы</th><th>Минусы</th></tr>
+      <tr><td><strong>Логистическая регрессия</strong></td><td>Интерпретируемость, соответствие регуляциям</td><td>Только линейные зависимости</td></tr>
+      <tr><td><strong>Scorecard</strong></td><td>Максимальная прозрачность</td><td>Ручная настройка</td></tr>
+      <tr><td><strong>Random Forest</strong></td><td>Нелинейные зависимости</td><td>Сложно объяснить</td></tr>
+      <tr><td><strong>XGBoost/LightGBM</strong></td><td>Высокая точность</td><td>Требует объяснения для регулятора</td></tr>
+      <tr><td><strong>Нейросети</strong></td><td>Максимальная гибкость</td><td>Черный ящик, редко используются</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Создание скоркарты (Scorecard)</h2>
+    <p><strong>Классический подход Weight of Evidence (WoE):</strong></p>
+    <pre><code>import scorecardpy as sc
+
+# Разбиение на бины
+bins = sc.woebin(df, y='default')
+
+# Преобразование в WoE
+train_woe = sc.woebin_ply(df_train, bins)
+
+# Обучение логистической регрессии
+lr = LogisticRegression()
+lr.fit(train_woe, y_train)
+
+# Создание скоркарты
+card = sc.scorecard(bins, lr, X_train.columns)
+
+# Расчет скорингового балла
+scores = sc.scorecard_ply(df_test, card)</code></pre>
+    <p><strong>WoE (Weight of Evidence):</strong></p>
+    <ul>
+      <li>WoE = ln(% good / % bad)</li>
+      <li>Положительный WoE → меньше риск</li>
+      <li>Отрицательный WoE → больше риск</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Метрики качества</h2>
+    <table>
+      <tr><th>Метрика</th><th>Описание</th><th>Типичное значение</th></tr>
+      <tr><td><strong>ROC-AUC</strong></td><td>Общее качество модели</td><td>>0.7 (хорошо), >0.8 (отлично)</td></tr>
+      <tr><td><strong>Gini</strong></td><td>2*AUC - 1</td><td>>0.4 (хорошо), >0.6 (отлично)</td></tr>
+      <tr><td><strong>KS (Kolmogorov-Smirnov)</strong></td><td>Максимальная разница между кумулятивными распределениями</td><td>>0.3 (хорошо), >0.4 (отлично)</td></tr>
+      <tr><td><strong>PSI (Population Stability Index)</strong></td><td>Стабильность популяции</td><td><0.1 (стабильна), >0.25 (нестабильна)</td></tr>
+      <tr><td><strong>Precision/Recall</strong></td><td>Точность/полнота</td><td>Зависит от бизнес-задачи</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Обработка дисбаланса классов</h2>
+    <p><strong>Проблема:</strong> дефолтов обычно 3-10% от всех кредитов</p>
+    <p><strong>Решения:</strong></p>
+    <ul>
+      <li><strong>Class weights</strong>: <code>class_weight='balanced'</code></li>
+      <li><strong>Oversampling</strong>: SMOTE, ADASYN</li>
+      <li><strong>Undersampling</strong>: RandomUnderSampler</li>
+      <li><strong>Ансамбли</strong>: BalancedRandomForest</li>
+      <li><strong>Порог классификации</strong>: подбор оптимального threshold</li>
+    </ul>
+    <pre><code>from imblearn.over_sampling import SMOTE
+smote = SMOTE(random_state=42)
+X_resampled, y_resampled = smote.fit_resample(X_train, y_train)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Feature Engineering</h2>
+    <p><strong>Ключевые признаки:</strong></p>
+    <ul>
+      <li><strong>DTI (Debt-to-Income)</strong>: платеж по кредиту / доход</li>
+      <li><strong>LTV (Loan-to-Value)</strong>: сумма кредита / стоимость залога</li>
+      <li><strong>Утилизация кредита</strong>: использованный лимит / общий лимит</li>
+      <li><strong>Возраст кредитной истории</strong>: месяцев с первого кредита</li>
+      <li><strong>Количество просрочек</strong>: за последние 6/12/24 месяца</li>
+    </ul>
+    <pre><code># Создание производных признаков
+df['dti'] = df['monthly_payment'] / df['income']
+df['credit_history_months'] = (
+    pd.to_datetime('today') - df['first_credit_date']
+).dt.days / 30
+df['utilization'] = df['used_credit'] / df['credit_limit']</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Проблемы и решения</h2>
+    <table>
+      <tr><th>Проблема</th><th>Решение</th></tr>
+      <tr><td>Дрейф данных</td><td>Регулярный мониторинг PSI, переобучение модели</td></tr>
+      <tr><td>Отсутствие кредитной истории</td><td>Альтернативные данные (телеком, соцсети)</td></tr>
+      <tr><td>Мошенничество</td><td>Отдельная модель fraud detection</td></tr>
+      <tr><td>Регуляторные требования</td><td>Использование интерпретируемых моделей</td></tr>
+      <tr><td>Сезонность</td><td>Признаки времени года, праздников</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Интерпретация модели</h2>
+    <p><strong>Регуляторы требуют объяснения решений</strong></p>
+    <p><strong>Методы:</strong></p>
+    <ul>
+      <li><strong>SHAP</strong>: вклад каждого признака в решение</li>
+      <li><strong>LIME</strong>: локальное объяснение</li>
+      <li><strong>Feature Importance</strong>: важность признаков</li>
+      <li><strong>Partial Dependence</strong>: влияние признака на прогноз</li>
+    </ul>
+    <pre><code>import shap
+
+# Объяснение модели SHAP
+explainer = shap.TreeExplainer(gbm_model)
+shap_values = explainer.shap_values(X_test)
+
+# Визуализация
+shap.summary_plot(shap_values, X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Валидация модели</h2>
+    <p><strong>Time-based split</strong>: важно для временных рядов</p>
+    <pre><code># Разделение по времени
+train_end = '2024-01-01'
+val_end = '2024-07-01'
+
+train = df[df['date'] < train_end]
+val = df[(df['date'] >= train_end) & (df['date'] < val_end)]
+test = df[df['date'] >= val_end]</code></pre>
+    <p><strong>Out-of-time validation:</strong> проверка на будущих периодах</p>
+    <p><strong>Back-testing:</strong> ретроспективная проверка на исторических данных</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист для продакшна</h2>
+    <ul>
+      <li>[ ] Модель соответствует регуляторным требованиям</li>
+      <li>[ ] Документация всех признаков и их источников</li>
+      <li>[ ] Мониторинг PSI для отслеживания дрейфа</li>
+      <li>[ ] A/B тестирование новой модели</li>
+      <li>[ ] План переобучения модели (обычно раз в квартал)</li>
+      <li>[ ] Процедура объяснения отказов клиентам</li>
+      <li>[ ] Защита от мошенничества</li>
+      <li>[ ] Обработка edge cases (очень высокий/низкий доход)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Когда использовать разные подходы</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Скоркарта (Scorecard)</h3>
+        <ul>
+          <li>Требования регулятора к прозрачности</li>
+          <li>Небольшие банки, простые продукты</li>
+          <li>Нужно объяснять решения клиентам</li>
+          <li>Ограниченные данные</li>
+        </ul>
+      </div>
+      <div class="good">
+        <h3>✅ Gradient Boosting</h3>
+        <ul>
+          <li>Крупные банки с большими данными</li>
+          <li>Есть команда для поддержки сложных моделей</li>
+          <li>Высокая конкуренция, нужна максимальная точность</li>
+          <li>Есть инструменты для объяснения (SHAP)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Практические советы</h2>
+    <ul>
+      <li><strong>Начните с простого</strong>: логистическая регрессия как baseline</li>
+      <li><strong>Бизнес-метрики важнее технических</strong>: считайте прибыль и потери</li>
+      <li><strong>Мониторинг критичен</strong>: модель деградирует со временем</li>
+      <li><strong>Альтернативные данные</strong>: телеком, e-commerce, соцсети</li>
+      <li><strong>Reject inference</strong>: учитывайте отклоненных клиентов</li>
+      <li><strong>Champion-Challenger</strong>: постоянное тестирование новых моделей</li>
+    </ul>
+    <blockquote>
+      💡 <strong>Объяснение заказчику:</strong> «Мы анализируем тысячи кредитных историй, чтобы понять, кто с большей вероятностью вернет кредит. Каждый фактор — возраст, доход, история — получает свой вес, и модель выдает финальную оценку кредитоспособности».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
