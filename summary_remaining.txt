@@ -1,8 +1,0 @@
-Files needed (5):
-1. self_attention_cheatsheet.html
-2. normalizing_flows_cheatsheet.html
-3. ppo_reinforcement_learning_cheatsheet.html
-4. bidirectional_rnn_cheatsheet.html  
-5. transfer_learning_cnn_cheatsheet.html
-
-Requirements: 6-30KB each, 8+ sections, Russian language
