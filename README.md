@@ -272,23 +272,23 @@
 1. [Hoeffding trees](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/hoeffding_trees_cheatsheet.html)
 
 ### **29. Мультимодальное обучение (классическое)**
-1. Early fusion и late fusion
+1. [Early fusion и late fusion](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/early_late_fusion_cheatsheet.html)
 1. [Canonical Correlation Analysis (CCA)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/canonical_correlation_analysis_cheatsheet.html)
-1. Kernel CCA
-1. Multi-view learning
+1. [Kernel CCA](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/kernel_cca_cheatsheet.html)
+1. [Multi-view learning](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/multi_view_learning_cheatsheet.html)
 1. Co-training
 
 ### **30. Обучение с ограничениями**
-1. Constrained optimization в ML
-1. Fairness constraints
-1. Monotonic constraints
-1. Shape constraints
+1. [Constrained optimization в ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/constrained_optimization_ml_cheatsheet.html)
+1. [Fairness constraints](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/fairness_constraints_cheatsheet.html)
+1. [Monotonic constraints](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/monotonic_constraints_cheatsheet.html)
+1. [Shape constraints](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/shape_constraints_cheatsheet.html)
 
 ### **31. Комбинаторная оптимизация и ML**
 1. [Генетические алгоритмы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/genetic_algorithms_cheatsheet.html)
-1. Эволюционные стратегии
-1. Swarm intelligence (PSO, ant colony)
-1. Simulated annealing
+1. [Эволюционные стратегии](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/evolutionary_strategies_cheatsheet.html)
+1. [Swarm intelligence (PSO, ant colony)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/swarm_intelligence_cheatsheet.html)
+1. [Simulated annealing](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/simulated_annealing_cheatsheet.html)
 1. Tabu search
 
 ### **32. Обучение с подкреплением (классическое RL)**

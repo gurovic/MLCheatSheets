@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Fairness Constraints Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📘 Fairness Constraints Cheatsheet</h1>
+  <div class="subtitle">Справедливость в ML • Ограничения для честных моделей<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть проблемы</h2>
+    <p><strong>Fairness constraints</strong> — ограничения, гарантирующие справедливость модели</p>
+    <ul>
+      <li><strong>Проблема</strong>: ML модели могут дискриминировать защищённые группы</li>
+      <li><strong>Защищённые атрибуты</strong>: пол, раса, возраст, религия, и т.д.</li>
+      <li><strong>Цель</strong>: модель должна быть точной И справедливой</li>
+    </ul>
+    <blockquote>
+      Fairness — это не одно понятие, существует множество определений справедливости, часто противоречащих друг другу
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы fairness</h2>
+    <table>
+      <tr><th>Тип</th><th>Определение</th></tr>
+      <tr><td><strong>Demographic Parity</strong></td><td>P(Ŷ=1|A=0) = P(Ŷ=1|A=1)</td></tr>
+      <tr><td><strong>Equal Opportunity</strong></td><td>TPR одинаков для всех групп</td></tr>
+      <tr><td><strong>Equalized Odds</strong></td><td>TPR и FPR одинаковы</td></tr>
+      <tr><td><strong>Predictive Parity</strong></td><td>PPV одинаков для всех групп</td></tr>
+      <tr><td><strong>Calibration</strong></td><td>P(Y=1|Ŷ=p,A) не зависит от A</td></tr>
+      <tr><td><strong>Individual Fairness</strong></td><td>Похожие люди → похожие предсказания</td></tr>
+    </table>
+    <p><em>A — защищённый атрибут, Ŷ — предсказание, Y — истинная метка</em></p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Demographic Parity</h2>
+    <p><strong>Определение:</strong> вероятность положительного предсказания одинакова для всех групп</p>
+    <pre><code>P(Ŷ=1|A=male) = P(Ŷ=1|A=female)</code></pre>
+    <p><strong>Constraint:</strong></p>
+    <pre><code>|P(Ŷ=1|A=0) - P(Ŷ=1|A=1)| ≤ ε</code></pre>
+    <p><strong>Применение:</strong> кредитование, прием на работу</p>
+    <p><strong>Критика:</strong> игнорирует различия в base rates между группами</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Equal Opportunity</h2>
+    <p><strong>Определение:</strong> True Positive Rate одинаков для всех групп</p>
+    <pre><code>TPR = P(Ŷ=1|Y=1,A)
+Constraint: TPR_group1 ≈ TPR_group2</code></pre>
+    <p><strong>Интерпретация:</strong> квалифицированные кандидаты имеют равные шансы быть принятыми</p>
+    <pre><code># Измерение
+from sklearn.metrics import confusion_matrix
+
+def equal_opportunity_diff(y_true, y_pred, sensitive):
+    groups = np.unique(sensitive)
+    tprs = []
+    for g in groups:
+        mask = (sensitive == g) & (y_true == 1)
+        if mask.sum() > 0:
+            cm = confusion_matrix(
+                y_true[mask], y_pred[mask]
+            )
+            tpr = cm[1,1] / (cm[1,1] + cm[1,0])
+            tprs.append(tpr)
+    return max(tprs) - min(tprs)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Equalized Odds</h2>
+    <p><strong>Определение:</strong> TPR И FPR одинаковы для всех групп</p>
+    <pre><code>TPR_group1 = TPR_group2
+FPR_group1 = FPR_group2</code></pre>
+    <p><strong>Сильнее Equal Opportunity:</strong> учитывает и положительные, и отрицательные примеры</p>
+    <p><strong>Применение:</strong> медицинская диагностика, криминальное правосудие</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Методы обеспечения fairness</h2>
+    <p><strong>1. Pre-processing (до обучения):</strong></p>
+    <ul>
+      <li>Удалить защищённые атрибуты из данных</li>
+      <li>Reweighting: изменить веса объектов</li>
+      <li>Resampling: балансировка групп</li>
+    </ul>
+    <p><strong>2. In-processing (во время обучения):</strong></p>
+    <ul>
+      <li>Добавить fairness constraint в оптимизацию</li>
+      <li>Adversarial debiasing</li>
+      <li>Fairness-aware loss functions</li>
+    </ul>
+    <p><strong>3. Post-processing (после обучения):</strong></p>
+    <ul>
+      <li>Calibration: настроить пороги для групп</li>
+      <li>Reject Option Classification</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Fairlearn: практический пример</h2>
+    <pre><code>from fairlearn.reductions import ExponentiatedGradient
+from fairlearn.reductions import DemographicParity
+from sklearn.linear_model import LogisticRegression
+
+# Базовая модель
+estimator = LogisticRegression()
+
+# Fairness constraint
+constraint = DemographicParity()
+
+# Fair model через constrained optimization
+mitigator = ExponentiatedGradient(
+    estimator, 
+    constraints=constraint
+)
+
+# Обучение
+mitigator.fit(X_train, y_train, 
+              sensitive_features=sensitive_train)
+
+# Предсказание
+y_pred = mitigator.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Adversarial Debiasing</h2>
+    <p><strong>Идея:</strong> обучаем классификатор + adversary, который пытается предсказать защищённый атрибут</p>
+    <pre><code># PyTorch псевдокод
+class FairClassifier(nn.Module):
+    def __init__(self):
+        self.predictor = nn.Sequential(...)
+        self.adversary = nn.Sequential(...)
+    
+    def forward(self, x):
+        pred = self.predictor(x)
+        adv = self.adversary(pred.detach())
+        return pred, adv
+
+# Loss
+loss = task_loss(pred, y) - λ * adversary_loss(adv, sensitive_attr)
+# Минус перед adversary loss — adversarial training</code></pre>
+    <p><strong>Цель:</strong> predictor не должен содержать информацию о защищённом атрибуте</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Threshold Optimization (Post-processing)</h2>
+    <p><strong>Подход:</strong> используем разные пороги для разных групп</p>
+    <pre><code>from fairlearn.postprocessing import ThresholdOptimizer
+from fairlearn.postprocessing import EqualizedOdds
+
+# Обучаем обычную модель
+model = LogisticRegression()
+model.fit(X_train, y_train)
+
+# Post-processing для fairness
+postprocess = ThresholdOptimizer(
+    estimator=model,
+    constraints=EqualizedOdds()
+)
+
+postprocess.fit(X_val, y_val, 
+                sensitive_features=sensitive_val)
+
+# Предсказания с fair thresholds
+y_pred = postprocess.predict(X_test, 
+                              sensitive_features=sensitive_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Trade-off: Accuracy vs Fairness</h2>
+    <p><strong>Проблема:</strong> fairness constraints часто снижают точность</p>
+    <pre><code># Визуализация trade-off
+import matplotlib.pyplot as plt
+
+lambdas = [0, 0.1, 0.5, 1.0, 2.0]
+accuracies = []
+fairness_violations = []
+
+for λ in lambdas:
+    model = train_fair_model(λ=λ)
+    acc = evaluate_accuracy(model)
+    fair = evaluate_fairness_violation(model)
+    accuracies.append(acc)
+    fairness_violations.append(fair)
+
+plt.plot(fairness_violations, accuracies)
+plt.xlabel('Fairness violation')
+plt.ylabel('Accuracy')
+plt.title('Accuracy-Fairness Trade-off')</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Individual Fairness</h2>
+    <p><strong>Липшицева fairness:</strong> похожие индивиды → похожие предсказания</p>
+    <pre><code>|f(x1) - f(x2)| ≤ L · d(x1, x2)</code></pre>
+    <p><strong>Проблема:</strong> как определить "похожесть" (метрику d)?</p>
+    <pre><code># Regularization для individual fairness
+def individual_fairness_loss(model, X, k=5):
+    # Для каждого x, находим k ближайших соседей
+    # и минимизируем разницу в предсказаниях
+    loss = 0
+    for i, x in enumerate(X):
+        neighbors = find_k_nearest(X, x, k)
+        pred_x = model(x)
+        for neighbor in neighbors:
+            pred_neighbor = model(neighbor)
+            loss += (pred_x - pred_neighbor)**2
+    return loss / len(X)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Fairness метрики</h2>
+    <table>
+      <tr><th>Метрика</th><th>Формула</th></tr>
+      <tr><td>Demographic Parity Gap</td><td>|P(Ŷ=1|A=0) - P(Ŷ=1|A=1)|</td></tr>
+      <tr><td>Equal Opportunity Gap</td><td>|TPR₀ - TPR₁|</td></tr>
+      <tr><td>Equalized Odds Gap</td><td>max(|TPR₀-TPR₁|, |FPR₀-FPR₁|)</td></tr>
+      <tr><td>Disparate Impact</td><td>P(Ŷ=1|A=0) / P(Ŷ=1|A=1)</td></tr>
+    </table>
+    <pre><code># Fairlearn metrics
+from fairlearn.metrics import demographic_parity_difference
+from fairlearn.metrics import equalized_odds_difference
+
+dp_gap = demographic_parity_difference(
+    y_true, y_pred, sensitive_features=sensitive
+)
+eo_gap = equalized_odds_difference(
+    y_true, y_pred, sensitive_features=sensitive
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Intersectional Fairness</h2>
+    <p><strong>Проблема:</strong> fairness для одного атрибута не гарантирует fairness для пересечений</p>
+    <p><strong>Пример:</strong> модель справедлива по полу И по расе, но не для (женщины × раса)</p>
+    <pre><code># Проверка intersectional fairness
+def check_intersectional_fairness(y_true, y_pred, 
+                                   attr1, attr2):
+    # Создаём комбинации атрибутов
+    intersections = list(product(
+        np.unique(attr1), np.unique(attr2)
+    ))
+    
+    tprs = {}
+    for (a1, a2) in intersections:
+        mask = (attr1 == a1) & (attr2 == a2) & (y_true == 1)
+        if mask.sum() > 0:
+            tpr = (y_pred[mask] == 1).mean()
+            tprs[(a1, a2)] = tpr
+    
+    return max(tprs.values()) - min(tprs.values())</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Практические соображения</h2>
+    <ul>
+      <li><strong>Юридические требования</strong>: в некоторых странах требуется fairness</li>
+      <li><strong>Этика</strong>: репутационные риски от дискриминации</li>
+      <li><strong>Множественные определения</strong>: выберите определение fairness для вашей задачи</li>
+      <li><strong>Документация</strong>: фиксируйте выбранные constraints и trade-offs</li>
+      <li><strong>Мониторинг</strong>: fairness может деградировать со временем</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Типичные ошибки</h2>
+    <ul>
+      <li>❌ <strong>Удаление защищённых атрибутов</strong> не гарантирует fairness (proxy variables)</li>
+      <li>❌ <strong>Использовать только один тип fairness</strong> — проверьте несколько</li>
+      <li>❌ <strong>Игнорировать base rate differences</strong> между группами</li>
+      <li>❌ <strong>Не учитывать intersectionality</strong></li>
+      <li>✅ <strong>Измерять fairness на test set</strong></li>
+      <li>✅ <strong>Консультироваться с экспертами</strong> (юристы, этики)</li>
+      <li>✅ <strong>Документировать решения</strong> по fairness</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Инструменты</h2>
+    <table>
+      <tr><th>Библиотека</th><th>Особенности</th></tr>
+      <tr><td><strong>Fairlearn</strong></td><td>Microsoft, sklearn-compatible</td></tr>
+      <tr><td><strong>AIF360</strong></td><td>IBM, много алгоритмов</td></tr>
+      <tr><td><strong>Themis-ML</strong></td><td>Простая, для Python</td></tr>
+      <tr><td><strong>FairML</strong></td><td>Audit моделей</td></tr>
+      <tr><td><strong>Aequitas</strong></td><td>Bias audit toolkit</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Fairness constraints нужны:</h3>
+        <ul>
+          <li>Решения влияют на людей (кредит, работа)</li>
+          <li>Есть защищённые группы</li>
+          <li>Юридические требования</li>
+          <li>Высокие репутационные риски</li>
+          <li>Критичные социальные последствия</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Можно не использовать:</h3>
+        <ul>
+          <li>Нет влияния на людей</li>
+          <li>Нет защищённых атрибутов</li>
+          <li>Внутренние процессы</li>
+          <li>Академические эксперименты</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Чек-лист</h2>
+    <ul>
+      <li>[ ] Идентифицировать защищённые атрибуты</li>
+      <li>[ ] Выбрать определение fairness (demographic parity, equal opportunity, etc.)</li>
+      <li>[ ] Измерить baseline fairness без constraints</li>
+      <li>[ ] Выбрать метод (pre/in/post-processing)</li>
+      <li>[ ] Реализовать с библиотекой (Fairlearn, AIF360)</li>
+      <li>[ ] Оценить accuracy-fairness trade-off</li>
+      <li>[ ] Проверить intersectional fairness</li>
+      <li>[ ] Документировать выбранные constraints</li>
+      <li>[ ] Настроить мониторинг fairness в production</li>
+    </ul>
+    <blockquote>
+      <strong>Золотое правило:</strong> Fairness — это не техническая, а социальная проблема. Привлекайте stakeholders для выбора определения справедливости.
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Kernel CCA Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📘 Kernel CCA Cheatsheet</h1>
+  <div class="subtitle">Нелинейный канонический корреляционный анализ • Мультимодальное обучение<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть метода</h2>
+    <p><strong>Kernel CCA (Kernel Canonical Correlation Analysis)</strong> — нелинейное обобщение CCA</p>
+    <ul>
+      <li><strong>CCA</strong>: находит линейные проекции двух наборов данных с максимальной корреляцией</li>
+      <li><strong>Kernel CCA</strong>: использует kernel trick для нелинейных зависимостей</li>
+      <li><strong>Цель</strong>: найти нелинейное общее представление для двух модальностей</li>
+    </ul>
+    <blockquote>
+      Kernel CCA переносит данные в высокоразмерное пространство, где находит линейные корреляции (которые нелинейны в исходном пространстве)
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. От CCA к Kernel CCA</h2>
+    <p><strong>Обычный CCA:</strong></p>
+    <ul>
+      <li>Имеем две матрицы: <code>X</code> (n × p) и <code>Y</code> (n × q)</li>
+      <li>Ищем векторы <code>w_x</code> и <code>w_y</code>, чтобы максимизировать корреляцию между <code>Xw_x</code> и <code>Yw_y</code></li>
+    </ul>
+    <p><strong>Kernel CCA:</strong></p>
+    <ul>
+      <li>Отображаем <code>X → φ(X)</code> и <code>Y → ψ(Y)</code> в пространства признаков</li>
+      <li>Применяем CCA в новых пространствах</li>
+      <li>Не вычисляем φ и ψ явно, используем kernel trick</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Базовый код</h2>
+    <pre><code>from sklearn.cross_decomposition import CCA
+# Для Kernel CCA нужна сторонняя библиотека
+
+# Вариант 1: использовать pyrcca
+import rcca
+kcca = rcca.CCACrossValidate(
+    kernelcca=True,
+    reg=0.1,
+    numCC=5,  # число компонент
+    kernel='rbf'  # RBF kernel
+)
+kcca.train([X, Y])
+X_proj, Y_proj = kcca.predict([X, Y])</code></pre>
+    <pre><code># Вариант 2: scikit-learn kernel approximation
+from sklearn.kernel_approximation import RBFSampler
+from sklearn.cross_decomposition import CCA
+
+# Kernel approximation
+rbf_X = RBFSampler(gamma=0.1, n_components=100)
+rbf_Y = RBFSampler(gamma=0.1, n_components=100)
+
+X_rbf = rbf_X.fit_transform(X)
+Y_rbf = rbf_Y.fit_transform(Y)
+
+# CCA в kernel пространстве
+cca = CCA(n_components=5)
+X_c, Y_c = cca.fit_transform(X_rbf, Y_rbf)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Ядра (Kernels)</h2>
+    <table>
+      <tr><th>Ядро</th><th>Формула</th><th>Применение</th></tr>
+      <tr><td>Linear</td><td>k(x,y) = x·y</td><td>CCA (без kernel)</td></tr>
+      <tr><td>RBF/Gaussian</td><td>k(x,y) = exp(-γ||x-y||²)</td><td>Гладкие нелинейности</td></tr>
+      <tr><td>Polynomial</td><td>k(x,y) = (x·y + c)^d</td><td>Полиномиальные зависимости</td></tr>
+      <tr><td>Sigmoid</td><td>k(x,y) = tanh(αx·y + c)</td><td>Нейросетевые паттерны</td></tr>
+    </table>
+    <p><strong>Выбор γ:</strong> кросс-валидация или правило <code>1/(n_features × X.var())</code></p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Параметры и настройка</h2>
+    <table>
+      <tr><th>Параметр</th><th>Значение</th><th>Описание</th></tr>
+      <tr><td><code>n_components</code></td><td>1–20</td><td>Число канонических компонент</td></tr>
+      <tr><td><code>kernel</code></td><td>rbf, poly, linear</td><td>Тип ядра</td></tr>
+      <tr><td><code>gamma</code></td><td>0.001–10</td><td>Параметр RBF (чем больше, тем локальнее)</td></tr>
+      <tr><td><code>reg</code></td><td>0.01–1.0</td><td>Регуляризация (Ridge)</td></tr>
+      <tr><td><code>degree</code></td><td>2–5</td><td>Степень для polynomial kernel</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Применения</h2>
+    <p><strong>1. Мультимодальное представление:</strong></p>
+    <ul>
+      <li>Изображение + текст (image captioning)</li>
+      <li>Аудио + видео (распознавание речи)</li>
+      <li>ЭЭГ + фМРТ (нейронаука)</li>
+    </ul>
+    <p><strong>2. Извлечение признаков:</strong></p>
+    <ul>
+      <li>Получение совместного представления для классификации</li>
+      <li>Трансферное обучение между модальностями</li>
+    </ul>
+    <p><strong>3. Анализ связей:</strong></p>
+    <ul>
+      <li>Поиск нелинейных зависимостей между наборами переменных</li>
+      <li>Генетика: экспрессия генов vs фенотипы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Регуляризация</h2>
+    <p><strong>Зачем нужна:</strong> kernel матрицы часто вырождены</p>
+    <p><strong>Методы:</strong></p>
+    <ul>
+      <li><strong>Ridge (L2)</strong>: добавляем λI к ковариационным матрицам</li>
+      <li><strong>Tikhonov</strong>: общая форма регуляризации</li>
+      <li><strong>Incomplete Cholesky</strong>: разложение для больших данных</li>
+    </ul>
+    <pre><code># Ridge регуляризация
+reg = 0.1  # λ parameter
+# Добавляем регуляризацию к матрицам K_x и K_y
+K_x_reg = K_x + reg * np.eye(n)
+K_y_reg = K_y + reg * np.eye(n)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Kernel CCA vs Alternatives</h2>
+    <table>
+      <tr><th>Метод</th><th>Линейность</th><th>Модальности</th><th>Сложность</th></tr>
+      <tr><td>PCA</td><td>Линейный</td><td>1</td><td>O(d³)</td></tr>
+      <tr><td>CCA</td><td>Линейный</td><td>2</td><td>O(d³)</td></tr>
+      <tr><td>Kernel CCA</td><td>Нелинейный</td><td>2</td><td>O(n³)</td></tr>
+      <tr><td>Deep CCA</td><td>Нелинейный</td><td>2+</td><td>Зависит от сети</td></tr>
+      <tr><td>Kernel PCA</td><td>Нелинейный</td><td>1</td><td>O(n³)</td></tr>
+    </table>
+    <p><em>d — размерность признаков, n — число объектов</em></p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Вычислительная сложность</h2>
+    <p><strong>Проблема:</strong> вычисление и хранение kernel матриц O(n²)</p>
+    <p><strong>Решения для больших данных:</strong></p>
+    <ul>
+      <li><strong>Nyström approximation</strong>: аппроксимация kernel матрицы подвыборкой</li>
+      <li><strong>Random Fourier Features</strong>: явная аппроксимация kernel (sklearn RBFSampler)</li>
+      <li><strong>Incomplete Cholesky</strong>: разложение больших матриц</li>
+      <li><strong>Mini-batch</strong>: обработка данных порциями</li>
+    </ul>
+    <pre><code># Random Fourier Features для ускорения
+from sklearn.kernel_approximation import RBFSampler
+rbf_features = RBFSampler(
+    gamma=0.1, 
+    n_components=1000,  # << n
+    random_state=42
+)
+X_approx = rbf_features.fit_transform(X)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Практический пример</h2>
+    <pre><code># Пример: изображение + текстовые метки
+import numpy as np
+from sklearn.kernel_approximation import RBFSampler
+from sklearn.cross_decomposition import CCA
+
+# Данные
+X_images = ...  # (n_samples, n_pixels)
+Y_text = ...    # (n_samples, n_words)
+
+# Нормализация
+from sklearn.preprocessing import StandardScaler
+X_images = StandardScaler().fit_transform(X_images)
+Y_text = StandardScaler().fit_transform(Y_text)
+
+# Kernel approximation (RFF)
+rbf_X = RBFSampler(gamma=0.01, n_components=500)
+rbf_Y = RBFSampler(gamma=0.01, n_components=500)
+X_k = rbf_X.fit_transform(X_images)
+Y_k = rbf_Y.fit_transform(Y_text)
+
+# CCA в kernel пространстве
+cca = CCA(n_components=10, max_iter=1000)
+X_c, Y_c = cca.fit_transform(X_k, Y_k)
+
+# Корреляции
+correlations = [np.corrcoef(X_c[:, i], Y_c[:, i])[0,1] 
+                for i in range(10)]
+print(f"Canonical correlations: {correlations}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Типичные ошибки</h2>
+    <ul>
+      <li>❌ <strong>Не масштабировать данные</strong> перед Kernel CCA</li>
+      <li>❌ <strong>Слишком большое γ</strong> → переобучение, только локальные паттерны</li>
+      <li>❌ <strong>Забыть про регуляризацию</strong> → сингулярные матрицы</li>
+      <li>❌ <strong>Игнорировать вычислительную сложность</strong> для больших данных</li>
+      <li>❌ <strong>Не проверять корреляции</strong> — низкие корреляции = плохо работает</li>
+      <li>✅ <strong>Начинать с линейного CCA</strong> как baseline</li>
+      <li>✅ <strong>Использовать CV для выбора гиперпараметров</strong></li>
+      <li>✅ <strong>Применять kernel approximation</strong> для n > 10000</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо подходит:</h3>
+        <ul>
+          <li>Нелинейные зависимости между модальностями</li>
+          <li>Средний размер данных (n &lt; 10000)</li>
+          <li>Две модальности (views)</li>
+          <li>Нужно общее представление (embedding)</li>
+          <li>Научные задачи (нейронаука, биоинформатика)</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Плохо работает:</h3>
+        <ul>
+          <li>Линейные зависимости (используйте CCA)</li>
+          <li>Очень большие данные (n &gt; 100000)</li>
+          <li>&gt;2 модальностей (нужен Multi-view)</li>
+          <li>Требуется интерпретируемость</li>
+          <li>Мало данных (переобучение)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Чек-лист</h2>
+    <ul>
+      <li>[ ] Нормализовать обе модальности (StandardScaler)</li>
+      <li>[ ] Попробовать линейный CCA как baseline</li>
+      <li>[ ] Выбрать тип kernel (начать с RBF)</li>
+      <li>[ ] Подобрать γ и reg через кросс-валидацию</li>
+      <li>[ ] Проверить canonical correlations (должны быть &gt; 0.3)</li>
+      <li>[ ] Если n &gt; 10000, использовать kernel approximation</li>
+      <li>[ ] Визуализировать проекции (t-SNE на X_c, Y_c)</li>
+      <li>[ ] Оценить качество на downstream задаче</li>
+    </ul>
+    <blockquote>
+      <strong>Совет:</strong> Kernel CCA — мощный, но дорогой метод. Для больших данных рассмотрите Deep CCA или CCA с kernel approximation.
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
