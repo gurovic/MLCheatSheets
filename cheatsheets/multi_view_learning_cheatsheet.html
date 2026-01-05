@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Multi-view Learning Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📘 Multi-view Learning Cheatsheet</h1>
+  <div class="subtitle">Обучение с несколькими представлениями • Мультимодальные данные<br>📅 5 января 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть метода</h2>
+    <p><strong>Multi-view learning</strong> — обучение на данных с несколькими представлениями (views)</p>
+    <ul>
+      <li><strong>View</strong> — различные источники/типы признаков для одних и тех же объектов</li>
+      <li><strong>Примеры</strong>: текст + изображение, видео + аудио, разные датчики</li>
+      <li><strong>Цель</strong>: использовать взаимодополняющую информацию из разных views</li>
+      <li><strong>Отличие от мультимодальности</strong>: более общий термин, включает одинаковые модальности с разными признаками</li>
+    </ul>
+    <blockquote>
+      Разные views могут давать дополнительную или избыточную информацию
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типы views</h2>
+    <table>
+      <tr><th>Тип</th><th>Пример</th></tr>
+      <tr><td>Разные модальности</td><td>Изображение + текст описания</td></tr>
+      <tr><td>Разные признаки</td><td>Пиксели + HOG + SIFT</td></tr>
+      <tr><td>Разные языки</td><td>Документ на русском + английском</td></tr>
+      <tr><td>Разные источники</td><td>Данные от нескольких сенсоров</td></tr>
+      <tr><td>Разные времена</td><td>Временные срезы данных</td></tr>
+      <tr><td>Разные подпространства</td><td>Разные проекции данных</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Категории методов</h2>
+    <p><strong>1. Co-training подходы:</strong></p>
+    <ul>
+      <li>Обучаем модели на разных views</li>
+      <li>Модели помогают друг другу псевдо-метками</li>
+    </ul>
+    <p><strong>2. Multiple kernel learning:</strong></p>
+    <ul>
+      <li>Для каждого view — своё ядро</li>
+      <li>Комбинируем ядра для финального решения</li>
+    </ul>
+    <p><strong>3. Subspace learning:</strong></p>
+    <ul>
+      <li>CCA, KCCA — общее латентное пространство</li>
+      <li>Проецируем все views в одно пространство</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Co-training</h2>
+    <p><strong>Алгоритм:</strong></p>
+    <ol>
+      <li>Обучаем две модели на разных views с помеченными данными</li>
+      <li>Каждая модель делает предсказания на непомеченных данных</li>
+      <li>Добавляем самые уверенные предсказания как псевдо-метки</li>
+      <li>Переобучаем модели с расширенным набором</li>
+      <li>Повторяем шаги 2-4</li>
+    </ol>
+    <pre><code># Простой co-training
+def co_training(X1, X2, y_labeled, unlabeled_idx, 
+                n_iter=10, k=10):
+    model1 = RandomForestClassifier()
+    model2 = LogisticRegression()
+    
+    for iteration in range(n_iter):
+        # Обучение на labeled
+        model1.fit(X1[labeled_idx], y_labeled)
+        model2.fit(X2[labeled_idx], y_labeled)
+        
+        # Предсказания на unlabeled
+        pred1 = model1.predict_proba(X1[unlabeled_idx])
+        pred2 = model2.predict_proba(X2[unlabeled_idx])
+        
+        # Выбираем k самых уверенных
+        confident1 = top_k_confident(pred1, k)
+        confident2 = top_k_confident(pred2, k)
+        
+        # Добавляем к labeled
+        # (детали опущены)
+    
+    return model1, model2</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Multiple Kernel Learning (MKL)</h2>
+    <p><strong>Идея:</strong> комбинируем ядра от разных views</p>
+    <pre><code>K_combined = α₁K₁ + α₂K₂ + ... + αₘKₘ</code></pre>
+    <p><strong>Веса α:</strong></p>
+    <ul>
+      <li><strong>Uniform</strong>: все веса равны 1/m</li>
+      <li><strong>Оптимизация</strong>: находим оптимальные α через SVM или другой метод</li>
+      <li><strong>Non-linear</strong>: K = K₁^α₁ ⊗ K₂^α₂</li>
+    </ul>
+    <pre><code># Простой MKL
+from sklearn.svm import SVC
+from sklearn.metrics.pairwise import rbf_kernel
+
+# Вычисляем ядра для каждого view
+K1 = rbf_kernel(X1, X1, gamma=0.1)
+K2 = rbf_kernel(X2, X2, gamma=0.1)
+
+# Взвешенная комбинация
+alpha = [0.6, 0.4]
+K_combined = alpha[0] * K1 + alpha[1] * K2
+
+# SVM с precomputed kernel
+svm = SVC(kernel='precomputed')
+svm.fit(K_combined, y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Subspace Learning (CCA семейство)</h2>
+    <p><strong>Canonical Correlation Analysis:</strong></p>
+    <ul>
+      <li>Находим проекции для каждого view в общее пространство</li>
+      <li>Максимизируем корреляцию между проекциями</li>
+    </ul>
+    <pre><code>from sklearn.cross_decomposition import CCA
+
+cca = CCA(n_components=10)
+X1_c, X2_c = cca.fit_transform(X1, X2)
+
+# Объединяем проекции для классификации
+X_combined = np.hstack([X1_c, X2_c])
+classifier = RandomForestClassifier()
+classifier.fit(X_combined, y)</code></pre>
+    <p><strong>Другие методы:</strong></p>
+    <ul>
+      <li><strong>Kernel CCA</strong>: нелинейные зависимости</li>
+      <li><strong>Deep CCA</strong>: нейросетевые энкодеры</li>
+      <li><strong>Partial Least Squares</strong>: максимизирует ковариацию</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Стратегии объединения views</h2>
+    <table>
+      <tr><th>Стратегия</th><th>Когда использовать</th></tr>
+      <tr><td><strong>Early fusion</strong></td><td>Views сильно коррелированы, достаточно данных</td></tr>
+      <tr><td><strong>Late fusion</strong></td><td>Views независимы, разные модели для каждого</td></tr>
+      <tr><td><strong>Intermediate</strong></td><td>Объединение на уровне признаков среднего уровня</td></tr>
+      <tr><td><strong>Co-training</strong></td><td>Мало размеченных, много неразмеченных данных</td></tr>
+      <tr><td><strong>MKL</strong></td><td>SVM-like задачи, kernel methods</td></tr>
+      <tr><td><strong>Subspace</strong></td><td>Нужно общее представление</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Multi-view Semi-supervised Learning</h2>
+    <p><strong>Использование неразмеченных данных:</strong></p>
+    <ul>
+      <li><strong>Co-training</strong>: views обучают друг друга</li>
+      <li><strong>Multi-view self-training</strong>: псевдо-метки от согласованных предсказаний</li>
+      <li><strong>Multi-view consensus</strong>: views должны согласовываться на непомеченных</li>
+    </ul>
+    <pre><code># Multi-view consensus regularization
+def multi_view_consensus_loss(pred1, pred2):
+    # Минимизируем расхождение между views
+    return torch.mean((pred1 - pred2) ** 2)
+
+# В обучении:
+loss = task_loss + λ * multi_view_consensus_loss(
+    model1(X1), model2(X2)
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Практические примеры</h2>
+    <p><strong>Пример 1: Классификация документов (текст на разных языках)</strong></p>
+    <pre><code># Views: русский текст и английский перевод
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+tfidf_ru = TfidfVectorizer(max_features=1000)
+tfidf_en = TfidfVectorizer(max_features=1000)
+
+X_ru = tfidf_ru.fit_transform(texts_ru)
+X_en = tfidf_en.fit_transform(texts_en)
+
+# CCA для общего представления
+from sklearn.cross_decomposition import CCA
+cca = CCA(n_components=50)
+X_ru_c, X_en_c = cca.fit_transform(
+    X_ru.toarray(), X_en.toarray()
+)
+X_combined = np.hstack([X_ru_c, X_en_c])</code></pre>
+    <p><strong>Пример 2: Медицинская диагностика (клинические + генетические данные)</strong></p>
+    <pre><code># View 1: клинические показатели
+# View 2: генетические маркеры
+# MKL approach
+from sklearn.svm import SVC
+K_clinical = rbf_kernel(X_clinical)
+K_genetic = linear_kernel(X_genetic)
+K = 0.7 * K_clinical + 0.3 * K_genetic
+svm = SVC(kernel='precomputed').fit(K, y)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Обработка отсутствующих views</h2>
+    <p><strong>Проблема:</strong> не все views доступны для всех объектов</p>
+    <p><strong>Решения:</strong></p>
+    <ul>
+      <li><strong>Imputation</strong>: заполняем отсутствующие views моделью</li>
+      <li><strong>View-specific models</strong>: обучаем отдельные модели для доступных views</li>
+      <li><strong>Partial multi-view learning</strong>: методы устойчивые к пропускам</li>
+      <li><strong>Zero-padding</strong>: заполняем нулями с индикатором отсутствия</li>
+    </ul>
+    <pre><code># Простой подход с маской
+def predict_with_missing_views(models, X_views, 
+                                available_mask):
+    predictions = []
+    for i, (model, X, avail) in enumerate(
+        zip(models, X_views, available_mask)):
+        if avail:
+            predictions.append(model.predict_proba(X))
+    # Усредняем доступные предсказания
+    return np.mean(predictions, axis=0)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Метрики и оценка</h2>
+    <ul>
+      <li><strong>Agreement</strong>: насколько views согласны между собой</li>
+      <li><strong>Diversity</strong>: насколько views дополняют друг друга</li>
+      <li><strong>Redundancy</strong>: взаимная информация между views</li>
+      <li><strong>Performance gain</strong>: улучшение относительно single-view</li>
+    </ul>
+    <pre><code># Измерение agreement между views
+from sklearn.metrics import cohen_kappa_score
+
+pred1 = model1.predict(X1_test)
+pred2 = model2.predict(X2_test)
+agreement = cohen_kappa_score(pred1, pred2)
+print(f"Views agreement: {agreement:.3f}")</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Multi-view learning эффективно:</h3>
+        <ul>
+          <li>Есть несколько источников данных</li>
+          <li>Views содержат дополняющую информацию</li>
+          <li>Каждый view недостаточен по отдельности</li>
+          <li>Мало размеченных данных (semi-supervised)</li>
+          <li>Views имеют разную природу</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Не подходит если:</h3>
+        <ul>
+          <li>Views полностью избыточны</li>
+          <li>Один view намного лучше других</li>
+          <li>Views сильно коррелированы (лучше PCA)</li>
+          <li>Нет четкого разделения на views</li>
+          <li>Слишком дорого обрабатывать все views</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Типичные ошибки</h2>
+    <ul>
+      <li>❌ <strong>Игнорировать качество отдельных views</strong> — сначала проверьте каждый view</li>
+      <li>❌ <strong>Одинаковые веса для всех views</strong> — некоторые могут быть важнее</li>
+      <li>❌ <strong>Утечка данных между views</strong> в co-training</li>
+      <li>❌ <strong>Переобучение</strong> на малом числе размеченных в co-training</li>
+      <li>✅ <strong>Валидировать на всех views</strong> отдельно и вместе</li>
+      <li>✅ <strong>Использовать регуляризацию</strong> для согласованности views</li>
+      <li>✅ <strong>Тестировать устойчивость</strong> к отсутствию некоторых views</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Чек-лист</h2>
+    <ul>
+      <li>[ ] Определить и выделить views в данных</li>
+      <li>[ ] Оценить качество каждого view отдельно (baseline)</li>
+      <li>[ ] Измерить корреляцию/избыточность между views</li>
+      <li>[ ] Выбрать стратегию (early/late/co-training/MKL/CCA)</li>
+      <li>[ ] Нормализовать каждый view независимо</li>
+      <li>[ ] Обучить multi-view модель</li>
+      <li>[ ] Сравнить с single-view baselines</li>
+      <li>[ ] Проверить устойчивость к missing views</li>
+      <li>[ ] Проанализировать вклад каждого view</li>
+    </ul>
+    <blockquote>
+      <strong>Правило:</strong> Multi-view learning эффективно, когда views дополняют друг друга, а не дублируют информацию.
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>
