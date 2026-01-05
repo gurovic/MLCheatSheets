@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Inductive Logic Programming</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🧠 Inductive Logic Programming (ILP)</h1>
+  <div class="subtitle">Логическое программирование • Символьное обучение • Индуктивный вывод<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Основы ILP</h2>
+    <p><strong>ILP</strong> — область ML на пересечении логического программирования и машинного обучения</p>
+    <ul>
+      <li><strong>Цель</strong>: автоматический вывод логических правил из примеров</li>
+      <li><strong>Вход</strong>: позитивные и негативные примеры + background knowledge</li>
+      <li><strong>Выход</strong>: логическая программа (Prolog-подобные правила)</li>
+      <li><strong>Отличие от ML</strong>: символьное представление, интерпретируемость</li>
+      <li><strong>Преимущество</strong>: возможность включить экспертные знания</li>
+    </ul>
+    <blockquote>ILP = Machine Learning + Logic Programming</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Основные понятия</h2>
+    <p><strong>Ключевые термины</strong>:</p>
+    <ul>
+      <li><strong>Background knowledge (B)</strong>: исходные факты и правила, известные системе</li>
+      <li><strong>Positive examples (E+)</strong>: примеры целевого концепта</li>
+      <li><strong>Negative examples (E-)</strong>: контрпримеры</li>
+      <li><strong>Hypothesis (H)</strong>: индуцированная гипотеза (правила)</li>
+      <li><strong>Coverage</strong>: какие примеры покрывает гипотеза</li>
+      <li><strong>Consistency</strong>: H не покрывает негативные примеры</li>
+    </ul>
+    <pre><code>% Пример задачи ILP
+% Background:
+parent(tom, bob).
+parent(bob, ann).
+% Positive example:
+grandparent(tom, ann).
+% Hypothesis:
+grandparent(X, Y) :- parent(X, Z), parent(Z, Y).</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Представление знаний</h2>
+    <p><strong>Логические формулы</strong>:</p>
+    <ul>
+      <li><strong>Atoms</strong>: предикаты с аргументами — parent(tom, bob)</li>
+      <li><strong>Literals</strong>: атомы или их отрицание</li>
+      <li><strong>Clauses</strong>: дизъюнкции литералов</li>
+      <li><strong>Horn clauses</strong>: клаузы с ≤1 позитивным литералом</li>
+      <li><strong>Definite clauses</strong>: Horn clause с 1 позитивным литералом</li>
+      <li><strong>Rules</strong>: Head :- Body (если Body, то Head)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Пространство гипотез</h2>
+    <p><strong>Lattice структура</strong>:</p>
+    <ul>
+      <li><strong>Specialization</strong>: добавление условий к правилу (сужение)</li>
+      <li><strong>Generalization</strong>: удаление условий (расширение)</li>
+      <li><strong>θ-subsumption</strong>: отношение порядка между клаузами</li>
+      <li><strong>Least general generalization (lgg)</strong>: наиболее специфичная общая гипотеза</li>
+      <li><strong>Mode declarations</strong>: ограничения на форму гипотез</li>
+    </ul>
+    <blockquote>Пространство гипотез упорядочено от общих к специфичным</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Алгоритмы ILP</h2>
+    <p><strong>Классические методы</strong>:</p>
+    <ul>
+      <li><strong>FOIL</strong>: top-down поиск, добавление литералов</li>
+      <li><strong>Progol</strong>: inverse entailment, bottom clause</li>
+      <li><strong>Aleph</strong>: расширение Progol с улучшениями</li>
+      <li><strong>TILDE</strong>: деревья решений в логическом представлении</li>
+      <li><strong>GOLEM</strong>: bottom-up метод, lgg</li>
+      <li><strong>QuickFOIL</strong>: более быстрая версия FOIL</li>
+    </ul>
+    <pre><code># Псевдокод FOIL
+while есть uncovered positive examples:
+    начать новое правило
+    while правило покрывает negatives:
+        добавить лучший литерал
+    добавить правило к гипотезе</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Оценочные функции</h2>
+    <p><strong>Критерии качества правил</strong>:</p>
+    <ul>
+      <li><strong>Information gain</strong>: энтропийная мера</li>
+      <li><strong>m-estimate</strong>: сглаженная accuracy с prior</li>
+      <li><strong>Precision</strong>: доля правильных среди покрытых</li>
+      <li><strong>Recall</strong>: доля покрытых среди позитивных</li>
+      <li><strong>F-score</strong>: гармоническое среднее precision и recall</li>
+      <li><strong>Compression</strong>: минимизация описания (MDL principle)</li>
+    </ul>
+    <table>
+      <tr><th>Метрика</th><th>Формула</th></tr>
+      <tr><td>Accuracy</td><td>(p + n) / (p + n + P + N)</td></tr>
+      <tr><td>Precision</td><td>p / (p + n)</td></tr>
+      <tr><td>Recall</td><td>p / (p + N)</td></tr>
+    </table>
+    <p>где p — правильно покрытые +, n — неправильно покрытые −</p>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Стратегии поиска</h2>
+    <p><strong>Методы навигации</strong>:</p>
+    <ul>
+      <li><strong>Top-down</strong>: от общего к специфичному (специализация)</li>
+      <li><strong>Bottom-up</strong>: от специфичного к общему (генерализация)</li>
+      <li><strong>Bidirectional</strong>: комбинация обоих направлений</li>
+      <li><strong>Beam search</strong>: сохранение k лучших гипотез</li>
+      <li><strong>Best-first search</strong>: выбор наилучшей гипотезы для расширения</li>
+      <li><strong>A* search</strong>: эвристический поиск с оценкой</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Refinement операторы</h2>
+    <p><strong>Операции над гипотезами</strong>:</p>
+    <ul>
+      <li><strong>Add literal</strong>: добавить условие в тело правила</li>
+      <li><strong>Remove literal</strong>: удалить условие</li>
+      <li><strong>Apply substitution</strong>: замена переменных</li>
+      <li><strong>Introduce variable</strong>: добавить новую переменную</li>
+      <li><strong>Least general generalization</strong>: обобщить два правила</li>
+      <li><strong>Inverse resolution</strong>: обратная операция к резолюции</li>
+    </ul>
+    <blockquote>Refinement operators систематически исследуют пространство гипотез</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Mode declarations</h2>
+    <p><strong>Ограничения на гипотезы</strong>:</p>
+    <ul>
+      <li><strong>modeh</strong>: возможная форма головы правила</li>
+      <li><strong>modeb</strong>: возможная форма тела правила</li>
+      <li><strong>+type</strong>: input аргумент (должен быть связан)</li>
+      <li><strong>-type</strong>: output аргумент (может быть новый)</li>
+      <li><strong>#type</strong>: константа</li>
+      <li><strong>Типизация</strong>: ограничения на типы аргументов</li>
+    </ul>
+    <pre><code>% Примеры mode declarations
+:- modeh(1, grandparent(+person, -person)).
+:- modeb(*, parent(+person, -person)).
+:- modeb(*, male(+person)).
+:- modeb(*, female(+person)).</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Inverse entailment</h2>
+    <p><strong>Метод Progol</strong>:</p>
+    <ul>
+      <li><strong>Идея</strong>: конструировать наиболее специфичную гипотезу</li>
+      <li><strong>Bottom clause</strong>: самое специфичное правило для примера</li>
+      <li><strong>Saturation</strong>: включение всех релевантных фактов</li>
+      <li><strong>Generalization</strong>: обобщение bottom clause</li>
+      <li><strong>Pruning</strong>: отсечение неперспективных гипотез</li>
+    </ul>
+    <p><strong>Шаги</strong>:</p>
+    <ol>
+      <li>Выбрать непокрытый позитивный пример e</li>
+      <li>Построить bottom clause ⊥ для e</li>
+      <li>Найти обобщение ⊥ через поиск</li>
+      <li>Добавить найденное правило</li>
+    </ol>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Реляционное обучение</h2>
+    <p><strong>Особенности структурированных данных</strong>:</p>
+    <ul>
+      <li><strong>Multi-relational data</strong>: связи между объектами</li>
+      <li><strong>Variables</strong>: переменные для связывания объектов</li>
+      <li><strong>Recursive rules</strong>: рекурсивные определения</li>
+      <li><strong>Background predicates</strong>: вспомогательные отношения</li>
+      <li><strong>Invented predicates</strong>: создание новых предикатов</li>
+    </ul>
+    <pre><code>% Рекурсивное правило
+ancestor(X, Y) :- parent(X, Y).
+ancestor(X, Y) :- parent(X, Z), ancestor(Z, Y).</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Применения ILP</h2>
+    <p><strong>Области использования</strong>:</p>
+    <ul>
+      <li><strong>Биоинформатика</strong>: предсказание функций белков</li>
+      <li><strong>Drug discovery</strong>: структура-активность соединений</li>
+      <li><strong>Natural language</strong>: извлечение грамматических правил</li>
+      <li><strong>Knowledge discovery</strong>: выявление закономерностей в базах данных</li>
+      <li><strong>Robotics</strong>: обучение планированию действий</li>
+      <li><strong>Network analysis</strong>: анализ социальных сетей</li>
+      <li><strong>Program synthesis</strong>: генерация программ из спецификаций</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Системы и инструменты</h2>
+    <p><strong>Популярные ILP системы</strong>:</p>
+    <table>
+      <tr><th>Система</th><th>Особенности</th></tr>
+      <tr><td>Aleph</td><td>Prolog-based, inverse entailment</td></tr>
+      <tr><td>Progol</td><td>Классическая система, bottom clause</td></tr>
+      <tr><td>FOIL</td><td>Top-down поиск, эффективная</td></tr>
+      <tr><td>TILDE</td><td>Логические деревья решений</td></tr>
+      <tr><td>Metagol</td><td>Meta-interpretive learning</td></tr>
+      <tr><td>ProGolem</td><td>Параллельная версия GOLEM</td></tr>
+      <tr><td>LINUS</td><td>Преобразование в атрибутно-значимую форму</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Предикатное изобретение</h2>
+    <p><strong>Predicate invention</strong>:</p>
+    <ul>
+      <li><strong>Проблема</strong>: иногда нужны промежуточные концепты</li>
+      <li><strong>Решение</strong>: автоматическое создание новых предикатов</li>
+      <li><strong>Метод</strong>: введение вспомогательных определений</li>
+      <li><strong>Пример</strong>: для grandparent может потребоваться изобрести ancestor</li>
+      <li><strong>Преимущество</strong>: более компактные и понятные правила</li>
+      <li><strong>Сложность</strong>: экспоненциальный рост пространства поиска</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Ограничения и вызовы</h2>
+    <p><strong>Проблемы ILP</strong>:</p>
+    <ul>
+      <li><strong>Вычислительная сложность</strong>: поиск в огромном пространстве гипотез</li>
+      <li><strong>Overfitting</strong>: слишком специфичные правила</li>
+      <li><strong>Noise</strong>: ошибки в данных усложняют индукцию</li>
+      <li><strong>Scalability</strong>: проблемы с большими датасетами</li>
+      <li><strong>Feature engineering</strong>: требуется правильное представление</li>
+      <li><strong>Background knowledge</strong>: необходимость экспертных знаний</li>
+    </ul>
+    <blockquote>Масштабируемость — основной вызов для современного ILP</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Современные направления</h2>
+    <p><strong>Актуальные исследования</strong>:</p>
+    <ul>
+      <li><strong>Statistical ILP</strong>: вероятностные расширения (ProbLog, PRISM)</li>
+      <li><strong>Differentiable ILP</strong>: интеграция с нейросетями</li>
+      <li><strong>Neural-symbolic learning</strong>: комбинация символьных и коннекционистских методов</li>
+      <li><strong>Transfer learning</strong>: переиспользование правил между задачами</li>
+      <li><strong>Lifelong learning</strong>: накопление знаний со временем</li>
+      <li><strong>Meta-interpretive learning</strong>: использование метаинтерпретаторов</li>
+      <li><strong>Answer set programming</strong>: использование ASP для ILP</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Сравнение с другими методами</h2>
+    <p><strong>ILP vs другие ML подходы</strong>:</p>
+    <table>
+      <tr><th>Аспект</th><th>ILP</th><th>Neural Networks</th></tr>
+      <tr><td>Интерпретируемость</td><td>Высокая</td><td>Низкая</td></tr>
+      <tr><td>Prior knowledge</td><td>Легко включить</td><td>Сложно</td></tr>
+      <tr><td>Структура данных</td><td>Реляционная</td><td>Векторная</td></tr>
+      <tr><td>Масштабируемость</td><td>Ограничена</td><td>Хорошая</td></tr>
+      <tr><td>Шум в данных</td><td>Чувствительна</td><td>Устойчивы</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Пример использования</h2>
+    <p><strong>Классификация семейных отношений</strong>:</p>
+    <pre><code>% Background knowledge
+parent(tom, bob).
+parent(tom, liz).
+parent(bob, ann).
+parent(bob, pat).
+parent(pat, jim).
+male(tom). male(bob). male(jim).
+female(liz). female(ann). female(pat).
+
+% Positive examples
+:- modeh(1, daughter(+person, +person)).
+daughter(liz, tom).
+daughter(ann, bob).
+
+% Learned rule
+daughter(X, Y) :- 
+    parent(Y, X), 
+    female(X).</code></pre>
+    <blockquote>ILP автоматически выводит определение daughter из примеров</blockquote>
+  </div>
+
+</div>
+</body>
+</html>

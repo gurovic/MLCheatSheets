@@ -546,17 +546,17 @@
 1. [Астрофизика и космология](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/astrophysics_cosmology_ml_cheatsheet.html)
 1. [Геоинформационные системы](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/geoinformation_systems_ml_cheatsheet.html)
 1. [Цифровая гуманитаристика](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/digital_humanities_cheatsheet.html)
-1. Computational social science
+1. [Computational social science](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/computational_social_science_cheatsheet.html)
 
 ### **3. Композиционное и структурное обучение**
 1. [Grammatical inference](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/grammatical_inference_cheatsheet.html)
-1. Inductive logic programming
+1. [Inductive logic programming](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/inductive_logic_programming_cheatsheet.html)
 1. [Program synthesis](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/program_synthesis_ml_cheatsheet.html)
 
 ### **4. Материаловедение и ML**
-1. Материальные информатики
-1. Свойства материалов и ML
-1. Дизайн материалов
+1. [Материальные информатики](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/material_informatics_cheatsheet.html)
+1. [Свойства материалов и ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/material_properties_ml_cheatsheet.html)
+1. [Дизайн материалов](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/material_design_cheatsheet.html)
 
 ### **5. Квантовое машинное обучение**
 1. [Квантовые алгоритмы для ML](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/quantum_algorithms_ml_cheatsheet.html)

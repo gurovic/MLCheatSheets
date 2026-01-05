@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Материальные информатики</title>
+  <style>
+    @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; } }
+    @media print { body { background: white; padding: 0; } @page { size: A4 landscape; margin: 10mm; } }
+    .container { column-count: 3; column-gap: 20px; max-width: 100%; }
+    .block { break-inside: avoid; margin-bottom: 1.2em; padding: 12px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    h1 { font-size: 1.6em; font-weight: 700; color: #1a5fb4; text-align: center; margin: 0 0 8px; column-span: all; }
+    .subtitle { text-align: center; color: #666; font-size: 0.9em; margin-bottom: 12px; column-span: all; }
+    h2 { font-size: 1.15em; font-weight: 700; color: #1a5fb4; margin: 0 0 8px; padding-bottom: 4px; border-bottom: 1px solid #e0e7ff; }
+    p, ul, ol { font-size: 0.92em; margin: 0.6em 0; }
+    ul, ol { padding-left: 18px; }
+    li { margin-bottom: 4px; }
+    code { font-family: 'Consolas', 'Courier New', monospace; background-color: #f0f4ff; padding: 1px 4px; border-radius: 3px; font-size: 0.88em; }
+    pre { background-color: #f0f4ff; padding: 8px; border-radius: 4px; overflow-x: auto; font-size: 0.84em; margin: 6px 0; }
+    pre code { padding: 0; background: none; white-space: pre-wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82em; margin: 6px 0; }
+    th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
+    td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
+    tr:nth-child(even) { background-color: #f8fbff; }
+    blockquote { font-style: italic; margin: 8px 0; padding: 6px 10px; background: #f8fbff; border-left: 2px solid #1a5fb4; font-size: 0.88em; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>🔬 Материальные информатики (Materials Informatics)</h1>
+  <div class="subtitle">ML для материаловедения • Предсказание свойств • Открытие материалов<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Введение в материальные информатики</h2>
+    <p><strong>Materials Informatics</strong> — применение data science и ML для ускорения открытия и разработки материалов</p>
+    <ul>
+      <li><strong>Цель</strong>: сократить время и стоимость разработки материалов</li>
+      <li><strong>Традиционный подход</strong>: trial-and-error, 10-20 лет на новый материал</li>
+      <li><strong>ML подход</strong>: предсказание свойств и направленный поиск</li>
+      <li><strong>Materials Genome Initiative</strong>: ускорить разработку в 2 раза</li>
+      <li><strong>Области</strong>: батареи, катализаторы, сплавы, полимеры, керамика</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Представление материалов</h2>
+    <p><strong>Методы кодирования структур</strong>:</p>
+    <ul>
+      <li><strong>Chemical formula</strong>: состав элементов (Fe₂O₃, TiO₂)</li>
+      <li><strong>Crystal structure</strong>: пространственная группа, решётка</li>
+      <li><strong>Atomic positions</strong>: координаты атомов в ячейке</li>
+      <li><strong>Graph representation</strong>: атомы = узлы, связи = рёбра</li>
+      <li><strong>Fingerprints</strong>: бинарные/векторные дескрипторы</li>
+      <li><strong>Coulomb matrix</strong>: матрица взаимодействий атомов</li>
+    </ul>
+    <blockquote>Правильное представление — ключ к успеху ML моделей</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Дескрипторы материалов</h2>
+    <p><strong>Feature engineering для материалов</strong>:</p>
+    <ul>
+      <li><strong>Compositional features</strong>: среднее атомное число, электроотрицательность</li>
+      <li><strong>Structural features</strong>: симметрия, объём ячейки, плотность упаковки</li>
+      <li><strong>Electronic features</strong>: число валентных электронов, заполнение орбиталей</li>
+      <li><strong>Magpie descriptors</strong>: 145 признаков из состава</li>
+      <li><strong>SOAP descriptors</strong>: Smooth Overlap of Atomic Positions</li>
+      <li><strong>Crystal Graph features</strong>: топология связей в структуре</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Базы данных материалов</h2>
+    <p><strong>Открытые источники данных</strong>:</p>
+    <table>
+      <tr><th>База данных</th><th>Содержание</th></tr>
+      <tr><td>Materials Project</td><td>~150k рассчитанных структур (DFT)</td></tr>
+      <tr><td>AFLOW</td><td>Кристаллические структуры, свойства</td></tr>
+      <tr><td>OQMD</td><td>Open Quantum Materials Database</td></tr>
+      <tr><td>NOMAD</td><td>3+ млн расчётов материалов</td></tr>
+      <tr><td>Citrination</td><td>Платформа для materials data</td></tr>
+      <tr><td>Materials Cloud</td><td>Репозиторий данных и инструментов</td></tr>
+      <tr><td>Crystallography Open DB</td><td>Экспериментальные структуры</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Предсказание свойств</h2>
+    <p><strong>Типы целевых свойств</strong>:</p>
+    <ul>
+      <li><strong>Механические</strong>: твёрдость, модуль упругости, прочность</li>
+      <li><strong>Электронные</strong>: ширина запрещённой зоны, проводимость</li>
+      <li><strong>Термические</strong>: температура плавления, теплопроводность</li>
+      <li><strong>Магнитные</strong>: магнитный момент, температура Кюри</li>
+      <li><strong>Оптические</strong>: показатель преломления, поглощение</li>
+      <li><strong>Химические</strong>: стабильность, реакционная способность</li>
+    </ul>
+    <pre><code># Пример с matminer
+from matminer.featurizers import composition as cf
+featurizer = cf.ElementProperty.from_preset("magpie")
+features = featurizer.featurize(comp)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. ML методы для материалов</h2>
+    <p><strong>Популярные алгоритмы</strong>:</p>
+    <ul>
+      <li><strong>Random Forest</strong>: хорошая baseline модель</li>
+      <li><strong>Gradient Boosting</strong>: XGBoost, LightGBM для табличных данных</li>
+      <li><strong>Kernel Ridge Regression</strong>: для малых датасетов</li>
+      <li><strong>Gaussian Processes</strong>: uncertainty quantification</li>
+      <li><strong>Neural Networks</strong>: для сложных зависимостей</li>
+      <li><strong>Graph Neural Networks</strong>: для структурных данных</li>
+    </ul>
+    <blockquote>GNN показывают лучшие результаты для кристаллических структур</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Graph Neural Networks для материалов</h2>
+    <p><strong>Архитектуры для кристаллов</strong>:</p>
+    <ul>
+      <li><strong>CGCNN</strong>: Crystal Graph Convolutional NN</li>
+      <li><strong>MEGNet</strong>: Materials Graph Network</li>
+      <li><strong>SchNet</strong>: учитывает межатомные расстояния</li>
+      <li><strong>ALIGNN</strong>: использует углы связей</li>
+      <li><strong>DimeNet</strong>: directional message passing</li>
+      <li><strong>M3GNet</strong>: universal потенциал для MD</li>
+    </ul>
+    <pre><code># PyTorch Geometric для материалов
+from torch_geometric.nn import MessagePassing
+class CrystalGNN(MessagePassing):
+    def forward(self, x, edge_index, edge_attr):
+        return self.propagate(edge_index, x=x, edge_attr=edge_attr)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Active Learning и Bayesian Optimization</h2>
+    <p><strong>Эффективное исследование пространства материалов</strong>:</p>
+    <ul>
+      <li><strong>Active learning</strong>: выбор наиболее информативных экспериментов</li>
+      <li><strong>Acquisition functions</strong>: EI, UCB, PI для выбора кандидатов</li>
+      <li><strong>Bayesian optimization</strong>: оптимизация дорогих функций</li>
+      <li><strong>Multi-fidelity</strong>: комбинация дешёвых и точных расчётов</li>
+      <li><strong>Expected improvement</strong>: баланс exploration/exploitation</li>
+      <li><strong>Uncertainty quantification</strong>: оценка надёжности предсказаний</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Генеративные модели</h2>
+    <p><strong>Создание новых материалов</strong>:</p>
+    <ul>
+      <li><strong>VAE</strong>: Variational Autoencoders для латентного пространства</li>
+      <li><strong>GAN</strong>: генерация кристаллических структур</li>
+      <li><strong>Diffusion models</strong>: современный подход к генерации</li>
+      <li><strong>Evolutionary algorithms</strong>: генетические алгоритмы</li>
+      <li><strong>SMACT</strong>: комбинаторная генерация композиций</li>
+      <li><strong>Crystal structure prediction</strong>: USPEX, CALYPSO</li>
+    </ul>
+    <blockquote>Генеративные модели открывают материалы вне известного пространства</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Transfer Learning</h2>
+    <p><strong>Переиспользование знаний</strong>:</p>
+    <ul>
+      <li><strong>Pre-training</strong>: обучение на больших датасетах (Materials Project)</li>
+      <li><strong>Fine-tuning</strong>: дообучение на специфичной задаче</li>
+      <li><strong>Multi-task learning</strong>: одновременное предсказание нескольких свойств</li>
+      <li><strong>Domain adaptation</strong>: перенос между классами материалов</li>
+      <li><strong>Few-shot learning</strong>: обучение на малых данных</li>
+      <li><strong>Meta-learning</strong>: обучение обучаться новым материалам</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Физически-информированные модели</h2>
+    <p><strong>Physics-informed ML</strong>:</p>
+    <ul>
+      <li><strong>Инварианты</strong>: учёт симметрий (трансляции, вращения)</li>
+      <li><strong>Законы сохранения</strong>: энергия, импульс, заряд</li>
+      <li><strong>Химические правила</strong>: валентность, электронейтральность</li>
+      <li><strong>PINN</strong>: Physics-Informed Neural Networks</li>
+      <li><strong>Equivariant NN</strong>: E(3)-эквивариантные сети</li>
+      <li><strong>Universal potentials</strong>: M3GNet, MACE для MD</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Высокопроизводительные расчёты</h2>
+    <p><strong>High-throughput computing</strong>:</p>
+    <ul>
+      <li><strong>DFT</strong>: Density Functional Theory расчёты (VASP, Quantum ESPRESSO)</li>
+      <li><strong>Workflows</strong>: автоматизация расчётов (AiiDA, FireWorks)</li>
+      <li><strong>Screening</strong>: массовая проверка кандидатов</li>
+      <li><strong>Computational cost</strong>: баланс точности и времени</li>
+      <li><strong>Cloud computing</strong>: использование облачных ресурсов</li>
+      <li><strong>ML surrogates</strong>: замена DFT предсказаниями ML</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Интерпретируемость и объяснимость</h2>
+    <p><strong>Понимание предсказаний</strong>:</p>
+    <ul>
+      <li><strong>Feature importance</strong>: какие дескрипторы важны</li>
+      <li><strong>SHAP values</strong>: вклад каждого признака</li>
+      <li><strong>Attention weights</strong>: фокус внимания в GNN</li>
+      <li><strong>Saliency maps</strong>: важные атомы в структуре</li>
+      <li><strong>Rule extraction</strong>: извлечение химических правил</li>
+      <li><strong>Counterfactual explanations</strong>: "что если" анализ</li>
+    </ul>
+    <blockquote>Интерпретируемость критична для доверия экспертов-материаловедов</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Специфические применения</h2>
+    <p><strong>Области использования</strong>:</p>
+    <ul>
+      <li><strong>Батареи</strong>: электролиты, катодные материалы, твердотельные батареи</li>
+      <li><strong>Катализаторы</strong>: активность, селективность, стабильность</li>
+      <li><strong>Суперпроводники</strong>: высокотемпературные сверхпроводники</li>
+      <li><strong>Термоэлектрики</strong>: figure of merit оптимизация</li>
+      <li><strong>Фотовольтаика</strong>: солнечные элементы, поглотители</li>
+      <li><strong>Структурные материалы</strong>: сплавы, композиты</li>
+      <li><strong>Мембраны</strong>: газоразделение, фильтрация</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Инструменты и библиотеки</h2>
+    <p><strong>Python экосистема</strong>:</p>
+    <table>
+      <tr><th>Библиотека</th><th>Назначение</th></tr>
+      <tr><td>pymatgen</td><td>Анализ и манипуляция структур</td></tr>
+      <tr><td>matminer</td><td>Извлечение дескрипторов</td></tr>
+      <tr><td>ASE</td><td>Atomic Simulation Environment</td></tr>
+      <tr><td>CGCNN</td><td>Crystal Graph CNN</td></tr>
+      <tr><td>MEGNet</td><td>Materials graph networks</td></tr>
+      <tr><td>SMACT</td><td>Генерация композиций</td></tr>
+      <tr><td>atomate</td><td>Workflows для расчётов</td></tr>
+      <tr><td>AiiDA</td><td>Управление расчётами</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Вызовы и ограничения</h2>
+    <p><strong>Текущие проблемы</strong>:</p>
+    <ul>
+      <li><strong>Размер данных</strong>: ограниченные датасеты по сравнению с ImageNet</li>
+      <li><strong>Качество данных</strong>: ошибки в расчётах и экспериментах</li>
+      <li><strong>Transferability</strong>: плохой перенос между классами материалов</li>
+      <li><strong>Метастабильность</strong>: стабильность при синтезе</li>
+      <li><strong>Синтезируемость</strong>: не все предсказанные материалы можно сделать</li>
+      <li><strong>Multi-property optimization</strong>: конфликтующие цели</li>
+      <li><strong>Uncertainty</strong>: надёжность экстраполяции</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 17. Closed-loop системы</h2>
+    <p><strong>Автоматизированные лаборатории</strong>:</p>
+    <ul>
+      <li><strong>Self-driving labs</strong>: роботизированные эксперименты</li>
+      <li><strong>ML guidance</strong>: предсказание → синтез → измерение → обучение</li>
+      <li><strong>Autonomous workflows</strong>: минимум человеческого вмешательства</li>
+      <li><strong>Real-time feedback</strong>: немедленная корректировка гипотез</li>
+      <li><strong>Accelerated discovery</strong>: сжатие времени в 10-100 раз</li>
+      <li><strong>Materials acceleration platforms</strong>: MAP инициативы</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 18. Кейс-стадии успеха</h2>
+    <p><strong>Реальные достижения</strong>:</p>
+    <ul>
+      <li><strong>Li-ion батареи</strong>: открытие новых электролитов за месяцы вместо лет</li>
+      <li><strong>Суперсплавы</strong>: оптимизация жаропрочных сплавов</li>
+      <li><strong>Термоэлектрики</strong>: повышение эффективности преобразования</li>
+      <li><strong>Катализаторы CO₂</strong>: поиск эффективных катализаторов</li>
+      <li><strong>Высокоэнтропийные сплавы</strong>: прогнозирование стабильности фаз</li>
+      <li><strong>Органические солнечные элементы</strong>: скрининг молекул</li>
+    </ul>
+    <blockquote>Materials informatics уже ускоряет разработку в ведущих лабораториях</blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 19. Будущие направления</h2>
+    <p><strong>Перспективы развития</strong>:</p>
+    <ul>
+      <li><strong>Foundation models</strong>: большие предобученные модели для материалов</li>
+      <li><strong>Multimodal learning</strong>: комбинация структур, текстов, изображений</li>
+      <li><strong>Quantum ML</strong>: квантовые алгоритмы для материалов</li>
+      <li><strong>Causal discovery</strong>: причинно-следственные связи свойств</li>
+      <li><strong>Federated learning</strong>: обучение без обмена данными</li>
+      <li><strong>Edge AI</strong>: ML на экспериментальном оборудовании</li>
+    </ul>
+  </div>
+
+</div>
+</body>
+</html>
