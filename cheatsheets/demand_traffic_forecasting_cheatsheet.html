@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Прогнозирование спроса и трафика Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    pre {
+      background-color: #f0f4ff;
+      padding: 8px;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.84em;
+      margin: 6px 0;
+    }
+
+    pre code {
+      padding: 0;
+      background: none;
+      white-space: pre-wrap;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82em;
+      margin: 6px 0;
+    }
+
+    th {
+      background-color: #e6f0ff;
+      text-align: left;
+      padding: 4px 6px;
+      font-weight: 600;
+    }
+
+    td {
+      padding: 4px 6px;
+      border-bottom: 1px solid #f0f4ff;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f8fbff;
+    }
+
+    .good-vs-bad {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .good-vs-bad div {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 4px;
+    }
+
+    .good {
+      background-color: #f0f9f4;
+      border-left: 3px solid #2e8b57;
+    }
+
+    .bad {
+      background-color: #fdf0f2;
+      border-left: 3px solid #d32f2f;
+    }
+
+    .good h3, .bad h3 {
+      margin: 0 0 4px;
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .good ul, .bad ul {
+      padding-left: 20px;
+      margin: 0;
+    }
+
+    .good li::before { content: "✅ "; font-weight: bold; }
+    .bad li::before { content: "❌ "; font-weight: bold; }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>📈 Прогнозирование спроса и трафика Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li><strong>Прогноз спроса</strong>: предсказание будущих продаж, заказов</li>
+      <li><strong>Прогноз трафика</strong>: загрузка дорог, сетевой трафик</li>
+      <li><strong>Цель</strong>: оптимизация запасов, инфраструктуры</li>
+      <li><strong>Особенность</strong>: множество внешних факторов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Типичные характеристики</h2>
+    <ul>
+      <li><strong>Сезонность</strong>: недельная, месячная, годовая</li>
+      <li><strong>Тренды</strong>: рост/спад со временем</li>
+      <li><strong>Праздники</strong>: всплески и провалы</li>
+      <li><strong>Промо</strong>: влияние акций и рекламы</li>
+      <li><strong>Погода</strong>: температура, осадки</li>
+      <li><strong>Экономика</strong>: кризисы, изменение доходов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Классические методы</h2>
+    <table>
+      <tr><th>Метод</th><th>Когда использовать</th><th>Плюсы</th></tr>
+      <tr><td><strong>Moving Average</strong></td><td>Стабильный спрос</td><td>Простота</td></tr>
+      <tr><td><strong>Exponential Smoothing</strong></td><td>Тренд есть</td><td>Адаптивность</td></tr>
+      <tr><td><strong>Holt-Winters</strong></td><td>Сезонность</td><td>Учёт сезонности</td></tr>
+      <tr><td><strong>SARIMA</strong></td><td>Сложная сезонность</td><td>Точность</td></tr>
+      <tr><td><strong>Prophet</strong></td><td>Много праздников</td><td>Удобство</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Prophet для спроса</h2>
+    <pre><code>from prophet import Prophet
+import pandas as pd
+
+# Данные: ds (дата), y (спрос)
+df = pd.DataFrame({
+    'ds': dates,
+    'y': demand
+})
+
+# Модель с праздниками
+model = Prophet(
+    yearly_seasonality=True,
+    weekly_seasonality=True,
+    daily_seasonality=False
+)
+
+# Добавить праздники
+holidays = pd.DataFrame({
+    'holiday': 'new_year',
+    'ds': pd.to_datetime(['2025-01-01', '2026-01-01']),
+    'lower_window': 0,
+    'upper_window': 1,
+})
+model.add_country_holidays(country_name='RU')
+
+model.fit(df)
+
+# Прогноз на 30 дней
+future = model.make_future_dataframe(periods=30)
+forecast = model.predict(future)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Feature Engineering</h2>
+    <p><strong>Временные признаки:</strong></p>
+    <ul>
+      <li>День недели, месяц, год</li>
+      <li>Выходной / рабочий день</li>
+      <li>Праздник (бинарный + дни до/после)</li>
+      <li>Неделя года, квартал</li>
+    </ul>
+
+    <p><strong>Лаговые признаки:</strong></p>
+    <pre><code>df['demand_lag_1'] = df['demand'].shift(1)
+df['demand_lag_7'] = df['demand'].shift(7)
+df['demand_lag_365'] = df['demand'].shift(365)
+
+# Rolling statistics
+df['demand_rolling_mean_7'] = df['demand'].rolling(7).mean()
+df['demand_rolling_std_7'] = df['demand'].rolling(7).std()</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. XGBoost для прогноза</h2>
+    <pre><code>import xgboost as xgb
+
+# Создаем признаки
+X = create_features(df)  # временные + лаги
+y = df['demand']
+
+# Модель
+model = xgb.XGBRegressor(
+    n_estimators=1000,
+    max_depth=5,
+    learning_rate=0.01,
+    subsample=0.8,
+    colsample_bytree=0.8
+)
+
+model.fit(X_train, y_train)
+
+# Прогноз
+y_pred = model.predict(X_test)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. LSTM для трафика</h2>
+    <pre><code>import torch.nn as nn
+
+class TrafficLSTM(nn.Module):
+    def __init__(self, input_size, hidden_size):
+        super().__init__()
+        self.lstm = nn.LSTM(
+            input_size, hidden_size, 
+            num_layers=2, 
+            dropout=0.2,
+            batch_first=True
+        )
+        self.fc = nn.Linear(hidden_size, 1)
+    
+    def forward(self, x):
+        # x: (batch, seq_len, features)
+        out, _ = self.lstm(x)
+        out = self.fc(out[:, -1, :])
+        return out
+
+# Пример использования
+model = TrafficLSTM(input_size=10, hidden_size=64)
+prediction = model(sequence)  # (batch, 1)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Attention для спроса</h2>
+    <p><strong>Идея:</strong> разные временные точки имеют разную важность</p>
+    <pre><code>class AttentionDemandModel(nn.Module):
+    def __init__(self, input_dim, hidden_dim):
+        super().__init__()
+        self.lstm = nn.LSTM(input_dim, hidden_dim, batch_first=True)
+        self.attention = nn.Linear(hidden_dim, 1)
+        self.fc = nn.Linear(hidden_dim, 1)
+    
+    def forward(self, x):
+        lstm_out, _ = self.lstm(x)  # (batch, seq, hidden)
+        
+        # Attention weights
+        attn_weights = torch.softmax(
+            self.attention(lstm_out), dim=1
+        )  # (batch, seq, 1)
+        
+        # Weighted sum
+        context = torch.sum(lstm_out * attn_weights, dim=1)
+        
+        return self.fc(context)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Ensemble подход</h2>
+    <pre><code># Комбинация моделей
+from sklearn.ensemble import VotingRegressor
+
+ensemble = VotingRegressor([
+    ('prophet', prophet_model),
+    ('xgboost', xgb_model),
+    ('lstm', lstm_model)
+], weights=[0.3, 0.4, 0.3])
+
+# Или weighted average
+predictions = (
+    0.3 * prophet_pred +
+    0.4 * xgb_pred +
+    0.3 * lstm_pred
+)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Обработка внешних факторов</h2>
+    <p><strong>Погода:</strong></p>
+    <ul>
+      <li>Температура, осадки, влажность</li>
+      <li>API: OpenWeatherMap, Weather API</li>
+    </ul>
+
+    <p><strong>Промо и маркетинг:</strong></p>
+    <ul>
+      <li>Бинарные признаки: есть промо или нет</li>
+      <li>Тип промо: скидка, подарок, реклама</li>
+      <li>Бюджет на рекламу</li>
+    </ul>
+
+    <p><strong>Экономические:</strong></p>
+    <ul>
+      <li>Индекс потребительских цен</li>
+      <li>Курс валют</li>
+      <li>Безработица</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 11. Hierarchical Forecasting</h2>
+    <p><strong>Задача:</strong> прогноз на разных уровнях (страна → регион → город)</p>
+    <pre><code># Bottom-up: суммируем прогнозы нижних уровней
+total_forecast = sum([
+    forecast_city1,
+    forecast_city2,
+    ...
+])
+
+# Top-down: распределяем прогноз сверху вниз
+proportions = historical_proportions()
+city1_forecast = total_forecast * proportions['city1']
+
+# Middle-out: комбинация подходов</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Метрики оценки</h2>
+    <table>
+      <tr><th>Метрика</th><th>Формула</th><th>Применение</th></tr>
+      <tr><td><strong>MAE</strong></td><td>mean(|y - ŷ|)</td><td>Абсолютная ошибка</td></tr>
+      <tr><td><strong>RMSE</strong></td><td>√mean((y - ŷ)²)</td><td>Штрафует большие ошибки</td></tr>
+      <tr><td><strong>MAPE</strong></td><td>mean(|y - ŷ|/y) × 100%</td><td>Процентная ошибка</td></tr>
+      <tr><td><strong>SMAPE</strong></td><td>mean(|y - ŷ|/(|y|+|ŷ|)) × 100%</td><td>Симметричная MAPE</td></tr>
+    </table>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Uncertainty Quantification</h2>
+    <p><strong>Доверительные интервалы:</strong></p>
+    <pre><code># Prophet автоматически дает интервалы
+forecast[['yhat', 'yhat_lower', 'yhat_upper']]
+
+# Quantile regression с XGBoost
+quantile_model = xgb.XGBRegressor(
+    objective='reg:quantileerror',
+    quantile_alpha=0.95
+)
+
+# Ensemble для uncertainty
+predictions = [model.predict(X) for model in models]
+mean_pred = np.mean(predictions, axis=0)
+std_pred = np.std(predictions, axis=0)
+confidence_interval = (mean_pred - 2*std_pred, mean_pred + 2*std_pred)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Production deployment</h2>
+    <ul>
+      <li><strong>Переобучение</strong>: регулярно (например, еженедельно)</li>
+      <li><strong>Мониторинг</strong>: отслеживать точность в реальном времени</li>
+      <li><strong>Fallback</strong>: иметь простую модель на случай сбоя</li>
+      <li><strong>A/B тесты</strong>: проверять новые модели</li>
+      <li><strong>Feature store</strong>: централизованное хранение признаков</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Когда использовать</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Хорошо</h3>
+        <ul>
+          <li>Есть исторические данные (>1 год)</li>
+          <li>Стабильные паттерны</li>
+          <li>Много внешних факторов</li>
+          <li>Нужна автоматизация</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Сложно</h3>
+        <ul>
+          <li>Новый продукт (нет истории)</li>
+          <li>Резкие изменения рынка</li>
+          <li>Очень редкие события</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <ul>
+      <li>[ ] Собрать исторические данные (минимум 2 сезона)</li>
+      <li>[ ] Визуализировать тренды и сезонность</li>
+      <li>[ ] Создать временные и лаговые признаки</li>
+      <li>[ ] Добавить внешние факторы (погода, праздники)</li>
+      <li>[ ] Выбрать метод или ensemble</li>
+      <li>[ ] Использовать walk-forward validation</li>
+      <li>[ ] Оценить uncertainty</li>
+      <li>[ ] Настроить мониторинг в продакшене</li>
+    </ul>
+
+    <h3>💡 Объяснение заказчику:</h3>
+    <blockquote>
+      «Прогнозирование спроса — это как предсказание погоды для бизнеса: мы смотрим на прошлые паттерны, учитываем праздники и другие факторы, чтобы понять, сколько товара понадобится завтра».
+    </blockquote>
+  </div>
+
+</div>
+
+</body>
+</html>

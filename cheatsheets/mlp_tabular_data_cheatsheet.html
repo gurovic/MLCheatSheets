@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>MLP для табличных данных Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🤖 MLP для табличных данных Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li>**Задача**: классификация/регрессия на таблицах</li>
+      <li>**Альтернатива**: gradient boosting</li>
+      <li>**Преимущества**: end-to-end обучение</li>
+      <li>**Когда**: сложные взаимодействия признаков</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Архитектура</h2>
+    <ul>
+      <li>Входной слой: размер = число признаков</li>
+      <li>Hidden layers: 2-5 слоёв</li>
+      <li>Активации: ReLU, SELU</li>
+      <li>Output: softmax (классификация) или linear (регрессия)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Preprocessing</h2>
+    <ul>
+      <li>Нормализация: StandardScaler, MinMaxScaler</li>
+      <li>Категориальные: Label encoding, One-hot</li>
+      <li>Missing values: imputation</li>
+      <li>Outliers: clipping, robust scaling</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. Embedding слои</h2>
+    <ul>
+      <li>Для категориальных признаков</li>
+      <li>Уменьшают размерность</li>
+      <li>Учат представления категорий</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. Regularization</h2>
+    <ul>
+      <li>Dropout: 0.2-0.5</li>
+      <li>L2 regularization</li>
+      <li>Batch Normalization</li>
+      <li>Early stopping</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Гиперпараметры</h2>
+    <ul>
+      <li>Hidden size: 64-512</li>
+      <li>Number of layers: 2-5</li>
+      <li>Learning rate: 0.001-0.01</li>
+      <li>Batch size: 32-256</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. PyTorch пример</h2>
+    <ul>
+      <li>nn.Linear слои</li>
+      <li>ReLU активации</li>
+      <li>Dropout layers</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. vs Gradient Boosting</h2>
+    <ul>
+      <li>MLP: лучше с эмбеддингами</li>
+      <li>GB: лучше на малых данных</li>
+      <li>Ensemble: комбинировать оба</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Feature Engineering</h2>
+    <ul>
+      <li>Polynomial features</li>
+      <li>Interaction terms</li>
+      <li>Target encoding</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Когда использовать</h2>
+    <ul>
+      <li>Большой датасет (>100K)</li>
+      <li>Категориальные с высокой cardinality</li>
+      <li>Нужны embeddings</li>
+      <li>End-to-end обучение</li>
+    </ul>
+  </div>
+
+
+  <div class="block">
+    <h2>🔷 11. Batch Normalization</h2>
+    <p>Нормализация активаций между слоями</p>
+    <ul>
+      <li>Стабилизирует обучение</li>
+      <li>Позволяет большие learning rates</li>
+      <li>Работает как regularization</li>
+      <li>Размещается после Linear, до активации</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Выбор архитектуры</h2>
+    <p>Правила для определения размера сети</p>
+    <ul>
+      <li>Ширина: начать с 64-128</li>
+      <li>Глубина: 2-3 слоя для начала</li>
+      <li>Увеличивать пока не переобучается</li>
+      <li>Wide & shallow vs Deep & narrow</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. Пример кода PyTorch</h2>
+    <p>Полная реализация MLP</p>
+    <ul>
+    </ul>
+    <pre><code>class TabularMLP(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, 128),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(128, 64),
+            nn.BatchNorm1d(64),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(64, output_dim)
+        )
+    
+    def forward(self, x):
+        return self.net(x)</code></pre>
+    <ul>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Training Tips</h2>
+    <p>Советы для успешного обучения</p>
+    <ul>
+      <li>Используйте Adam оптимизатор</li>
+      <li>Learning rate: начать с 0.001</li>
+      <li>Gradient clipping при нестабильности</li>
+      <li>Мониторить train/val loss</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Чек-лист</h2>
+    <p>Шаги для успешного применения</p>
+    <ul>
+      <li>[ ] Нормализовать числовые признаки</li>
+      <li>[ ] Обработать категориальные (embedding/onehot)</li>
+      <li>[ ] Разделить train/val/test</li>
+      <li>[ ] Выбрать архитектуру</li>
+      <li>[ ] Настроить regularization</li>
+      <li>[ ] Обучить с early stopping</li>
+      <li>[ ] Сравнить с gradient boosting</li>
+      <li>[ ] Оценить на тестовой выборке</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>

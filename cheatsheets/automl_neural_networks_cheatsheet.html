@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>AutoML для нейросетей Cheatsheet — 3 колонки</title>
+  <style>
+    @media screen {
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        color: #333;
+        background: #fafcff;
+        padding: 10px;
+      }
+    }
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    .container {
+      column-count: 3;
+      column-gap: 20px;
+      max-width: 100%;
+    }
+
+    .block {
+      break-inside: avoid;
+      margin-bottom: 1.2em;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    h1 {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #1a5fb4;
+      text-align: center;
+      margin: 0 0 8px;
+      column-span: all;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      font-size: 0.9em;
+      margin-bottom: 12px;
+      column-span: all;
+    }
+
+    h2 {
+      font-size: 1.15em;
+      font-weight: 700;
+      color: #1a5fb4;
+      margin: 0 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e0e7ff;
+    }
+
+    p, ul, ol {
+      font-size: 0.92em;
+      margin: 0.6em 0;
+    }
+
+    ul, ol {
+      padding-left: 18px;
+    }
+
+    li {
+      margin-bottom: 4px;
+    }
+
+    code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      background-color: #f0f4ff;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 0.88em;
+    }
+
+    blockquote {
+      font-style: italic;
+      margin: 8px 0;
+      padding: 6px 10px;
+      background: #f8fbff;
+      border-left: 2px solid #1a5fb4;
+      font-size: 0.88em;
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>🤖 AutoML для нейросетей Cheatsheet</h1>
+  <div class="subtitle">Для начинающих • Без сложной математики • Практический фокус<br>📅 Январь 2026</div>
+
+  <div class="block">
+    <h2>🔷 1. Суть</h2>
+    <ul>
+      <li>**Автоматизация**: поиск архитектуры и гиперпараметров</li>
+      <li>**NAS**: Neural Architecture Search</li>
+      <li>**HPO**: Hyperparameter Optimization</li>
+      <li>**Цель**: найти лучшую модель</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Neural Architecture Search</h2>
+    <ul>
+      <li>Search space: возможные архитектуры</li>
+      <li>Search strategy: как искать</li>
+      <li>Performance estimation: оценка кандидатов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Search Strategies</h2>
+    <ul>
+      <li>Random search</li>
+      <li>Bayesian optimization</li>
+      <li>Evolutionary algorithms</li>
+      <li>Reinforcement learning</li>
+      <li>Gradient-based (DARTS)</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 4. DARTS</h2>
+    <ul>
+      <li>Differentiable Architecture Search</li>
+      <li>Relaxed search space</li>
+      <li>Градиентная оптимизация</li>
+      <li>Быстрее чем RL/Evolution</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 5. AutoKeras</h2>
+    <ul>
+      <li>High-level API</li>
+      <li>Поиск архитектуры автоматически</li>
+      <li>Простое использование</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 6. Optuna для HP</h2>
+    <ul>
+      <li>Hyperparameter optimization</li>
+      <li>Tree-structured Parzen Estimator</li>
+      <li>Pruning неперспективных trial'ов</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 7. Population Based Training</h2>
+    <ul>
+      <li>Параллельное обучение</li>
+      <li>Mutation лучших моделей</li>
+      <li>Онлайн HP optimization</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 8. Meta-learning</h2>
+    <ul>
+      <li>Warm start from similar tasks</li>
+      <li>Transfer learned architectures</li>
+      <li>Few-shot architecture search</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 9. Стоимость</h2>
+    <ul>
+      <li>NAS: очень дорого (1000s GPU hours)</li>
+      <li>HPO: умеренно (10-100 GPU hours)</li>
+      <li>Transfer NAS: дешевле</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 10. Практическое применение</h2>
+    <ul>
+      <li>Начать с готовых архитектур</li>
+      <li>HPO для fine-tuning</li>
+      <li>NAS только если есть ресурсы</li>
+      <li>Использовать transfer learning</li>
+    </ul>
+  </div>
+
+
+  <div class="block">
+    <h2>🔷 11. Weight Sharing в NAS</h2>
+    <p>Ускорение поиска архитектуры</p>
+    <ul>
+      <li>One-shot NAS: одна супер-сеть</li>
+      <li>Подсети наследуют веса</li>
+      <li>Быстрее чем обучать каждую отдельно</li>
+      <li>ENAS, DARTS используют это</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 12. Пример: Optuna HPO</h2>
+    <p>Код для поиска гиперпараметров</p>
+    <ul>
+    </ul>
+    <pre><code>import optuna
+
+def objective(trial):
+    lr = trial.suggest_float('lr', 1e-5, 1e-1, log=True)
+    hidden = trial.suggest_int('hidden', 32, 512)
+    layers = trial.suggest_int('layers', 1, 5)
+    
+    model = create_model(hidden, layers)
+    val_loss = train(model, lr)
+    return val_loss
+
+study = optuna.create_study(direction='minimize')
+study.optimize(objective, n_trials=100)
+
+print(f'Best params: {study.best_params}')</code></pre>
+    <ul>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 13. AutoKeras пример</h2>
+    <p>Простой AutoML</p>
+    <ul>
+    </ul>
+    <pre><code>import autokeras as ak
+
+clf = ak.StructuredDataClassifier(
+    max_trials=10
+)
+
+clf.fit(x_train, y_train, epochs=10)
+preds = clf.predict(x_test)</code></pre>
+    <ul>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 14. Стратегии ускорения</h2>
+    <p>Как сделать NAS быстрее</p>
+    <ul>
+      <li>Early stopping для плохих кандидатов</li>
+      <li>Transfer learning from similar tasks</li>
+      <li>Low-fidelity estimates (меньше epochs)</li>
+      <li>Parallel evaluation</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 15. Transfer NAS</h2>
+    <p>Переиспользование архитектур</p>
+    <ul>
+      <li>Начать с архитектуры для похожей задачи</li>
+      <li>Fine-tune architecture</li>
+      <li>Дешевле чем поиск с нуля</li>
+      <li>Работает для CV, NLP</li>
+    </ul>
+  </div>
+
+  <div class="block">
+    <h2>🔷 16. Чек-лист</h2>
+    <p>Практическое применение</p>
+    <ul>
+      <li>[ ] Начать с известной архитектуры</li>
+      <li>[ ] HPO для fine-tuning</li>
+      <li>[ ] Optuna для гиперпараметров</li>
+      <li>[ ] Использовать early stopping</li>
+      <li>[ ] Параллелизовать trials</li>
+      <li>[ ] Рассмотреть transfer learning</li>
+      <li>[ ] NAS только если нужно и есть ресурсы</li>
+      <li>[ ] Сохранить лучшую модель</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
