@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Метрики оценки кластеризации Cheatsheet</title>
+  <title>Метрики оценки кластеризации Cheatsheet — 3 колонки</title>
   <style>
     @media screen { body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #333; background: #fafcff; padding: 10px; }}
     .container { column-count: 3; column-gap: 20px; max-width: 100%; }
@@ -25,7 +25,7 @@
 <body>
 <div class="container">
   <h1>🎯 Метрики оценки кластеризации</h1>
-  <div class="subtitle">Практический фокус • 📅 Январь 2026</div>
+  <div class="subtitle"></div>
 
   <div class="block">
     <h2>🔷 1. Типы метрик кластеризации</h2>
@@ -376,7 +376,8 @@ print(f"Optimal K (max silhouette): {optimal_k_silhouette}")</code></pre>
     print("=" * 50)
     
     # Базовая информация
-    print(f"\nБазовая информация:")
+    print(f"
+Базовая информация:")
     print(f"  Количество кластеров: {n_clusters}")
     print(f"  Количество шумовых точек: {n_noise}")
     print(f"  Размер каждого кластера:")
@@ -387,7 +388,8 @@ print(f"Optimal K (max silhouette): {optimal_k_silhouette}")</code></pre>
     
     # Внутренние метрики
     if n_clusters > 1:
-        print(f"\nВнутренние метрики (без меток):")
+        print(f"
+Внутренние метрики (без меток):")
         
         sil = silhouette_score(X, labels)
         print(f"  Silhouette Score: {sil:.3f}")
@@ -415,7 +417,8 @@ print(f"Optimal K (max silhouette): {optimal_k_silhouette}")</code></pre>
     
     # Внешние метрики (если есть истинные метки)
     if true_labels is not None:
-        print(f"\nВнешние метрики (с метками):")
+        print(f"
+Внешние метрики (с метками):")
         
         ari = adjusted_rand_score(true_labels, labels)
         print(f"  ARI: {ari:.3f}")

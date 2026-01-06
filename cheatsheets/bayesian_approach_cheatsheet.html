@@ -181,8 +181,8 @@
 
 <div class="container">
 
-  <h1>🎲 Байесовский подход в Machine Learning Cheatsheet</h1>
-  <div class="subtitle">Вероятностное мышление • От теоремы до практики<br>📅 Январь 2026</div>
+  <h1>🎲 Байесовский подход в Machine Learning</h1>
+  <div class="subtitle">📅 Январь 2026</div>
 
   <div class="block">
     <h2>🔷 1. Основы байесовского подхода</h2>
@@ -377,8 +377,10 @@ model.fit(X_train, y_train)
 # Предсказание с неопределенностью
 y_pred, y_std = model.predict(X_test, return_std=True)
 
-print(f"Posterior mean weights:\n{model.w_mean}")
-print(f"Posterior covariance:\n{model.w_cov}")
+print(f"Posterior mean weights:
+{model.w_mean}")
+print(f"Posterior covariance:
+{model.w_cov}")
 
 # Визуализация неопределенности
 plt.figure(figsize=(10, 5))
@@ -696,7 +698,8 @@ plt.title('Gaussian Process Regression')
 plt.show()
 
 # Оптимизированные гиперпараметры ядра
-print(f"Оптимизированное ядро:\n{gp.kernel_}")</code></pre>
+print(f"Оптимизированное ядро:
+{gp.kernel_}")</code></pre>
   </div>
 
   <div class="block">
