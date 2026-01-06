@@ -185,91 +185,181 @@
   <div class="subtitle">📅 Январь 2026</div>
 
   <div class="block">
-    <h2>🔷 1. Основы Adversarial Training</h2>
+    <h2>🔷 1. Что такое Adversarial Training</h2>
     <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
+      <li><strong>Определение</strong>: метод обучения модели на adversarial примерах</li>
+      <li><strong>Цель</strong>: повысить устойчивость к adversarial атакам</li>
+      <li><strong>Идея</strong>: обучить модель на специально искажённых данных</li>
+      <li><strong>Применение</strong>: безопасность ML-систем, защита от атак</li>
+    </ul>
+    <blockquote>
+      Adversarial Training — это вакцинация модели против adversarial атак
+    </blockquote>
+  </div>
+
+  <div class="block">
+    <h2>🔷 2. Adversarial примеры</h2>
+    <ul>
+      <li><strong>Что это</strong>: входные данные с небольшими возмущениями</li>
+      <li><strong>Особенность</strong>: незаметны для человека, но обманывают модель</li>
+      <li><strong>Пример</strong>: изображение панды → модель видит гиббона</li>
+      <li><strong>Возмущение</strong>: δ с ограничением ||δ|| ≤ ε</li>
+    </ul>
+    <pre><code>x_adv = x + δ
+где ||δ||_∞ ≤ ε (обычно ε = 8/255 для изображений)</code></pre>
+  </div>
+
+  <div class="block">
+    <h2>🔷 3. Зачем нужен Adversarial Training</h2>
+    <ul>
+      <li><strong>Безопасность</strong>: защита от целенаправленных атак</li>
+      <li><strong>Надёжность</strong>: стабильная работа на зашумлённых данных</li>
+      <li><strong>Критичные приложения</strong>: автопилоты, медицина, финансы</li>
+      <li><strong>Соответствие стандартам</strong>: требования к robustness моделей</li>
     </ul>
   </div>
+
   <div class="block">
-    <h2>🔷 1. Основы Adversarial Training</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
+    <h2>🔷 4. Основной алгоритм</h2>
+    <ol>
+      <li><strong>Взять батч</strong>: обычные тренировочные данные (x, y)</li>
+      <li><strong>Создать adversarial примеры</strong>: x_adv = Attack(x, model)</li>
+      <li><strong>Обучить на обоих</strong>: минимизировать loss на x и x_adv</li>
+      <li><strong>Повторить</strong>: до конца обучения</li>
+    </ol>
+    <pre><code>for batch in data_loader:
+  x, y = batch
+  x_adv = generate_adversarial(x, y, model)
+  
+  loss = criterion(model(x), y) + 
+         criterion(model(x_adv), y)
+  
+  loss.backward()
+  optimizer.step()</code></pre>
   </div>
+
   <div class="block">
-    <h2>🔷 1. Основы Adversarial Training</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
+    <h2>🔷 5. Методы генерации adversarial примеров</h2>
+    <p><strong>FGSM (Fast Gradient Sign Method)</strong>:</p>
+    <pre><code>x_adv = x + ε * sign(∇_x Loss(x, y, θ))</code></pre>
+    <p><strong>PGD (Projected Gradient Descent)</strong>:</p>
+    <pre><code>x_adv = x
+for i in range(steps):
+  x_adv = Proj(x_adv + α * sign(∇Loss))
+  x_adv = clip(x_adv, x-ε, x+ε)</code></pre>
+    <p><strong>PGD</strong> — более сильная атака, лучше для обучения</p>
   </div>
+
   <div class="block">
-    <h2>🔷 1. Основы Adversarial Training</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
+    <h2>🔷 6. FGSM — быстрый метод</h2>
+    <pre><code>import torch
+
+def fgsm_attack(image, epsilon, data_grad):
+  # Берём знак градиента
+  sign_data_grad = data_grad.sign()
+  
+  # Создаём adversarial пример
+  perturbed_image = image + epsilon * sign_data_grad
+  
+  # Ограничиваем в [0,1]
+  perturbed_image = torch.clamp(perturbed_image, 0, 1)
+  
+  return perturbed_image</code></pre>
   </div>
+
   <div class="block">
-    <h2>🔷 1. Основы Adversarial Training</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
+    <h2>🔷 7. PGD — итеративный метод</h2>
+    <pre><code>def pgd_attack(model, images, labels, eps, alpha, steps):
+  delta = torch.zeros_like(images).uniform_(-eps, eps)
+  delta.requires_grad = True
+  
+  for _ in range(steps):
+    outputs = model(images + delta)
+    loss = criterion(outputs, labels)
+    loss.backward()
+    
+    # Градиентный шаг
+    delta.data = (delta + alpha * delta.grad.sign()).clamp(-eps, eps)
+    delta.grad.zero_()
+    
+  return images + delta.detach()</code></pre>
   </div>
+
   <div class="block">
-    <h2>🔷 1. Основы Adversarial Training</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
+    <h2>🔷 8. Гиперпараметры</h2>
+    <table>
+      <tr>
+        <th>Параметр</th>
+        <th>Типичное значение</th>
+        <th>Назначение</th>
+      </tr>
+      <tr>
+        <td>ε (epsilon)</td>
+        <td>8/255 для L∞</td>
+        <td>Макс. возмущение</td>
+      </tr>
+      <tr>
+        <td>α (alpha)</td>
+        <td>2/255</td>
+        <td>Размер шага PGD</td>
+      </tr>
+      <tr>
+        <td>steps</td>
+        <td>7-10</td>
+        <td>Итераций PGD</td>
+      </tr>
+      <tr>
+        <td>λ</td>
+        <td>0.5-1.0</td>
+        <td>Вес adv. loss</td>
+      </tr>
+    </table>
   </div>
+
   <div class="block">
-    <h2>🔷 1. Основы Adversarial Training</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
+    <h2>🔷 9. Преимущества и недостатки</h2>
+    <div class="good-vs-bad">
+      <div class="good">
+        <h3>✅ Плюсы:</h3>
+        <ul>
+          <li>Повышает robustness к атакам</li>
+          <li>Улучшает генерализацию</li>
+          <li>Простая идея, легко реализовать</li>
+          <li>Работает для многих задач</li>
+        </ul>
+      </div>
+      <div class="bad">
+        <h3>❌ Минусы:</h3>
+        <ul>
+          <li>Сильно замедляет обучение (2-10x)</li>
+          <li>Может снизить accuracy на чистых данных</li>
+          <li>Требует больше GPU памяти</li>
+          <li>Трудно подобрать гиперпараметры</li>
+        </ul>
+      </div>
+    </div>
   </div>
+
   <div class="block">
-    <h2>🔷 1. Основы Adversarial Training</h2>
+    <h2>🔷 10. Метрики robustness</h2>
     <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
+      <li><strong>Clean accuracy</strong>: точность на обычных данных</li>
+      <li><strong>Robust accuracy</strong>: точность на adversarial примерах</li>
+      <li><strong>Attack success rate</strong>: % успешных атак</li>
+      <li><strong>Certified robustness</strong>: гарантированная устойчивость</li>
     </ul>
+    <p><strong>Баланс</strong>: обычно есть trade-off между clean и robust accuracy</p>
   </div>
+
   <div class="block">
-    <h2>🔷 1. Основы Adversarial Training</h2>
+    <h2>🔷 11. Практические советы</h2>
     <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы Adversarial Training</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
-    </ul>
-  </div>
-  <div class="block">
-    <h2>🔷 1. Основы Adversarial Training</h2>
-    <ul>
-      <li><strong>Определение</strong>: ключевая концепция</li>
-      <li><strong>Применение</strong>: практическое использование</li>
-      <li><strong>Преимущества</strong>: почему это важно</li>
+      <li><strong>Начните с FGSM</strong>, потом переходите на PGD</li>
+      <li><strong>Early stopping</strong>: следите за robust accuracy</li>
+      <li><strong>Больше эпох</strong>: нужно 2-3x больше обучения</li>
+      <li><strong>Learning rate schedule</strong>: cosine annealing работает хорошо</li>
+      <li><strong>Data augmentation</strong>: комбинируйте с adversarial training</li>
+      <li><strong>Библиотеки</strong>: используйте Foolbox, ART, Advertorch</li>
     </ul>
   </div>
 
