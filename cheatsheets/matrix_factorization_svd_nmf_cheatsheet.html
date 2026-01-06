@@ -413,7 +413,8 @@ U, sigma, Vt = svds(ratings_filled, k=2)
 sigma = np.diag(sigma)
 predicted_ratings = np.dot(np.dot(U, sigma), Vt)
 
-print("Predicted ratings:\n", predicted_ratings)
+print("Predicted ratings:
+", predicted_ratings)
 
 # NMF с sklearn
 nmf_model = sklearn_NMF(
@@ -430,7 +431,9 @@ W = nmf_model.fit_transform(ratings_positive)
 H = nmf_model.components_
 
 predicted_nmf = np.dot(W, H)
-print("\nNMF predicted ratings:\n", predicted_nmf)</code></pre>
+print("
+NMF predicted ratings:
+", predicted_nmf)</code></pre>
   </div>
 
   <div class="block">

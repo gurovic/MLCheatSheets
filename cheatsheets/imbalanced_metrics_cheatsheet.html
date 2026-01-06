@@ -537,29 +537,35 @@ def evaluate_imbalanced(y_true, y_pred, y_proba=None):
     print("=" * 50)
     
     # Базовые метрики
-    print(f"\nAccuracy: {accuracy_score(y_true, y_pred):.3f}")
+    print(f"
+Accuracy: {accuracy_score(y_true, y_pred):.3f}")
     print(f"Balanced Accuracy: {balanced_accuracy_score(y_true, y_pred):.3f}")
     
     # Precision, Recall, F1
-    print(f"\nPrecision: {precision_score(y_true, y_pred):.3f}")
+    print(f"
+Precision: {precision_score(y_true, y_pred):.3f}")
     print(f"Recall: {recall_score(y_true, y_pred):.3f}")
     print(f"F1-Score: {f1_score(y_true, y_pred):.3f}")
     
     # Продвинутые
-    print(f"\nMCC: {matthews_corrcoef(y_true, y_pred):.3f}")
+    print(f"
+MCC: {matthews_corrcoef(y_true, y_pred):.3f}")
     print(f"Cohen's Kappa: {cohen_kappa_score(y_true, y_pred):.3f}")
     
     # AUC метрики (если есть вероятности)
     if y_proba is not None:
-        print(f"\nROC-AUC: {roc_auc_score(y_true, y_proba):.3f}")
+        print(f"
+ROC-AUC: {roc_auc_score(y_true, y_proba):.3f}")
         print(f"PR-AUC: {average_precision_score(y_true, y_proba):.3f}")
     
     # Confusion matrix
-    print("\nConfusion Matrix:")
+    print("
+Confusion Matrix:")
     print(confusion_matrix(y_true, y_pred))
     
     # Детальный отчет
-    print("\n" + classification_report(y_true, y_pred))
+    print("
+" + classification_report(y_true, y_pred))
 
 # Использование
 evaluate_imbalanced(y_test, y_pred, y_proba)</code></pre>

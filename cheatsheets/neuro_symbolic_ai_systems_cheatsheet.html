@@ -155,7 +155,19 @@
 
   <div class="block">
     <h2>🔷 2. Символьный AI</h2>
-    <p>Символьный AI использует явные правила и логику.</p><p><strong>Компоненты</strong>:</p><ul><li><strong>Факты</strong>: утверждения о мире</li><li><strong>Правила</strong>: if-then логика</li><li><strong>Inference engine</strong>: вывод новых фактов</li></ul><pre><code># Пример на Prolog\nparent(john, mary).\nparent(john, bob).\n\n% Правило\nsibling(X, Y) :- \n    parent(P, X),\n    parent(P, Y),\n    X \= Y.\n\n% Запрос\n?- sibling(mary, bob).\n% true</code></pre><p><strong>Преимущества</strong>:</p><ul><li>Интерпретируемость</li><li>Точность в логических задачах</li><li>Работа с малым количеством данных</li></ul><p><strong>Недостатки</strong>:</p><ul><li>Хрупкость к шуму</li><li>Трудность кодирования знаний</li><li>Не работает с неструктурированными данными</li></ul>
+    <p>Символьный AI использует явные правила и логику.</p><p><strong>Компоненты</strong>:</p><ul><li><strong>Факты</strong>: утверждения о мире</li><li><strong>Правила</strong>: if-then логика</li><li><strong>Inference engine</strong>: вывод новых фактов</li></ul><pre><code># Пример на Prolog
+parent(john, mary).
+parent(john, bob).
+
+% Правило
+sibling(X, Y) :- 
+    parent(P, X),
+    parent(P, Y),
+    X \= Y.
+
+% Запрос
+?- sibling(mary, bob).
+% true</code></pre><p><strong>Преимущества</strong>:</p><ul><li>Интерпретируемость</li><li>Точность в логических задачах</li><li>Работа с малым количеством данных</li></ul><p><strong>Недостатки</strong>:</p><ul><li>Хрупкость к шуму</li><li>Трудность кодирования знаний</li><li>Не работает с неструктурированными данными</li></ul>
   </div>
 
   <div class="block">
@@ -165,32 +177,148 @@
 
   <div class="block">
     <h2>🔷 4. Гибридная архитектура</h2>
-    <p>Комбинирование нейронных и символьных компонентов.</p><p><strong>Подходы</strong>:</p><ul><li><strong>Нейро-символьная</strong>: нейросети + символьный модуль</li><li><strong>Символьно-нейронная</strong>: символьные правила + нейронное выполнение</li><li><strong>Полностью интегрированная</strong>: тесная интеграция</li></ul><pre><code># Гибридная система\nclass NeuroSymbolicSystem:\n    def __init__(self):\n        self.neural = NeuralNet()  # восприятие\n        self.symbolic = LogicEngine()  # рассуждение\n        \n    def process(self, input_data):\n        # 1. Нейронная обработка\n        features = self.neural.extract(input_data)\n        \n        # 2. Преобразование в символы\n        symbols = self.neuralize(features)\n        \n        # 3. Символьное рассуждение\n        conclusion = self.symbolic.infer(symbols)\n        \n        return conclusion</code></pre>
+    <p>Комбинирование нейронных и символьных компонентов.</p><p><strong>Подходы</strong>:</p><ul><li><strong>Нейро-символьная</strong>: нейросети + символьный модуль</li><li><strong>Символьно-нейронная</strong>: символьные правила + нейронное выполнение</li><li><strong>Полностью интегрированная</strong>: тесная интеграция</li></ul><pre><code># Гибридная система
+class NeuroSymbolicSystem:
+    def __init__(self):
+        self.neural = NeuralNet()  # восприятие
+        self.symbolic = LogicEngine()  # рассуждение
+        
+    def process(self, input_data):
+        # 1. Нейронная обработка
+        features = self.neural.extract(input_data)
+        
+        # 2. Преобразование в символы
+        symbols = self.neuralize(features)
+        
+        # 3. Символьное рассуждение
+        conclusion = self.symbolic.infer(symbols)
+        
+        return conclusion</code></pre>
   </div>
 
   <div class="block">
     <h2>🔷 5. Logic Tensor Networks</h2>
-    <p><strong>LTN</strong> - интеграция логики в нейросети через дифференцируемую логику.</p><p><strong>Идея</strong>:</p><ul><li>Логические формулы как функции потерь</li><li>Предикаты реализованы нейросетями</li><li>Обучение через backpropagation</li></ul><pre><code>import ltn\n\n# Предикаты как нейросети\nclass Predicate_IsAnimal(torch.nn.Module):\n    def __init__(self):\n        super().__init__()\n        self.net = nn.Sequential(\n            nn.Linear(128, 64),\n            nn.ReLU(),\n            nn.Linear(64, 1),\n            nn.Sigmoid()\n        )\n    \n    def forward(self, x):\n        return self.net(x)\n\n# Логическая формула\n# ∀x: IsAnimal(x) → HasLegs(x)\nformula = ltn.ForAll(\n    ltn_vars.x,\n    ltn.Implies(\n        IsAnimal(ltn_vars.x),\n        HasLegs(ltn_vars.x)\n    )\n)\n\n# Обучение минимизирует нарушения формулы\nloss = 1 - formula.value</code></pre>
+    <p><strong>LTN</strong> - интеграция логики в нейросети через дифференцируемую логику.</p><p><strong>Идея</strong>:</p><ul><li>Логические формулы как функции потерь</li><li>Предикаты реализованы нейросетями</li><li>Обучение через backpropagation</li></ul><pre><code>import ltn
+
+# Предикаты как нейросети
+class Predicate_IsAnimal(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, 1),
+            nn.Sigmoid()
+        )
+    
+    def forward(self, x):
+        return self.net(x)
+
+# Логическая формула
+# ∀x: IsAnimal(x) → HasLegs(x)
+formula = ltn.ForAll(
+    ltn_vars.x,
+    ltn.Implies(
+        IsAnimal(ltn_vars.x),
+        HasLegs(ltn_vars.x)
+    )
+)
+
+# Обучение минимизирует нарушения формулы
+loss = 1 - formula.value</code></pre>
   </div>
 
   <div class="block">
     <h2>🔷 6. Neural Theorem Provers</h2>
-    <p>Автоматическое доказательство теорем с нейросетями.</p><p><strong>Применение</strong>:</p><ul><li>Автоматизация математических доказательств</li><li>Проверка программ</li><li>Автоматическое рассуждение</li></ul><pre><code># Упрощенный пример\nclass NeuralProver:\n    def __init__(self):\n        self.premise_encoder = TransformerEncoder()\n        self.tactic_predictor = nn.Linear(512, num_tactics)\n        \n    def prove(self, goal, premises):\n        # Кодируем premises\n        context = self.premise_encoder(premises)\n        \n        # Предсказываем следующую тактику\n        tactic_logits = self.tactic_predictor(context)\n        tactic = sample(tactic_logits)\n        \n        # Применяем тактику\n        new_goals = apply_tactic(tactic, goal)\n        \n        # Рекурсивно доказываем подцели\n        return all(self.prove(g, premises) for g in new_goals)</code></pre><p><strong>Проекты</strong>:</p><ul><li>DeepMath (Google)</li><li>Holophrasm</li><li>GPT-f (OpenAI)</li></ul>
+    <p>Автоматическое доказательство теорем с нейросетями.</p><p><strong>Применение</strong>:</p><ul><li>Автоматизация математических доказательств</li><li>Проверка программ</li><li>Автоматическое рассуждение</li></ul><pre><code># Упрощенный пример
+class NeuralProver:
+    def __init__(self):
+        self.premise_encoder = TransformerEncoder()
+        self.tactic_predictor = nn.Linear(512, num_tactics)
+        
+    def prove(self, goal, premises):
+        # Кодируем premises
+        context = self.premise_encoder(premises)
+        
+        # Предсказываем следующую тактику
+        tactic_logits = self.tactic_predictor(context)
+        tactic = sample(tactic_logits)
+        
+        # Применяем тактику
+        new_goals = apply_tactic(tactic, goal)
+        
+        # Рекурсивно доказываем подцели
+        return all(self.prove(g, premises) for g in new_goals)</code></pre><p><strong>Проекты</strong>:</p><ul><li>DeepMath (Google)</li><li>Holophrasm</li><li>GPT-f (OpenAI)</li></ul>
   </div>
 
   <div class="block">
     <h2>🔷 7. Differentiable ILP</h2>
-    <p><strong>ILP</strong> - Inductive Logic Programming становится дифференцируемым.</p><p><strong>Идея</strong>:</p><ul><li>Обучение логических правил из данных</li><li>Градиентный спуск вместо комбинаторного поиска</li></ul><pre><code># δILP (дифференцируемый ILP)\nclass DifferentiableILP:\n    def __init__(self):\n        self.rule_weights = nn.Parameter(torch.randn(n_rules))\n        \n    def forward(self, facts):\n        # Soft execution логических правил\n        activations = []\n        for rule in self.rules:\n            # Веса правил обучаются\n            act = self.execute_soft(rule, facts)\n            activations.append(\n                self.rule_weights[i] * act\n            )\n        \n        return torch.sum(activations)\n    \n    def execute_soft(self, rule, facts):\n        # Soft версия логической конъюнкции\n        # AND → product\n        # OR → probabilistic sum\n        pass</code></pre>
+    <p><strong>ILP</strong> - Inductive Logic Programming становится дифференцируемым.</p><p><strong>Идея</strong>:</p><ul><li>Обучение логических правил из данных</li><li>Градиентный спуск вместо комбинаторного поиска</li></ul><pre><code># δILP (дифференцируемый ILP)
+class DifferentiableILP:
+    def __init__(self):
+        self.rule_weights = nn.Parameter(torch.randn(n_rules))
+        
+    def forward(self, facts):
+        # Soft execution логических правил
+        activations = []
+        for rule in self.rules:
+            # Веса правил обучаются
+            act = self.execute_soft(rule, facts)
+            activations.append(
+                self.rule_weights[i] * act
+            )
+        
+        return torch.sum(activations)
+    
+    def execute_soft(self, rule, facts):
+        # Soft версия логической конъюнкции
+        # AND → product
+        # OR → probabilistic sum
+        pass</code></pre>
   </div>
 
   <div class="block">
     <h2>🔷 8. Knowledge Graphs + DL</h2>
-    <p>Интеграция Knowledge Graphs с deep learning.</p><p><strong>Подходы</strong>:</p><ul><li><strong>GNN на KG</strong>: Graph Neural Networks</li><li><strong>KG embeddings</strong>: TransE, RotatE, ComplEx</li><li><strong>KG reasoning</strong>: Path ranking, Neural theorem proving</li></ul><pre><code># GNN для Knowledge Graph\nimport torch_geometric as pyg\n\nclass KGReasoningGNN(nn.Module):\n    def __init__(self):\n        self.conv1 = pyg.nn.RGCNConv(emb_dim, hidden_dim, num_relations)\n        self.conv2 = pyg.nn.RGCNConv(hidden_dim, emb_dim, num_relations)\n        \n    def forward(self, x, edge_index, edge_type):\n        x = self.conv1(x, edge_index, edge_type)\n        x = F.relu(x)\n        x = self.conv2(x, edge_index, edge_type)\n        return x\n\n# Link prediction\ndef predict_link(h, r, t):\n    return torch.dot(h + r, t)  # TransE scoring</code></pre><blockquote>🔗 Knowledge Graphs + DL = более интерпретируемые предсказания</blockquote>
+    <p>Интеграция Knowledge Graphs с deep learning.</p><p><strong>Подходы</strong>:</p><ul><li><strong>GNN на KG</strong>: Graph Neural Networks</li><li><strong>KG embeddings</strong>: TransE, RotatE, ComplEx</li><li><strong>KG reasoning</strong>: Path ranking, Neural theorem proving</li></ul><pre><code># GNN для Knowledge Graph
+import torch_geometric as pyg
+
+class KGReasoningGNN(nn.Module):
+    def __init__(self):
+        self.conv1 = pyg.nn.RGCNConv(emb_dim, hidden_dim, num_relations)
+        self.conv2 = pyg.nn.RGCNConv(hidden_dim, emb_dim, num_relations)
+        
+    def forward(self, x, edge_index, edge_type):
+        x = self.conv1(x, edge_index, edge_type)
+        x = F.relu(x)
+        x = self.conv2(x, edge_index, edge_type)
+        return x
+
+# Link prediction
+def predict_link(h, r, t):
+    return torch.dot(h + r, t)  # TransE scoring</code></pre><blockquote>🔗 Knowledge Graphs + DL = более интерпретируемые предсказания</blockquote>
   </div>
 
   <div class="block">
     <h2>🔷 9. Probabilistic Programming</h2>
-    <p>Вероятностная модель + нейронный inference.</p><p><strong>Примеры</strong>:</p><ul><li><strong>Pyro</strong>: Probabilistic programming на PyTorch</li><li><strong>Edward</strong>: PP на TensorFlow</li><li><strong>Stan</strong>: MCMC sampling</li></ul><pre><code># Pyro example\nimport pyro\nimport pyro.distributions as dist\n\ndef model(data):\n    # Priors\n    mu = pyro.sample('mu', dist.Normal(0, 10))\n    sigma = pyro.sample('sigma', dist.HalfNormal(10))\n    \n    # Likelihood\n    with pyro.plate('data', len(data)):\n        pyro.sample('obs', dist.Normal(mu, sigma), obs=data)\n\n# Neural guide для вариационного вывода\ndef guide(data):\n    mu_loc = pyro.param('mu_loc', torch.tensor(0.))\n    mu_scale = pyro.param('mu_scale', torch.tensor(1.), \n                         constraint=constraints.positive)\n    pyro.sample('mu', dist.Normal(mu_loc, mu_scale))</code></pre>
+    <p>Вероятностная модель + нейронный inference.</p><p><strong>Примеры</strong>:</p><ul><li><strong>Pyro</strong>: Probabilistic programming на PyTorch</li><li><strong>Edward</strong>: PP на TensorFlow</li><li><strong>Stan</strong>: MCMC sampling</li></ul><pre><code># Pyro example
+import pyro
+import pyro.distributions as dist
+
+def model(data):
+    # Priors
+    mu = pyro.sample('mu', dist.Normal(0, 10))
+    sigma = pyro.sample('sigma', dist.HalfNormal(10))
+    
+    # Likelihood
+    with pyro.plate('data', len(data)):
+        pyro.sample('obs', dist.Normal(mu, sigma), obs=data)
+
+# Neural guide для вариационного вывода
+def guide(data):
+    mu_loc = pyro.param('mu_loc', torch.tensor(0.))
+    mu_scale = pyro.param('mu_scale', torch.tensor(1.), 
+                         constraint=constraints.positive)
+    pyro.sample('mu', dist.Normal(mu_loc, mu_scale))</code></pre>
   </div>
 
   <div class="block">
