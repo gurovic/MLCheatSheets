@@ -1,4 +1,4 @@
-# ML Cheatsheets by Владимир Гуровиц (школа "Летово"), DeepSeek, Github copilot, Perplexity Comet
+# ML Cheatsheets by Владимир Гуровиц (школа "Летово"), DeepSeek, GitHub Copilot, Perplexity Comet
 
 ## 📚 Полная коллекция в PDF
 

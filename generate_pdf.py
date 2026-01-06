@@ -33,7 +33,7 @@ def create_cover_page_html(num_sheets):
     """Create a cover page HTML."""
     return f"""
     <!DOCTYPE html>
-    <html lang="ru">
+    <html>
     <head>
         <meta charset="UTF-8">
         <title>ML Cheatsheets - Cover</title>
@@ -86,7 +86,7 @@ def create_cover_page_html(num_sheets):
             <h1>ML Cheatsheets</h1>
             <h2>Полная коллекция шпаргалок по машинному обучению</h2>
             <p>Владимир Гуровиц (школа "Летово")</p>
-            <p>DeepSeek, Github Copilot, Perplexity Comet</p>
+            <p>DeepSeek, GitHub Copilot, Perplexity Comet</p>
             <p class="count">Всего шпаргалок: {num_sheets}</p>
         </div>
     </body>
