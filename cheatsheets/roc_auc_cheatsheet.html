@@ -30,6 +30,8 @@
     .good li::before{content:"✅ ";font-weight:bold}
     .bad li::before{content:"❌ ";font-weight:bold}
     blockquote{font-style:italic;margin:8px 0;padding:6px 10px;background:#f8fbff;border-left:2px solid #1a5fb4;font-size:0.88em}
+    .illustration{width:100%;max-width:100%;height:auto;margin:10px 0;border-radius:4px;background:white}
+    .illustration svg{display:block;width:100%;height:auto}
     @media print{.container{column-gap:12px}.block{box-shadow:none}code,pre,table{font-size:0.78em}h1{font-size:1.4em}h2{font-size:1em}}
   </style>
 </head>
@@ -46,6 +48,87 @@
       <li><strong>Применение</strong>: выбор оптимального порога</li>
     </ul>
     <blockquote>ROC-кривая показывает компромисс между True Positive Rate и False Positive Rate при разных порогах классификации.</blockquote>
+    <div class="illustration">
+      <svg viewBox="0 0 300 180" xmlns="http://www.w3.org/2000/svg">
+        <!-- Заголовок -->
+        <text x="150" y="15" font-size="12" font-weight="bold" text-anchor="middle" fill="#1a5fb4">Что такое ROC кривая?</text>
+        
+        <!-- Основная ROC кривая -->
+        <g>
+          <!-- Оси -->
+          <line x1="30" y1="30" x2="30" y2="160" stroke="#333" stroke-width="2"/>
+          <line x1="30" y1="160" x2="160" y2="160" stroke="#333" stroke-width="2"/>
+          
+          <!-- Подписи осей -->
+          <text x="95" y="175" font-size="9" text-anchor="middle" fill="#555" font-weight="bold">False Positive Rate</text>
+          <text x="12" y="95" font-size="9" text-anchor="middle" fill="#555" font-weight="bold" transform="rotate(-90, 12, 95)">True Positive Rate</text>
+          
+          <!-- Диагональ (случайная модель) -->
+          <line x1="30" y1="160" x2="160" y2="30" stroke="#999" stroke-width="2" stroke-dasharray="4,4"/>
+          
+          <!-- ROC кривая (более реалистичная форма) -->
+          <path d="M 30 160 C 32 155, 33 145, 35 135 C 38 115, 42 105, 48 92 C 54 78, 62 68, 72 58 C 85 45, 100 38, 120 34 C 135 32, 148 30, 160 30" stroke="#1565c0" stroke-width="3" fill="none"/>
+          
+          <!-- Заливка AUC -->
+          <path d="M 30 160 C 32 155, 33 145, 35 135 C 38 115, 42 105, 48 92 C 54 78, 62 68, 72 58 C 85 45, 100 38, 120 34 C 135 32, 148 30, 160 30 L 160 160 Z" fill="#1565c0" fill-opacity="0.15"/>
+          
+          <!-- Метки (исправление пересечений с кривой) -->
+          <text x="50" y="120" font-size="10" fill="#1565c0" font-weight="bold">AUC</text>
+          <text x="120" y="155" font-size="8" fill="#999">Случайная</text>
+          
+          <!-- Точки на кривой с подписями порогов (исправление пересечений) -->
+          <circle cx="33" cy="145" r="2.5" fill="#ef6c00"/>
+          <text x="15" y="152" font-size="7" fill="#ef6c00">t=0.9</text>
+          
+          <circle cx="45" cy="100" r="2.5" fill="#ef6c00"/>
+          <text x="28" y="107" font-size="7" fill="#ef6c00">t=0.7</text>
+          
+          <circle cx="70" cy="62" r="2.5" fill="#ef6c00"/>
+          <text x="52" y="69" font-size="7" fill="#ef6c00">t=0.5</text>
+          
+          <circle cx="115" cy="35" r="2.5" fill="#ef6c00"/>
+          <text x="97" y="40" font-size="7" fill="#ef6c00">t=0.3</text>
+          
+          <!-- Метки на осях -->
+          <text x="28" y="164" font-size="7" text-anchor="end" fill="#333">0</text>
+          <text x="28" y="96" font-size="7" text-anchor="end" fill="#333">0.5</text>
+          <text x="28" y="34" font-size="7" text-anchor="end" fill="#333">1.0</text>
+          
+          <text x="30" y="170" font-size="7" text-anchor="middle" fill="#333">0</text>
+          <text x="95" y="170" font-size="7" text-anchor="middle" fill="#333">0.5</text>
+          <text x="160" y="170" font-size="7" text-anchor="middle" fill="#333">1.0</text>
+        </g>
+        
+        <!-- Пояснение справа -->
+        <g transform="translate(175, 40)">
+          <text x="0" y="0" font-size="9" font-weight="bold" fill="#333">Ключевые точки:</text>
+          
+          <!-- Идеальная модель -->
+          <circle cx="0" cy="15" r="2" fill="#2e7d32"/>
+          <text x="6" y="18" font-size="8" fill="#333">(0,1) - Идеальная</text>
+          
+          <!-- Хорошая модель -->
+          <circle cx="0" cy="30" r="2" fill="#1565c0"/>
+          <text x="6" y="33" font-size="8" fill="#333">Ближе к (0,1)</text>
+          <text x="6" y="42" font-size="7" fill="#666">= лучше модель</text>
+          
+          <!-- Случайная -->
+          <circle cx="0" cy="55" r="2" fill="#999"/>
+          <text x="6" y="58" font-size="8" fill="#333">Диагональ -</text>
+          <text x="6" y="67" font-size="7" fill="#666">случайная</text>
+          
+          <!-- AUC -->
+          <rect x="-2" y="80" width="4" height="15" fill="#1565c0" fill-opacity="0.3"/>
+          <text x="6" y="90" font-size="8" fill="#333">AUC = площадь</text>
+          <text x="6" y="99" font-size="7" fill="#666">под кривой</text>
+          
+          <!-- Пороги -->
+          <circle cx="0" cy="115" r="2" fill="#ef6c00"/>
+          <text x="6" y="118" font-size="8" fill="#333">Точки = пороги</text>
+          <text x="6" y="127" font-size="7" fill="#666">классификации</text>
+        </g>
+      </svg>
+    </div>
   </div>
 
   <div class="block">
@@ -57,6 +140,49 @@
       <tr><td><strong>TNR (Specificity)</strong></td><td>TN/(TN+FP)</td><td>Доля правильных отрицательных</td></tr>
       <tr><td><strong>AUC</strong></td><td>[0, 1]</td><td>Площадь под ROC-кривой</td></tr>
     </table>
+    <div class="illustration">
+      <svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg">
+        <!-- Матрица ошибок -->
+        <text x="150" y="15" font-size="12" font-weight="bold" text-anchor="middle" fill="#1a5fb4">Матрица ошибок</text>
+        
+        <!-- Заголовки -->
+        <text x="150" y="45" font-size="10" text-anchor="middle" fill="#666">Предсказано</text>
+        <text x="30" y="110" font-size="10" text-anchor="middle" fill="#666" transform="rotate(-90, 30, 110)">Фактическое</text>
+        
+        <!-- Ячейки матрицы -->
+        <!-- TN (верхний левый) -->
+        <rect x="80" y="60" width="80" height="60" fill="#e8f5e9" stroke="#2e7d32" stroke-width="2"/>
+        <text x="120" y="85" font-size="14" font-weight="bold" text-anchor="middle" fill="#2e7d32">TN</text>
+        <text x="120" y="102" font-size="9" text-anchor="middle" fill="#555">True Negative</text>
+        <text x="120" y="112" font-size="8" text-anchor="middle" fill="#777">Правильно</text>
+        
+        <!-- FP (верхний правый) -->
+        <rect x="160" y="60" width="80" height="60" fill="#ffebee" stroke="#c62828" stroke-width="2"/>
+        <text x="200" y="85" font-size="14" font-weight="bold" text-anchor="middle" fill="#c62828">FP</text>
+        <text x="200" y="102" font-size="9" text-anchor="middle" fill="#555">False Positive</text>
+        <text x="200" y="112" font-size="8" text-anchor="middle" fill="#777">Ошибка I рода</text>
+        
+        <!-- FN (нижний левый) -->
+        <rect x="80" y="120" width="80" height="60" fill="#fff3e0" stroke="#ef6c00" stroke-width="2"/>
+        <text x="120" y="145" font-size="14" font-weight="bold" text-anchor="middle" fill="#ef6c00">FN</text>
+        <text x="120" y="162" font-size="9" text-anchor="middle" fill="#555">False Negative</text>
+        <text x="120" y="172" font-size="8" text-anchor="middle" fill="#777">Ошибка II рода</text>
+        
+        <!-- TP (нижний правый) -->
+        <rect x="160" y="120" width="80" height="60" fill="#e3f2fd" stroke="#1565c0" stroke-width="2"/>
+        <text x="200" y="145" font-size="14" font-weight="bold" text-anchor="middle" fill="#1565c0">TP</text>
+        <text x="200" y="162" font-size="9" text-anchor="middle" fill="#555">True Positive</text>
+        <text x="200" y="172" font-size="8" text-anchor="middle" fill="#777">Правильно</text>
+        
+        <!-- Метки столбцов -->
+        <text x="120" y="50" font-size="9" text-anchor="middle" fill="#333">Negative (0)</text>
+        <text x="200" y="50" font-size="9" text-anchor="middle" fill="#333">Positive (1)</text>
+        
+        <!-- Метки строк -->
+        <text x="65" y="95" font-size="9" text-anchor="end" fill="#333">Negative (0)</text>
+        <text x="65" y="155" font-size="9" text-anchor="end" fill="#333">Positive (1)</text>
+      </svg>
+    </div>
   </div>
 
   <div class="block">
@@ -96,6 +222,56 @@ plt.show()</code></pre>
       <tr><td>0.5-0.6</td><td>Очень плохо</td><td>Чуть лучше случайного</td></tr>
       <tr><td>0.5</td><td>Случайность</td><td>Модель не лучше подбрасывания монеты</td></tr>
     </table>
+    <div class="illustration">
+      <svg viewBox="0 0 320 250" xmlns="http://www.w3.org/2000/svg">
+        <!-- Заголовок -->
+        <text x="160" y="15" font-size="12" font-weight="bold" text-anchor="middle" fill="#1a5fb4">ROC кривые разных моделей</text>
+        
+        <!-- Оси -->
+        <line x1="40" y1="30" x2="40" y2="220" stroke="#333" stroke-width="2"/>
+        <line x1="40" y1="220" x2="300" y2="220" stroke="#333" stroke-width="2"/>
+        
+        <!-- Стрелки -->
+        <polygon points="40,25 37,30 43,30" fill="#333"/>
+        <polygon points="305,220 300,217 300,223" fill="#333"/>
+        
+        <!-- Подписи осей -->
+        <text x="160" y="242" font-size="10" text-anchor="middle" fill="#555">False Positive Rate (FPR)</text>
+        <text x="15" y="130" font-size="10" text-anchor="middle" fill="#555" transform="rotate(-90, 15, 130)">True Positive Rate (TPR)</text>
+        
+        <!-- Сетка -->
+        <line x1="40" y1="125" x2="300" y2="125" stroke="#ddd" stroke-width="1" stroke-dasharray="3,3"/>
+        <line x1="170" y1="30" x2="170" y2="220" stroke="#ddd" stroke-width="1" stroke-dasharray="3,3"/>
+        
+        <!-- Диагональ (случайная модель) -->
+        <line x1="40" y1="220" x2="300" y2="30" stroke="#999" stroke-width="2" stroke-dasharray="5,5"/>
+        <text x="210" y="128" font-size="8" fill="#666">Random (AUC=0.5)</text>
+        
+        <!-- Идеальная модель -->
+        <path d="M 40 220 L 40 30 L 300 30" stroke="#2e7d32" stroke-width="2.5" fill="none"/>
+        <text x="48" y="50" font-size="8" fill="#2e7d32" font-weight="bold">Идеальная (AUC=1.0)</text>
+        
+        <!-- Хорошая модель (более плавная кривая) -->
+        <path d="M 40 220 C 42 210, 44 195, 48 175 C 52 155, 58 135, 68 110 C 78 85, 92 65, 110 50 C 130 35, 155 32, 180 31 C 210 30, 250 30, 300 30" stroke="#1565c0" stroke-width="2.5" fill="none"/>
+        <text x="85" y="75" font-size="8" fill="#1565c0" font-weight="bold">Хорошая (AUC=0.85)</text>
+        
+        <!-- Слабая модель (более реалистичная) -->
+        <path d="M 40 220 C 50 205, 65 190, 85 170 C 105 150, 130 130, 160 110 C 190 90, 220 70, 250 55 C 270 45, 285 38, 300 30" stroke="#ef6c00" stroke-width="2" fill="none"/>
+        <text x="235" y="93" font-size="8" fill="#ef6c00">Слабая (AUC=0.65)</text>
+        
+        <!-- Метки на осях -->
+        <text x="37" y="225" font-size="8" text-anchor="end" fill="#333">0.0</text>
+        <text x="37" y="127" font-size="8" text-anchor="end" fill="#333">0.5</text>
+        <text x="37" y="35" font-size="8" text-anchor="end" fill="#333">1.0</text>
+        
+        <text x="40" y="232" font-size="8" text-anchor="middle" fill="#333">0.0</text>
+        <text x="170" y="232" font-size="8" text-anchor="middle" fill="#333">0.5</text>
+        <text x="300" y="232" font-size="8" text-anchor="middle" fill="#333">1.0</text>
+        
+        <!-- Заливка под кривой (AUC) для хорошей модели -->
+        <path d="M 40 220 C 42 210, 44 195, 48 175 C 52 155, 58 135, 68 110 C 78 85, 92 65, 110 50 C 130 35, 155 32, 180 31 C 210 30, 250 30, 300 30 L 300 220 Z" fill="#1565c0" fill-opacity="0.1"/>
+      </svg>
+    </div>
   </div>
 
   <div class="block">
@@ -119,6 +295,81 @@ print(f"Optimal threshold: {optimal_threshold:.3f}")
 J = tpr - fpr
 optimal_idx = np.argmax(J)
 optimal_threshold = thresholds[optimal_idx]</code></pre>
+    <div class="illustration">
+      <svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg">
+        <!-- Заголовок -->
+        <text x="150" y="15" font-size="12" font-weight="bold" text-anchor="middle" fill="#1a5fb4">Выбор оптимального порога</text>
+        
+        <!-- ROC кривая -->
+        <g>
+          <!-- Оси -->
+          <line x1="40" y1="30" x2="40" y2="160" stroke="#333" stroke-width="1.5"/>
+          <line x1="40" y1="160" x2="170" y2="160" stroke="#333" stroke-width="1.5"/>
+          
+          <!-- Диагональ -->
+          <line x1="40" y1="160" x2="170" y2="30" stroke="#ddd" stroke-width="1.5" stroke-dasharray="3,3"/>
+          
+          <!-- ROC кривая (более плавная) -->
+          <path d="M 40 160 C 42 150, 45 135, 50 115 C 55 95, 62 80, 72 68 C 85 55, 100 47, 120 42 C 135 38, 150 35, 170 30" stroke="#1565c0" stroke-width="2" fill="none"/>
+          
+          <!-- Точки на кривой (обновленные позиции) -->
+          <circle cx="44" cy="140" r="3" fill="#ef6c00"/>
+          <circle cx="65" cy="82" r="3" fill="#2e7d32"/>
+          <circle cx="115" cy="44" r="3" fill="#ef6c00"/>
+          
+          <!-- Подписи точек (исправление пересечений) -->
+          <text x="18" y="148" font-size="7" fill="#ef6c00">t=0.8</text>
+          <text x="38" y="75" font-size="7" fill="#2e7d32" font-weight="bold">Optimal</text>
+          <text x="90" y="50" font-size="7" fill="#ef6c00">t=0.2</text>
+          
+          <!-- Подписи осей -->
+          <text x="105" y="175" font-size="8" text-anchor="middle" fill="#555">FPR</text>
+          <text x="25" y="95" font-size="8" text-anchor="middle" fill="#555" transform="rotate(-90, 25, 95)">TPR</text>
+        </g>
+        
+        <!-- Распределения классов -->
+        <g transform="translate(180, 30)">
+          <text x="55" y="0" font-size="10" font-weight="bold" text-anchor="middle" fill="#333">Распределение вероятностей</text>
+          
+          <!-- Ось X -->
+          <line x1="10" y1="130" x2="100" y2="130" stroke="#333" stroke-width="1"/>
+          
+          <!-- Отрицательный класс (более реалистичное нормальное распределение) -->
+          <path d="M 10 130 C 12 128, 15 120, 18 110 C 22 95, 26 75, 30 60 C 34 45, 37 38, 40 35 C 43 33, 45 35, 47 40 C 49 47, 51 60, 53 80 C 54 95, 55 115, 55 130" fill="#e3f2fd" stroke="#1565c0" stroke-width="1.5"/>
+          <text x="20" y="20" font-size="7" fill="#1565c0" font-weight="bold">Class 0</text>
+          
+          <!-- Положительный класс (более реалистичное нормальное распределение) -->
+          <path d="M 55 130 C 57 115, 58 95, 60 80 C 62 60, 64 47, 66 40 C 68 35, 70 33, 73 35 C 76 38, 79 45, 83 60 C 87 75, 91 95, 95 110 C 98 120, 100 128, 100 130" fill="#e8f5e9" stroke="#2e7d32" stroke-width="1.5"/>
+          <text x="75" y="20" font-size="7" fill="#2e7d32" font-weight="bold">Class 1</text>
+          
+          <!-- Оптимальный порог -->
+          <line x1="55" y1="10" x2="55" y2="130" stroke="#ef6c00" stroke-width="2" stroke-dasharray="4,2"/>
+          <text x="55" y="145" font-size="8" text-anchor="middle" fill="#ef6c00" font-weight="bold">Threshold</text>
+          
+          <!-- Метки на оси -->
+          <text x="10" y="142" font-size="7" text-anchor="middle" fill="#555">0</text>
+          <text x="55" y="142" font-size="7" text-anchor="middle" fill="#555">0.5</text>
+          <text x="100" y="142" font-size="7" text-anchor="middle" fill="#555">1</text>
+          
+          <!-- Стрелки с метками (улучшенное позиционирование) -->
+          <path d="M 50 115 L 35 115" stroke="#c62828" stroke-width="1" marker-end="url(#arrowhead-threshold)"/>
+          <text x="48" y="113" font-size="6" text-anchor="end" fill="#c62828">FP</text>
+          
+          <path d="M 60 115 L 75 115" stroke="#2e7d32" stroke-width="1" marker-end="url(#arrowhead-threshold)"/>
+          <text x="62" y="113" font-size="6" fill="#2e7d32">TP</text>
+        </g>
+        
+        <!-- Arrow marker definition -->
+        <defs>
+          <marker id="arrowhead-threshold" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#555"/>
+          </marker>
+        </defs>
+        
+        <!-- Пояснение -->
+        <text x="150" y="200" font-size="8" text-anchor="middle" fill="#666">Оптимальный порог минимизирует ошибки обоих типов</text>
+      </svg>
+    </div>
   </div>
 
   <div class="block">

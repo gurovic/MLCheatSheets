@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Сравнение вариантов иллюстраций ROC и AUC</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+      background: #f5f5f5;
+      color: #333;
+    }
+    
+    h1 {
+      color: #1a5fb4;
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 3px solid #1a5fb4;
+    }
+    
+    h2 {
+      color: #1565c0;
+      margin-top: 40px;
+      padding: 10px;
+      background: #e3f2fd;
+      border-left: 5px solid #1565c0;
+    }
+    
+    .variant {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      margin: 20px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .status {
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    
+    .status.ready {
+      background: #4caf50;
+      color: white;
+    }
+    
+    .status.partial {
+      background: #ff9800;
+      color: white;
+    }
+    
+    .status.future {
+      background: #9e9e9e;
+      color: white;
+    }
+    
+    .pros-cons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    
+    .pros, .cons {
+      padding: 15px;
+      border-radius: 8px;
+    }
+    
+    .pros {
+      background: #e8f5e9;
+      border-left: 4px solid #4caf50;
+    }
+    
+    .cons {
+      background: #ffebee;
+      border-left: 4px solid #f44336;
+    }
+    
+    .pros h3, .cons h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    .pros ul, .cons ul {
+      margin: 10px 0;
+      padding-left: 20px;
+    }
+    
+    .pros li::marker {
+      content: "✅ ";
+    }
+    
+    .cons li::marker {
+      content: "❌ ";
+    }
+    
+    .image-container {
+      margin: 30px 0;
+      text-align: center;
+    }
+    
+    .image-container img {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .image-caption {
+      margin-top: 10px;
+      font-style: italic;
+      color: #666;
+    }
+    
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 30px;
+      margin: 30px 0;
+    }
+    
+    .comparison-item {
+      background: #fafafa;
+      padding: 20px;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0;
+    }
+    
+    .comparison-item h4 {
+      color: #1565c0;
+      margin-top: 0;
+    }
+    
+    code {
+      background: #f5f5f5;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+    }
+    
+    pre {
+      background: #263238;
+      color: #aed581;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    
+    .note {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 30px 0;
+    }
+    
+    .summary-table th, .summary-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .summary-table th {
+      background: #1565c0;
+      color: white;
+      font-weight: bold;
+    }
+    
+    .summary-table tr:hover {
+      background: #f5f5f5;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Сравнение вариантов иллюстраций ROC и AUC</h1>
+  
+  <div class="note">
+    <strong>📌 Цель:</strong> Сравнить три подхода к созданию иллюстраций для cheatsheet:
+    статичные SVG, программно-генерируемые (matplotlib), и анимированные (Manim).
+  </div>
+
+  <!-- Вариант 1: Статичные SVG -->
+  <div class="variant">
+    <h2>Вариант 1: Встроенные SVG иллюстрации <span class="status ready">✅ Готово</span></h2>
+    
+    <p><strong>Описание:</strong> Иллюстрации созданы вручную как inline SVG и встроены непосредственно в HTML файл cheatsheet.</p>
+    
+    <div class="pros-cons">
+      <div class="pros">
+        <h3>Плюсы</h3>
+        <ul>
+          <li>Работает сразу, без зависимостей</li>
+          <li>Идеально для печати</li>
+          <li>Малый размер файла</li>
+          <li>Полный контроль над дизайном</li>
+          <li>Можно оптимизировать под печать</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h3>Минусы</h3>
+        <ul>
+          <li>Ручное создание кривых</li>
+          <li>Трудно изменять</li>
+          <li>Нет анимации</li>
+          <li>Нужно знать SVG</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="image-container">
+      <img src="../cheatsheets/roc_auc_cheatsheet_screenshot.png" 
+           alt="Текущий cheatsheet" 
+           onerror="this.src='https://via.placeholder.com/800x600?text=См.+cheatsheets/roc_auc_cheatsheet.html'">
+      <div class="image-caption">Текущий статичный cheatsheet с SVG иллюстрациями</div>
+    </div>
+    
+    <p><strong>Файл:</strong> <code>cheatsheets/roc_auc_cheatsheet.html</code></p>
+  </div>
+
+  <!-- Вариант 2: Matplotlib -->
+  <div class="variant">
+    <h2>Вариант 2: Программно-генерируемые иллюстрации (Matplotlib) <span class="status ready">✅ Демо готово</span></h2>
+    
+    <p><strong>Описание:</strong> Python скрипт генерирует статичные иллюстрации с помощью matplotlib. Результат экспортируется в PNG и SVG.</p>
+    
+    <div class="pros-cons">
+      <div class="pros">
+        <h3>Плюсы</h3>
+        <ul>
+          <li>Программно генерируемые</li>
+          <li>Легко создавать варианты</li>
+          <li>Математически точные кривые</li>
+          <li>Экспорт в SVG и PNG</li>
+          <li>Простая установка (pip install)</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h3>Минусы</h3>
+        <ul>
+          <li>Нет анимации</li>
+          <li>Требует Python окружение</li>
+          <li>Менее кастомизируемый дизайн</li>
+          <li>Отдельный build процесс</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="comparison-grid">
+      <div class="comparison-item">
+        <h4>ROC Curves Comparison</h4>
+        <img src="output/roc_curve_comparison.png" alt="ROC Curves" style="width: 100%;">
+      </div>
+      <div class="comparison-item">
+        <h4>Confusion Matrix</h4>
+        <img src="output/confusion_matrix.png" alt="Confusion Matrix" style="width: 100%;">
+      </div>
+    </div>
+    
+    <p><strong>Использование:</strong></p>
+    <pre>cd animations
+pip install -r requirements.txt
+python demo/roc_curve_demo.py</pre>
+    
+    <p><strong>Выходные файлы:</strong></p>
+    <ul>
+      <li><code>output/roc_curve_comparison.png</code> (168 KB)</li>
+      <li><code>output/roc_curve_comparison.svg</code> (75 KB)</li>
+      <li><code>output/confusion_matrix.png</code> (57 KB)</li>
+      <li><code>output/confusion_matrix.svg</code> (46 KB)</li>
+    </ul>
+  </div>
+
+  <!-- Вариант 3: Manim -->
+  <div class="variant">
+    <h2>Вариант 3: Анимированные иллюстрации (Manim) <span class="status partial">⚠️ Скрипты готовы</span></h2>
+    
+    <p><strong>Описание:</strong> Использование Manim (Mathematical Animation Engine) для создания профессиональных анимаций. Экспорт в MP4 видео или статичные кадры.</p>
+    
+    <div class="pros-cons">
+      <div class="pros">
+        <h3>Плюсы</h3>
+        <ul>
+          <li>Красивые плавные анимации</li>
+          <li>Профессиональное качество</li>
+          <li>Математически точные</li>
+          <li>Популярен в YouTube edu</li>
+          <li>Можно экспортировать кадры в SVG</li>
+        </ul>
+      </div>
+      <div class="cons">
+        <h3>Минусы</h3>
+        <ul>
+          <li>Сложная установка (LaTeX, Cairo, FFmpeg)</li>
+          <li>Долгий рендеринг (минуты)</li>
+          <li>Большие файлы (видео MB)</li>
+          <li>Нельзя печатать анимации</li>
+          <li>Крутая кривая обучения</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="note">
+      <strong>⚠️ Примечание:</strong> Manim требует установки системных зависимостей (Cairo, Pango, FFmpeg, LaTeX).
+      Скрипты готовы, но для рендеринга нужно установить Manim локально.
+    </div>
+    
+    <p><strong>Установка (Ubuntu/Debian):</strong></p>
+    <pre>sudo apt update
+sudo apt install libcairo2-dev libpango1.0-dev ffmpeg
+pip install manim</pre>
+    
+    <p><strong>Использование:</strong></p>
+    <pre>cd animations
+
+# Низкое качество (быстро, для проверки)
+manim -pql demo/roc_curve_manim.py ROCCurveScene
+
+# Высокое качество (финальная версия)
+manim -pqh demo/roc_curve_manim.py ROCCurveScene
+
+# Все сцены
+manim -pql demo/roc_curve_manim.py ROCCurveScene
+manim -pql demo/roc_curve_manim.py ThresholdSelectionScene
+manim -pql demo/roc_curve_manim.py ConfusionMatrixScene</pre>
+    
+    <p><strong>Доступные сцены:</strong></p>
+    <ul>
+      <li><code>ROCCurveScene</code> - Построение ROC кривой с анимацией</li>
+      <li><code>ThresholdSelectionScene</code> - Выбор оптимального порога</li>
+      <li><code>ConfusionMatrixScene</code> - Анимация матрицы ошибок</li>
+    </ul>
+    
+    <p><strong>Файл:</strong> <code>demo/roc_curve_manim.py</code></p>
+  </div>
+
+  <!-- Сводная таблица -->
+  <h2>📋 Сводная таблица сравнения</h2>
+  
+  <table class="summary-table">
+    <thead>
+      <tr>
+        <th>Критерий</th>
+        <th>Вариант 1: SVG</th>
+        <th>Вариант 2: Matplotlib</th>
+        <th>Вариант 3: Manim</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Статус</strong></td>
+        <td>✅ Готово</td>
+        <td>✅ Демо готово</td>
+        <td>⚠️ Требует установки</td>
+      </tr>
+      <tr>
+        <td><strong>Установка</strong></td>
+        <td>Не требуется</td>
+        <td>pip install</td>
+        <td>Системные пакеты + pip</td>
+      </tr>
+      <tr>
+        <td><strong>Время создания</strong></td>
+        <td>30-60 мин (ручная)</td>
+        <td>1 сек</td>
+        <td>30-120 сек (рендеринг)</td>
+      </tr>
+      <tr>
+        <td><strong>Размер файла</strong></td>
+        <td>~438 KB (HTML)</td>
+        <td>~350 KB (PNG+SVG)</td>
+        <td>~5-50 MB (MP4)</td>
+      </tr>
+      <tr>
+        <td><strong>Анимация</strong></td>
+        <td>❌ Нет</td>
+        <td>❌ Нет</td>
+        <td>✅ Да</td>
+      </tr>
+      <tr>
+        <td><strong>Печать</strong></td>
+        <td>✅ Отлично</td>
+        <td>✅ Отлично</td>
+        <td>⚠️ Только кадры</td>
+      </tr>
+      <tr>
+        <td><strong>Кастомизация</strong></td>
+        <td>✅ Полная</td>
+        <td>⚠️ Ограниченная</td>
+        <td>✅ Высокая</td>
+      </tr>
+      <tr>
+        <td><strong>Сложность</strong></td>
+        <td>Средняя (SVG)</td>
+        <td>Низкая (Python)</td>
+        <td>Высокая (Manim API)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Рекомендации -->
+  <h2>💡 Рекомендации</h2>
+  
+  <div class="variant">
+    <h3>Для статичного cheatsheet (печать)</h3>
+    <p>✅ <strong>Использовать Вариант 1 (текущий)</strong> - встроенные SVG</p>
+    <p><em>Причина:</em> Оптимально для печати, малый размер, не требует зависимостей.</p>
+    
+    <h3>Для генерации множества вариантов</h3>
+    <p>✅ <strong>Использовать Вариант 2</strong> - matplotlib скрипты</p>
+    <p><em>Причина:</em> Легко менять параметры и генерировать новые версии программно.</p>
+    
+    <h3>Для обучающих видео / онлайн курсов</h3>
+    <p>✅ <strong>Использовать Вариант 3</strong> - Manim анимации</p>
+    <p><em>Причина:</em> Профессиональные анимации, идеальны для видео контента.</p>
+    
+    <h3>Комбинированный подход</h3>
+    <p>✅ <strong>Использовать все три варианта:</strong></p>
+    <ul>
+      <li>Вариант 1 для основного статичного cheatsheet</li>
+      <li>Вариант 2 для быстрого создания дополнительных иллюстраций</li>
+      <li>Вариант 3 для создания демо-видео и интерактивных примеров</li>
+    </ul>
+  </div>
+
+  <!-- Заключение -->
+  <div class="note" style="margin-top: 40px;">
+    <strong>📚 Дополнительные материалы:</strong>
+    <ul>
+      <li><code>animations/README.md</code> - Подробная документация</li>
+      <li><code>animations/demo/roc_curve_demo.py</code> - Matplotlib скрипт</li>
+      <li><code>animations/demo/roc_curve_manim.py</code> - Manim скрипты</li>
+      <li><code>animations/requirements.txt</code> - Python зависимости</li>
+    </ul>
+  </div>
+
+  <p style="text-align: center; margin-top: 40px; padding: 20px; color: #666;">
+    <em>Создано для проекта MLCheatSheets • 2026</em>
+  </p>
+</body>
+</html>
