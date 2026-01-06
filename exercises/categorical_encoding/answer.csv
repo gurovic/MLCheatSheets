@@ -1,0 +1,9 @@
+size_encoded,category_Clothing,category_Electronics,category_Furniture,color_target_encoded,price
+1,0,1,0,88.75,100
+2,1,0,0,47.5,50
+0,0,1,0,88.75,80
+2,0,0,1,175.0,200
+1,1,0,0,47.5,45
+2,0,1,0,88.75,120
+0,0,0,1,175.0,150
+1,1,0,0,88.75,55
