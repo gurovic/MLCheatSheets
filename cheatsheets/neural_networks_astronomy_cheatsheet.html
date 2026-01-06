@@ -151,7 +151,6 @@
   <div class="block">
     <h2>🔷 1. Введение</h2>
     <p><strong>ML в астрономии</strong> — революция в обработке огромных объемов данных.</p><ul><li><strong>Телескопы</strong>: генерируют петабайты данных</li><li><strong>Задачи</strong>: классификация, детекция, регрессия</li><li><strong>Данные</strong>: изображения, спектры, временные ряды</li><li><strong>Преимущества</strong>: автоматизация, новые открытия</li></ul><blockquote>💡 Один современный телескоп генерирует больше данных, чем могут обработать астрономы вручную</blockquote>
-  </div>
 
   <div class="block">
     <h2>🔷 2. Классификация галактик</h2>
@@ -269,11 +268,11 @@ class TransientDetector:
             prob = self.cnn(cutout)
             
             if prob > threshold:
-                yield {{
+                yield {
                     'position': cand,
                     'class': classify(prob),
                     'confidence': prob
-                }}
+                }
 </code></pre><p><strong>Проекты</strong>: ZTF, LSST используют ML</p>
   </div>
 
@@ -415,13 +414,13 @@ def extract_features(lightcurve):
     
     mean, median, std = sigma_clipped_stats(lightcurve)
     
-    features = {{
+    features = {
         'mean': mean,
         'std': std,
         'amplitude': np.ptp(lightcurve),
         'skewness': skew(lightcurve),
         'kurtosis': kurtosis(lightcurve)
-    }}
+    }
     return features</code></pre>
   </div>
 
@@ -445,11 +444,12 @@ model = load_model('galaxy_classifier.pt')
 with torch.no_grad():
     pred = model(torch.FloatTensor(image_norm[None, None]))
     
-print(f'Galaxy type: {{pred.argmax()}}')</code></pre>
+print(f'Galaxy type: {pred.argmax()}')</code></pre>
   </div>
 
 
 </div>
 
+</div>
 </body>
 </html>

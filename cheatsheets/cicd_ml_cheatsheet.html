@@ -41,7 +41,6 @@
   <li><strong>Model Monitoring</strong>: отслеживание performance</li>
 </ul>
 <blockquote>💡 ML CI/CD отличается от традиционного CI/CD наличием данных и моделей</blockquote>
-  </div>
 
   <div class="block">
     <h2>🔷 2. GitHub Actions для ML</h2>
@@ -229,14 +228,14 @@ def test_inference_time():
   if: github.ref == 'refs/heads/main'
   run: |
     # Build Docker image
-    docker build -t mymodel:${{ github.sha }} .
+    docker build -t mymodel:${ github.sha } .
     
     # Push to registry
-    docker push myregistry/mymodel:${{ github.sha }}
+    docker push myregistry/mymodel:${ github.sha }
     
     # Deploy to Kubernetes
     kubectl set image deployment/mymodel \
-      mymodel=myregistry/mymodel:${{ github.sha }}
+      mymodel=myregistry/mymodel:${ github.sha }
     
     # Wait for rollout
     kubectl rollout status deployment/mymodel
@@ -396,6 +395,7 @@ resource "aws_sagemaker_endpoint" "endpoint" {
 </table>
   </div>
 
+</div>
 </div>
 </body>
 </html>
