@@ -1,0 +1,8 @@
+name,age,salary,city,experience
+Alice,25,50000,Moscow,3
+Bob,,60000,SPB,5
+Charlie,30,,Moscow,
+David,28,55000,,4
+Eve,35,70000,Moscow,7
+Frank,,65000,SPB,
+George,32,58000,Moscow,6
