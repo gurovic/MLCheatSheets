@@ -152,30 +152,32 @@
     <h2>🔷 1. Explainability (объяснимость)</h2>
     <p><strong>Способность понять и объяснить решения модели</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для explainability (объяснимость)</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Определение</strong>:  способность объяснить, почему модель приняла решение</li>
+      <li><strong>Интерпретируемость vs объяснимость</strong>:  понимание vs постфактум объяснения</li>
+      <li><strong>Black-box vs white-box</strong>:  непрозрачные модели vs интерпретируемые</li>
+      <li><strong>Stakeholders</strong>:  разработчики, пользователи, регуляторы</li>
+      <li><strong>Trade-off</strong>:  точность vs интерпретируемость</li>
+      <li><strong>Важность</strong>:  доверие, отладка, соответствие регуляциям</li>
+
     </ul>
     <blockquote>
-      💡 Explainability (объяснимость) — важный аспект для понимания темы
+      💡 Без объяснимости невозможно отладить, улучшить или доверять AI системе
     </blockquote>
 
   <div class="block">
     <h2>🔷 2. Accountability (подотчетность)</h2>
     <p><strong>Ответственность за решения и последствия ML систем</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для accountability (подотчетность)</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Определение</strong>:  ответственность за решения и действия AI системы</li>
+      <li><strong>Кто отвечает</strong>:  разработчики, компания, операторы системы</li>
+      <li><strong>Аудит решений</strong>:  возможность проверить и оспорить</li>
+      <li><strong>Документирование</strong>:  логирование решений и их обоснований</li>
+      <li><strong>Компенсация</strong>:  механизмы исправления ошибок</li>
+      <li><strong>Правовая ответственность</strong>:  соответствие законодательству</li>
+
     </ul>
     <blockquote>
-      💡 Accountability (подотчетность) — важный аспект для понимания темы
+      💡 Accountability требует не только объяснений, но и механизмов исправления ошибок
     </blockquote>
   </div>
 
@@ -183,59 +185,51 @@
     <h2>🔷 3. Зачем нужна объяснимость</h2>
     <p><strong>Доверие, отладка, регуляторные требования, этика</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для зачем нужна объяснимость</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Доверие пользователей</strong>:  люди доверяют тому, что понимают</li>
+      <li><strong>Отладка моделей</strong>:  выявление ошибок и bias</li>
+      <li><strong>Соответствие регуляциям</strong>:  GDPR, AI Act требуют объяснений</li>
+      <li><strong>Безопасность</strong>:  обнаружение adversarial attacks</li>
+      <li><strong>Этика</strong>:  справедливость и прозрачность решений</li>
+      <li><strong>Бизнес-ценность</strong>:  понимание драйверов предсказаний</li>
+
     </ul>
     <blockquote>
-      💡 Зачем нужна объяснимость — важный аспект для понимания темы
+      💡 В критических областях (медицина, финансы, суд) объяснимость обязательна
     </blockquote>
-    <pre><code># Пример кода
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
-
-# Загрузка данных
-data = pd.read_csv('data.csv')
-X = data.drop('target', axis=1)
-y = data['target']
-
-# Разделение на train/test
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-# Обучение модели
+    <pre><code>import shap
 from sklearn.ensemble import RandomForestClassifier
 
+# Обучение модели
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
-# Оценка
-from sklearn.metrics import accuracy_score, classification_report
+# SHAP explainer
+explainer = shap.TreeExplainer(model)
+shap_values = explainer.shap_values(X_test)
 
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy:.3f}")
-print(classification_report(y_test, y_pred))</code></pre>
+# Визуализация важности признаков
+shap.summary_plot(shap_values, X_test, plot_type="bar")
+
+# Объяснение конкретного предсказания
+shap.force_plot(explainer.expected_value[1], 
+                shap_values[1][0], 
+                X_test.iloc[0])</code></pre>
   </div>
 
   <div class="block">
     <h2>🔷 4. Типы объяснений</h2>
     <p><strong>Global vs Local, Model-specific vs Model-agnostic</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для типы объяснений</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Global</strong>:  общее поведение модели на всех данных</li>
+      <li><strong>Local</strong>:  объяснение конкретного предсказания</li>
+      <li><strong>Model-agnostic</strong>:  работают с любой моделью</li>
+      <li><strong>Model-specific</strong>:  для определенных типов моделей</li>
+      <li><strong>Feature importance</strong>:  какие признаки важны</li>
+      <li><strong>Counterfactual</strong>:  что нужно изменить для другого результата</li>
+
     </ul>
     <blockquote>
-      💡 Типы объяснений — важный аспект для понимания темы
+      💡 Разные stakeholders нуждаются в разных типах объяснений
     </blockquote>
   </div>
 
@@ -243,15 +237,16 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 5. Intrinsic interpretability</h2>
     <p><strong>Простые модели (линейные, деревья)</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для intrinsic interpretability</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Линейные модели</strong>:  коэффициенты показывают важность</li>
+      <li><strong>Деревья решений</strong>:  понятная последовательность правил</li>
+      <li><strong>Naive Bayes</strong>:  вероятностная интерпретация</li>
+      <li><strong>GAM (Generalized Additive Models)</strong>:  аддитивные эффекты</li>
+      <li><strong>Rule-based systems</strong>:  явные if-then правила</li>
+      <li><strong>Ограничение</strong>:  простые модели часто менее точны</li>
+
     </ul>
     <blockquote>
-      💡 Intrinsic interpretability — важный аспект для понимания темы
+      💡 Intrinsically interpretable модели объяснимы по своей природе
     </blockquote>
   </div>
 
@@ -259,59 +254,58 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 6. Post-hoc объяснения</h2>
     <p><strong>SHAP, LIME, Integrated Gradients для черных ящиков</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для post-hoc объяснения</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>LIME</strong>:  локальные линейные приближения</li>
+      <li><strong>SHAP</strong>:  Shapley values для важности признаков</li>
+      <li><strong>Partial Dependence Plots</strong>:  влияние признака на предсказание</li>
+      <li><strong>Grad-CAM</strong>:  визуализация важных областей в изображениях</li>
+      <li><strong>Counterfactual explanations</strong>:  минимальные изменения для другого класса</li>
+      <li><strong>Применение</strong>:  объяснение black-box моделей (нейросети, ансамбли)</li>
+
     </ul>
     <blockquote>
-      💡 Post-hoc объяснения — важный аспект для понимания темы
+      💡 Post-hoc методы позволяют объяснять сложные модели без потери точности
     </blockquote>
-    <pre><code># Пример кода
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
-
-# Загрузка данных
-data = pd.read_csv('data.csv')
-X = data.drop('target', axis=1)
-y = data['target']
-
-# Разделение на train/test
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-# Обучение модели
+    <pre><code>import lime
+import lime.lime_tabular
 from sklearn.ensemble import RandomForestClassifier
 
-model = RandomForestClassifier(n_estimators=100, random_state=42)
+# Модель
+model = RandomForestClassifier(n_estimators=100)
 model.fit(X_train, y_train)
 
-# Оценка
-from sklearn.metrics import accuracy_score, classification_report
+# LIME explainer
+explainer = lime.lime_tabular.LimeTabularExplainer(
+    X_train.values,
+    feature_names=X_train.columns,
+    class_names=['class_0', 'class_1'],
+    mode='classification'
+)
 
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy:.3f}")
-print(classification_report(y_test, y_pred))</code></pre>
+# Объяснение конкретного предсказания
+i = 0
+exp = explainer.explain_instance(
+    X_test.values[i], 
+    model.predict_proba,
+    num_features=10
+)
+
+exp.show_in_notebook()</code></pre>
   </div>
 
   <div class="block">
     <h2>🔷 7. Fairness и bias</h2>
     <p><strong>Обнаружение и устранение дискриминации</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для fairness и bias</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Algorithmic bias</strong>:  дискриминация по защищенным признакам</li>
+      <li><strong>Data bias</strong>:  перекос в обучающих данных</li>
+      <li><strong>Demographic parity</strong>:  равные вероятности для групп</li>
+      <li><strong>Equal opportunity</strong>:  равные TPR для групп</li>
+      <li><strong>Fairness through awareness</strong>:  учет защищенных признаков</li>
+      <li><strong>Fairness metrics</strong>:  disparate impact, demographic parity</li>
+
     </ul>
     <blockquote>
-      💡 Fairness и bias — важный аспект для понимания темы
+      💡 Объяснимость помогает выявить и устранить bias в моделях
     </blockquote>
   </div>
 
@@ -319,15 +313,16 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 8. Transparency</h2>
     <p><strong>Документирование данных, моделей, решений</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для transparency</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Прозрачность данных</strong>:  источники, качество, предобработка</li>
+      <li><strong>Прозрачность модели</strong>:  архитектура, гиперпараметры</li>
+      <li><strong>Прозрачность процесса</strong>:  как принимаются решения</li>
+      <li><strong>Документация</strong>:  model cards, datasheets</li>
+      <li><strong>Open source</strong>:  код и веса моделей</li>
+      <li><strong>Reproducibility</strong>:  воспроизводимость результатов</li>
+
     </ul>
     <blockquote>
-      💡 Transparency — важный аспект для понимания темы
+      💡 Transparency — основа для accountability и trust
     </blockquote>
   </div>
 
@@ -335,59 +330,53 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 9. Auditability</h2>
     <p><strong>Возможность проверки и аудита системы</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для auditability</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Логирование решений</strong>:  сохранение всех предсказаний</li>
+      <li><strong>Versioning</strong>:  отслеживание версий модели и данных</li>
+      <li><strong>Monitoring</strong>:  контроль качества в продакшене</li>
+      <li><strong>Audit trails</strong>:  история изменений и решений</li>
+      <li><strong>Testing</strong>:  систематическое тестирование на fairness</li>
+      <li><strong>Compliance</strong>:  соответствие стандартам и регуляциям</li>
+
     </ul>
     <blockquote>
-      💡 Auditability — важный аспект для понимания темы
+      💡 Auditability позволяет проверить и оспорить решения AI системы
     </blockquote>
-    <pre><code># Пример кода
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
+    <pre><code>from sklearn.ensemble import RandomForestClassifier
+import matplotlib.pyplot as plt
 
-# Загрузка данных
-data = pd.read_csv('data.csv')
-X = data.drop('target', axis=1)
-y = data['target']
-
-# Разделение на train/test
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-# Обучение модели
-from sklearn.ensemble import RandomForestClassifier
-
+# Обучение
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
-# Оценка
-from sklearn.metrics import accuracy_score, classification_report
+# Feature importance
+importances = model.feature_importances_
+indices = np.argsort(importances)[::-1]
 
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy:.3f}")
-print(classification_report(y_test, y_pred))</code></pre>
+# Визуализация
+plt.figure(figsize=(10, 6))
+plt.title("Feature Importances")
+plt.bar(range(X_train.shape[1]), 
+        importances[indices])
+plt.xticks(range(X_train.shape[1]), 
+           X_train.columns[indices], rotation=90)
+plt.tight_layout()
+plt.show()</code></pre>
   </div>
 
   <div class="block">
     <h2>🔷 10. Governance</h2>
     <p><strong>Управление жизненным циклом ML систем</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для governance</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>AI governance framework</strong>:  правила и процессы для AI</li>
+      <li><strong>Review boards</strong>:  комитеты по этике AI</li>
+      <li><strong>Risk assessment</strong>:  оценка рисков AI систем</li>
+      <li><strong>Approval процессы</strong>:  утверждение моделей перед деплоем</li>
+      <li><strong>Incident management</strong>:  реагирование на проблемы</li>
+      <li><strong>Stakeholder engagement</strong>:  вовлечение заинтересованных сторон</li>
+
     </ul>
     <blockquote>
-      💡 Governance — важный аспект для понимания темы
+      💡 Governance обеспечивает ответственное использование AI в организации
     </blockquote>
   </div>
 
@@ -395,15 +384,16 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 11. Регуляторные требования</h2>
     <p><strong>GDPR, AI Act, sector-specific regulations</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для регуляторные требования</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>GDPR</strong>:  право на объяснение автоматических решений</li>
+      <li><strong>EU AI Act</strong>:  требования к high-risk AI системам</li>
+      <li><strong>CCPA</strong>:  прозрачность использования данных</li>
+      <li><strong>Sector-specific</strong>:  регуляции в медицине, финансах</li>
+      <li><strong>Right to explanation</strong>:  право получить объяснение</li>
+      <li><strong>Impact assessments</strong>:  оценка влияния AI систем</li>
+
     </ul>
     <blockquote>
-      💡 Регуляторные требования — важный аспект для понимания темы
+      💡 Регуляторные требования делают explainability обязательной, не опциональной
     </blockquote>
   </div>
 
@@ -411,44 +401,36 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 12. Best practices</h2>
     <p><strong>Model cards, datasheets, ethical guidelines</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для best practices</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Design for interpretability</strong>:  учитывать объяснимость с начала</li>
+      <li><strong>Multiple explanations</strong>:  разные методы для разных аудиторий</li>
+      <li><strong>Human-in-the-loop</strong>:  человек в процессе принятия решений</li>
+      <li><strong>Continuous monitoring</strong>:  постоянный контроль качества</li>
+      <li><strong>Documentation</strong>:  comprehensive model cards и datasheets</li>
+      <li><strong>User testing</strong>:  проверка понятности объяснений</li>
+
     </ul>
     <blockquote>
-      💡 Best practices — важный аспект для понимания темы
+      💡 Explainability — не afterthought, а integral part дизайна AI системы
     </blockquote>
-    <pre><code># Пример кода
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
+    <pre><code>from aif360.datasets import BinaryLabelDataset
+from aif360.metrics import BinaryLabelDatasetMetric
 
-# Загрузка данных
-data = pd.read_csv('data.csv')
-X = data.drop('target', axis=1)
-y = data['target']
-
-# Разделение на train/test
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
+# Проверка fairness
+dataset = BinaryLabelDataset(
+    df=df, 
+    label_names=['target'],
+    protected_attribute_names=['gender', 'race']
 )
 
-# Обучение модели
-from sklearn.ensemble import RandomForestClassifier
+metric = BinaryLabelDatasetMetric(
+    dataset,
+    unprivileged_groups=[{'gender': 0}],
+    privileged_groups=[{'gender': 1}]
+)
 
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
-
-# Оценка
-from sklearn.metrics import accuracy_score, classification_report
-
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy:.3f}")
-print(classification_report(y_test, y_pred))</code></pre>
+# Demographic parity
+print(f"Disparate impact: {metric.disparate_impact():.3f}")
+print(f"Statistical parity difference: {metric.statistical_parity_difference():.3f}")</code></pre>
   </div>
 
 </div>
