@@ -18,9 +18,18 @@ def parse_illustrations_file(filepath: str) -> List[Dict[str, any]]:
     
     Returns:
         List of dicts with 'section' name and 'pages' list
+    
+    Raises:
+        FileNotFoundError: If the file doesn't exist
+        IOError: If there's an error reading the file
     """
-    with open(filepath, 'r', encoding='utf-8') as f:
-        content = f.read()
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Файл '{filepath}' не найден. Убедитесь, что вы запускаете скрипт из корневой директории проекта.")
+    except IOError as e:
+        raise IOError(f"Ошибка при чтении файла '{filepath}': {e}")
     
     sections = []
     current_section = None
@@ -109,13 +118,24 @@ def generate_issue_content(section_name: str, pages: List[str]) -> str:
 def generate_all_issues(output_dir: str = 'issues_to_create'):
     """
     Генерирует файлы с содержимым issues для всех разделов.
+    
+    Raises:
+        FileNotFoundError: If pages_for_illustrations.md doesn't exist
+        IOError: If there's an error reading or writing files
     """
     # Создаем директорию для issues
     output_path = Path(output_dir)
-    output_path.mkdir(exist_ok=True)
+    try:
+        output_path.mkdir(exist_ok=True)
+    except OSError as e:
+        raise IOError(f"Ошибка при создании директории '{output_dir}': {e}")
     
     # Парсим файл
-    sections = parse_illustrations_file('pages_for_illustrations.md')
+    try:
+        sections = parse_illustrations_file('pages_for_illustrations.md')
+    except (FileNotFoundError, IOError) as e:
+        print(f"❌ Ошибка: {e}")
+        return
     
     print(f"📋 Найдено разделов: {len(sections)}")
     print(f"📁 Создание issues в директории: {output_dir}/\n")
@@ -133,13 +153,15 @@ def generate_all_issues(output_dir: str = 'issues_to_create'):
         filename = output_path / f"{i:02d}-{safe_filename}.md"
         
         # Записываем содержимое
-        with open(filename, 'w', encoding='utf-8') as f:
-            f.write(f"# {title}\n\n")
-            f.write(f"**Заголовок issue:** `{title}`\n\n")
-            f.write("---\n\n")
-            f.write(body)
-        
-        print(f"✅ {i:2d}. {section_name} ({len(pages)} страниц) -> {filename.name}")
+        try:
+            with open(filename, 'w', encoding='utf-8') as f:
+                f.write(f"# {title}\n\n")
+                f.write(f"**Заголовок issue:** `{title}`\n\n")
+                f.write("---\n\n")
+                f.write(body)
+            print(f"✅ {i:2d}. {section_name} ({len(pages)} страниц) -> {filename.name}")
+        except IOError as e:
+            print(f"❌ Ошибка при записи файла {filename}: {e}")
     
     print(f"\n✨ Успешно создано {len(sections)} файлов с issues!")
     print(f"\n📝 Следующие шаги:")
@@ -152,8 +174,16 @@ def generate_all_issues(output_dir: str = 'issues_to_create'):
 def generate_batch_script():
     """
     Генерирует скрипт для пакетного создания issues через GitHub CLI.
+    
+    Raises:
+        FileNotFoundError: If pages_for_illustrations.md doesn't exist
+        IOError: If there's an error reading or writing files
     """
-    sections = parse_illustrations_file('pages_for_illustrations.md')
+    try:
+        sections = parse_illustrations_file('pages_for_illustrations.md')
+    except (FileNotFoundError, IOError) as e:
+        print(f"❌ Ошибка при генерации bash скрипта: {e}")
+        return
     
     script_content = """#!/bin/bash
 # Скрипт для автоматического создания GitHub issues
@@ -208,11 +238,13 @@ echo ""
 echo "🔗 Просмотреть все issues: gh issue list --label matplotlib"
 """
     
-    with open('create_issues.sh', 'w', encoding='utf-8') as f:
-        f.write(script_content)
-    
-    print("✅ Создан скрипт create_issues.sh для автоматического создания issues")
-    print("   Для использования: chmod +x create_issues.sh && ./create_issues.sh")
+    try:
+        with open('create_issues.sh', 'w', encoding='utf-8') as f:
+            f.write(script_content)
+        print("✅ Создан скрипт create_issues.sh для автоматического создания issues")
+        print("   Для использования: chmod +x create_issues.sh && ./create_issues.sh")
+    except IOError as e:
+        print(f"❌ Ошибка при создании скрипта create_issues.sh: {e}")
 
 
 if __name__ == '__main__':
