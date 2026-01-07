@@ -1,6 +1,29 @@
 <!DOCTYPE html>
 <html lang="ru"><head><meta charset="UTF-8"><title>ML Pipelines Cheatsheet — 3 колонки</title>
-<style>@media screen{body{font-family:-apple-system,sans-serif;color:#333;background:#fafcff;padding:10px}}.container{column-count:3;column-gap:20px}.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px}h1{font-size:1.6em;color:#1a5fb4;text-align:center;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;color:#1a5fb4;margin:8px 0;border-bottom:1px solid #e0e7ff}code{background:#f0f4ff;padding:2px 4px}pre{background:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em}</style></head><body>
+<style>@media screen{body{font-family:-apple-system,sans-serif;color:#333;background:#fafcff;padding:10px}}    .container {
+      max-width: 100%;
+    }
+
+    /* Responsive columns: 3 columns on wide screens, fewer on narrow */
+    @media (min-width: 900px) {
+      .container {
+        column-count: 3;
+        column-gap: 20px;
+      }
+    }
+    
+    @media (min-width: 600px) and (max-width: 899px) {
+      .container {
+        column-count: 2;
+        column-gap: 20px;
+      }
+    }
+    
+    @media (max-width: 599px) {
+      .container {
+        column-count: 1;
+      }
+    }.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px}h1{font-size:1.6em;color:#1a5fb4;text-align:center;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;color:#1a5fb4;margin:8px 0;border-bottom:1px solid #e0e7ff}code{background:#f0f4ff;padding:2px 4px}pre{background:#f0f4ff;padding:8px;border-radius:4px;overflow-x:auto;font-size:0.84em}</style></head><body>
 <div class="container"><h1>🔧 ML Pipelines</h1>
 <div class="subtitle">📅 Январь 2026</div>
 <div class="block"><h2>1. Базовый Pipeline</h2><pre><code>from sklearn.pipeline import Pipeline
