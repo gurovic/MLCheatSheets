@@ -391,12 +391,12 @@ pm.plot_posterior(trace)</code></pre>
     <h2>🔷 13. Stan для сложных моделей</h2>
     <pre><code># Stan model file (model.stan)
 data {
-  int<lower=0> N;
+  int&lt;lower=0&gt; N;
   vector[N] y;
 }
 parameters {
   real mu;
-  real<lower=0> sigma;
+  real&lt;lower=0&gt; sigma;
 }
 model {
   mu ~ normal(0, 10);

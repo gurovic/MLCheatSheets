@@ -508,14 +508,14 @@ import pystan
 
 stan_code = """
 data {
-    int<lower=0> N;
+    int&lt;lower=0&gt; N;
     vector[N] x;
     vector[N] y;
 }
 parameters {
     real alpha;
     real beta;
-    real<lower=0> sigma;
+    real&lt;lower=0&gt; sigma;
 }
 model {
     y ~ normal(alpha + beta * x, sigma);

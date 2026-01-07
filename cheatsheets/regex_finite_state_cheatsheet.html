@@ -418,12 +418,12 @@ pattern = r'\w+(?=\s\d+)'
 # Найти слова без гласных
 pattern = r'\b(?![aeiou])\w+\b'
 
-# Positive lookbehind (?<=...)
+# Positive lookbehind (?&lt;=...)
 # Найти числа после $
-pattern = r'(?<=\$)\d+'
+pattern = r'(?&lt;=\$)\d+'
 
-# Negative lookbehind (?<!...)
-pattern = r'(?<!@)\w+'</code></pre>
+# Negative lookbehind (?&lt;!...)
+pattern = r'(?&lt;!@)\w+'</code></pre>
 
     <p><strong>Именованные группы:</strong></p>
     <pre><code>pattern = r'(?P&lt;year&gt;\d{4})-(?P&lt;month&gt;\d{2})-(?P&lt;day&gt;\d{2})'

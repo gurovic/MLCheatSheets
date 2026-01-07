@@ -38,6 +38,8 @@ production_data = [...]
 
 stat, p_value = ks_2samp(train_data, production_data)
 if p_value < 0.05:
+    print("Drift detected!")
+</code></pre></div>
 <div class="block"><h2>3. Population Stability Index</h2><pre><code>import numpy as np
 
 def calculate_psi(expected, actual, bins=10):
@@ -73,6 +75,8 @@ for pred, true in zip(predictions, true_labels):
     ddm.update(error)
     
     if ddm.drift_detected:
+        print("Drift detected!")
+</code></pre></div>
 <div class="block"><h2>6. Мониторинг метрик</h2><pre><code># Отслеживание accuracy/F1 во времени
 import pandas as pd
 
@@ -87,6 +91,7 @@ for batch in data_stream:
     })
 
 df = pd.DataFrame(metrics_log)
+</code></pre></div>
 <div class="block"><h2>7. Стратегии реакции</h2><ul><li><strong>Periodic Retraining</strong>: регулярное переобучение</li><li><strong>Triggered Retraining</strong>: при детекции drift</li><li><strong>Incremental Learning</strong>: онлайн-обучение</li><li><strong>Ensemble</strong>: несколько моделей разных периодов</li></ul></div>
 <div class="block"><h2>8. Методы детекции</h2><table><tr><th>Метод</th><th>Применение</th></tr><tr><td>KS-test</td><td>Распределения признаков</td></tr><tr><td>PSI</td><td>Сравнение распределений</td></tr><tr><td>ADWIN</td><td>Потоковые данные</td></tr><tr><td>DDM</td><td>Ошибки классификации</td></tr><tr><td>Monitoring</td><td>Метрики модели</td></tr></table></div>
 <div class="block"><h2>9. Инструменты</h2><pre><code># Evidently AI
