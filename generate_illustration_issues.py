@@ -9,7 +9,7 @@
 
 import re
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 
 def parse_illustrations_file(filepath: str) -> List[Dict[str, any]]:
@@ -56,9 +56,12 @@ def parse_illustrations_file(filepath: str) -> List[Dict[str, any]]:
     return sections
 
 
-def generate_issue_content(section_name: str, pages: List[str]) -> str:
+def generate_issue_content(section_name: str, pages: List[str]) -> Tuple[str, str]:
     """
     Генерирует содержимое issue для раздела.
+    
+    Returns:
+        Tuple of (title, body) for the issue
     """
     # Создаем красивый заголовок
     title = f"Добавить matplotlib-иллюстрации: {section_name}"
