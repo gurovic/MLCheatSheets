@@ -66,27 +66,35 @@ def add_illustrations_to_seasonal_decomposition(html_content, illustrations):
         insert_pos = match.end(1)
         html_content = html_content[:insert_pos] + decomp_img + html_content[insert_pos:]
     
-    # Add additive vs multiplicative comparison
-    model_pattern = r'(<h2>🔷.*?[Мм]одел.*?</h2>)'
+    # Add additive vs multiplicative comparison after section 2 (Основные компоненты)
+    component_pattern = r'(</ul>\s*</div>\s*<div class="block">\s*<h2>🔷 3\.)'
     model_img = create_img_tag(illustrations['additive_vs_multiplicative'], 
                                 'Аддитивная vs Мультипликативная модель', '95%')
-    match = re.search(model_pattern, html_content, re.DOTALL | re.IGNORECASE)
+    match = re.search(component_pattern, html_content)
     if match:
-        insert_pos = match.end(1)
-        html_content = html_content[:insert_pos] + model_img + html_content[insert_pos:]
+        insert_pos = match.start(1)
+        html_content = html_content[:insert_pos] + model_img + '\n  ' + html_content[insert_pos:]
     
     return html_content
 
 def add_illustrations_to_time_series_validation(html_content, illustrations):
     """Add illustrations to time_series_validation_cheatsheet.html."""
     # Add train/test split visualization after first section
-    split_pattern = r'(</ul>\s*</div>\s*<div class="block">\s*<h2>🔷 2\.)'
+    # Pattern 1: Try with </p> closing tag
+    split_pattern1 = r'(</p>\s*\n\s*</div>\s*<div class="block">\s*<h2>🔷 2\.)'
     split_img = create_img_tag(illustrations['train_test_split'], 
                                 'Стратегии разделения временных рядов', '95%')
-    match = re.search(split_pattern, html_content)
+    match = re.search(split_pattern1, html_content)
     if match:
         insert_pos = match.start(1)
         html_content = html_content[:insert_pos] + split_img + '\n  ' + html_content[insert_pos:]
+    else:
+        # Pattern 2: Try with </ul> closing tag
+        split_pattern2 = r'(</ul>\s*</div>\s*<div class="block">\s*<h2>🔷 2\.)'
+        match = re.search(split_pattern2, html_content)
+        if match:
+            insert_pos = match.start(1)
+            html_content = html_content[:insert_pos] + split_img + '\n  ' + html_content[insert_pos:]
     
     return html_content
 
@@ -136,6 +144,15 @@ def add_illustrations_to_rnn_lstm(html_content, illustrations):
 
 def add_illustrations_to_transformers(html_content, illustrations):
     """Add illustrations to transformers_time_series_cheatsheet.html."""
+    # Add transformer prediction after first section
+    pred_pattern1 = r'(</ul>\s*</div>\s*<div class="block">\s*<h2>🔷 2\.)'
+    pred_img = create_img_tag(illustrations['transformer_prediction'], 
+                               'Transformer прогнозирование', '90%')
+    match = re.search(pred_pattern1, html_content)
+    if match:
+        insert_pos = match.start(1)
+        html_content = html_content[:insert_pos] + pred_img + '\n  ' + html_content[insert_pos:]
+    
     # Add attention mechanism visualization
     attention_pattern = r'(<h2>🔷.*?[Вв]ниман.*?</h2>)'
     attention_img = create_img_tag(illustrations['attention_mechanism'], 
@@ -144,15 +161,6 @@ def add_illustrations_to_transformers(html_content, illustrations):
     if match:
         insert_pos = match.end(1)
         html_content = html_content[:insert_pos] + attention_img + html_content[insert_pos:]
-    
-    # Add transformer prediction
-    pred_pattern = r'(</ul>\s*</div>\s*<div class="block">\s*<h2>🔷 2\.)'
-    pred_img = create_img_tag(illustrations['transformer_prediction'], 
-                               'Transformer прогнозирование', '90%')
-    match = re.search(pred_pattern, html_content)
-    if match:
-        insert_pos = match.start(1)
-        html_content = html_content[:insert_pos] + pred_img + '\n  ' + html_content[insert_pos:]
     
     return html_content
 
