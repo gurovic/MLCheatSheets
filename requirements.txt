@@ -1,0 +1,22 @@
+# ML Cheatsheets Project Dependencies
+# Core libraries for working with exercises and examples
+
+# Data manipulation
+pandas>=1.5.0
+numpy>=1.23.0
+
+# Machine Learning
+scikit-learn>=1.2.0
+
+# Visualization (for animations and examples)
+matplotlib>=3.6.0
+seaborn>=0.12.0
+
+# Optional: For advanced exercises
+scipy>=1.10.0
+
+# Optional: For imbalanced data exercises
+imbalanced-learn>=0.10.0
+
+# Optional: For animations (see animations/requirements.txt for more)
+# manim  # Uncomment if you want to create animations
