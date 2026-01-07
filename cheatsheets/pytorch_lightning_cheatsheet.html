@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PyTorch Lightning Cheatsheet — 3 колонки</title>
   <style>
     @media screen {
@@ -10,6 +11,8 @@
         color: #333;
         background: #fafcff;
         padding: 10px;
+      
+        min-width: 900px;
       }
     }
     @media print {
@@ -23,10 +26,29 @@
       }
     }
 
-    .container {
-      column-count: 3;
-      column-gap: 20px;
+        .container {
       max-width: 100%;
+    }
+
+    /* Responsive columns: 3 columns on wide screens, fewer on narrow */
+    @media (min-width: 900px) {
+      .container {
+        column-count: 3;
+        column-gap: 20px;
+      }
+    }
+    
+    @media (min-width: 600px) and (max-width: 899px) {
+      .container {
+        column-count: 2;
+        column-gap: 20px;
+      }
+    }
+    
+    @media (max-width: 599px) {
+      .container {
+        column-count: 1;
+      }
     }
 
     .block {
