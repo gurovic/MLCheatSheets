@@ -112,6 +112,12 @@ def process_html_file(filepath, add_illustrations_func, illustrations):
     """Process a single HTML file to add illustrations."""
     print(f"Processing {filepath}...")
     
+    # Check if file exists
+    import os
+    if not os.path.exists(filepath):
+        print(f"  ✗ File not found: {filepath}")
+        return False
+    
     try:
         with open(filepath, 'r', encoding='utf-8') as f:
             html_content = f.read()

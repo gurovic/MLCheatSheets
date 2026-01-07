@@ -234,8 +234,8 @@ def generate_attention_mechanism():
     attention_weights[1, 2] += 0.8
     attention_weights[1, 5] += 0.7
     
-    # Normalize rows to sum to 1
-    attention_weights = attention_weights / attention_weights.sum(axis=1, keepdims=True)
+    # Normalize rows to sum to 1 (add small epsilon to prevent division by zero)
+    attention_weights = attention_weights / (attention_weights.sum(axis=1, keepdims=True) + 1e-8)
     
     # Plot heatmap
     im = ax.imshow(attention_weights, cmap='YlOrRd', aspect='auto', vmin=0, vmax=0.5)
