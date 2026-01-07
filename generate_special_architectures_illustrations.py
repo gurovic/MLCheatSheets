@@ -27,11 +27,10 @@ plt.rcParams['legend.fontsize'] = 9
 
 def fig_to_base64(fig):
     """Convert matplotlib figure to base64 string."""
-    buf = BytesIO()
-    fig.savefig(buf, format='png', bbox_inches='tight', dpi=300)
-    buf.seek(0)
-    img_base64 = base64.b64encode(buf.read()).decode('utf-8')
-    buf.close()
+    with BytesIO() as buf:
+        fig.savefig(buf, format='png', bbox_inches='tight', dpi=300)
+        buf.seek(0)
+        img_base64 = base64.b64encode(buf.read()).decode('utf-8')
     plt.close(fig)
     return img_base64
 

@@ -140,8 +140,12 @@ def main():
                 print(f"  ✓ Successfully updated {filepath}")
             else:
                 print(f"  ! No changes made to {filepath}")
+        except FileNotFoundError:
+            print(f"  ✗ File not found: {filepath}")
+        except UnicodeDecodeError:
+            print(f"  ✗ Encoding error reading {filepath}")
         except Exception as e:
-            print(f"  ✗ Error: {e}")
+            print(f"  ✗ Unexpected error processing {filepath}: {type(e).__name__}: {e}")
     
     print("\n" + "=" * 70)
     print("Completed")
