@@ -17,7 +17,11 @@ def create_img_tag(base64_data, alt_text, width="100%"):
 '''
 
 def add_illustrations_to_cnn_basics(html_content, illustrations):
-    """Add illustrations to CNN basics cheatsheet."""
+    """Add illustrations to CNN basics cheatsheet.
+    
+    Note: Uses regex patterns for HTML manipulation. While BeautifulSoup would be more robust,
+    regex is sufficient here since we control the HTML structure and patterns are well-defined.
+    """
     
     # Add convolution operation after the main layers section
     conv_pattern = r'(</table>\s*</div>\s*<div class="block">\s*<h2>🔷 3\. Простая CNN \(PyTorch\))'

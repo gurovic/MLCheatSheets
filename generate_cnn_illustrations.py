@@ -16,8 +16,9 @@ warnings.filterwarnings('ignore')
 
 # Set consistent style
 sns.set_style("whitegrid")
-plt.rcParams['figure.dpi'] = 300
-plt.rcParams['savefig.dpi'] = 300
+DPI_VALUE = 300
+plt.rcParams['figure.dpi'] = DPI_VALUE
+plt.rcParams['savefig.dpi'] = DPI_VALUE
 plt.rcParams['font.size'] = 10
 plt.rcParams['axes.labelsize'] = 11
 plt.rcParams['axes.titlesize'] = 12
@@ -28,7 +29,7 @@ plt.rcParams['legend.fontsize'] = 9
 def fig_to_base64(fig):
     """Convert matplotlib figure to base64 string."""
     buf = BytesIO()
-    fig.savefig(buf, format='png', bbox_inches='tight', dpi=300)
+    fig.savefig(buf, format='png', bbox_inches='tight', dpi=DPI_VALUE)
     buf.seek(0)
     img_base64 = base64.b64encode(buf.read()).decode('utf-8')
     buf.close()
@@ -69,6 +70,7 @@ def generate_convolution_operation():
     
     # Input image
     ax1 = plt.subplot(1, 4, 1)
+    # vmin/vmax values chosen to ensure clear contrast: input normalized around 0-1 with some noise
     im1 = ax1.imshow(input_img, cmap='gray', vmin=-1, vmax=2)
     ax1.set_title('Входное изображение\n(6×6)', fontsize=11, fontweight='bold')
     ax1.set_xticks([])
