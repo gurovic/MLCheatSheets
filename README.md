@@ -394,7 +394,7 @@ Computer Vision, NLP, Time Series, Reinforcement Learning
 1. [Ранняя остановка и кривые обучения (Early Stopping)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/early_stopping_cheatsheet.html)
 1. [Регуляризация нейронных сетей (Dropout и др.)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dropout_regularization_cheatsheet.html)
 
-### **2. Сверточные нейронные сети (CNN)**
+### **2. 🎨 Сверточные нейронные сети (CNN)**
 1. [Основы свертки](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_basics_cheatsheet.html)
 1. [Пулинг-слои (Max, Average, Global Pooling)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pooling_layers_cheatsheet.html)
 1. [Архитектуры CNN (LeNet, AlexNet, VGG)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_architectures_cheatsheet.html)
