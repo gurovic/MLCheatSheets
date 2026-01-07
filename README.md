@@ -381,7 +381,7 @@ Computer Vision, NLP, Time Series, Reinforcement Learning
 
 ## II Глубокое обучение
 
-### **1. Основы нейронных сетей**
+### **1. 🎨 Основы нейронных сетей**
 1. [Искусственный нейрон (перцептрон)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/perceptron_cheatsheet.html)
 1. [Архитектура MLP (многослойный перцептрон)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mlp_cheatsheet.html)
 1. [Функции активации (ReLU, Sigmoid, Tanh, Softmax)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/activation_functions_cheatsheet.html)
