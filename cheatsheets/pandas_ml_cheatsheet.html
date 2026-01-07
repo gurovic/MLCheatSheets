@@ -228,7 +228,8 @@ df = pd.read_json('data.json')
 df = pd.read_sql('SELECT * FROM table', conn)
 df = pd.read_parquet('data.parquet')  # быстрый формат</code></pre>
 
-  <div class="block">
+    </div>
+<div class="block">
     <h2>🔷 2. Быстрый анализ данных</h2>
     <pre><code># Первичный осмотр
 df.head()           # первые 5 строк
@@ -563,7 +564,7 @@ df['category'] = np.where(df['score'] > 80, 'high', 'low')</code></pre>
     </blockquote>
   </div>
 
-</div>
+
 
 </div>
 </body>
