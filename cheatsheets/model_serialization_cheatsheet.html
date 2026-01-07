@@ -509,7 +509,7 @@ mlflow.sklearn.log_model(model, "model")
 mlflow.end_run()
 
 # Загрузка модели из MLflow
-model_uri = "runs:/<run_id>/model"
+model_uri = "runs:/&lt;run_id&gt;/model"
 loaded_model = mlflow.sklearn.load_model(model_uri)</code></pre>
   </div>
 
