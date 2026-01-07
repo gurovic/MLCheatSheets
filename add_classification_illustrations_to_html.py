@@ -142,13 +142,13 @@ def add_illustrations_to_logreg(html_content, illustrations):
 def add_illustrations_to_knn(html_content, illustrations):
     """Add illustrations to KNN cheatsheet."""
     # Add KNN illustration showing how it works
-    sutt_pattern = r'(<h2>🔷.*?Суть.*?</h2>)'
-    sutt_img = create_img_tag(illustrations['knn_illustration'], 
+    essence_pattern = r'(<h2>🔷.*?Суть.*?</h2>)'
+    essence_img = create_img_tag(illustrations['knn_illustration'], 
                              'Принцип работы KNN', '90%')
-    match = re.search(sutt_pattern, html_content, re.DOTALL)
+    match = re.search(essence_pattern, html_content, re.DOTALL)
     if match:
         insert_pos = match.end(1)
-        html_content = html_content[:insert_pos] + sutt_img + html_content[insert_pos:]
+        html_content = html_content[:insert_pos] + essence_img + html_content[insert_pos:]
     
     # Add decision boundary comparison for different K values
     k_pattern = r'(<h2>🔷.*?[Вв]ыбор.*?K.*?</h2>|<h2>🔷.*?[Пп]араметр.*?K.*?</h2>)'

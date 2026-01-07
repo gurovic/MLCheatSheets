@@ -17,6 +17,7 @@ from sklearn.datasets import make_classification, make_moons, make_circles
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import accuracy_score
+from scipy.stats import norm
 import base64
 from io import BytesIO
 import warnings
@@ -558,7 +559,6 @@ def generate_naive_bayes_distributions():
     axes[0].hist(X_class1[:, 0], bins=20, alpha=0.6, label='Класс 1', color='red', density=True)
     
     # Overlay Gaussian fits
-    x_range = np.linspace(X[:, 0].min(), X[:, 0].max(), 100)
     from scipy.stats import norm
     axes[0].plot(x_range, norm.pdf(x_range, X_class0[:, 0].mean(), X_class0[:, 0].std()),
                 'b-', linewidth=2, label='N(μ₀, σ₀)')
