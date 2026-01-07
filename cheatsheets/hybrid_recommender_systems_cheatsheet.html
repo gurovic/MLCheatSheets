@@ -152,30 +152,32 @@
     <h2>🔷 1. Суть гибридных систем</h2>
     <p><strong>Комбинирование разных методов рекомендаций для улучшения качества</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для суть гибридных систем</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Комбинация подходов</strong>:  CF + Content-based + Knowledge-based</li>
+      <li><strong>Цель</strong>:  преодолеть ограничения отдельных методов</li>
+      <li><strong>Холодный старт</strong>:  помощь новым пользователям/товарам</li>
+      <li><strong>Data sparsity</strong>:  борьба с разреженностью данных</li>
+      <li><strong>Улучшение точности</strong>:  синергия разных алгоритмов</li>
+      <li><strong>Разнообразие</strong>:  больше вариантов рекомендаций</li>
+
     </ul>
     <blockquote>
-      💡 Суть гибридных систем — важный аспект для понимания темы
+      💡 Гибридные системы достигают лучших результатов, чем single-approach методы
     </blockquote>
 
   <div class="block">
     <h2>🔷 2. Типы гибридизации</h2>
     <p><strong>Weighted, Switching, Mixed, Feature combination, Cascade, Feature augmentation, Meta-level</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для типы гибридизации</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Weighted</strong>:  взвешенное комбинирование скоров</li>
+      <li><strong>Switching</strong>:  выбор метода в зависимости от ситуации</li>
+      <li><strong>Mixed</strong>:  параллельные рекомендации от разных методов</li>
+      <li><strong>Feature Combination</strong>:  объединение признаков в одну модель</li>
+      <li><strong>Cascade</strong>:  последовательная фильтрация</li>
+      <li><strong>Meta-level</strong>:  выход одного метода как вход другого</li>
+
     </ul>
     <blockquote>
-      💡 Типы гибридизации — важный аспект для понимания темы
+      💡 Выбор типа гибридизации зависит от данных и бизнес-задачи
     </blockquote>
   </div>
 
@@ -183,59 +185,51 @@
     <h2>🔷 3. Weighted Hybrid</h2>
     <p><strong>Взвешенное объединение оценок разных моделей</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для weighted hybrid</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Формула</strong>:  score = w₁·CF_score + w₂·CB_score + w₃·KB_score</li>
+      <li><strong>Веса</strong>:  подбираются на валидации или через обучение</li>
+      <li><strong>Простота</strong>:  легко реализовать и настроить</li>
+      <li><strong>Гибкость</strong>:  можно динамически менять веса</li>
+      <li><strong>Недостаток</strong>:  требуется нормализация скоров</li>
+      <li><strong>Применение</strong>:  Netflix, Amazon</li>
+
     </ul>
     <blockquote>
-      💡 Weighted Hybrid — важный аспект для понимания темы
+      💡 Weighted hybrid — самый простой и популярный подход
     </blockquote>
-    <pre><code># Пример кода
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
+    <pre><code>import pandas as pd
+from surprise import SVD, KNNBasic, Dataset, Reader
 
-# Загрузка данных
-data = pd.read_csv('data.csv')
-X = data.drop('target', axis=1)
-y = data['target']
+# Weighted Hybrid
+cf_model = SVD(n_factors=50)
+cb_model = KNNBasic(sim_options={'user_based': False})
 
-# Разделение на train/test
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+# Веса (подобраны на валидации)
+w_cf, w_cb = 0.7, 0.3
 
-# Обучение модели
-from sklearn.ensemble import RandomForestClassifier
+def hybrid_predict(user_id, item_id):
+    cf_pred = cf_model.predict(user_id, item_id).est
+    cb_pred = cb_model.predict(user_id, item_id).est
+    return w_cf * cf_pred + w_cb * cb_pred
 
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
-
-# Оценка
-from sklearn.metrics import accuracy_score, classification_report
-
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy:.3f}")
-print(classification_report(y_test, y_pred))</code></pre>
+# Рекомендации
+score = hybrid_predict(user_id=123, item_id=456)
+print(f"Hybrid score: {score:.2f}")</code></pre>
   </div>
 
   <div class="block">
     <h2>🔷 4. Switching Hybrid</h2>
     <p><strong>Выбор модели в зависимости от ситуации (холодный старт, достаточно данных)</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для switching hybrid</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Идея</strong>:  выбор метода на основе ситуации или confidence</li>
+      <li><strong>Новый пользователь</strong>:  используем content-based</li>
+      <li><strong>Есть история</strong>:  переключаемся на collaborative filtering</li>
+      <li><strong>Критерий переключения</strong>:  количество рейтингов, confidence</li>
+      <li><strong>Преимущество</strong>:  использует сильные стороны каждого метода</li>
+      <li><strong>Недостаток</strong>:  нужны критерии переключения</li>
+
     </ul>
     <blockquote>
-      💡 Switching Hybrid — важный аспект для понимания темы
+      💡 Switching адаптируется к доступности данных для каждого пользователя
     </blockquote>
   </div>
 
@@ -243,15 +237,16 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 5. Mixed Hybrid</h2>
     <p><strong>Одновременное представление рекомендаций от разных моделей</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для mixed hybrid</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Идея</strong>:  показываем рекомендации от разных методов одновременно</li>
+      <li><strong>Разнообразие</strong>:  пользователь видит разные типы рекомендаций</li>
+      <li><strong>Интерфейс</strong>:  раздельные списки или перемешанные</li>
+      <li><strong>Преимущество</strong>:  максимальное покрытие</li>
+      <li><strong>Недостаток</strong>:  сложнее ранжировать</li>
+      <li><strong>Пример</strong>:  Amazon показывает "похожие" и "часто покупают вместе"</li>
+
     </ul>
     <blockquote>
-      💡 Mixed Hybrid — важный аспект для понимания темы
+      💡 Mixed подход максимизирует serendipity и разнообразие
     </blockquote>
   </div>
 
@@ -259,59 +254,61 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 6. Feature Combination</h2>
     <p><strong>Использование выходов одной модели как входов для другой</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для feature combination</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Идея</strong>:  объединить признаки CF и CB в единую модель</li>
+      <li><strong>CF features</strong>:  user/item embeddings, similarity scores</li>
+      <li><strong>CB features</strong>:  content attributes, metadata</li>
+      <li><strong>Model</strong>:  gradient boosting, neural network</li>
+      <li><strong>Преимущество</strong>:  модель сама выучит важность признаков</li>
+      <li><strong>Применение</strong>:  широко используется в modern RecSys</li>
+
     </ul>
     <blockquote>
-      💡 Feature Combination — важный аспект для понимания темы
+      💡 Feature combination естественно интегрирует разные источники информации
     </blockquote>
-    <pre><code># Пример кода
+    <pre><code>from sklearn.ensemble import GradientBoostingRegressor
 import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
 
-# Загрузка данных
-data = pd.read_csv('data.csv')
-X = data.drop('target', axis=1)
-y = data['target']
+# Feature Combination Hybrid
+# Объединяем CF embeddings + content features
 
-# Разделение на train/test
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+# CF embeddings (from matrix factorization)
+user_emb = user_embeddings[user_id]  # shape: (50,)
+item_emb = item_embeddings[item_id]  # shape: (50,)
 
-# Обучение модели
-from sklearn.ensemble import RandomForestClassifier
+# Content features
+content_features = item_metadata[item_id]  # genre, year, etc.
 
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
+# Combine features
+features = np.concatenate([
+    user_emb,
+    item_emb,
+    user_emb * item_emb,  # interaction
+    content_features
+])
 
-# Оценка
-from sklearn.metrics import accuracy_score, classification_report
+# ML model
+model = GradientBoostingRegressor(n_estimators=100)
+model.fit(X_train_combined, y_train)
 
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy:.3f}")
-print(classification_report(y_test, y_pred))</code></pre>
+# Предсказание
+rating = model.predict([features])[0]
+print(f"Predicted rating: {rating:.2f}")</code></pre>
   </div>
 
   <div class="block">
     <h2>🔷 7. Cascade Hybrid</h2>
     <p><strong>Последовательное применение моделей с уточнением</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для cascade hybrid</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Идея</strong>:  последовательная фильтрация рекомендаций</li>
+      <li><strong>Этап 1</strong>:  грубая фильтрация (быстрый метод)</li>
+      <li><strong>Этап 2</strong>:  точная фильтрация (медленный, но точный)</li>
+      <li><strong>Пример</strong>:  CF отбирает 1000 кандидатов → CB выбирает топ-10</li>
+      <li><strong>Эффективность</strong>:  снижает вычислительную сложность</li>
+      <li><strong>Недостаток</strong>:  ошибки на ранних этапах не исправляются</li>
+
     </ul>
     <blockquote>
-      💡 Cascade Hybrid — важный аспект для понимания темы
+      💡 Cascade оптимизирует trade-off между скоростью и качеством
     </blockquote>
   </div>
 
@@ -319,15 +316,16 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 8. Meta-level Hybrid</h2>
     <p><strong>Модель обучается на выходах других моделей</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для meta-level hybrid</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Идея</strong>:  выход одной модели как признак для другой</li>
+      <li><strong>Пример</strong>:  CB создает профиль пользователя → CF использует его</li>
+      <li><strong>Learned features</strong>:  латентные представления из одного метода</li>
+      <li><strong>Глубокая интеграция</strong>:  тесная связь между методами</li>
+      <li><strong>Сложность</strong>:  труднее реализовать и отладить</li>
+      <li><strong>Преимущество</strong>:  максимальная синергия</li>
+
     </ul>
     <blockquote>
-      💡 Meta-level Hybrid — важный аспект для понимания темы
+      💡 Meta-level — наиболее глубокая форма интеграции методов
     </blockquote>
   </div>
 
@@ -335,59 +333,63 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 9. Практическая реализация</h2>
     <p><strong>Примеры кода на Python</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для практическая реализация</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Начать с Weighted</strong>:  простота и быстрый результат</li>
+      <li><strong>A/B тестирование</strong>:  сравнение с базовыми методами</li>
+      <li><strong>Оптимизация весов</strong>:  grid search, Bayesian optimization</li>
+      <li><strong>Feature engineering</strong>:  создание качественных признаков</li>
+      <li><strong>Monitoring</strong>:  отслеживание метрик в продакшене</li>
+      <li><strong>Инкрементальное улучшение</strong>:  постепенное усложнение</li>
+
     </ul>
     <blockquote>
-      💡 Практическая реализация — важный аспект для понимания темы
+      💡 Начинайте просто, усложняйте постепенно на основе метрик
     </blockquote>
-    <pre><code># Пример кода
-import numpy as np
-import pandas as pd
-from sklearn.model_selection import train_test_split
+    <pre><code># Cascade Hybrid: CF → Content-based refinement
+from surprise import SVD
 
-# Загрузка данных
-data = pd.read_csv('data.csv')
-X = data.drop('target', axis=1)
-y = data['target']
+# Stage 1: CF generates candidates
+cf_model = SVD(n_factors=100)
+cf_model.fit(trainset)
 
-# Разделение на train/test
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+# Get top 100 candidates
+candidates = []
+for item_id in all_items:
+    score = cf_model.predict(user_id, item_id).est
+    candidates.append((item_id, score))
 
-# Обучение модели
-from sklearn.ensemble import RandomForestClassifier
+top_candidates = sorted(candidates, key=lambda x: x[1], reverse=True)[:100]
 
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
+# Stage 2: Content-based re-ranking
+from sklearn.metrics.pairwise import cosine_similarity
 
-# Оценка
-from sklearn.metrics import accuracy_score, classification_report
+user_profile = get_user_profile(user_id)  # from past interactions
+item_features = get_item_features(top_candidates)
 
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"Accuracy: {accuracy:.3f}")
-print(classification_report(y_test, y_pred))</code></pre>
+# Content similarity
+similarities = cosine_similarity([user_profile], item_features)[0]
+
+# Final ranking
+final_scores = [(cand[0], 0.6*cand[1] + 0.4*sim) 
+                for cand, sim in zip(top_candidates, similarities)]
+recommendations = sorted(final_scores, key=lambda x: x[1], reverse=True)[:10]
+
+print(recommendations)</code></pre>
   </div>
 
   <div class="block">
     <h2>🔷 10. Netflix Prize</h2>
     <p><strong>Знаменитый пример успешной гибридной системы</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для netflix prize</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>2006-2009</strong>:  конкурс Netflix на $1M</li>
+      <li><strong>Задача</strong>:  улучшить RMSE на 10%</li>
+      <li><strong>Победитель</strong>:  ансамбль из 100+ моделей</li>
+      <li><strong>Гибридизация</strong>:  ключ к победе</li>
+      <li><strong>Blend</strong>:  взвешенное комбинирование предсказаний</li>
+      <li><strong>Урок</strong>:  гибридные подходы превосходят single models</li>
+
     </ul>
     <blockquote>
-      💡 Netflix Prize — важный аспект для понимания темы
+      💡 Netflix Prize доказал эффективность гибридных recommender систем
     </blockquote>
   </div>
 
@@ -395,15 +397,16 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 11. Выбор стратегии</h2>
     <p><strong>Когда использовать каждый тип гибридизации</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для выбор стратегии</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Холодный старт</strong>:  Feature Combination или Switching</li>
+      <li><strong>Много данных</strong>:  Weighted или Cascade</li>
+      <li><strong>Разнообразие важно</strong>:  Mixed</li>
+      <li><strong>Вычислительные ресурсы</strong>:  Cascade для масштаба</li>
+      <li><strong>Accuracy critical</strong>:  Meta-level или Feature Combination</li>
+      <li><strong>Простота поддержки</strong>:  Weighted</li>
+
     </ul>
     <blockquote>
-      💡 Выбор стратегии — важный аспект для понимания темы
+      💡 Нет универсального решения — выбор зависит от контекста и ограничений
     </blockquote>
   </div>
 
@@ -411,15 +414,16 @@ print(classification_report(y_test, y_pred))</code></pre>
     <h2>🔷 12. Метрики и оценка</h2>
     <p><strong>Как оценивать гибридные системы</strong></p>
     <ul>
-      <li><strong>Ключевая концепция</strong>: детали и примеры для метрики и оценка</li>
-      <li><strong>Применение</strong>: практическое использование в реальных задачах</li>
-      <li><strong>Инструменты</strong>: библиотеки и фреймворки</li>
-      <li><strong>Best practices</strong>: рекомендации экспертов</li>
-      <li><strong>Типичные ошибки</strong>: чего следует избегать</li>
-      <li><strong>Метрики</strong>: как измерять эффективность</li>
+            <li><strong>Accuracy</strong>:  RMSE, MAE, precision@k, recall@k</li>
+      <li><strong>Diversity</strong>:  intra-list diversity, coverage</li>
+      <li><strong>Novelty</strong>:  рекомендации неочевидных товаров</li>
+      <li><strong>Serendipity</strong>:  приятные неожиданные открытия</li>
+      <li><strong>Business metrics</strong>:  CTR, conversion rate, revenue</li>
+      <li><strong>A/B testing</strong>:  online эксперименты для валидации</li>
+
     </ul>
     <blockquote>
-      💡 Метрики и оценка — важный аспект для понимания темы
+      💡 Оценивайте гибридную систему по множеству метрик, не только accuracy
     </blockquote>
     <pre><code># Пример кода
 import numpy as np
