@@ -406,6 +406,8 @@ print(nb.class_prior_)  # P(y)</code></pre>
 
 </div>
 
+</div>
+
   <div class="block">
     <h2>🔷 12. Ограничения</h2>
     <p><strong>Наивное предположение независимости, выбор prior</strong></p>
@@ -442,7 +444,6 @@ gnb_incremental = GaussianNB()
 for i in range(0, len(X), 100):
     gnb_incremental.partial_fit(X[i:i+100], y[i:i+100], 
                                  classes=np.unique(y))</code></pre>
-  </div>
 
 </body>
 </html>

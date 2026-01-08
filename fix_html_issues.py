@@ -14,7 +14,7 @@ import hashlib
 
 
 def fix_consecutive_duplicate_images(html_content):
-    """Remove images that appear twice in a row."""
+    """Remove images that appear twice in a row (even with div wrappers between them)."""
     # Find all img tags with their positions
     img_pattern = r'<img[^>]*>'
     matches = list(re.finditer(img_pattern, html_content))
@@ -22,28 +22,44 @@ def fix_consecutive_duplicate_images(html_content):
     if not matches:
         return html_content
     
-    # Identify positions of duplicates to remove
-    positions_to_remove = []
+    # Identify div wrappers with duplicate images to remove
+    divs_to_remove = []
     prev_img = None
-    prev_end = 0
+    prev_match_idx = -1
     
     for i, match in enumerate(matches):
         current_img = match.group()
-        current_start = match.start()
         
-        # Check if there's only whitespace between previous and current
-        if prev_img is not None:
-            between = html_content[prev_end:current_start].strip()
-            if between == '' and current_img == prev_img:
-                # This is a consecutive duplicate
-                positions_to_remove.append((prev_end, match.end()))
-                print(f"  Removing consecutive duplicate image: {current_img[:80]}...")
+        if prev_img is not None and current_img == prev_img:
+            # Found a duplicate image
+            # Look for the div wrapper around this duplicate
+            # Pattern: <div...>...img...</div>
+            
+            # Find the opening div before this image
+            search_start = max(0, match.start() - 500)  # Look back up to 500 chars
+            before_img = html_content[search_start:match.start()]
+            
+            # Find last <div before the image
+            div_matches = list(re.finditer(r'<div[^>]*>', before_img))
+            if div_matches:
+                last_div_start = search_start + div_matches[-1].start()
+                
+                # Find the closing </div> after the image
+                after_img = html_content[match.end():match.end() + 100]
+                close_div_match = re.search(r'</div>', after_img)
+                if close_div_match:
+                    close_div_end = match.end() + close_div_match.end()
+                    
+                    # This is the range to remove (the entire div wrapper with duplicate image)
+                    divs_to_remove.append((last_div_start, close_div_end))
+                    print(f"  Removing duplicate image wrapper: {current_img[:80]}...")
         
         prev_img = current_img
-        prev_end = match.end()
+        prev_match_idx = i
     
-    # Remove duplicates in reverse order to maintain positions
-    for start, end in reversed(positions_to_remove):
+    # Remove divs in reverse order to maintain positions
+    for start, end in reversed(divs_to_remove):
+        # Also remove any extra newlines
         html_content = html_content[:start] + html_content[end:]
     
     return html_content
