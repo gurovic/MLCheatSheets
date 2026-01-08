@@ -49,27 +49,27 @@ def add_illustrations_to_bayesian_neural_networks(html_content, illustrations):
     """Add illustrations to Bayesian Neural Networks cheatsheet."""
     
     # Add uncertainty comparison after section 2 "Обычные NN vs Байесовские"
-    pattern1 = r'(</table></div><div class="block"><h2>🔷 3\. Математическая основа</h2>)'
+    pattern1 = r'(</table>\s*</div>)(\s*<div class="block">\s*<h2>🔷 3\. Математическая основа</h2>)'
     img1 = create_img_tag(illustrations['bnn_uncertainty'], 
                          'Сравнение: обычная NN vs Байесовская NN', '100%')
     html_content = re.sub(pattern1, 
-                         r'</table></div>\n' + img1 + r'\n<div class="block"><h2>🔷 3. Математическая основа</h2>', 
+                         r'\1\n' + img1 + r'\2', 
                          html_content, count=1)
     
     # Add weight distributions after section 4 "Variational Inference"
-    pattern2 = r'(↑ data fit\s+↑ regularization</code></pre></div>)'
+    pattern2 = r'(↑ data fit\s+↑ regularization</code></pre>\s*</div>)'
     img2 = create_img_tag(illustrations['bnn_weights'], 
                          'Распределения весов в Байесовских нейронных сетях', '95%')
     html_content = re.sub(pattern2, 
-                         r'\1' + '\n' + img2, 
+                         r'\1\n' + img2, 
                          html_content, count=1)
     
-    # Add prediction samples after section 6 "Предсказание с uncertainty"
-    pattern3 = r'(# Среднее и std</code></pre></div>)'
+    # Add prediction samples after section 6 "MC Dropout"
+    pattern3 = r'(print\(f"Prediction: \{y_mean\[0\]:.2f\} ± \{y_std\[0\]:.2f\}"\)</code></pre>\s*</div>)'
     img3 = create_img_tag(illustrations['bnn_samples'], 
                          'Множественные предсказания Байесовской NN', '95%')
     html_content = re.sub(pattern3, 
-                         r'\1' + '\n' + img3, 
+                         r'\1\n' + img3, 
                          html_content, count=1)
     
     return html_content
@@ -114,20 +114,20 @@ def add_illustrations_to_gaussian_processes(html_content, illustrations):
                          r'\1\n' + img1, 
                          html_content, count=1)
     
-    # Add kernels comparison after kernel section table
-    pattern2 = r'(</table>\s*</div>\s*<div class="block">\s*<h2>🔷 4\. Композиции kernels</h2>)'
+    # Add kernels comparison after section 3 kernel functions
+    pattern2 = r'(white = WhiteKernel\(noise_level=0\.1\)</code></pre>\s*</div>)'
     img2 = create_img_tag(illustrations['gp_kernels'], 
                          'Различные Kernel Functions в Gaussian Processes', '100%')
     html_content = re.sub(pattern2, 
-                         r'</table>\n  </div>\n' + img2 + r'\n  <div class="block">\n    <h2>🔷 4. Композиции kernels</h2>', 
+                         r'\1\n' + img2, 
                          html_content, count=1)
     
-    # Add hyperparameters effect after hyperparameters section
-    pattern3 = r'(print\(gp\.kernel_\)</code></pre>\s*</div>\s*<div class="block">\s*<h2>🔷 6\. GP для классификации</h2>)'
+    # Add hyperparameters effect after hyperparameters section 5
+    pattern3 = r'(print\(f"\{kernel\}: MSE = \{-scores\.mean\(\):.4f\} ± \{scores\.std\(\):.4f\}"\)</code></pre>\s*</div>)'
     img3 = create_img_tag(illustrations['gp_hyperparams'], 
                          'Влияние Length Scale на Gaussian Process', '95%')
     html_content = re.sub(pattern3, 
-                         r'print(gp.kernel_)</code></pre>\n  </div>\n' + img3 + r'\n  <div class="block">\n    <h2>🔷 6. GP для классификации</h2>', 
+                         r'\1\n' + img3, 
                          html_content, count=1)
     
     return html_content
