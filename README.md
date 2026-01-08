@@ -51,8 +51,8 @@ pip install -r animations/requirements.txt
 * 📘 [I. Классическое машинное обучение](#i-классическое-машинное-обучение) (32 раздела, 250+ cheatsheets)
 * 🧠 [II. Глубокое обучение](#ii-глубокое-обучение) (27 разделов, 200+ cheatsheets)
 * 🔬 [III. Разные темы машинного обучения](#iii-разные-темы-машинного-обучения) (6 разделов, 50+ cheatsheets)
-* 💪 [Практические упражнения](exercises.md) (8 упражнений с решениями)
-* 🎥 [Анимации и визуализации](animations/README.md)
+* 💪 EXPERIMENTAL [Практические упражнения](exercises.md) (8 упражнений с решениями)
+* 🎥 EXPERIMENTAL [Анимации и визуализации](animations/README.md)
 
 ## 🗺️ Рекомендуемые пути обучения
 
@@ -88,7 +88,7 @@ Computer Vision, NLP, Time Series, Reinforcement Learning
 1. [Снижение размерности (Dimensionality Reduction)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dimensionality_reduction_cheatsheet.html)
 1. [Балансировка классов (Imbalanced Data)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/imbalanced_data_cheatsheet.html)
 
-### **2. Классификация**
+### **2. 🎨 Классификация**
 1. [Логистическая регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/logreg_cheatsheet.html)
 1. [Метод опорных векторов (SVM)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/svm_cheatsheet.html)
 1. [Наивный Байес (Naive Bayes)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/naive_bayes_cheatsheet.html)
@@ -97,7 +97,7 @@ Computer Vision, NLP, Time Series, Reinforcement Learning
 1. [Случайный лес для классификации](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/random_forest_cheatsheet.html)
 1. [Ансамбли методов (Voting, Stacking)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ensemble_methods_cheatsheet.html)
 
-### **3. Регрессия**
+### **3. 🎨 Регрессия**
 1. [Линейная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/linreg_cheatsheet.html)
 1. [Полиномиальная регрессия](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/polynomial_regression_cheatsheet.html)
 1. [Ридж, Лассо, ElasticNet](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/ridge_lasso_elasticnet_cheatsheet.html)
@@ -381,7 +381,7 @@ Computer Vision, NLP, Time Series, Reinforcement Learning
 
 ## II Глубокое обучение
 
-### **1. Основы нейронных сетей**
+### **1. 🎨 Основы нейронных сетей**
 1. [Искусственный нейрон (перцептрон)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/perceptron_cheatsheet.html)
 1. [Архитектура MLP (многослойный перцептрон)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/mlp_cheatsheet.html)
 1. [Функции активации (ReLU, Sigmoid, Tanh, Softmax)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/activation_functions_cheatsheet.html)
@@ -394,7 +394,7 @@ Computer Vision, NLP, Time Series, Reinforcement Learning
 1. [Ранняя остановка и кривые обучения (Early Stopping)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/early_stopping_cheatsheet.html)
 1. [Регуляризация нейронных сетей (Dropout и др.)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/dropout_regularization_cheatsheet.html)
 
-### **2. Сверточные нейронные сети (CNN)**
+### **2. 🎨 Сверточные нейронные сети (CNN)**
 1. [Основы свертки](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_basics_cheatsheet.html)
 1. [Пулинг-слои (Max, Average, Global Pooling)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/pooling_layers_cheatsheet.html)
 1. [Архитектуры CNN (LeNet, AlexNet, VGG)](https://html-preview.github.io/?url=https://github.com/gurovic/MLCheatSheets/blob/main/cheatsheets/cnn_architectures_cheatsheet.html)
