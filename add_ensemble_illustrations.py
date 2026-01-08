@@ -4,14 +4,18 @@ Add matplotlib illustrations to ensemble cheatsheet HTML files.
 """
 
 import re
+import html
+import traceback
 from generate_ensemble_illustrations import generate_all_illustrations
 
 def create_img_tag(base64_data, alt_text, width="100%"):
     """Create HTML img tag with base64 encoded image."""
+    # Sanitize alt_text to prevent XSS
+    safe_alt_text = html.escape(alt_text)
     return f'''
     <div style="text-align: center; margin: 10px 0;">
       <img src="data:image/png;base64,{base64_data}" 
-           alt="{alt_text}" 
+           alt="{safe_alt_text}" 
            style="max-width: {width}; height: auto; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
     </div>
 '''
@@ -219,7 +223,6 @@ def process_html_file(filepath, add_illustrations_func, illustrations):
         return True
     except Exception as e:
         print(f"  ✗ Error processing {filepath}: {e}")
-        import traceback
         traceback.print_exc()
         return False
 

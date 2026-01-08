@@ -9,9 +9,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.ensemble import (
     RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier,
-    BaggingClassifier, VotingClassifier
+    BaggingClassifier, VotingClassifier, GradientBoostingRegressor
 )
-from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor, plot_tree
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.datasets import make_classification, make_moons
@@ -511,8 +511,6 @@ def generate_gradient_boosting_residuals():
     fig, axes = plt.subplots(2, 2, figsize=(12, 10))
     axes = axes.ravel()
     
-    from sklearn.tree import DecisionTreeRegressor
-    
     # Initial prediction (mean)
     y_pred = np.full_like(y, y.mean())
     
@@ -651,11 +649,7 @@ def generate_learning_rate_effect():
     axes = axes.ravel()
     
     for idx, lr in enumerate(learning_rates):
-        gb = GradientBoostingClassifier(n_estimators=50, learning_rate=lr, 
-                                        max_depth=3, random_state=42)
-        
-        # For visualization, use regression
-        from sklearn.ensemble import GradientBoostingRegressor
+        # Use regression for visualization
         gb_reg = GradientBoostingRegressor(n_estimators=50, learning_rate=lr,
                                           max_depth=2, random_state=42)
         gb_reg.fit(X, y)
