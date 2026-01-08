@@ -807,29 +807,32 @@ def generate_all_illustrations():
     
     illustrations = {}
     
-    print("  - Transfer Learning Concepts...")
-    illustrations['tl_concept'] = generate_transfer_learning_concept()
-    illustrations['tl_types'] = generate_transfer_learning_types()
-    illustrations['domain_shift'] = generate_domain_shift()
+    # Define all illustration generators
+    generators = [
+        ('tl_concept', generate_transfer_learning_concept, "Transfer Learning Concepts"),
+        ('tl_types', generate_transfer_learning_types, "Transfer Learning Types"),
+        ('domain_shift', generate_domain_shift, "Domain Shift"),
+        ('da_methods', generate_domain_adaptation_methods, "Domain Adaptation Methods"),
+        ('mmd', generate_mmd_illustration, "MMD"),
+        ('cnn_architecture', generate_cnn_transfer_architecture, "CNN Architecture"),
+        ('finetuning_strategies', generate_finetuning_strategies, "Fine-tuning Strategies"),
+        ('learning_rate_schedule', generate_learning_rate_schedule, "Learning Rate Schedule"),
+        ('transfer_vs_scratch', generate_transfer_vs_scratch, "Transfer vs Scratch"),
+        ('negative_transfer', generate_negative_transfer, "Negative Transfer"),
+        ('tradaboost', generate_tradaboost_process, "TrAdaBoost"),
+        ('self_training', generate_self_training, "Self-training")
+    ]
     
-    print("  - Domain Adaptation...")
-    illustrations['da_methods'] = generate_domain_adaptation_methods()
-    illustrations['mmd'] = generate_mmd_illustration()
+    # Generate each illustration with error handling
+    for key, generator_func, description in generators:
+        try:
+            print(f"  - {description}...")
+            illustrations[key] = generator_func()
+        except Exception as e:
+            print(f"  ✗ Error generating {description}: {e}")
+            continue
     
-    print("  - CNN Transfer Learning...")
-    illustrations['cnn_architecture'] = generate_cnn_transfer_architecture()
-    illustrations['finetuning_strategies'] = generate_finetuning_strategies()
-    illustrations['learning_rate_schedule'] = generate_learning_rate_schedule()
-    
-    print("  - Performance Comparisons...")
-    illustrations['transfer_vs_scratch'] = generate_transfer_vs_scratch()
-    illustrations['negative_transfer'] = generate_negative_transfer()
-    
-    print("  - Algorithms...")
-    illustrations['tradaboost'] = generate_tradaboost_process()
-    illustrations['self_training'] = generate_self_training()
-    
-    print("✓ All illustrations generated successfully!")
+    print(f"✓ Generated {len(illustrations)} illustrations successfully!")
     return illustrations
 
 if __name__ == '__main__':

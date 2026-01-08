@@ -105,7 +105,6 @@ python3 add_transfer_learning_illustrations_to_html.py
 - Python 3.6+
 - matplotlib
 - numpy
-- BeautifulSoup4 (для HTML-парсинга)
 
 ## Примечания
 

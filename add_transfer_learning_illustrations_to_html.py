@@ -4,6 +4,7 @@ Add matplotlib illustrations to transfer learning cheatsheet HTML files.
 """
 
 import re
+import traceback
 from generate_transfer_learning_illustrations import generate_all_illustrations
 
 def create_img_tag(base64_data, alt_text, width="100%"):
@@ -213,7 +214,8 @@ def add_illustrations_to_domain_adaptation(html_content, illustrations):
     for pattern in methods_patterns:
         match = re.search(pattern, html_content, re.DOTALL | re.IGNORECASE)
         if match:
-            insert_pos = match.end(1) if len(match.groups()) > 0 else match.end()
+            # Use the end of the first captured group if it exists, otherwise use match end
+            insert_pos = match.end(1) if match.lastindex and match.lastindex >= 1 else match.end()
             html_content = html_content[:insert_pos] + methods_img + html_content[insert_pos:]
             break
     
@@ -255,7 +257,6 @@ def process_html_file(filepath, add_illustrations_func, illustrations):
         return True
     except Exception as e:
         print(f"  ✗ Error processing {filepath}: {e}")
-        import traceback
         traceback.print_exc()
         return False
 
