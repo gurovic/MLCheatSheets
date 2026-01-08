@@ -18,5 +18,8 @@ scipy>=1.10.0
 # Optional: For imbalanced data exercises
 imbalanced-learn>=0.10.0
 
+# Optional: For UMAP dimensionality reduction
+umap-learn>=0.5.0
+
 # Optional: For animations (see animations/requirements.txt for more)
 # manim  # Uncomment if you want to create animations
