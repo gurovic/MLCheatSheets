@@ -4,15 +4,17 @@ Generate matplotlib illustrations for Computer Vision cheatsheets.
 This script creates high-quality visualizations and encodes them as base64 for inline HTML embedding.
 """
 
+import base64
+import warnings
+from io import BytesIO
+
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.patches import Rectangle, FancyBboxPatch, Circle, Polygon, FancyArrowPatch
 from matplotlib.colors import LinearSegmentedColormap
-import base64
-from io import BytesIO
 from scipy import integrate, ndimage
-import warnings
+
 warnings.filterwarnings('ignore')
 
 # Set consistent style
