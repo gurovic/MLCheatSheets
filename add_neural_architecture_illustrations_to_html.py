@@ -270,11 +270,18 @@ def main():
         ('cheatsheets/transformers_cheatsheet.html', add_illustrations_to_transformers),
         ('cheatsheets/attention_mechanism_cheatsheet.html', add_illustrations_to_attention_mechanism),
         ('cheatsheets/multi_head_attention_cheatsheet.html', add_illustrations_to_multi_head_attention),
+        ('cheatsheets/self_attention_cheatsheet.html', add_illustrations_to_self_attention),
+        ('cheatsheets/encoder_decoder_cheatsheet.html', add_illustrations_to_encoder_decoder),
         ('cheatsheets/autoencoders_cheatsheet.html', add_illustrations_to_autoencoders),
         ('cheatsheets/vae_cheatsheet.html', add_illustrations_to_vae),
         ('cheatsheets/gan_cheatsheet.html', add_illustrations_to_gan),
+        ('cheatsheets/dcgan_conditional_gan_cheatsheet.html', add_illustrations_to_dcgan_conditional_gan),
+        ('cheatsheets/stylegan_architecture_cheatsheet.html', add_illustrations_to_stylegan_architecture),
         ('cheatsheets/diffusion_models_cheatsheet.html', add_illustrations_to_diffusion_models),
         ('cheatsheets/capsule_networks_cheatsheet.html', add_illustrations_to_capsule_networks),
+        ('cheatsheets/gpt_architectures_cheatsheet.html', add_illustrations_to_gpt_architectures),
+        ('cheatsheets/bert_language_models_cheatsheet.html', add_illustrations_to_bert_language_models),
+        ('cheatsheets/neural_architecture_patterns_cheatsheet.html', add_illustrations_to_neural_architecture_patterns),
     ]
     
     success_count = 0
@@ -288,3 +295,94 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+def add_illustrations_to_gpt_architectures(html_content, illustrations):
+    """Add illustrations to GPT Architectures cheatsheet."""
+    
+    # Add GPT architecture
+    gpt_pattern = r'(<div class="block"><h2>🔷 1\. GPT: основы</h2>.*?</div>)'
+    gpt_img = create_img_tag(illustrations['gpt_architecture'], 
+                             'GPT Architecture', '95%')
+    html_content = re.sub(gpt_pattern, 
+                         r'\1\n' + gpt_img, 
+                         html_content, count=1, flags=re.DOTALL)
+    
+    return html_content
+
+def add_illustrations_to_bert_language_models(html_content, illustrations):
+    """Add illustrations to BERT Language Models cheatsheet."""
+    
+    # Add BERT architecture
+    bert_pattern = r'(<div class="block"><h2>🔷 1\. BERT: основы</h2>.*?</div>)'
+    bert_img = create_img_tag(illustrations['bert_architecture'], 
+                              'BERT Architecture', '95%')
+    html_content = re.sub(bert_pattern, 
+                         r'\1\n' + bert_img, 
+                         html_content, count=1, flags=re.DOTALL)
+    
+    return html_content
+
+def add_illustrations_to_self_attention(html_content, illustrations):
+    """Add illustrations to Self-Attention cheatsheet."""
+    
+    # Add self-attention visualization
+    self_attn_pattern = r'(<div class="block"><h2>🔷 1\. Суть Attention</h2>.*?</div>)'
+    self_attn_img = create_img_tag(illustrations['self_attention'], 
+                                   'Self-Attention Mechanism', '90%')
+    html_content = re.sub(self_attn_pattern, 
+                         r'\1\n' + self_attn_img, 
+                         html_content, count=1, flags=re.DOTALL)
+    
+    return html_content
+
+def add_illustrations_to_encoder_decoder(html_content, illustrations):
+    """Add illustrations to Encoder-Decoder cheatsheet."""
+    
+    # Add encoder-decoder architecture
+    enc_dec_pattern = r'(<div class="block"><h2>🔷 1\. Суть</h2>.*?</div>)'
+    enc_dec_img = create_img_tag(illustrations['encoder_decoder'], 
+                                 'Encoder-Decoder Architecture', '95%')
+    html_content = re.sub(enc_dec_pattern, 
+                         r'\1\n' + enc_dec_img, 
+                         html_content, count=1, flags=re.DOTALL)
+    
+    return html_content
+
+def add_illustrations_to_dcgan_conditional_gan(html_content, illustrations):
+    """Add illustrations to DCGAN/Conditional GAN cheatsheet."""
+    
+    # Add DCGAN architecture
+    dcgan_pattern = r'(<div class="block"><h2>🔷 2\. DCGAN Architecture</h2>.*?</div>)'
+    dcgan_img = create_img_tag(illustrations['dcgan_architecture'], 
+                               'DCGAN Architecture', '95%')
+    html_content = re.sub(dcgan_pattern, 
+                         r'\1\n' + dcgan_img, 
+                         html_content, count=1, flags=re.DOTALL)
+    
+    return html_content
+
+def add_illustrations_to_stylegan_architecture(html_content, illustrations):
+    """Add illustrations to StyleGAN Architecture cheatsheet."""
+    
+    # Add StyleGAN features
+    stylegan_pattern = r'(<div class="block"><h2>🔷 1\. Что такое StyleGAN\?</h2>.*?</div>)'
+    stylegan_img = create_img_tag(illustrations['stylegan_features'], 
+                                  'StyleGAN Key Features', '95%')
+    html_content = re.sub(stylegan_pattern, 
+                         r'\1\n' + stylegan_img, 
+                         html_content, count=1, flags=re.DOTALL)
+    
+    return html_content
+
+def add_illustrations_to_neural_architecture_patterns(html_content, illustrations):
+    """Add illustrations to Neural Architecture Patterns cheatsheet."""
+    
+    # Add architecture patterns
+    patterns_pattern = r'(<div class="block"><h2>🔷 1\. Основные паттерны</h2>.*?</div>)'
+    patterns_img = create_img_tag(illustrations['neural_architecture_patterns'], 
+                                  'Common Neural Architecture Patterns', '95%')
+    html_content = re.sub(patterns_pattern, 
+                         r'\1\n' + patterns_img, 
+                         html_content, count=1, flags=re.DOTALL)
+    
+    return html_content

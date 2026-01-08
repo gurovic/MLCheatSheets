@@ -1478,6 +1478,660 @@ def generate_vision_transformer():
     return fig_to_base64(fig)
 
 # ============================================================================
+# GPT, BERT, SELF-ATTENTION ILLUSTRATIONS
+# ============================================================================
+
+def generate_gpt_architecture():
+    """Visualize GPT decoder-only architecture."""
+    fig, ax = plt.subplots(figsize=(12, 10))
+    ax.set_xlim(0, 12)
+    ax.set_ylim(0, 12)
+    ax.axis('off')
+    
+    # Input tokens
+    input_box = FancyBboxPatch((4.5, 10.5), 3, 0.8,
+                              boxstyle="round,pad=0.1", 
+                              facecolor='#e3f2fd', 
+                              edgecolor='black', linewidth=2)
+    ax.add_patch(input_box)
+    ax.text(6, 10.9, 'Input Tokens', ha='center', va='center', fontsize=10, fontweight='bold')
+    
+    # Token + Positional Embeddings
+    embed_box = FancyBboxPatch((4.5, 9.3), 3, 0.8,
+                              boxstyle="round,pad=0.1", 
+                              facecolor='#fff9c4', 
+                              edgecolor='black', linewidth=2)
+    ax.add_patch(embed_box)
+    ax.text(6, 9.7, 'Token + Positional\nEmbeddings', ha='center', va='center', fontsize=9, fontweight='bold')
+    
+    ax.arrow(6, 10.5, 0, -0.5, head_width=0.25, head_length=0.1, 
+            fc='black', ec='black', linewidth=2)
+    
+    # Decoder Blocks
+    decoder_y = [8, 6, 4, 2]
+    for i, y in enumerate(decoder_y):
+        # Decoder block
+        block_box = FancyBboxPatch((3, y-0.8), 6, 1.5,
+                                  boxstyle="round,pad=0.1", 
+                                  facecolor='#ce93d8', 
+                                  edgecolor='black', linewidth=2, alpha=0.8)
+        ax.add_patch(block_box)
+        
+        # Components inside block
+        components = ['Masked\nMulti-Head\nAttention', 'Feed\nForward', 'Layer\nNorm']
+        for j, comp in enumerate(components):
+            mini_box = FancyBboxPatch((3.2 + j*2, y-0.6), 1.6, 1.1,
+                                     boxstyle="round,pad=0.05", 
+                                     facecolor='white', 
+                                     edgecolor='black', linewidth=1)
+            ax.add_patch(mini_box)
+            ax.text(4 + j*2, y, comp, ha='center', va='center', fontsize=7, fontweight='bold')
+        
+        if i == 0:
+            ax.text(0.5, y, f'Decoder\nBlock {i+1}', ha='left', fontsize=9, fontweight='bold')
+        
+        # Arrow to next block
+        if i < len(decoder_y) - 1:
+            ax.arrow(6, y-0.8, 0, -0.5, head_width=0.25, head_length=0.1, 
+                    fc='black', ec='black', linewidth=2)
+    
+    ax.text(6, 0.5, '× N layers', ha='center', fontsize=10, style='italic', fontweight='bold')
+    
+    # Causal mask annotation
+    ax.text(10, 8, 'Causal Mask:\nВидит только\nпредыдущие\nтокены', ha='center', fontsize=8,
+           bbox=dict(boxstyle='round', facecolor='#ffcdd2', alpha=0.7), fontweight='bold')
+    
+    # Output head
+    ax.text(6, -0.5, 'Language Model Head\n(Predict Next Token)', ha='center', fontsize=10, fontweight='bold',
+           bbox=dict(boxstyle='round', facecolor='#c8e6c9', alpha=0.7))
+    
+    plt.title('GPT Architecture: Decoder-Only Transformer', fontsize=14, fontweight='bold', pad=20)
+    
+    return fig_to_base64(fig)
+
+def generate_bert_architecture():
+    """Visualize BERT encoder-only architecture."""
+    fig, ax = plt.subplots(figsize=(12, 10))
+    ax.set_xlim(0, 12)
+    ax.set_ylim(0, 12)
+    ax.axis('off')
+    
+    # Input with [CLS] and [SEP]
+    input_box = FancyBboxPatch((3, 10.5), 6, 0.8,
+                              boxstyle="round,pad=0.1", 
+                              facecolor='#e3f2fd', 
+                              edgecolor='black', linewidth=2)
+    ax.add_patch(input_box)
+    ax.text(6, 10.9, '[CLS] Token1 Token2 ... [SEP]', ha='center', va='center', fontsize=10, fontweight='bold')
+    
+    # Three types of embeddings
+    embed_types = [
+        ('Token\nEmbedding', 4, '#fff9c4'),
+        ('Segment\nEmbedding', 6, '#ffccbc'),
+        ('Position\nEmbedding', 8, '#c5e1a5')
+    ]
+    
+    for label, x, color in embed_types:
+        box = FancyBboxPatch((x-0.7, 9), 1.4, 0.8,
+                            boxstyle="round,pad=0.05", 
+                            facecolor=color, 
+                            edgecolor='black', linewidth=1.5)
+        ax.add_patch(box)
+        ax.text(x, 9.4, label, ha='center', va='center', fontsize=8, fontweight='bold')
+        ax.arrow(6, 10.5, x - 6, -1, head_width=0.15, head_length=0.08, 
+                fc='gray', ec='gray', linewidth=1.2, alpha=0.6)
+    
+    # Sum embeddings
+    sum_box = FancyBboxPatch((4.5, 7.5), 3, 0.7,
+                            boxstyle="round,pad=0.1", 
+                            facecolor='#ffe082', 
+                            edgecolor='black', linewidth=2)
+    ax.add_patch(sum_box)
+    ax.text(6, 7.85, 'Sum Embeddings', ha='center', va='center', fontsize=9, fontweight='bold')
+    
+    for x in [4, 6, 8]:
+        ax.arrow(x, 9, 6 - x, -0.7, head_width=0.15, head_length=0.08, 
+                fc='black', ec='black', linewidth=1.5, alpha=0.7)
+    
+    # Encoder blocks
+    encoder_y = [6.3, 4.5, 2.7]
+    for i, y in enumerate(encoder_y):
+        block_box = FancyBboxPatch((3, y-0.8), 6, 1.5,
+                                  boxstyle="round,pad=0.1", 
+                                  facecolor='#bbdefb', 
+                                  edgecolor='black', linewidth=2, alpha=0.8)
+        ax.add_patch(block_box)
+        
+        # Components
+        components = ['Multi-Head\nAttention', 'Feed\nForward', 'Layer\nNorm']
+        for j, comp in enumerate(components):
+            mini_box = FancyBboxPatch((3.2 + j*2, y-0.6), 1.6, 1.1,
+                                     boxstyle="round,pad=0.05", 
+                                     facecolor='white', 
+                                     edgecolor='black', linewidth=1)
+            ax.add_patch(mini_box)
+            ax.text(4 + j*2, y, comp, ha='center', va='center', fontsize=7, fontweight='bold')
+        
+        if i == 0:
+            ax.text(0.5, y, f'Encoder\nBlock {i+1}', ha='left', fontsize=9, fontweight='bold')
+        
+        if i < len(encoder_y) - 1:
+            ax.arrow(6, y-0.8, 0, -0.5, head_width=0.25, head_length=0.1, 
+                    fc='black', ec='black', linewidth=2)
+    
+    ax.text(6, 1.3, '× N layers', ha='center', fontsize=10, style='italic', fontweight='bold')
+    
+    # Bidirectional annotation
+    ax.text(10, 6, 'Bidirectional:\nВидит все\nтокены', ha='center', fontsize=8,
+           bbox=dict(boxstyle='round', facecolor='#c8e6c9', alpha=0.7), fontweight='bold')
+    
+    # Output tasks
+    ax.text(3, 0.3, 'MLM', ha='center', fontsize=8, fontweight='bold',
+           bbox=dict(boxstyle='round', facecolor='#ffeb3b', alpha=0.7))
+    ax.text(6, 0.3, 'NSP', ha='center', fontsize=8, fontweight='bold',
+           bbox=dict(boxstyle='round', facecolor='#ffeb3b', alpha=0.7))
+    ax.text(9, 0.3, 'Fine-tune', ha='center', fontsize=8, fontweight='bold',
+           bbox=dict(boxstyle='round', facecolor='#ffeb3b', alpha=0.7))
+    
+    plt.title('BERT Architecture: Encoder-Only Transformer', fontsize=14, fontweight='bold', pad=20)
+    
+    return fig_to_base64(fig)
+
+def generate_self_attention():
+    """Visualize self-attention mechanism in detail."""
+    fig, ax = plt.subplots(figsize=(12, 9))
+    ax.set_xlim(0, 12)
+    ax.set_ylim(0, 10)
+    ax.axis('off')
+    
+    # Input sequence
+    words = ['The', 'cat', 'sat']
+    for i, word in enumerate(words):
+        x = 2 + i * 3
+        box = FancyBboxPatch((x-0.5, 8.5), 1, 0.8,
+                            boxstyle="round,pad=0.05", 
+                            facecolor='#e3f2fd', 
+                            edgecolor='black', linewidth=1.5)
+        ax.add_patch(box)
+        ax.text(x, 8.9, word, ha='center', va='center', fontsize=10, fontweight='bold')
+    
+    # Q, K, V transformations
+    qkv_labels = ['Q', 'K', 'V']
+    qkv_colors = ['#ffcdd2', '#c5e1a5', '#bbdefb']
+    
+    for j, (label, color) in enumerate(zip(qkv_labels, qkv_colors)):
+        y = 6.5 - j * 1.2
+        for i in range(3):
+            x = 2 + i * 3
+            box = FancyBboxPatch((x-0.4, y-0.3), 0.8, 0.6,
+                                boxstyle="round,pad=0.03", 
+                                facecolor=color, 
+                                edgecolor='black', linewidth=1)
+            ax.add_patch(box)
+            ax.text(x, y, label, ha='center', va='center', fontsize=8, fontweight='bold')
+            
+            if i == 0:
+                ax.text(0.8, y, label + ':', ha='right', fontsize=9, fontweight='bold')
+            
+            # Arrow from input
+            if j == 0:
+                ax.arrow(2 + i * 3, 8.5, 0, -1.5, head_width=0.15, head_length=0.1, 
+                        fc='gray', ec='gray', linewidth=1, alpha=0.5)
+    
+    # Attention scores matrix
+    ax.text(6, 3.5, 'Attention Scores = softmax(QK^T / √d_k)', 
+           ha='center', fontsize=10, fontweight='bold',
+           bbox=dict(boxstyle='round', facecolor='#fff9c4', alpha=0.8))
+    
+    # Simple attention matrix visualization
+    matrix_data = np.array([[0.7, 0.2, 0.1],
+                           [0.1, 0.8, 0.1],
+                           [0.2, 0.1, 0.7]])
+    
+    for i in range(3):
+        for j in range(3):
+            x = 4 + j * 1.5
+            y = 2 - i * 0.6
+            alpha = matrix_data[i, j]
+            rect = Rectangle((x-0.4, y-0.2), 0.8, 0.4,
+                           facecolor=plt.cm.Blues(alpha), 
+                           edgecolor='black', linewidth=1)
+            ax.add_patch(rect)
+            ax.text(x, y, f'{alpha:.1f}', ha='center', va='center', fontsize=7, fontweight='bold')
+    
+    ax.text(1.5, 1.4, 'Q\\K→', ha='right', fontsize=8, fontweight='bold')
+    ax.text(4, 2.5, 'The', ha='center', fontsize=7)
+    ax.text(5.5, 2.5, 'cat', ha='center', fontsize=7)
+    ax.text(7, 2.5, 'sat', ha='center', fontsize=7)
+    
+    # Weighted sum with values
+    ax.arrow(6, 0.5, 0, -0.3, head_width=0.2, head_length=0.08, 
+            fc='black', ec='black', linewidth=2)
+    
+    ax.text(6, -0.3, 'Output = Attention × V\n(Weighted sum of values)', 
+           ha='center', fontsize=10, fontweight='bold',
+           bbox=dict(boxstyle='round', facecolor='#c8e6c9', alpha=0.8))
+    
+    plt.title('Self-Attention: Query-Key-Value Mechanism', fontsize=14, fontweight='bold', pad=20)
+    
+    return fig_to_base64(fig)
+
+def generate_encoder_decoder():
+    """Visualize encoder-decoder architecture for sequence-to-sequence."""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 8))
+    
+    # Encoder side
+    ax1.set_xlim(0, 6)
+    ax1.set_ylim(0, 10)
+    ax1.axis('off')
+    ax1.set_title('Encoder (Source)', fontsize=12, fontweight='bold')
+    
+    # Source input
+    source_words = ['Hello', 'world']
+    for i, word in enumerate(source_words):
+        y = 9 - i * 1.5
+        box = FancyBboxPatch((2, y-0.3), 2, 0.6,
+                            boxstyle="round,pad=0.05", 
+                            facecolor='#e3f2fd', 
+                            edgecolor='black', linewidth=1.5)
+        ax1.add_patch(box)
+        ax1.text(3, y, word, ha='center', va='center', fontsize=9, fontweight='bold')
+    
+    # Encoder layers
+    encoder_layers = ['Embedding', 'Encoder\nLayer 1', 'Encoder\nLayer 2', 'Context']
+    for i, label in enumerate(encoder_layers):
+        y = 6 - i * 1.5
+        box = FancyBboxPatch((1.5, y-0.4), 3, 0.8,
+                            boxstyle="round,pad=0.1", 
+                            facecolor='#bbdefb', 
+                            edgecolor='black', linewidth=1.5)
+        ax1.add_patch(box)
+        ax1.text(3, y, label, ha='center', va='center', fontsize=8, fontweight='bold')
+        
+        if i < len(encoder_layers) - 1:
+            ax1.arrow(3, y-0.4, 0, -0.5, head_width=0.25, head_length=0.1, 
+                     fc='black', ec='black', linewidth=1.5)
+    
+    # Decoder side
+    ax2.set_xlim(0, 6)
+    ax2.set_ylim(0, 10)
+    ax2.axis('off')
+    ax2.set_title('Decoder (Target)', fontsize=12, fontweight='bold')
+    
+    # Target input (shifted)
+    target_words = ['<SOS>', 'Привет']
+    for i, word in enumerate(target_words):
+        y = 9 - i * 1.5
+        box = FancyBboxPatch((2, y-0.3), 2, 0.6,
+                            boxstyle="round,pad=0.05", 
+                            facecolor='#fff9c4', 
+                            edgecolor='black', linewidth=1.5)
+        ax2.add_patch(box)
+        ax2.text(3, y, word, ha='center', va='center', fontsize=9, fontweight='bold')
+    
+    # Decoder layers
+    decoder_layers = ['Embedding', 'Decoder\nLayer 1', 'Decoder\nLayer 2', 'Output']
+    for i, label in enumerate(decoder_layers):
+        y = 6 - i * 1.5
+        box = FancyBboxPatch((1.5, y-0.4), 3, 0.8,
+                            boxstyle="round,pad=0.1", 
+                            facecolor='#ce93d8', 
+                            edgecolor='black', linewidth=1.5)
+        ax2.add_patch(box)
+        ax2.text(3, y, label, ha='center', va='center', fontsize=8, fontweight='bold')
+        
+        if i < len(decoder_layers) - 1:
+            ax2.arrow(3, y-0.4, 0, -0.5, head_width=0.25, head_length=0.1, 
+                     fc='black', ec='black', linewidth=1.5)
+    
+    # Context vector passing
+    ax2.arrow(-0.5, 2.5, 0.8, 0, head_width=0.2, head_length=0.15, 
+             fc='red', ec='red', linewidth=2.5)
+    ax2.text(-0.5, 3, 'Context\nfrom\nEncoder', ha='center', fontsize=8, 
+            color='red', fontweight='bold')
+    
+    # Output prediction
+    ax2.text(3, 0.3, 'Prediction:\nПривет мир', ha='center', fontsize=9, fontweight='bold',
+            bbox=dict(boxstyle='round', facecolor='#c8e6c9', alpha=0.7))
+    
+    plt.suptitle('Encoder-Decoder Architecture: Sequence-to-Sequence', 
+                fontsize=14, fontweight='bold', y=0.98)
+    plt.tight_layout()
+    
+    return fig_to_base64(fig)
+
+# ============================================================================
+# DCGAN, STYLEGAN, NEURAL ARCHITECTURE PATTERNS
+# ============================================================================
+
+def generate_dcgan_architecture():
+    """Visualize DCGAN generator architecture."""
+    fig, ax = plt.subplots(figsize=(14, 7))
+    ax.set_xlim(0, 14)
+    ax.set_ylim(0, 8)
+    ax.axis('off')
+    
+    # Generator
+    gen_layers = [
+        {'x': 1, 'y': 3, 'w': 0.8, 'h': 2, 'label': 'Noise\nz\n100', 'color': '#fff9c4'},
+        {'x': 2.3, 'y': 2.7, 'w': 1.0, 'h': 2.6, 'label': 'Dense\n→\n4×4×1024', 'color': '#bbdefb'},
+        {'x': 3.8, 'y': 2.4, 'w': 1.2, 'h': 3.2, 'label': 'TransConv\n8×8×512', 'color': '#90caf9'},
+        {'x': 5.5, 'y': 2.1, 'w': 1.4, 'h': 3.8, 'label': 'TransConv\n16×16×256', 'color': '#64b5f6'},
+        {'x': 7.5, 'y': 1.8, 'w': 1.6, 'h': 4.4, 'label': 'TransConv\n32×32×128', 'color': '#42a5f5'},
+        {'x': 9.6, 'y': 1.5, 'w': 1.8, 'h': 5, 'label': 'TransConv\n64×64×3', 'color': '#2196f3'},
+    ]
+    
+    for layer in gen_layers:
+        rect = FancyBboxPatch((layer['x'], layer['y']), layer['w'], layer['h'],
+                             boxstyle="round,pad=0.1", 
+                             facecolor=layer['color'], 
+                             edgecolor='black', linewidth=2)
+        ax.add_patch(rect)
+        
+        for i, line in enumerate(layer['label'].split('\n')):
+            ax.text(layer['x'] + layer['w']/2, 
+                   layer['y'] + layer['h']/2 + 0.25 - i*0.35, 
+                   line, ha='center', va='center', fontsize=8, fontweight='bold')
+    
+    # Arrows
+    for i in range(len(gen_layers) - 1):
+        x1 = gen_layers[i]['x'] + gen_layers[i]['w']
+        y1 = gen_layers[i]['y'] + gen_layers[i]['h']/2
+        x2 = gen_layers[i+1]['x']
+        y2 = gen_layers[i+1]['y'] + gen_layers[i+1]['h']/2
+        
+        arrow = FancyArrowPatch((x1, y1), (x2, y2),
+                               arrowstyle='->', mutation_scale=20, 
+                               linewidth=2, color='gray')
+        ax.add_patch(arrow)
+    
+    # Annotations
+    ax.text(5.5, 0.5, 'DCGAN Generator: Transposed Convolutions', 
+           ha='center', fontsize=12, fontweight='bold', color='#1976d2')
+    
+    ax.text(2, 6.5, 'BatchNorm + ReLU', ha='center', fontsize=8, 
+           bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.7))
+    ax.text(7, 7, 'Tanh Output', ha='center', fontsize=8, 
+           bbox=dict(boxstyle='round', facecolor='lightgreen', alpha=0.7))
+    
+    plt.title('DCGAN Architecture: Deep Convolutional GAN', fontsize=14, fontweight='bold', pad=20)
+    
+    return fig_to_base64(fig)
+
+def generate_stylegan_features():
+    """Visualize StyleGAN key features."""
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    
+    # Style-based generator
+    ax = axes[0, 0]
+    ax.set_xlim(0, 8)
+    ax.set_ylim(0, 8)
+    ax.axis('off')
+    ax.set_title('Style-Based Generator', fontsize=11, fontweight='bold')
+    
+    # Latent code
+    latent_box = FancyBboxPatch((1, 6.5), 1.5, 0.8,
+                               boxstyle="round,pad=0.1", 
+                               facecolor='#fff9c4', 
+                               edgecolor='black', linewidth=1.5)
+    ax.add_patch(latent_box)
+    ax.text(1.75, 6.9, 'z', ha='center', va='center', fontsize=10, fontweight='bold')
+    
+    # Mapping network
+    mapping_box = FancyBboxPatch((3, 6.3), 2, 1.2,
+                                boxstyle="round,pad=0.1", 
+                                facecolor='#bbdefb', 
+                                edgecolor='black', linewidth=1.5)
+    ax.add_patch(mapping_box)
+    ax.text(4, 6.9, 'Mapping\nNetwork', ha='center', va='center', fontsize=9, fontweight='bold')
+    
+    ax.arrow(2.5, 6.9, 0.4, 0, head_width=0.2, head_length=0.1, 
+            fc='black', ec='black', linewidth=1.5)
+    
+    # Style vector
+    style_box = FancyBboxPatch((5.5, 6.5), 1.5, 0.8,
+                              boxstyle="round,pad=0.1", 
+                              facecolor='#ffccbc', 
+                              edgecolor='black', linewidth=1.5)
+    ax.add_patch(style_box)
+    ax.text(6.25, 6.9, 'w', ha='center', va='center', fontsize=10, fontweight='bold')
+    
+    ax.arrow(5, 6.9, 0.4, 0, head_width=0.2, head_length=0.1, 
+            fc='black', ec='black', linewidth=1.5)
+    
+    # Synthesis blocks with AdaIN
+    synth_blocks = ['4×4', '8×8', '16×16', '...']
+    for i, label in enumerate(synth_blocks):
+        y = 5 - i * 1.2
+        block = FancyBboxPatch((2.5, y-0.4), 3, 0.8,
+                              boxstyle="round,pad=0.1", 
+                              facecolor='#c8e6c9', 
+                              edgecolor='black', linewidth=1.5)
+        ax.add_patch(block)
+        ax.text(4, y, f'Synth {label}', ha='center', va='center', fontsize=8, fontweight='bold')
+        
+        # Style injection
+        ax.arrow(6.25, 6.5, -2, y - 6.2, head_width=0.15, head_length=0.08, 
+                fc='red', ec='red', linewidth=1.2, alpha=0.7)
+        ax.text(5.8, y, 'AdaIN', ha='right', fontsize=7, color='red', fontweight='bold')
+    
+    # Progressive growing
+    ax = axes[0, 1]
+    ax.set_xlim(0, 8)
+    ax.set_ylim(0, 8)
+    ax.axis('off')
+    ax.set_title('Progressive Growing', fontsize=11, fontweight='bold')
+    
+    resolutions = ['4×4', '8×8', '16×16', '32×32']
+    for i, res in enumerate(resolutions):
+        size = 0.8 + i * 0.4
+        x = 2 + i * 1.5
+        y = 4 - size / 2
+        
+        rect = FancyBboxPatch((x, y), size, size,
+                             boxstyle="round,pad=0.05", 
+                             facecolor=plt.cm.Blues((i+1)/len(resolutions)), 
+                             edgecolor='black', linewidth=1.5)
+        ax.add_patch(rect)
+        ax.text(x + size/2, y + size/2, res, ha='center', va='center', 
+               fontsize=8, fontweight='bold')
+        
+        if i < len(resolutions) - 1:
+            ax.arrow(x + size, y + size/2, 0.3, 0, head_width=0.15, head_length=0.1, 
+                    fc='black', ec='black', linewidth=1.5)
+    
+    ax.text(4, 7, 'Постепенное увеличение разрешения', ha='center', fontsize=9, style='italic')
+    
+    # Noise injection
+    ax = axes[1, 0]
+    ax.set_xlim(0, 8)
+    ax.set_ylim(0, 8)
+    ax.axis('off')
+    ax.set_title('Noise Injection', fontsize=11, fontweight='bold')
+    
+    # Feature map
+    feat_box = FancyBboxPatch((2, 3), 4, 2,
+                             boxstyle="round,pad=0.1", 
+                             facecolor='#e3f2fd', 
+                             edgecolor='black', linewidth=1.5)
+    ax.add_patch(feat_box)
+    ax.text(4, 4, 'Feature Map', ha='center', va='center', fontsize=9, fontweight='bold')
+    
+    # Noise
+    noise_box = FancyBboxPatch((1, 6), 1.5, 0.8,
+                              boxstyle="round,pad=0.1", 
+                              facecolor='#fff9c4', 
+                              edgecolor='black', linewidth=1.5)
+    ax.add_patch(noise_box)
+    ax.text(1.75, 6.4, 'Noise', ha='center', va='center', fontsize=8, fontweight='bold')
+    
+    ax.arrow(1.75, 6, 1, -1, head_width=0.2, head_length=0.1, 
+            fc='orange', ec='orange', linewidth=2)
+    
+    ax.text(4, 1.5, 'Добавляет случайные детали\n(волосы, поры кожи)', 
+           ha='center', fontsize=8, style='italic')
+    
+    # Style mixing
+    ax = axes[1, 1]
+    ax.set_xlim(0, 8)
+    ax.set_ylim(0, 8)
+    ax.axis('off')
+    ax.set_title('Style Mixing', fontsize=11, fontweight='bold')
+    
+    # Two source styles
+    for i, (label, color) in enumerate([('Style A', '#ffcdd2'), ('Style B', '#c5e1a5')]):
+        y = 7 - i * 2
+        box = FancyBboxPatch((1, y-0.3), 1.5, 0.6,
+                            boxstyle="round,pad=0.05", 
+                            facecolor=color, 
+                            edgecolor='black', linewidth=1.5)
+        ax.add_patch(box)
+        ax.text(1.75, y, label, ha='center', va='center', fontsize=8, fontweight='bold')
+    
+    # Mixed layers
+    layers = ['Coarse', 'Middle', 'Fine']
+    for i, (layer, style_source) in enumerate(zip(layers, ['A', 'A', 'B'])):
+        y = 6 - i * 1.5
+        color = '#ffcdd2' if style_source == 'A' else '#c5e1a5'
+        box = FancyBboxPatch((3.5, y-0.3), 2, 0.6,
+                            boxstyle="round,pad=0.05", 
+                            facecolor=color, 
+                            edgecolor='black', linewidth=1.5)
+        ax.add_patch(box)
+        ax.text(4.5, y, f'{layer}\n(Style {style_source})', ha='center', va='center', 
+               fontsize=7, fontweight='bold')
+    
+    ax.text(4, 2, 'Смешивание стилей\nдля разных уровней', ha='center', 
+           fontsize=8, style='italic')
+    
+    plt.suptitle('StyleGAN Key Features', fontsize=14, fontweight='bold', y=0.98)
+    plt.tight_layout()
+    
+    return fig_to_base64(fig)
+
+def generate_neural_architecture_patterns():
+    """Visualize common neural architecture patterns."""
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    
+    # Skip connection
+    ax = axes[0, 0]
+    ax.set_xlim(0, 6)
+    ax.set_ylim(0, 6)
+    ax.axis('off')
+    ax.set_title('Skip Connection', fontsize=11, fontweight='bold')
+    
+    layers_y = [5, 3.5, 2]
+    for i, y in enumerate(layers_y):
+        box = FancyBboxPatch((2, y-0.4), 2, 0.8,
+                            boxstyle="round,pad=0.1", 
+                            facecolor='#bbdefb', 
+                            edgecolor='black', linewidth=1.5)
+        ax.add_patch(box)
+        ax.text(3, y, f'Layer {i+1}', ha='center', va='center', fontsize=9, fontweight='bold')
+        
+        if i < len(layers_y) - 1:
+            ax.arrow(3, y-0.4, 0, -0.6, head_width=0.2, head_length=0.1, 
+                    fc='black', ec='black', linewidth=1.5)
+    
+    # Skip
+    ax.plot([4.5, 4.5, 4.5, 3.5], [5, 4, 2.2, 2.2], 'r-', linewidth=2.5)
+    ax.arrow(3.5, 2.2, -0.3, -0.1, head_width=0.15, head_length=0.1, 
+            fc='red', ec='red', linewidth=2.5)
+    ax.text(5, 3.5, 'Skip', ha='left', fontsize=8, color='red', fontweight='bold')
+    
+    # Bottleneck
+    ax = axes[0, 1]
+    ax.set_xlim(0, 6)
+    ax.set_ylim(0, 6)
+    ax.axis('off')
+    ax.set_title('Bottleneck', fontsize=11, fontweight='bold')
+    
+    bottleneck_layers = [
+        {'y': 5, 'w': 2, 'label': '1×1 Conv\nReduce'},
+        {'y': 3.5, 'w': 2, 'label': '3×3 Conv'},
+        {'y': 2, 'w': 2, 'label': '1×1 Conv\nExpand'},
+    ]
+    
+    for layer in bottleneck_layers:
+        box = FancyBboxPatch((2, layer['y']-0.4), layer['w'], 0.8,
+                            boxstyle="round,pad=0.1", 
+                            facecolor='#90caf9', 
+                            edgecolor='black', linewidth=1.5)
+        ax.add_patch(box)
+        ax.text(3, layer['y'], layer['label'], ha='center', va='center', fontsize=8, fontweight='bold')
+    
+    ax.arrow(3, 4.6, 0, -0.5, head_width=0.2, head_length=0.1, 
+            fc='black', ec='black', linewidth=1.5)
+    ax.arrow(3, 3.1, 0, -0.5, head_width=0.2, head_length=0.1, 
+            fc='black', ec='black', linewidth=1.5)
+    
+    ax.text(3, 0.8, 'Уменьшение параметров', ha='center', fontsize=8, style='italic')
+    
+    # Depthwise separable
+    ax = axes[1, 0]
+    ax.set_xlim(0, 6)
+    ax.set_ylim(0, 6)
+    ax.axis('off')
+    ax.set_title('Depthwise Separable Conv', fontsize=11, fontweight='bold')
+    
+    depthwise_layers = [
+        {'y': 5, 'w': 2, 'label': 'Depthwise\n3×3', 'color': '#c5e1a5'},
+        {'y': 3.2, 'w': 2, 'label': 'Pointwise\n1×1', 'color': '#ffccbc'},
+    ]
+    
+    for layer in depthwise_layers:
+        box = FancyBboxPatch((2, layer['y']-0.4), layer['w'], 0.8,
+                            boxstyle="round,pad=0.1", 
+                            facecolor=layer['color'], 
+                            edgecolor='black', linewidth=1.5)
+        ax.add_patch(box)
+        ax.text(3, layer['y'], layer['label'], ha='center', va='center', fontsize=8, fontweight='bold')
+    
+    ax.arrow(3, 4.6, 0, -0.8, head_width=0.2, head_length=0.1, 
+            fc='black', ec='black', linewidth=1.5)
+    
+    ax.text(3, 2, 'Разделение пространственного\nи канального фильтров', 
+           ha='center', fontsize=8, style='italic')
+    
+    # Inverted residual
+    ax = axes[1, 1]
+    ax.set_xlim(0, 6)
+    ax.set_ylim(0, 6)
+    ax.axis('off')
+    ax.set_title('Inverted Residual (MobileNet)', fontsize=11, fontweight='bold')
+    
+    inverted_layers = [
+        {'y': 5, 'w': 1.5, 'label': '1×1 Conv\nExpand'},
+        {'y': 3.5, 'w': 2, 'label': 'Depthwise\n3×3'},
+        {'y': 2, 'w': 1.5, 'label': '1×1 Conv\nCompress'},
+    ]
+    
+    for layer in inverted_layers:
+        x = 3 - layer['w']/2
+        box = FancyBboxPatch((x, layer['y']-0.4), layer['w'], 0.8,
+                            boxstyle="round,pad=0.1", 
+                            facecolor='#ce93d8', 
+                            edgecolor='black', linewidth=1.5)
+        ax.add_patch(box)
+        ax.text(3, layer['y'], layer['label'], ha='center', va='center', fontsize=8, fontweight='bold')
+    
+    ax.arrow(3, 4.6, 0, -0.5, head_width=0.2, head_length=0.1, 
+            fc='black', ec='black', linewidth=1.5)
+    ax.arrow(3, 3.1, 0, -0.5, head_width=0.2, head_length=0.1, 
+            fc='black', ec='black', linewidth=1.5)
+    
+    # Skip
+    ax.plot([4.5, 4.5, 4.5, 3.5], [5.4, 4.5, 1.8, 1.8], 'r--', linewidth=2)
+    ax.arrow(3.5, 1.8, -0.3, -0.1, head_width=0.15, head_length=0.1, 
+            fc='red', ec='red', linewidth=2)
+    
+    plt.suptitle('Common Neural Architecture Patterns', fontsize=14, fontweight='bold', y=0.98)
+    plt.tight_layout()
+    
+    return fig_to_base64(fig)
+
+
+# ============================================================================
 # MAIN FUNCTION
 # ============================================================================
 
@@ -1525,28 +2179,51 @@ def generate_all_illustrations():
     illustrations['transformer_architecture'] = generate_transformer_architecture()
     print("  ✓ Transformer encoder-decoder")
     
-    print("\n5. Vision Transformers:")
+    illustrations['self_attention'] = generate_self_attention()
+    print("  ✓ Self-attention")
+    
+    illustrations['encoder_decoder'] = generate_encoder_decoder()
+    print("  ✓ Encoder-decoder")
+    
+    print("\n5. Language Model Architectures:")
+    illustrations['gpt_architecture'] = generate_gpt_architecture()
+    print("  ✓ GPT architecture")
+    
+    illustrations['bert_architecture'] = generate_bert_architecture()
+    print("  ✓ BERT architecture")
+    
+    print("\n6. Vision Transformers:")
     illustrations['vision_transformer'] = generate_vision_transformer()
     print("  ✓ Vision Transformer (ViT)")
     
-    print("\n6. Autoencoders & VAE:")
+    print("\n7. Autoencoders & VAE:")
     illustrations['autoencoder_architecture'] = generate_autoencoder_architecture()
     print("  ✓ Autoencoder architecture")
     
     illustrations['vae_architecture'] = generate_vae_architecture()
     print("  ✓ VAE with reparameterization")
     
-    print("\n7. GANs:")
+    print("\n8. GANs:")
     illustrations['gan_architecture'] = generate_gan_architecture()
     print("  ✓ GAN architecture")
     
-    print("\n8. Diffusion Models:")
+    illustrations['dcgan_architecture'] = generate_dcgan_architecture()
+    print("  ✓ DCGAN architecture")
+    
+    illustrations['stylegan_features'] = generate_stylegan_features()
+    print("  ✓ StyleGAN features")
+    
+    print("\n9. Diffusion Models:")
     illustrations['diffusion_process'] = generate_diffusion_process()
     print("  ✓ Diffusion forward/reverse process")
     
-    print("\n9. Capsule Networks:")
+    print("\n10. Capsule Networks:")
     illustrations['capsule_network'] = generate_capsule_network()
     print("  ✓ Capsule network")
+    
+    print("\n11. Architecture Patterns:")
+    illustrations['neural_architecture_patterns'] = generate_neural_architecture_patterns()
+    print("  ✓ Neural architecture patterns")
     
     print("\n" + "=" * 70)
     print(f"✓ Successfully generated {len(illustrations)} illustrations!")
@@ -1558,3 +2235,4 @@ if __name__ == '__main__':
     illustrations = generate_all_illustrations()
     print(f"\nGenerated {len(illustrations)} illustrations")
     print("Illustrations are base64 encoded and ready for HTML embedding")
+
