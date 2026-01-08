@@ -11,6 +11,7 @@ from matplotlib.patches import Rectangle, FancyBboxPatch, Circle, Polygon, Fancy
 from matplotlib.colors import LinearSegmentedColormap
 import base64
 from io import BytesIO
+from scipy import integrate, ndimage
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -159,7 +160,6 @@ def generate_object_detection_map():
     ax1.set_xlim(0, 1)
     ax1.set_ylim(0, 1)
     # Calculate area under curve (AP)
-    from scipy import integrate
     ap = integrate.trapezoid(precision, recall)
     ax1.text(0.5, 0.2, f'AP = {ap:.3f}', fontsize=11, 
              bbox=dict(boxstyle='round', facecolor='yellow', alpha=0.7))
@@ -1093,7 +1093,6 @@ def generate_gradcam_layers():
         heatmap = np.exp(-((x - center)**2 + (y - center)**2) / (2 * (spread/4)**2))
         
         # Resize to original size
-        from scipy import ndimage
         heatmap_resized = ndimage.zoom(heatmap, 64/resolution, order=1)
         
         # Overlay
