@@ -249,53 +249,6 @@ def process_html_file(filepath, add_illustrations_func, illustrations):
         print(f"  ✗ Error processing {filepath}: {e}")
         return False
 
-def main():
-    """Main function to add illustrations to all Neural Architecture cheatsheets."""
-    print("=" * 70)
-    print("Adding matplotlib illustrations to Neural Architecture cheatsheets")
-    print("=" * 70)
-    
-    # Generate all illustrations
-    print("\n1. Generating illustrations...")
-    illustrations = generate_all_illustrations()
-    
-    # Process each HTML file
-    print("\n2. Adding illustrations to HTML files...")
-    
-    files_to_process = [
-        ('cheatsheets/cnn_architectures_cheatsheet.html', add_illustrations_to_cnn_architectures),
-        ('cheatsheets/resnet_cheatsheet.html', add_illustrations_to_resnet),
-        ('cheatsheets/inception_efficientnet_cheatsheet.html', add_illustrations_to_inception_efficientnet),
-        ('cheatsheets/vision_transformers_vit_cheatsheet.html', add_illustrations_to_vision_transformers),
-        ('cheatsheets/transformers_cheatsheet.html', add_illustrations_to_transformers),
-        ('cheatsheets/attention_mechanism_cheatsheet.html', add_illustrations_to_attention_mechanism),
-        ('cheatsheets/multi_head_attention_cheatsheet.html', add_illustrations_to_multi_head_attention),
-        ('cheatsheets/self_attention_cheatsheet.html', add_illustrations_to_self_attention),
-        ('cheatsheets/encoder_decoder_cheatsheet.html', add_illustrations_to_encoder_decoder),
-        ('cheatsheets/autoencoders_cheatsheet.html', add_illustrations_to_autoencoders),
-        ('cheatsheets/vae_cheatsheet.html', add_illustrations_to_vae),
-        ('cheatsheets/gan_cheatsheet.html', add_illustrations_to_gan),
-        ('cheatsheets/dcgan_conditional_gan_cheatsheet.html', add_illustrations_to_dcgan_conditional_gan),
-        ('cheatsheets/stylegan_architecture_cheatsheet.html', add_illustrations_to_stylegan_architecture),
-        ('cheatsheets/diffusion_models_cheatsheet.html', add_illustrations_to_diffusion_models),
-        ('cheatsheets/capsule_networks_cheatsheet.html', add_illustrations_to_capsule_networks),
-        ('cheatsheets/gpt_architectures_cheatsheet.html', add_illustrations_to_gpt_architectures),
-        ('cheatsheets/bert_language_models_cheatsheet.html', add_illustrations_to_bert_language_models),
-        ('cheatsheets/neural_architecture_patterns_cheatsheet.html', add_illustrations_to_neural_architecture_patterns),
-    ]
-    
-    success_count = 0
-    for filepath, add_func in files_to_process:
-        if process_html_file(filepath, add_func, illustrations):
-            success_count += 1
-    
-    print("\n" + "=" * 70)
-    print(f"Completed: {success_count}/{len(files_to_process)} files successfully updated")
-    print("=" * 70)
-
-if __name__ == '__main__':
-    main()
-
 def add_illustrations_to_gpt_architectures(html_content, illustrations):
     """Add illustrations to GPT Architectures cheatsheet."""
     
@@ -386,3 +339,50 @@ def add_illustrations_to_neural_architecture_patterns(html_content, illustration
                          html_content, count=1, flags=re.DOTALL)
     
     return html_content
+
+def main():
+    """Main function to add illustrations to all Neural Architecture cheatsheets."""
+    print("=" * 70)
+    print("Adding matplotlib illustrations to Neural Architecture cheatsheets")
+    print("=" * 70)
+    
+    # Generate all illustrations
+    print("\n1. Generating illustrations...")
+    illustrations = generate_all_illustrations()
+    
+    # Process each HTML file
+    print("\n2. Adding illustrations to HTML files...")
+    
+    files_to_process = [
+        ('cheatsheets/cnn_architectures_cheatsheet.html', add_illustrations_to_cnn_architectures),
+        ('cheatsheets/resnet_cheatsheet.html', add_illustrations_to_resnet),
+        ('cheatsheets/inception_efficientnet_cheatsheet.html', add_illustrations_to_inception_efficientnet),
+        ('cheatsheets/vision_transformers_vit_cheatsheet.html', add_illustrations_to_vision_transformers),
+        ('cheatsheets/transformers_cheatsheet.html', add_illustrations_to_transformers),
+        ('cheatsheets/attention_mechanism_cheatsheet.html', add_illustrations_to_attention_mechanism),
+        ('cheatsheets/multi_head_attention_cheatsheet.html', add_illustrations_to_multi_head_attention),
+        ('cheatsheets/self_attention_cheatsheet.html', add_illustrations_to_self_attention),
+        ('cheatsheets/encoder_decoder_cheatsheet.html', add_illustrations_to_encoder_decoder),
+        ('cheatsheets/autoencoders_cheatsheet.html', add_illustrations_to_autoencoders),
+        ('cheatsheets/vae_cheatsheet.html', add_illustrations_to_vae),
+        ('cheatsheets/gan_cheatsheet.html', add_illustrations_to_gan),
+        ('cheatsheets/dcgan_conditional_gan_cheatsheet.html', add_illustrations_to_dcgan_conditional_gan),
+        ('cheatsheets/stylegan_architecture_cheatsheet.html', add_illustrations_to_stylegan_architecture),
+        ('cheatsheets/diffusion_models_cheatsheet.html', add_illustrations_to_diffusion_models),
+        ('cheatsheets/capsule_networks_cheatsheet.html', add_illustrations_to_capsule_networks),
+        ('cheatsheets/gpt_architectures_cheatsheet.html', add_illustrations_to_gpt_architectures),
+        ('cheatsheets/bert_language_models_cheatsheet.html', add_illustrations_to_bert_language_models),
+        ('cheatsheets/neural_architecture_patterns_cheatsheet.html', add_illustrations_to_neural_architecture_patterns),
+    ]
+    
+    success_count = 0
+    for filepath, add_func in files_to_process:
+        if process_html_file(filepath, add_func, illustrations):
+            success_count += 1
+    
+    print("\n" + "=" * 70)
+    print(f"Completed: {success_count}/{len(files_to_process)} files successfully updated")
+    print("=" * 70)
+
+if __name__ == '__main__':
+    main()
