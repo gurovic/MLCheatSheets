@@ -69,14 +69,48 @@
 
 ---
 
-### 6. Выбор признаков (Feature Selection)
+### 6. Выбор признаков (Feature Selection) - Цикл упражнений
 
-**Описание:** Выбор наиболее значимых признаков на основе корреляции Пирсона с целевой переменной.
+**Описание:** Комплексный цикл упражнений по различным методам отбора признаков (Filter, Wrapper, Embedded).
 
-**Файлы:**
-- [Входные данные](exercises/feature_selection/input.csv)
-- [Условие задачи](exercises/feature_selection/task.md)
-- [Ответ](exercises/feature_selection/answer.csv)
+**Упражнения:**
+
+#### 6.1. Variance Threshold (Удаление низкодисперсных признаков)
+- [Входные данные](exercises/feature_selection/exercise1_variance_threshold/input.csv)
+- [Условие задачи](exercises/feature_selection/exercise1_variance_threshold/task.md)
+- [Ответ](exercises/feature_selection/exercise1_variance_threshold/answer.csv)
+
+#### 6.2. Mutual Information (Взаимная информация)
+- [Входные данные](exercises/feature_selection/exercise2_mutual_information/input.csv)
+- [Условие задачи](exercises/feature_selection/exercise2_mutual_information/task.md)
+- [Ответ](exercises/feature_selection/exercise2_mutual_information/answer.csv)
+
+#### 6.3. RFE - Recursive Feature Elimination
+- [Входные данные](exercises/feature_selection/exercise3_rfe/input.csv)
+- [Условие задачи](exercises/feature_selection/exercise3_rfe/task.md)
+- [Ответ](exercises/feature_selection/exercise3_rfe/answer.csv)
+
+#### 6.4. Lasso (L1 регуляризация)
+- [Входные данные](exercises/feature_selection/exercise4_lasso/input.csv)
+- [Условие задачи](exercises/feature_selection/exercise4_lasso/task.md)
+- [Ответ](exercises/feature_selection/exercise4_lasso/answer.csv)
+
+#### 6.5. Tree-based Feature Importance
+- [Входные данные](exercises/feature_selection/exercise5_tree_importance/input.csv)
+- [Условие задачи](exercises/feature_selection/exercise5_tree_importance/task.md)
+- [Ответ](exercises/feature_selection/exercise5_tree_importance/answer.csv)
+
+#### 6.6. Удаление коррелирующих признаков
+- [Входные данные](exercises/feature_selection/exercise6_remove_correlated/input.csv)
+- [Условие задачи](exercises/feature_selection/exercise6_remove_correlated/task.md)
+- [Ответ](exercises/feature_selection/exercise6_remove_correlated/answer.csv)
+
+#### 6.7. Корреляция с целевой переменной
+- [Входные данные](exercises/feature_selection/exercise7_correlation_target/input.csv)
+- [Условие задачи](exercises/feature_selection/exercise7_correlation_target/task.md)
+- [Ответ](exercises/feature_selection/exercise7_correlation_target/answer.csv)
+
+**См. также:** [README цикла упражнений](exercises/feature_selection/README.md)
 
 ---
 
