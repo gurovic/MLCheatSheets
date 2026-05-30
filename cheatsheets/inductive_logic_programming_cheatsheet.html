@@ -147,11 +147,11 @@ while есть uncovered positive examples:
     </ul>
     <table>
       <tr><th>Метрика</th><th>Формула</th></tr>
-      <tr><td>Accuracy</td><td>(p + n) / (p + n + P + N)</td></tr>
+      <tr><td>Accuracy</td><td>(p + (N - n)) / (P + N)</td></tr>
       <tr><td>Precision</td><td>p / (p + n)</td></tr>
-      <tr><td>Recall</td><td>p / (p + N)</td></tr>
+      <tr><td>Recall</td><td>p / P</td></tr>
     </table>
-    <p>где p — правильно покрытые +, n — неправильно покрытые −</p>
+    <p>где p — правильно покрытые +, n — неправильно покрытые −, P — общее число +, N — общее число −</p>
   </div>
 
   <div class="block">
