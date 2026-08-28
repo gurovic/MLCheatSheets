@@ -46,6 +46,25 @@
     th { background-color: #e6f0ff; text-align: left; padding: 4px 6px; font-weight: 600; }
     td { padding: 4px 6px; border-bottom: 1px solid #f0f4ff; }
     tr:nth-child(even) { background-color: #f8fbff; }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
   </style>
 </head>
 <body>
