@@ -26,7 +26,25 @@
       .container {
         column-count: 1;
       }
-    }.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px}h1{font-size:1.6em;color:#1a5fb4;text-align:center;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;color:#1a5fb4;margin:8px 0;border-bottom:1px solid #e0e7ff}code{background:#f0f4ff;padding:2px 4px}pre{background:#f0f4ff;padding:8px;border-radius:4px;font-size:0.84em}table{width:100%;border-collapse:collapse;font-size:0.82em}th{background:#e6f0ff;padding:4px}td{padding:4px;border-bottom:1px solid #f0f4ff}</style></head><body>
+    }.block{break-inside:avoid;margin-bottom:1.2em;padding:12px;background:white;border-radius:6px}h1{font-size:1.6em;color:#1a5fb4;text-align:center;column-span:all}.subtitle{text-align:center;color:#666;font-size:0.9em;margin-bottom:12px;column-span:all}h2{font-size:1.15em;color:#1a5fb4;margin:8px 0;border-bottom:1px solid #e0e7ff}code{background:#f0f4ff;padding:2px 4px}pre{background:#f0f4ff;padding:8px;border-radius:4px;font-size:0.84em}table{width:100%;border-collapse:collapse;font-size:0.82em}th{background:#e6f0ff;padding:4px}td{padding:4px;border-bottom:1px solid #f0f4ff}@media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      @page {
+        size: A4 landscape;
+        margin: 10mm;
+      }
+    }
+
+    @media print {
+      .container { column-gap: 12px; }
+      .block { box-shadow: none; }
+      code, pre, table { font-size: 0.78em; }
+      h1 { font-size: 1.4em; }
+      h2 { font-size: 1em; }
+    }
+  </style></head><body>
 <div class="container"><h1>🔍 Стратегии поиска гиперпараметров</h1>
 <div class="subtitle">📅 Январь 2026</div>
 <div class="block"><h2>1. Grid Search</h2><pre><code>from sklearn.model_selection import GridSearchCV
